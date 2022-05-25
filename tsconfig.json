@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "lib": ["ES5", "ES6", "DOM"],
+        "removeComments": false,
+        "sourceMap": true,
+        "alwaysStrict": true,
+        "outDir": "./dist/"
+    },
+    "include": [
+        "./**/*.ts"
+    ]
+}
