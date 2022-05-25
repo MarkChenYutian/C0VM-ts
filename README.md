@@ -2,21 +2,28 @@
 
 ## Compile Project
 
-```
+The entry point of this projcet is at `/src/main.ts`.
+
+The project is setup to be compiled to `CommonJS` using `webpack`.
+
+```bash
 $ npx webpack
 ```
 
-## Memory Allocator
+## Heap Allocator
 
 > See `./utility/memory.ts`
 
 ```typescript
-interface VM_Memory {
+interface C0HeapAllocator {
+		// Basic Operations
     malloc(size: number): C0Pointer
     free(ptr: C0Pointer): void
-    // Clean up the whole heap memory.
+  	// Clear the whole heap memory, called when C0VM restarts
     clear(): void
-    // Used for debug, will return the read-only memory pool ArrayBuffer
+
+  	// Return the memory pool as ArrayBuffer - used for debug only
+  	// Should not change the memory by altering the ArrayBuffer here
     debug_getMemPool(): ArrayBuffer
     // Operations on Heap Memory
     cmstore(ptr: C0Pointer, value: DataView): void
@@ -28,29 +35,70 @@ interface VM_Memory {
     amstore(ptr: C0Pointer, stored_ptr: C0Pointer): void
     amload(ptr: C0Pointer): DataView
 }
+
+// Factory Function for HeapAllocator
+export function createHeap(allocator: C0HeapAllocatorConstructor, size ?: number): C0HeapAllocator
 ```
 
 In C0VM.ts, we use a `ArrayBuffer` to simulate the heap memory of a C program.
 
-Since we are following the C's convention (`0x0000000000000000` is a `NULL`pointer), the memory address at `0x00` is reserved and never touched. Allocator will start to allocate memory from `0x01`.
+Since we are following the C's convention (`0x0000000000000000` is a `NULL`pointer), the memory address at `0x00` is reserved and never touched. 
+
+### VM_Memory
+
+```typescript
+export class VM_Memory implements C0HeapAllocator {
+    private memory_pool: ArrayBuffer;
+    private heap_top_address: number;
+    private memory_size: number;
+
+    constructor(size?: number);
+
+    malloc(size: number): C0Pointer;
+    free(ptr: C0Pointer): void;
+    clear(): void;
+
+    debug_getMemPool(): ArrayBuffer;
+
+    cmstore(ptr: C0Pointer, value: DataView): void;
+    cmload(ptr: C0Pointer): DataView;
+    imstore(ptr: C0Pointer, value: DataView): void;
+    imload(ptr: C0Pointer): DataView;
+    amstore(ptr: C0Pointer, stored_ptr: DataView): void;
+    amload(ptr: C0Pointer): DataView;
+}
+```
+
+Written in `./src/memory.ts`, the `VM_Memory` class is a naive implementation to the `C0HeapAllocator` interface.
+
+The private property `heap_top_address` will keep track of the boundary between allocated and unallocated parts of the memory pool. Whenever a `malloc` is called to allocate `n` bytes of heap memory, the allocator will give the memory segment `[heap_top, heap_top + n)`  to the caller and make `heap_top += n`.
+
+Since `0x00` is reserved for `NULL`, allocator will start to allocate memory from `0x01`.
+
+>  :construction: `free` is not implemented in this naive implementation! Currently, calling the `free` will only write zero to the memory block the pointer is pointing at. Memory will NOT be re-claimed or re-allocated anyway.
+>
+> In the future, we may implement a fancy allocator which will re-claim the freed memory.
 
 ## Data Types
 
-In `C0VM.ts`, **everything** is eventually a segment of `ArrayBuffer`.
+In `C0VM.ts`, **everything** is eventually a segment of `ArrayBuffer`. We use `DataView` to wrap up the `ArrayBuffer` with two benefits:
+
+* `DataView` provides an interface that allow us to manipulate the `ArrayBuffer` without difficulty
+* `DataView` allow us to create alias to a specific segment of `ArrayBuffer`.
 
 ### C0Pointer `*t`
 
-`C0Pointer` is a `bytearray` with length `8` (64-bit). However, different from what C actually do to pointer, we only use the first `6` bytes to store the memory address. The remaining `2` bytes are used to annotate the size of allocated memory segment. This allow C0VM.ts to check memory-access out of bound and throw error when dereferencing such pointer.
+`C0Pointer` is a `DataView` with byte-length of `8` (64-bit). However, different from what C actually do to pointer, we only use the first `6` bytes to store the memory address. The remaining `2` bytes are used to annotate the size of allocated memory segment. This allow C0VM.ts to check memory-access out of bound and throw error when dereferencing (or even creating!) such pointer.
 
 | Start Index (include) | End Index (exclude) | Representation                                               |
 | --------------------- | ------------------- | ------------------------------------------------------------ |
-| `0`                   | `4`                 | `Uint32` - Address of Memory block this pointer is pointing to |
-| `4`                   | `6`                 | `Uint16` - Offset of the pointer on the pointed memory block |
-| `6`                   | `8`                 | `Uint16` - The size of memory block                          |
+| `0`                   | `4`                 | `Uint32` - (address) Address of Memory block this pointer is pointing to |
+| `4`                   | `6`                 | `Uint16` - (offset) Offset of the pointer on the pointed memory block |
+| `6`                   | `8`                 | `Uint16` - (size) The size of memory block                   |
 
+> :spiral_notepad: *Explanation:* A pointer points at allocated memory segment `[address, address + size)` with precise address as `address + offset`.
 
-
-:warning: Note: By C convention, if a pointer is `0x0000000000000000` (64-bit zero), we say this pointer is a `NULL` Pointer.
+>  :warning: Note: By C convention, if a pointer is `0x0000000000000000` (64-bit zero), we say this pointer is a `NULL` Pointer. In C0VM.ts, if the first 32-bits of a pointer are all zero, we can assert it is `NULL`.
 
 A helper function `read_ptr` is defined in `utility/pointer_ops.ts`. Giving the function a `C0Pointer` (which is, in fact, only an alias of `DataView`), it will return the `address`, `offset` and `size` of pointer.
 
@@ -64,10 +112,10 @@ In C0VM Writeup, these 4-bytes values are all annotated as `w32`.
 
 For any type `t` with size $s$, we can create an array of it. The array is described by structure like this
 
-| Starting Bit Index | Ending Bit Index | Meaning                           |
-| ------------------ | ---------------- | --------------------------------- |
-| `0`                | `4`              | Size of each element of the array |
-| `4`                | `4 + n * s`      | An `n`-element array              |
+| Starting Index (Include) | Ending Bit Index (Exclude) | Meaning                           |
+| ------------------------ | -------------------------- | --------------------------------- |
+| `0`                      | `4`                        | Size of each element of the array |
+| `4`                      | `4 + n * s`                | An `n`-element array              |
 
 ## Arithmetic Operations
 
@@ -109,7 +157,7 @@ The list of native functions is listed below:
 
 > :white_check_mark: - Currently Support
 >
-> :hourglass: - Development in Progress
+> :hourglass: - Development in Progress, will be supported
 >
 > :x: - No Recent Plan for implementation
 
@@ -122,7 +170,7 @@ The list of native functions is listed below:
 | NATIVE_ARGS_PARSE  | :hourglass: |
 | NATIVE_ARGS_STRING | :hourglass: |
 
-#### Standard IO
+### Standard IO
 
 | Native Functions | Support?    |
 | ---------------- | ----------- |
@@ -135,11 +183,11 @@ The list of native functions is listed below:
 | NATIVE_PRINTLN   | :hourglass: |
 | NATIVE_READLINE  | :hourglass: |
 
-#### Curses :x:
+### Curses :x:
 
-> There are no recent plans to implement native functions in this category (`INDEX = [12, 54]`)
+> There are no recent plans to implement native functions in this category (`NATIVE_INDEX = [12, 54]`)
 
-#### Dub
+### Double Arithmetic
 
 | Native Functions | Support?    |
 | ---------------- | ----------- |
@@ -152,11 +200,11 @@ The list of native functions is listed below:
 | NATIVE_ITOD      | :hourglass: |
 | NATIVE_PRINT_DUB | :hourglass: |
 
-#### File IO :x:
+### File IO :x:
 
-> There are no recent plans to implement native functions in this category (`INDEX=[62, 67)`)
+> There are no recent plans to implement native functions in this category (`NATIVE_INDEX=[62, 67)`)
 
-#### Float Points
+### Float Arithmetic
 
 | Native Functions | Support?    |
 | ---------------- | ----------- |
@@ -171,20 +219,11 @@ The list of native functions is listed below:
 | NATIVE_PRINT_HEX | :hourglass: |
 | NATIVE_PRINT_INT | :hourglass: |
 
-#### Image
+### Image :x:
 
-| Native Functions      | Support?    |
-| --------------------- | ----------- |
-| NATIVE_IMAGE_CLONE    | :hourglass: |
-| NATIVE_IMAGE_CREATE   | :hourglass: |
-| NATIVE_IMAGE_DATA     | :hourglass: |
-| NATIVE_IMAGE_HEIGHT   | :hourglass: |
-| NATIVE_IMAGE_LOAD     | :hourglass: |
-| NATIVE_IMAGE_SAVE     | :hourglass: |
-| NATIVE_IMAGE_SUBIMAGE | :hourglass: |
-| NATIVE_IMAGE_WIDTH    | :hourglass: |
+> There are no recent plans to implement native functions in this category (`NATIVE_INDEX = [77, 85)`)
 
-#### Parse String
+### Parse String
 
 | Native Functions    | Support?    |
 | ------------------- | ----------- |
@@ -195,7 +234,7 @@ The list of native functions is listed below:
 | NATIVE_PARSE_INTS   | :hourglass: |
 | NATIVE_PARSE_TOKENS | :hourglass: |
 
-#### String
+### String Operations
 
 | Native Functions             | Support?    |
 | ---------------------------- | ----------- |
