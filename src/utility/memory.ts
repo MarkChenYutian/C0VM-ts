@@ -10,15 +10,29 @@
 import { c0_memory_error, vm_error } from "./errors";
 import { read_ptr } from "./pointer_ops";
 
+/**
+ * Naive Heap Memory Allocator that mimic the memory manegement in C.
+ * 
+ * Didn't implement Garbage Collection. The allocator will try to 
+ * allocate a segment straignt from the heap top.
+ */
 export class VM_Memory implements C0HeapAllocator {
     private memory_pool: ArrayBuffer;
     private heap_top_address: number;
     private memory_size: number;
 
+    /**
+     * Construct a VM Heap Memory Space
+     * @param size Size (in bytes) of the VM Heap Space
+     * @throws `vm_error` when `size <= 0`
+     * @throws `vm_error` when `size >= 0xFFFFFFFE` (since `0x00` is reserved for NULL)
+     */
     constructor(size?: number) {
-        
-        if (size >= 0xFFFFFFE) {
-            throw new c0_memory_error(`Unable to initialize memory greater than 0xFFFFFFFE`);
+        if (size >= 0xFFFFFFFE) {
+            throw new vm_error(`Unable to initialize memory greater than 0xFFFFFFFE bytes`);
+        }
+        if (size <= 0) {
+            throw new vm_error(`Unable to initialize memory smaller than 1 byte`);
         }
         // Add 1 here since the address 0x00 is reserved for NULL
         // Initialize 50kb of memory by default

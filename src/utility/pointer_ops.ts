@@ -1,5 +1,17 @@
 import { vm_error, c0_memory_error } from "./errors";
 
+/**
+ * 
+ * @param ptr C0Pointer to be interpreted
+ * @returns A tuple in form (address, offset, mem_blocksize)
+ * 
+ * address - the start address of segment that pointer is pointing to
+ * offset - the offset of pointer from the address
+ * mem_blocksize - the size of allocated memory block
+ * 
+ * [address, address + mem_blocksize) is the allocated memory segment
+ * `address + offset` is the actual position that the pointer is pointing to
+ */
 export function read_ptr(ptr: C0Pointer): [number, number, number] {
     if (ptr.byteLength < 8) {
         throw new vm_error(`Invalid Pointer ${ptr} is dereferenced.`);
@@ -13,11 +25,22 @@ export function read_ptr(ptr: C0Pointer): [number, number, number] {
     return [address, offset, block_size];
 }
 
+
+/**
+ * Shift the pointer either forward (positive offset) or backward (negative offset)
+ * @param ptr Pointer to be manipulated
+ * @param offset The additional offset to be appplied on the pointer (can be negative/positive)
+ * @returns A new pointer with offset applied on it
+ * @throws `c0_memory_error` when applying such offset will let a pointer point outside of the current memory block.
+ * That is, pointing to somewhere not in interval [address, address + block_size)
+ */
 export function shift_ptr(ptr: C0Pointer, offset: number): C0Pointer {
     const [address, original_offset, size] = read_ptr(ptr);
     const new_offset = original_offset + offset;
-    if (new_offset > size) {
-        throw new c0_memory_error(`Tried to perform +${offset} shift on pointer @${address}+${original_offset}. However, the allocated segment is only [${address}, ${address + size})`)
+    if (new_offset > size || new_offset < 0) {
+        throw new c0_memory_error(
+            `Tried to perform ${offset} shift on pointer @${address}+${original_offset}. However, the allocated segment is only [${address}, ${address + size})`
+        );
     }
     const new_ptr: C0Pointer = new DataView(new ArrayBuffer(8));
     new_ptr.setUint32(0, address);

@@ -75,20 +75,37 @@ For any type `t` with size $s$, we can create an array of it. The array is descr
 
 Since the JavaScript only have `number` type, which is an abstraction of `float`/`int`. We use functions in `arithmetic.ts` to perform basic arithmetic operations like `+`, `-`, `*` or `/`.
 
-These functions will *try its best* to mimic the overflow behavior of C program. However, **it is not perfect**. A specific example is shown below:
-
+```typescript
+export function c_add(x: DataView, y: DataView): DataView;	// x + y
+export function c_sub(x: DataView, y: DataView): DataView;	// x - y
+export function c_mul(x: DataView, y: DataView, Issue_Handler: MessageEmitter): DataView;	// x * y
+export function c_div(x: DataView, y: DataView): DataView;	// x / y
+export function c_lsh(x: DataView, y: DataView): DataView;	// x << y
+export function c_rsh(x: DataView, y: DataView): DataView;	// x >> y
 ```
-2147483647 * 25165823 = 2122317824 (JS)
-2147483647 * 25165823 = 2122317825 (C)
-```
 
-This is due to the **precision lost** problem of `float`. When such precision lost is detected, C0VM.ts will issue a warning to the user interface *but will NOT interrupt the execution*.
+These functions will *try its best* to mimic the overflow behavior of C program. 
+
+> **What is `Issue_Handler` in `c_mul`'s header'?**
+>
+> These functions are not perfect. A specific example is shown below:
+>
+> ```
+> cmul(2147483647, 25165823) = 2122317824 (JS)
+> 2147483647 * 25165823 = 2122317825 (C)
+> ```
+>
+> This is due to the **precision lost** problem of `float`. When such precision lost is detected, C0VM.ts will issue a warning to the user interface *but will NOT interrupt the execution*.
+>
+> However, we do want the user to realize such imprecise calculation. Therefore, we will use `IssueHandler` to emit a **warning** to user. The `IssueHandler` is an object that follows the `MessageEmitter` interface.
+>
+> By passing in different implementation of `MessageEmitter`, we may have one of the following behaviors: 1) log a warning in the console, 2) popup a warning in the GUI, etc.
 
 ## Native Functions
 
-In original C0VM, a bunch of native functions are implemented in Standard ML and connected to C0VM to perform some basic functions that interact with system (e.g. receive user input, etc.).
+In original C0VM, a bunch of native functions are implemented in C and connected to C0VM to support the system calls (e.g. receive user input, etc.).
 
-The list of native functions are listed below:
+The list of native functions is listed below:
 
 > :white_check_mark: - Currently Support
 >

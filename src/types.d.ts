@@ -15,6 +15,22 @@ type C0Native = {
     readonly f: Function;
 };
 
+type C0ByteCode = {
+    version: number;
+    /* Int Constant Pool */
+    intCount: number;
+    intPool: Int32Array;
+    /* String Constant Pool */
+    stringCount: number;
+    stringPool: Uint8Array;
+    /* Function Pool */
+    functionCount: number;
+    functionPool: C0Function[];
+    /* Native Functions */
+    nativeCount: number;
+    nativePool: C0Native[];
+};
+
 // Memory System that allows c-like ptr
 type C0HeapMemory = ArrayBuffer;
 
