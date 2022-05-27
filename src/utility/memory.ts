@@ -25,28 +25,28 @@ export class VM_Memory implements C0HeapAllocator {
      * Construct a VM Heap Memory Space
      * @param size Size (in bytes) of the VM Heap Space
      * @throws `vm_error` when `size <= 0`
-     * @throws `vm_error` when `size >= 0xFFFFFFFE` (since `0x00` is reserved for NULL)
+     * @throws `vm_error` when `size >= MEM_POOL_MAX_SIZE`
      */
     constructor(size?: number) {
-        if (size >= 0xFFFFFFFE) {
+        if (size >= MEM_POOL_MAX_SIZE) {
             throw new vm_error(`Unable to initialize memory greater than 0xFFFFFFFE bytes`);
         }
-        if (size <= 0) {
+        if (size <= MEM_POOL_MIN_SIZE) {
             throw new vm_error(`Unable to initialize memory smaller than 1 byte`);
         }
         // Add 1 here since the address 0x00 is reserved for NULL
         // Initialize 50kb of memory by default
-        this.memory_size = (size ? size : 1024 * 50) + 1;
+        this.memory_size = (size ? size : MEM_POOL_DEFAULT_SIZE) + 1;
         this.memory_pool = new ArrayBuffer(this.memory_size);
         this.heap_top_address = 0x01;
     }
 
     malloc(size: number): C0Pointer {
-        if (size < 0 || this.heap_top_address + size > this.memory_pool.byteLength) {
+        if (size < 0 || this.heap_top_address + size > this.memory_size) {
             throw new c0_memory_error(`Unable to allocate ${size} bytes of memory.`);
         }
-        if (size > 0xFFFF) {
-            throw new c0_memory_error(`Unable to allocate memory block bigger than 0xFFFF (65535)`);
+        if (size > MEM_BLOCK_MAX_SIZE) {
+            throw new c0_memory_error(`Unable to allocate memory block bigger than ${MEM_BLOCK_MAX_SIZE}`);
         }
         const ptr = new DataView(new ArrayBuffer(8));
         ptr.setUint32(0, this.heap_top_address);
@@ -123,6 +123,7 @@ export class VM_Memory implements C0HeapAllocator {
         if (value.byteLength < 4) {
             throw new vm_error("Not enough value to store!");
         }
+        //TODO: mark all the debug code
         if (size - offset < 4) {
             throw new c0_memory_error(
                 `Tried to write 4 bytes @${address + offset}, but segment is only allocated as [${address}, ${address + size})`
@@ -183,6 +184,18 @@ export class VM_Memory implements C0HeapAllocator {
         return result;
     }
 
+    deref(ptr: DataView, block_size: number): DataView {
+        const [address, offset, size] = read_ptr(ptr);
+        if (address === 0) {
+            throw new c0_memory_error("Dereferencing NULL Pointer");
+        }
+        if (offset + block_size > size) {
+            throw new c0_memory_error("Memory access out of bound");
+        }
+        return new DataView(
+            this.memory_pool, address + offset, block_size
+        );
+    }
 }
 
 /**

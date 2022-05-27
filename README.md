@@ -34,6 +34,8 @@ interface C0HeapAllocator {
 
     amstore(ptr: C0Pointer, stored_ptr: C0Pointer): void
     amload(ptr: C0Pointer): DataView
+
+    deref(ptr: C0Pointer, block_size: number): DataView
 }
 
 // Factory Function for HeapAllocator
@@ -66,10 +68,12 @@ export class VM_Memory implements C0HeapAllocator {
     imload(ptr: C0Pointer): DataView;
     amstore(ptr: C0Pointer, stored_ptr: DataView): void;
     amload(ptr: C0Pointer): DataView;
+
+    deref(ptr: DataView, block_size: number): DataView
 }
 ```
 
-Written in `./src/memory.ts`, the `VM_Memory` class is a naive implementation to the `C0HeapAllocator` interface.
+Written in `./utility/memory.ts`, the `VM_Memory` class is a naive implementation to the `C0HeapAllocator` interface.
 
 The private property `heap_top_address` will keep track of the boundary between allocated and unallocated parts of the memory pool. Whenever a `malloc` is called to allocate `n` bytes of heap memory, the allocator will give the memory segment `[heap_top, heap_top + n)`  to the caller and make `heap_top += n`.
 
@@ -112,7 +116,7 @@ In C0VM Writeup, these 4-bytes values are all annotated as `w32`.
 
 For any type `t` with size $s$, we can create an array of it. The array is described by structure like this
 
-| Starting Index (Include) | Ending Bit Index (Exclude) | Meaning                           |
+| Starting Index (Include) | Ending Byte Index (Exclude) | Meaning                           |
 | ------------------------ | -------------------------- | --------------------------------- |
 | `0`                      | `4`                        | Size of each element of the array |
 | `4`                      | `4 + n * s`                | An `n`-element array              |
@@ -236,21 +240,21 @@ The list of native functions is listed below:
 
 ### String Operations
 
-| Native Functions             | Support?    |
-| ---------------------------- | ----------- |
-| NATIVE_CHAR_CHR              | :hourglass: |
-| NATIVE_CHAR_ORD              | :hourglass: |
-| NATIVE_STRING_CHARAT         | :hourglass: |
-| NATIVE_STRING_COMPARE        | :hourglass: |
-| NATIVE_STRING_EQUAL          | :hourglass: |
-| NATIVE_STRING_FROM_CHARARRAY | :hourglass: |
-| NATIVE_STRING_FROMBOOL       | :hourglass: |
-| NATIVE_STRING_FROMCHAR       | :hourglass: |
-| NATIVE_STRING_FROMINT        | :hourglass: |
-| NATIVE_STRING_JOIN           | :hourglass: |
-| NATIVE_STRING_LENGTH         | :hourglass: |
-| NATIVE_STRING_SUB            | :hourglass: |
-| NATIVE_STRING_TERMINATED     | :hourglass: |
-| NATIVE_STRING_TO_CHARARRAY   | :hourglass: |
-| NATIVE_STRING_TOLOWER        | :hourglass: |
+| Native Functions             | Support?           |
+| ---------------------------- | ------------------ |
+| NATIVE_CHAR_CHR              | :hourglass:        |
+| NATIVE_CHAR_ORD              | :hourglass:        |
+| NATIVE_STRING_CHARAT         | :hourglass:        |
+| NATIVE_STRING_COMPARE        | :white_check_mark: |
+| NATIVE_STRING_EQUAL          | :white_check_mark: |
+| NATIVE_STRING_FROM_CHARARRAY | :hourglass:        |
+| NATIVE_STRING_FROMBOOL       | :hourglass:        |
+| NATIVE_STRING_FROMCHAR       | :hourglass:        |
+| NATIVE_STRING_FROMINT        | :hourglass:        |
+| NATIVE_STRING_JOIN           | :hourglass:        |
+| NATIVE_STRING_LENGTH         | :hourglass:        |
+| NATIVE_STRING_SUB            | :hourglass:        |
+| NATIVE_STRING_TERMINATED     | :hourglass:        |
+| NATIVE_STRING_TO_CHARARRAY   | :hourglass:        |
+| NATIVE_STRING_TOLOWER        | :hourglass:        |
 

@@ -113,5 +113,13 @@ interface C0HeapAllocator {
      * @returns A DataView that has byte length of 8.
      */
     amload(ptr: C0Pointer): DataView
+
+    /**
+     * Returns the memory segment [ptr, end_of_segment)
+     * @param ptr The pointer points to the memory location
+     * @param block_size The size to be returned
+     * @returns A **reference/alias** of the specific segment of the memory pool.
+     */
+    deref(ptr: C0Pointer, block_size: number): DataView
 }
 

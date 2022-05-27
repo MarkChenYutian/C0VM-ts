@@ -1,18 +1,43 @@
 type C0Function = {
-    numVars: number;
-    varName: string[];
-    numArgs: number;
-    size: number;
+    // function name, inferenced from comments in .bc0 file
     name: string;
+
+    // Number of local vairables in function
+    numVars: number;
+    // Number of arguments the function receives        
+    numArgs: number;
+
+    // name of local variables, inferenced from comments in .bc0 file
+    varName: string[];
+    
+    
+    // the length of code of the function
+    size: number;
+    // bytecodes of the function
     code: Uint8Array;
+
+    /**
+     * the mapping between the bytecode index and the comment
+     * Note: only the opcode's bytecode will have mapping. For instance
+     * if there's 
+     * 
+     * bipush 00 01 # something
+     * 
+     * then "something" as a reference will only be mapped from the index of bipush
+     */
+    comment: Map<number, CodeComment>;
 };
+
+type CodeComment = {
+    dataType?: "char" | "boolean" | "int"
+}
 
 type C0Native = {
     numArgs: number;
     // functionIndex: number;
     readonly functionType: C0NativeFuncType;
     // name: number;
-    readonly f: Function;
+    readonly f: (mem: C0HeapAllocator, ...args: C0Value[]) => C0Value;
 };
 
 type C0ByteCode = {
@@ -31,20 +56,29 @@ type C0ByteCode = {
     nativePool: C0Native[];
 };
 
-// Memory System that allows c-like ptr
-type C0HeapMemory = ArrayBuffer;
 
-// C0Pointer = [addr: u32, offset: u32]
+/**
+ * C0Pointer = ArrayBuffer(8)
+ * C0Pointer = <addr: u32, offset: u16, size: u16>
+ * 
+ * The function to check NULL ptr is defined in ./utility/pointer_ops.ts
+ */
 type C0Pointer = DataView;
-// Note: a C0 Pointer is NULL when ptr.getBigUint64() === 0n is true
+
 
 type C0Value = {
     class: "value" | "ptr";
-    type: "<unknown>" | "int" | "char" | "boolean"; // Preserved for future use
+    // type:
+    // Preserved for the visualization part - we need to know the 
+    // type to display corresponding value.
+    type: "<unknown>" | "int" | "string" | "char" | "boolean" | "struct"; 
     value: DataView;
 }
 
-// Enum Types for C0VM
+type VM_OperandStack = C0Value[];
+type VM_LocalVariables = C0Value[];
+
+// Enum Types for C0VM Instructions
 type OpCode =
     | 0x60 // IADD
     | 0x7e // IAND
@@ -90,6 +124,7 @@ type OpCode =
     | 0xb7 // INVOKENATIVE
     | 0xb0; // RETURN
 
+// use_official name instead of internal name.
 type C0NativeFuncType =
     "NATIVE_ARGS_FLAG"
     | "NATIVE_ARGS_INT"

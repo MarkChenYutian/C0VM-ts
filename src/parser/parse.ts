@@ -1,6 +1,7 @@
-import { bc0_format_error } from "../utility/errors";
-import { nativeFuncLoader } from "../native/native_funcs";
+import { bc0_format_error, vm_error } from "../utility/errors";
+import { nativeFuncLoader } from "../native/native_interface";
 
+//TODO: use regex instead of hardcoding
 /**
  * Parse the bc0 text into byte arrays, load Native Functions from Native Pool
  * @param raw_file A .bc0 string compiled by cc0 with -b flag
@@ -79,6 +80,16 @@ export default function parse(raw_file: string): C0ByteCode {
         const funcSize = parseInt(funcLines[3].split("#")[0].trim().replace(" ", ""), 16);
 
         // Extract variable Names
+        /**
+         * TODO: constraint propagation
+         * C0Value - type
+         * if type is <unknown>, depending on the comment, update the type
+         * 
+         * f(x) => x + 1, g(x) => x
+         * 
+         * when parsing, keep dict, do type inference
+         * 
+         */
         const varNames = Array(funcNumVars).fill("<anonymous>");
         let funcCode: number[] = [];
         for (let lineNum = 4; lineNum < funcLines.length; lineNum++) {
@@ -98,6 +109,36 @@ export default function parse(raw_file: string): C0ByteCode {
                 }
             }
         }
+        // Extract DataType from bipush comments
+        let code_byte_counter = 0;
+
+        const comment_mapping = new Map<number, CodeComment>();
+        const int_comment_regex = /\d+/;
+        const bool_comment_regex = /(true)|(false)/;
+        const char_comment_regex = /'.*'/;
+
+        for (let lineNum = 4; lineNum < funcLines.length; lineNum++) {
+            const [lineBytes, opcodeName, comment] = funcLines[lineNum].split("#")
+                .map((elem) => elem.trim());
+            if (opcodeName.startsWith("bipush")) {
+                let type: "int" | "boolean" | "char";
+                if (int_comment_regex.test(comment)) {
+                    type = "int";
+                } else if (bool_comment_regex.test(comment)) {
+                    type = "boolean";
+                } else if (char_comment_regex.test(comment)) {
+                    type = "char";
+                } else {
+                    throw new vm_error("Failed to inference value type from bipush comment:\n" + comment);
+                }
+                comment_mapping.set(code_byte_counter, 
+                    {
+                        dataType: type
+                    }
+                );
+            }
+            code_byte_counter += lineBytes.split(" ").length;
+        }
 
         functionPool.push({
             name: funcName,
@@ -105,10 +146,10 @@ export default function parse(raw_file: string): C0ByteCode {
             numArgs: funcNumArgs,
             numVars: funcNumVars,
             varName: varNames,
-            code: new Uint8Array(funcCode)
+            code: new Uint8Array(funcCode),
+            comment: comment_mapping
         });
     }
-    // console.log("Function Pool: \n", functionPool, "\n");
 
 
     /* Load Native Pool */
@@ -124,8 +165,6 @@ export default function parse(raw_file: string): C0ByteCode {
     ).map(
         row => nativeFuncLoader(row[1], row[0])
     )
-    // console.log("Native Pool Count:", nativeCount);
-    // console.log("Native Pool:\n" + nativeFuncs);
     if (nativeFuncs.length != nativeCount) {
         throw new bc0_format_error();
     }

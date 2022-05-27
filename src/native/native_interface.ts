@@ -1,4 +1,6 @@
+import { cvt_c0_value } from "../utility/c0_value";
 import { vm_instruct_error } from "../utility/errors";
+import * as StringNative from "./native_strings";
 
 /**
  * Load the C0Native Functions from bytecode to C0VM.
@@ -286,14 +288,18 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_STRING_COMPARE",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem, arg1, arg2) => {
+                    return cvt_c0_value(StringNative.c0_string_compare(mem, arg1, arg2));
+                }
             }
         }
         case 95: {
             return {
                 functionType: "NATIVE_STRING_EQUAL",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem, arg1, arg2) => {
+                    return cvt_c0_value(StringNative.c0_string_equal(mem, arg1, arg2));
+                }
             }
         }
         case 96: {

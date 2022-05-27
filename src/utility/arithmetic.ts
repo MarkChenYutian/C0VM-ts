@@ -16,7 +16,7 @@ function read_i32_with_check(x: DataView): number {
 }
 
 /**
- * Computes `x + y` with C's behavior
+ * Computes `x + y` with C's behavior when -fwrap flag is on
  * @param x The first 4 bytes of `x` will be interpreted as an i32
  * @param y The first 4 bytes of `y` will be interpreted as an i32
  * @returns `A dataview with length 4 that stores x + y`, following C's overflow behavior with `-fwrap` flag on gcc.
@@ -32,7 +32,7 @@ export function c_add(x: DataView, y: DataView): DataView {
 
 
 /**
- * Computes `x - y` with C's behavior
+ * Computes `x - y` with C's behavior when -fwrap flag is on
  * @param x The first 4 bytes of `x` will be interpreted as an i32
  * @param y The first 4 bytes of `y` will be interpreted as an i32
  * @returns A dataview with length 4 that stores `x - y`, following C's overflow behavior with `-fwrap` flag on gcc.
@@ -47,7 +47,7 @@ export function c_sub(x: DataView, y: DataView): DataView {
 }
 
 /**
- * Computes `x * y` with C's behavior
+ * Computes `x * y` with C's behavior when -fwrap flag is on
  * @param x The first 4 bytes of `x` will be interpreted as an i32
  * @param y The first 4 bytes of `y` will be interpreted as an i32
  * @returns A dataview with length 4 that stores `x * y`, following C's overflow behavior with `-fwrap` flag on gcc.
@@ -64,7 +64,9 @@ export function c_mul(x: DataView, y: DataView, Issue_Handler: MessageEmitter): 
         Issue_Handler.warn(
             "Inevitable Precision Lost Detected",
             `When calculating ${x} * ${y}, inevitable precison lost is very likely to happened since its value is too big for JavaScript to handle. The result might be inaccurate.`
-        )
+        );
+        // adding a fall-back here?
+        // TODO: helper function here
     }
     const res_data = new DataView(new ArrayBuffer(4));
     res_data.setInt32(0, res);
@@ -73,7 +75,7 @@ export function c_mul(x: DataView, y: DataView, Issue_Handler: MessageEmitter): 
 
 
 /**
- * Computes `x / y` with C's behavior
+ * Computes `x / y` with C's behavior when -fwrap flag is on
  * @param x The first 4 bytes of `x` will be interpreted as an i32
  * @param y The first 4 bytes of `y` will be interpreted as an i32
  * @returns A dataview with length 4 that stores `x / y`, following C's overflow behavior with `-fwrap` flag on gcc.
@@ -93,7 +95,7 @@ export function c_div(x: DataView, y: DataView): DataView {
 
 
 /**
- * Computes `x << y` with C's behavior
+ * Computes `x << y` with C's behavior when -fwrap flag is on
  * @param x The first 4 bytes of `x` will be interpreted as an i32
  * @param y The first 4 bytes of `y` will be interpreted as an i32
  * @returns A dataview with length 4 that stores `x << y`, following C's overflow behavior with `-fwrap` flag on gcc.
@@ -113,7 +115,7 @@ export function c_lsh(x: DataView, y: DataView): DataView {
 
 
 /**
- * Computes `x >> y` with C's behavior
+ * Computes `x >> y` with C's behavior when -fwrap flag is on
  * @param x The first 4 bytes of `x` will be interpreted as an i32
  * @param y The first 4 bytes of `y` will be interpreted as an i32
  * @returns A dataview with length 4 that stores `x >> y`, following C's overflow behavior with `-fwrap` flag on gcc.
