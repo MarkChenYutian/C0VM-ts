@@ -55,7 +55,7 @@ interface C0HeapAllocator {
     /**
      * Used for debug, will return the read-only memory pool ArrayBuffer
      */
-    debug_getMemPool(): ArrayBuffer
+    debug_getMemPool(): ArrayBuffer | undefined
     // Operations on Heap Memory
     /**
      * Write 1 byte of data into the heap memory.

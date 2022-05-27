@@ -6,14 +6,14 @@ export function cvt_c0_value(value: boolean | number | string): C0Value{
         case "boolean":
             view.setUint32(0, value ? 1 : 0);
             return ({
-                class: "value",
+                vm_type: "value",
                 type: "boolean",
                 value: view
             });
         case "number":
             view.setUint32(0, value);
             return ({
-                class: "value",
+                vm_type: "value",
                 type: "int",
                 value: view
             });
@@ -25,9 +25,17 @@ export function cvt_c0_value(value: boolean | number | string): C0Value{
             }
             view.setUint8(0, ascii_code);
             return ({
-                class: "value",
+                vm_type: "value",
                 type: "string",
                 value: view
             });
     }
+}
+
+export function build_c0_value(value: DataView, vm_type: C0ValueVMType, t?: C0ValueType): C0Value {
+    return {
+        value: value,
+        type: t ? "<unknown>" : t,
+        vm_type: vm_type
+    };
 }

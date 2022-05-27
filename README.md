@@ -1,13 +1,17 @@
 # C0VM.ts Documentation
 
-## Compile Project
+## Compile & Execute Project
 
 The entry point of this projcet is at `/src/main.ts`.
 
 The project is setup to be compiled to `CommonJS` using `webpack`.
 
+> :warning: Currently, we set the compile target to `node` in `webpack.config.js` in order to use some NodeJS utility like `fs`.
+
 ```bash
 $ npx webpack
+% execute the project
+$ node ./build/bundle.js
 ```
 
 ## Heap Allocator
@@ -24,7 +28,7 @@ interface C0HeapAllocator {
 
   	// Return the memory pool as ArrayBuffer - used for debug only
   	// Should not change the memory by altering the ArrayBuffer here
-    debug_getMemPool(): ArrayBuffer
+    debug_getMemPool(): ArrayBuffer | undefined
     // Operations on Heap Memory
     cmstore(ptr: C0Pointer, value: DataView): void
     cmload(ptr: C0Pointer): DataView
@@ -45,6 +49,28 @@ export function createHeap(allocator: C0HeapAllocatorConstructor, size ?: number
 In C0VM.ts, we use a `ArrayBuffer` to simulate the heap memory of a C program.
 
 Since we are following the C's convention (`0x0000000000000000` is a `NULL`pointer), the memory address at `0x00` is reserved and never touched. 
+
+### `malloc` & `free` Functions
+
+A `C0HeapAllocator` is able to manage its own memory pool and encapsulate the details with `malloc` and `free` interface.
+
+`malloc` will allocate a block of memory and return a `C0Pointer` that referes to the starting position of the allocated memory segment.
+
+`free` will free/release a block of memory. When the pointer given to `free` does not points to the start of memory segment, `c0_memory_error` should be throw to caller. (since free a memory with result of pointer arithmetic will lead to undefined behavior in C)
+
+### `deref` Function
+
+The `deref` function is a simulation of the `*` operator in C.
+
+Given a `C0Pointer`, the `deref` function will return a `DataView` that is an alias of the `ArrayBuffer` of the memory block that pointer is pointing to.
+
+> Example: For some pointer `0x0000_0000_0070_00FF`, passing it to `deref` will return you a DataView of hte segment `[0x0000_0070, 0x0000_00FF)`.
+>
+> ```
+> 0x0000_0000                            0x0000_00FF
+> |=====================^================|
+> ^- addr = 0x0000_0000 ^- offset = 0x0070
+> ```
 
 ### VM_Memory
 
@@ -102,15 +128,47 @@ In `C0VM.ts`, **everything** is eventually a segment of `ArrayBuffer`. We use `D
 
 > :spiral_notepad: *Explanation:* A pointer points at allocated memory segment `[address, address + size)` with precise address as `address + offset`.
 
->  :warning: Note: By C convention, if a pointer is `0x0000000000000000` (64-bit zero), we say this pointer is a `NULL` Pointer. In C0VM.ts, if the first 32-bits of a pointer are all zero, we can assert it is `NULL`.
+#### NULL Pointer
 
-A helper function `read_ptr` is defined in `utility/pointer_ops.ts`. Giving the function a `C0Pointer` (which is, in fact, only an alias of `DataView`), it will return the `address`, `offset` and `size` of pointer.
+:warning: By C convention, if a pointer is `0x0000000000000000` (64-bit zero), we say this pointer is a `NULL` Poiner.
+
+Since the definition of NULL pointer is subject to chnage in the future, it is **highly recommended** to use the function 
+
+```typescript
+export function isNullPtr(ptr: C0Pointer): boolean;
+```
+
+to verify whether a pointer is `NULL` or not.
+
+#### Read Pointer
+
+A helper function 
+
+```typescript
+export function read_ptr(ptr: C0Pointer): [number, number, number];
+```
+
+is defined in `utility/pointer_ops.ts`. Giving the function a `C0Pointer` (which is, in fact, only an alias of `DataView`), it will return the `address`, `offset` of pointer and `size` of memory segment.
+
+#### Function Pointer (Implement in future, C1 Standard)
+
+> Currently, I planned to use functions with 
+>
+> | Field   | Value                |
+> | ------- | -------------------- |
+> | Address | `0x0000_0000`        |
+> | Offset  | `0x0000` to `0xFFFF` |
+> | Size    | `0x0000`             |
+>
+> to represent a function pointer. This will present one more constraint on the C0 (C1) Functions - there can have at most `65535` functions in a C1 program.
 
 ### Int, Boolean and Char `t`
 
 `int`, `boolean` and `char` are all a sequence of `4` bytes. That is to say, they are all stored in a segment of `ArrayBuffer`.
 
 In C0VM Writeup, these 4-bytes values are all annotated as `w32`.
+
+For types of `boolean` and `char`, their value will be stored in the **first byte** of the 4-byte `ArrayBuffer`.
 
 ### Array `t[]`
 
@@ -120,6 +178,34 @@ For any type `t` with size $s$, we can create an array of it. The array is descr
 | ------------------------ | -------------------------- | --------------------------------- |
 | `0`                      | `4`                        | Size of each element of the array |
 | `4`                      | `4 + n * s`                | An `n`-element array              |
+
+## C0Value
+
+```typescript
+type C0ValueVMType = "value" | "ptr";
+type C0ValueType = "<unknown>" | "int" | "string" | "char" | "boolean" | "struct";
+
+type C0Value = {
+    vm_type: C0ValueVMType;
+    type: C0ValueType;
+    value: DataView;
+}
+```
+
+`C0Value` is a wrapper for the actual values in C0VM.
+
+The `vm_type` property is a reflection to the `w32`/`*` type in original C0VM.
+
+The `type` is the inferenced data type that can be used for visualiation and type constraint propagation. By default, the `type` will be `<unknown>`. But when additional information are available, the `type` property will be assigned.
+
+The `value` is the DataView of actual data
+
+| `vm_type` | Length of `ArrayBuffer` in `value` |
+| --------- | ---------------------------------- |
+| `value`   | 4                                  |
+| `ptr`     | 8                                  |
+
+> :construction: In the future, some more options will be added to the `vm_type` to make it compatible with `tagged_pointer` and `func_pointer`.
 
 ## Arithmetic Operations
 
@@ -132,8 +218,13 @@ export function c_add(x: DataView, y: DataView): DataView;	// x + y
 export function c_sub(x: DataView, y: DataView): DataView;	// x - y
 export function c_mul(x: DataView, y: DataView, Issue_Handler: MessageEmitter): DataView;	// x * y
 export function c_div(x: DataView, y: DataView): DataView;	// x / y
+export function c_rem(x: DataView, y: DataView): DataView;  // x % y
 export function c_lsh(x: DataView, y: DataView): DataView;	// x << y
 export function c_rsh(x: DataView, y: DataView): DataView;	// x >> y
+
+export function c_and(x: DataView, y: DataView): DataView; 	// x & y
+export function c_or(x: DataView, y: DataView): DataView;   // x | y
+export function c_xor(x: DataView, y: DataView): DataView;  // x ^ y
 ```
 
 These functions will *try its best* to mimic the overflow behavior of C program. 
@@ -147,9 +238,7 @@ These functions will *try its best* to mimic the overflow behavior of C program.
 > 2147483647 * 25165823 = 2122317825 (C)
 > ```
 >
-> This is due to the **precision lost** problem of `float`. When such precision lost is detected, C0VM.ts will issue a warning to the user interface *but will NOT interrupt the execution*.
->
-> However, we do want the user to realize such imprecise calculation. Therefore, we will use `IssueHandler` to emit a **warning** to user. The `IssueHandler` is an object that follows the `MessageEmitter` interface.
+> This is due to the **precision lost** problem of `float`. When such precision lost is detected, C0VM.ts *will NOT interrupt the execution.* However, we do want the user to realize such imprecise calculation. Therefore, we will use `IssueHandler` to emit a **warning** to user. The `IssueHandler` is an object that follows the `MessageEmitter` interface.
 >
 > By passing in different implementation of `MessageEmitter`, we may have one of the following behaviors: 1) log a warning in the console, 2) popup a warning in the GUI, etc.
 

@@ -8,7 +8,7 @@
  */
 
 import { c0_memory_error, vm_error } from "./errors";
-import { read_ptr } from "./pointer_ops";
+import { isNullPtr, read_ptr } from "./pointer_ops";
 
 /**
  * Naive Heap Memory Allocator that mimic the memory manegement in C.
@@ -28,15 +28,15 @@ export class VM_Memory implements C0HeapAllocator {
      * @throws `vm_error` when `size >= MEM_POOL_MAX_SIZE`
      */
     constructor(size?: number) {
-        if (size >= MEM_POOL_MAX_SIZE) {
-            throw new vm_error(`Unable to initialize memory greater than 0xFFFFFFFE bytes`);
+        if (size >= globalThis.MEM_POOL_MAX_SIZE) {
+            throw new vm_error(`Unable to initialize memory greater than ${globalThis.MEM_POOL_MAX_SIZE} bytes`);
         }
-        if (size <= MEM_POOL_MIN_SIZE) {
-            throw new vm_error(`Unable to initialize memory smaller than 1 byte`);
+        if (size <= globalThis.MEM_POOL_MIN_SIZE) {
+            throw new vm_error(`Unable to initialize memory smaller than ${globalThis.MEM_POOL_MIN_SIZE} byte`);
         }
         // Add 1 here since the address 0x00 is reserved for NULL
         // Initialize 50kb of memory by default
-        this.memory_size = (size ? size : MEM_POOL_DEFAULT_SIZE) + 1;
+        this.memory_size = (size ? size : globalThis.MEM_POOL_DEFAULT_SIZE) + 1;
         this.memory_pool = new ArrayBuffer(this.memory_size);
         this.heap_top_address = 0x01;
     }
@@ -45,8 +45,8 @@ export class VM_Memory implements C0HeapAllocator {
         if (size < 0 || this.heap_top_address + size > this.memory_size) {
             throw new c0_memory_error(`Unable to allocate ${size} bytes of memory.`);
         }
-        if (size > MEM_BLOCK_MAX_SIZE) {
-            throw new c0_memory_error(`Unable to allocate memory block bigger than ${MEM_BLOCK_MAX_SIZE}`);
+        if (size > globalThis.MEM_BLOCK_MAX_SIZE) {
+            throw new c0_memory_error(`Unable to allocate memory block bigger than ${globalThis.MEM_BLOCK_MAX_SIZE}`);
         }
         const ptr = new DataView(new ArrayBuffer(8));
         ptr.setUint32(0, this.heap_top_address);
@@ -85,7 +85,7 @@ export class VM_Memory implements C0HeapAllocator {
 
     cmstore(ptr: C0Pointer, value: DataView): void {
         const [address, offset, size] = read_ptr(ptr);
-        if (address === 0) {
+        if (isNullPtr(ptr)) {
             throw new c0_memory_error("Dereferencing NULL Pointer");
         }
         if (value.byteLength < 1) {
@@ -103,7 +103,7 @@ export class VM_Memory implements C0HeapAllocator {
 
     cmload(ptr: C0Pointer): DataView {
         const [address, offset, size] = read_ptr(ptr);
-        if (address === 0) {
+        if (isNullPtr(ptr)) {
             throw new c0_memory_error("Dereferencing NULL Pointer");
         }
         if (size - offset < 1) {
@@ -117,7 +117,7 @@ export class VM_Memory implements C0HeapAllocator {
 
     imstore(ptr: C0Pointer, value: DataView): void {
         const [address, offset, size] = read_ptr(ptr);
-        if (address === 0) {
+        if (isNullPtr(ptr)) {
             throw new c0_memory_error("Dereferencing NULL Pointer");
         }
         if (value.byteLength < 4) {
@@ -136,7 +136,7 @@ export class VM_Memory implements C0HeapAllocator {
 
     imload(ptr: C0Pointer): DataView {
         const [address, offset, size] = read_ptr(ptr);
-        if (address === 0) {
+        if (isNullPtr(ptr)) {
             throw new c0_memory_error("Dereferencing NULL Pointer");
         }
         if (size - offset < 4) {
@@ -153,7 +153,7 @@ export class VM_Memory implements C0HeapAllocator {
 
     amstore(ptr: C0Pointer, stored_ptr: DataView): void {
         const [address, offset, size] = read_ptr(ptr);
-        if (address === 0) {
+        if (isNullPtr(ptr)) {
             throw new c0_memory_error("Dereferencing NULL Pointer");
         }
         if (stored_ptr.byteLength < 8) {
@@ -171,7 +171,7 @@ export class VM_Memory implements C0HeapAllocator {
 
     amload(ptr: C0Pointer): DataView {
         const [address, offset, size] = read_ptr(ptr);
-        if (address === 0) {
+        if (isNullPtr(ptr)) {
             throw new c0_memory_error("Dereferencing NULL Pointer");
         }
         if (size - offset < 8) {
@@ -186,7 +186,7 @@ export class VM_Memory implements C0HeapAllocator {
 
     deref(ptr: DataView, block_size: number): DataView {
         const [address, offset, size] = read_ptr(ptr);
-        if (address === 0) {
+        if (isNullPtr(ptr)) {
             throw new c0_memory_error("Dereferencing NULL Pointer");
         }
         if (offset + block_size > size) {

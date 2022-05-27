@@ -1,23 +1,30 @@
-import { createHeap, VM_Memory } from "./utility/memory";
+import fs = require('fs');
+require('util').inspect.defaultOptions.depth = null;
 
-const heap = createHeap(VM_Memory, 16);
-const ptr: C0Pointer = heap.malloc(8);
-console.log(`Address: ${ptr.getInt32(0)}, Offset: ${ptr.getUint16(4)}, BlockSize: ${ptr.getUint16(6)}`);
-const ptr2: C0Pointer = heap.malloc(4);
-console.log(`Address: ${ptr2.getInt32(0)}, Offset: ${ptr2.getUint16(4)}, BlockSize: ${ptr2.getUint16(6)}`);
+import { step } from './exec/exec';
+import ConsoleEmitter from './gui/console_emitter';
+import { VM_Memory, createHeap } from './utility/memory';
+import parse from './parser/parse';
 
-const rawValue = new Uint8Array([0xCC, 0xC0, 0xFF, 0xEE, 0x00, 0x02, 0x03, 0xCC]);
 
-heap.amstore(ptr, new DataView(rawValue.buffer));
+// Initialize global variables
+globalThis.DEBUG = true;
+///////////////////////////////
 
-heap.imstore(ptr2, new DataView(rawValue.buffer, 1));
+const data = fs.readFileSync("./src/test/task1.bc0", 'utf8');
+const code = parse(data);
 
-console.log(heap.imload(ptr2));
-console.log(heap.cmload(ptr2));
-console.log(heap.amload(ptr));
+const heap = createHeap(VM_Memory);
+const handle = new ConsoleEmitter();
 
-console.log(heap.debug_getMemPool());
+const func = code.functionPool[0];
+const state: VM_State = {
+    F: func,
+    PC: 0,
+    S: [],
+    V: new Array(func.numVars).fill(undefined)
+};
 
-heap.free(ptr2);
+step(state, heap, handle);
 
-console.log(heap.debug_getMemPool());
+console.log(state);

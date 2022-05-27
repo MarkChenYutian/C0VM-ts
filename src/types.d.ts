@@ -9,8 +9,8 @@ type C0Function = {
 
     // name of local variables, inferenced from comments in .bc0 file
     varName: string[];
-    
-    
+
+
     // the length of code of the function
     size: number;
     // bytecodes of the function
@@ -28,9 +28,12 @@ type C0Function = {
     comment: Map<number, CodeComment>;
 };
 
+// Information extracted from comment during parsing phase
+// Facilitate type inference etc.
 type CodeComment = {
     dataType?: "char" | "boolean" | "int"
 }
+
 
 type C0Native = {
     numArgs: number;
@@ -66,17 +69,17 @@ type C0ByteCode = {
 type C0Pointer = DataView;
 
 
+type C0ValueVMType = "value" | "ptr";
+type C0ValueType = "<unknown>" | "int" | "string" | "char" | "boolean" | "struct";
+
 type C0Value = {
-    class: "value" | "ptr";
+    vm_type: C0ValueVMType;
     // type:
     // Preserved for the visualization part - we need to know the 
     // type to display corresponding value.
-    type: "<unknown>" | "int" | "string" | "char" | "boolean" | "struct"; 
+    type: C0ValueType;
     value: DataView;
 }
-
-type VM_OperandStack = C0Value[];
-type VM_LocalVariables = C0Value[];
 
 // Enum Types for C0VM Instructions
 type OpCode =
@@ -240,3 +243,15 @@ type C0NativeFuncType =
     | "NATIVE_STRING_TERMINATED"
     | "NATIVE_STRING_TO_CHARARRAY"
     | "NATIVE_STRING_TOLOWER";
+
+
+
+
+type VM_OperandStack = C0Value[];
+type VM_LocalVariables = (C0Value | undefined)[];
+type VM_State = {
+    PC: number,
+    S: VM_OperandStack,
+    V: VM_LocalVariables,
+    F: C0Function
+};

@@ -2,7 +2,7 @@ import { c0_value_error } from "../utility/errors";
 import { read_ptr } from "../utility/pointer_ops";
 
 export function c0_string_compare(mem: C0HeapAllocator, arg1: C0Value, arg2: C0Value): number {
-    if (arg1.class !== 'ptr' || arg2.class !== 'ptr') {
+    if (arg1.vm_type !== 'ptr' || arg2.vm_type !== 'ptr') {
         throw new c0_value_error("String compare only receives strings on heap memory");
     }
     const [addr1, offset1, size1] = read_ptr(arg1.value);

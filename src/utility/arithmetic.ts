@@ -93,6 +93,24 @@ export function c_div(x: DataView, y: DataView): DataView {
     return res;
 }
 
+/**
+ * Computes `x % y` with C's behavior when -fwrap flag is on
+ * @param x The first 4 bytes of `x` will be interpreted as an i32
+ * @param y The first 4 bytes of `y` will be interpreted as an i32
+ * @returns A dataview with length 4 that stores `x % y`, following C's overflow behavior with `-fwrap` flag on gcc.
+ * @throws `vm_error` when `x` or `y` have a length < 4
+ * @throws `c0_arith_error` when `y == 0` or `x = INT_MIN && y = 0`.
+ */
+ export function c_rem(x: DataView, y: DataView): DataView {
+    const x_i32 = read_i32_with_check(x);
+    const y_i32 = read_i32_with_check(y);
+    if (y_i32 === 0 || (x_i32 === 0x8000_0000 && y_i32 === -1)) {
+        throw new c0_arith_error("Divide by zero.");
+    }
+    const res = new DataView(new ArrayBuffer(4));
+    res.setInt32(0, x_i32 % y_i32);
+    return res;
+}
 
 /**
  * Computes `x << y` with C's behavior when -fwrap flag is on
@@ -130,5 +148,48 @@ export function c_rsh(x: DataView, y: DataView): DataView {
     }
     const res = new DataView(new ArrayBuffer(4));
     res.setInt32(0, x_i32 >> y_i32);
+    return res;
+}
+
+/**
+ * Computes `x & y`
+ * @param x The first 4 bytes of `x` will be interpreted as an i32
+ * @param y The first 4 bytes of `y` will be interpreted as an i32
+ * @returns A dataview with length 4 that stores `x & y`
+ */
+export function c_and(x: DataView, y: DataView): DataView {
+    const res = new DataView(new ArrayBuffer(4));
+    res.setInt32(
+        0, read_i32_with_check(x) & read_i32_with_check(y)
+    );
+    return res;
+}
+
+/**
+ * Computes `x | y`
+ * @param x The first 4 bytes of `x` will be interpreted as an i32
+ * @param y The first 4 bytes of `y` will be interpreted as an i32
+ * @returns A dataview with length 4 that stores `x | y`
+ */
+export function c_or(x: DataView, y: DataView): DataView {
+    const res = new DataView(new ArrayBuffer(4));
+    res.setInt32(
+        0, read_i32_with_check(x) | read_i32_with_check(y)
+    );
+    return res;
+}
+
+
+/**
+ * Computes `x ^ y`
+ * @param x The first 4 bytes of `x` will be interpreted as an i32
+ * @param y The first 4 bytes of `y` will be interpreted as an i32
+ * @returns A dataview with length 4 that stores `x ^ y`
+ */
+export function c_xor(x: DataView, y: DataView): DataView {
+    const res = new DataView(new ArrayBuffer(4));
+    res.setInt32(
+        0, read_i32_with_check(x) ^ read_i32_with_check(y)
+    );
     return res;
 }

@@ -57,3 +57,6 @@ export function shift_ptr(ptr: C0Pointer, offset: number): C0Pointer {
     return new_ptr;
 }
 
+export function isNullPtr(ptr: C0Pointer): boolean {
+    return ptr.getBigUint64(0) === BigInt(0);
+}
