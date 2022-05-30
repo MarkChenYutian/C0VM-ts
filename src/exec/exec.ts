@@ -1,50 +1,52 @@
 import * as arithmetic from "../utility/arithmetic";
 import { copy_dataview } from "../utility/array_buffer";
-import { build_c0_value } from "../utility/c0_value";
+import { build_c0_value, cvt_c0_value } from "../utility/c0_value";
 import { vm_error } from "../utility/errors";
+import { shift_ptr } from "../utility/pointer_ops";
 import { safe_pop_stack } from "./helpers";
 
-export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: MessageEmitter): C0Value | undefined {
-    switch (state.F.code[state.PC]) {
+export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: MessageEmitter): boolean {
+    const F = state.CurrFrame.P; // the function that is currently running on
+    switch (F.code[state.CurrFrame.PC]) {
         // dup
         case 0x59: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const v = safe_pop_stack(state.S);
+            const v = safe_pop_stack(state.CurrFrame.S);
             const nv = build_c0_value(
                 copy_dataview(v.value), v.vm_type, v.type
             );
 
-            state.S.push(v);
-            state.S.push(nv);
+            state.CurrFrame.S.push(v);
+            state.CurrFrame.S.push(nv);
             break;
         }
 
         // pop
         case 0x57: {
-            state.PC += 1;
-            safe_pop_stack(state.S);
+            state.CurrFrame.PC += 1;
+            safe_pop_stack(state.CurrFrame.S);
             break;
         }
 
         // swap
         case 0x5F: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const v2 = safe_pop_stack(state.S);
-            const v1 = safe_pop_stack(state.S);
-            state.S.push(v2);
-            state.S.push(v1);
+            const v2 = safe_pop_stack(state.CurrFrame.S);
+            const v1 = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(v2);
+            state.CurrFrame.S.push(v1);
             break;
         }
 
         // iadd
         case 0x60: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const y = safe_pop_stack(state.S);
-            const x = safe_pop_stack(state.S);
-            state.S.push(
+            const y = safe_pop_stack(state.CurrFrame.S);
+            const x = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(
                 build_c0_value(
                     arithmetic.c_add(x.value, y.value),
                     "value",
@@ -56,11 +58,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
         // iand
         case 0x7E: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const y = safe_pop_stack(state.S);
-            const x = safe_pop_stack(state.S);
-            state.S.push(
+            const y = safe_pop_stack(state.CurrFrame.S);
+            const x = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(
                 build_c0_value(
                     arithmetic.c_and(x.value, y.value),
                     "value",
@@ -72,11 +74,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
         // idiv
         case 0x6c: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const y = safe_pop_stack(state.S);
-            const x = safe_pop_stack(state.S);
-            state.S.push(
+            const y = safe_pop_stack(state.CurrFrame.S);
+            const x = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(
                 build_c0_value(
                     arithmetic.c_div(x.value, y.value), 
                     "value",
@@ -88,11 +90,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
         // imul
         case 0x68: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const y = safe_pop_stack(state.S);
-            const x = safe_pop_stack(state.S);
-            state.S.push(
+            const y = safe_pop_stack(state.CurrFrame.S);
+            const x = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(
                 build_c0_value(
                     arithmetic.c_mul(x.value, y.value, msg_handle), 
                     "value",
@@ -104,11 +106,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
         // ior
         case 0x80: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const y = safe_pop_stack(state.S);
-            const x = safe_pop_stack(state.S);
-            state.S.push(
+            const y = safe_pop_stack(state.CurrFrame.S);
+            const x = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(
                 build_c0_value(
                     arithmetic.c_or(x.value, y.value),
                     "value",
@@ -120,11 +122,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
         // irem
         case 0x70: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const y = safe_pop_stack(state.S);
-            const x = safe_pop_stack(state.S);
-            state.S.push(
+            const y = safe_pop_stack(state.CurrFrame.S);
+            const x = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(
                 build_c0_value(
                     arithmetic.c_rem(x.value, y.value),
                     "value",
@@ -136,11 +138,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
         // ishl
         case 0x78: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const y = safe_pop_stack(state.S);
-            const x = safe_pop_stack(state.S);
-            state.S.push(
+            const y = safe_pop_stack(state.CurrFrame.S);
+            const x = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(
                 build_c0_value(
                     arithmetic.c_lsh(x.value, y.value),
                     "value",
@@ -152,11 +154,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
         // ishr
         case 0x7a: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const y = safe_pop_stack(state.S);
-            const x = safe_pop_stack(state.S);
-            state.S.push(
+            const y = safe_pop_stack(state.CurrFrame.S);
+            const x = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(
                 build_c0_value(
                     arithmetic.c_rsh(x.value, y.value),
                     "value",
@@ -168,11 +170,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
         // isub
         case 0x64: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const y = safe_pop_stack(state.S);
-            const x = safe_pop_stack(state.S);
-            state.S.push(
+            const y = safe_pop_stack(state.CurrFrame.S);
+            const x = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(
                 build_c0_value(
                     arithmetic.c_sub(x.value, y.value),
                     "value",
@@ -184,11 +186,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
         // ixor
         case 0x82: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            const y = safe_pop_stack(state.S);
-            const x = safe_pop_stack(state.S);
-            state.S.push(
+            const y = safe_pop_stack(state.CurrFrame.S);
+            const x = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.S.push(
                 build_c0_value(
                     arithmetic.c_xor(x.value, y.value),
                     "value",
@@ -200,9 +202,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
         // aconst_null
         case 0x01: {
-            state.PC += 1;
+            state.CurrFrame.PC += 1;
 
-            state.S.push(
+            state.CurrFrame.S.push(
                 build_c0_value(
                     new DataView(new ArrayBuffer(8)),
                     "ptr", "<unknown>"
@@ -214,26 +216,106 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
         // bipush
         case 0x10: {
             // in this case, we will have sign extension
-            const b = new DataView(state.F.code.buffer)
-                .getInt8(state.PC + 1);
-            const rebuild_type = state.F.comment.get(state.PC).dataType;
+            const b = F.code[state.CurrFrame.PC + 1];
+            let rebuild_type: C0ValueType = F.comment.get(state.CurrFrame.PC).dataType;
 
-            state.PC += 2;
+            if (rebuild_type === undefined) {
+                rebuild_type = "<unknown>"
+            }
+
+            state.CurrFrame.PC += 2;
 
             const v = new DataView(new ArrayBuffer(4));
             v.setInt32(0, b);
-            state.S.push(
+            state.CurrFrame.S.push(
                 build_c0_value(
                     v,
                     "value",
-                    rebuild_type ? rebuild_type : "<unknown>"
+                    rebuild_type
                 )
             );
             break;
         }
 
-        default:
-            throw new vm_error(`Undefined instruction ${state.F.code[state.PC]}`);
+        // ildc
+        case 0x13: {
+            const c1 = F.code[state.CurrFrame.PC + 1];
+            const c2 = F.code[state.CurrFrame.PC + 2];
+            const idx = (c1 << 8) | c2;
+
+            state.CurrFrame.PC += 3;
+
+            state.CurrFrame.S.push(cvt_c0_value(
+                state.P.intPool[idx]
+            ));
+            break;
+        }
+
+        // aldc
+        case 0x14: {
+            const c1 = F.code[state.CurrFrame.PC + 1];
+            const c2 = F.code[state.CurrFrame.PC + 2];
+            const idx = (c1 << 8) | c2;
+
+            state.CurrFrame.PC += 3;
+
+            state.CurrFrame.S.push({
+                type: "string",
+                vm_type: "ptr",
+                value: shift_ptr(state.C.stringPoolPtr, idx)
+            });
+            break;
+        }
+
+        // aconst_null
+        case 0x01: {
+            state.CurrFrame.PC += 1;
+
+            const null_ptr = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]);
+            state.CurrFrame.S.push({
+                type: "<unknown>",
+                vm_type: "ptr",
+                value: new DataView(null_ptr.buffer)
+            });
+            break;
+        }
+
+        // vload
+        case 0x15: {
+            const idx = F.code[state.CurrFrame.PC + 1];
+
+            state.CurrFrame.PC += 2;
+
+            if (state.CurrFrame.V[idx] === undefined) {
+                throw new vm_error("Unable to load undefined local variable.");
+            }
+            state.CurrFrame.S.push(state.CurrFrame.V[idx]);
+            break;
+        }
+
+        // vstore
+        case 0x36: {
+            const idx = F.code[state.CurrFrame.PC + 1];
+
+            state.CurrFrame.PC += 2;
+
+            const val = safe_pop_stack(state.CurrFrame.S);
+            state.CurrFrame.V[idx] = val;
+            break;
+        }
+
+        // return
+        case 0xB0: {
+            const retval = safe_pop_stack(state.CurrFrame.S);
+            console.log(`return from <${state.CurrFrame.P.name}> with retval:`);
+            console.log(retval);
+
+            return false;
+        }
+
+        default: {
+            throw new vm_error(`Undefined instruction ${F.code[state.CurrFrame.PC]}`);
+        }
     }
-    return undefined;
+    return true;
 }

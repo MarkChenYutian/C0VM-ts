@@ -5,10 +5,17 @@ import { step } from './exec/exec';
 import ConsoleEmitter from './gui/console_emitter';
 import { VM_Memory, createHeap } from './utility/memory';
 import parse from './parser/parse';
+import { loadStringPool } from './exec/string_loader';
 
 
 // Initialize global variables
 globalThis.DEBUG = true;
+
+globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
+globalThis.MEM_POOL_MAX_SIZE = 0xFFFF_FFFE;
+globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
+
+globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
 ///////////////////////////////
 
 const data = fs.readFileSync("./src/test/task1.bc0", 'utf8');
@@ -17,14 +24,24 @@ const code = parse(data);
 const heap = createHeap(VM_Memory);
 const handle = new ConsoleEmitter();
 
-const func = code.functionPool[0];
+const constant: VM_Constants = {
+    stringPoolPtr: loadStringPool(code.stringPool, heap)
+} ;
+
 const state: VM_State = {
-    F: func,
-    PC: 0,
-    S: [],
-    V: new Array(func.numVars).fill(undefined)
+    P: code,
+    C: constant,
+    CallStack: [],
+    CurrFrame: {
+        PC: 0,
+        S: [],
+        V: new Array(code.functionPool[0].numVars).fill(undefined),
+        P: code.functionPool[0]
+    }
 };
 
-step(state, heap, handle);
-
-console.log(state);
+let cont = true;
+while (cont) {
+    // console.log(state.CurrFrame);
+    cont = step(state, heap, handle);
+}

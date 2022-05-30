@@ -36,7 +36,7 @@ export class VM_Memory implements C0HeapAllocator {
         }
         // Add 1 here since the address 0x00 is reserved for NULL
         // Initialize 50kb of memory by default
-        this.memory_size = (size ? size : globalThis.MEM_POOL_DEFAULT_SIZE) + 1;
+        this.memory_size = (size === undefined ? globalThis.MEM_POOL_DEFAULT_SIZE + 1 : size);
         this.memory_pool = new ArrayBuffer(this.memory_size);
         this.heap_top_address = 0x01;
     }
@@ -184,10 +184,13 @@ export class VM_Memory implements C0HeapAllocator {
         return result;
     }
 
-    deref(ptr: DataView, block_size: number): DataView {
+    deref(ptr: C0Pointer, block_size?: number): DataView {
         const [address, offset, size] = read_ptr(ptr);
         if (isNullPtr(ptr)) {
             throw new c0_memory_error("Dereferencing NULL Pointer");
+        }
+        if (block_size === undefined) {
+            block_size = size - offset; // Load the remaining of memory segment by default
         }
         if (offset + block_size > size) {
             throw new c0_memory_error("Memory access out of bound");

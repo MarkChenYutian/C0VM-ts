@@ -35,7 +35,7 @@ export function cvt_c0_value(value: boolean | number | string): C0Value{
 export function build_c0_value(value: DataView, vm_type: C0ValueVMType, t?: C0ValueType): C0Value {
     return {
         value: value,
-        type: t ? "<unknown>" : t,
+        type: t ? t : "<unknown>",
         vm_type: vm_type
     };
 }

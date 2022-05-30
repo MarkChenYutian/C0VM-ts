@@ -120,6 +120,6 @@ interface C0HeapAllocator {
      * @param block_size The size to be returned
      * @returns A **reference/alias** of the specific segment of the memory pool.
      */
-    deref(ptr: C0Pointer, block_size: number): DataView
+    deref(ptr: C0Pointer, block_size?: number): DataView
 }
 

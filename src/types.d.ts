@@ -249,9 +249,22 @@ type C0NativeFuncType =
 
 type VM_OperandStack = C0Value[];
 type VM_LocalVariables = (C0Value | undefined)[];
-type VM_State = {
+type VM_Constants = {
+    // The pointer that points to the start of string pool in heap allocator
+    stringPoolPtr: C0Pointer
+}
+type VM_StackFrame = {
     PC: number,
     S: VM_OperandStack,
     V: VM_LocalVariables,
-    F: C0Function
+    P: C0Function
+};
+
+type VM_CallStack = VM_StackFrame[];
+
+type VM_State = {
+    P: C0ByteCode,
+    C: VM_Constants, // Constants the VM will use
+    CallStack: VM_CallStack,
+    CurrFrame: VM_StackFrame,
 };
