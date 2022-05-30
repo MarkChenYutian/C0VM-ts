@@ -70,7 +70,8 @@ type C0Pointer = DataView;
 
 
 type C0ValueVMType = "value" | "ptr";
-type C0ValueType = "<unknown>" | "int" | "string" | "char" | "boolean" | "struct";
+type C0ValueType = "<unknown>" | "int" | "char" | "boolean" 
+    | "string"| "struct" | "int[]" | "string[]" | "char[]" | "boolean[]" | "struct[]";
 
 type C0Value = {
     vm_type: C0ValueVMType;
@@ -260,11 +261,9 @@ type VM_StackFrame = {
     P: C0Function
 };
 
-type VM_CallStack = VM_StackFrame[];
-
 type VM_State = {
     P: C0ByteCode,
     C: VM_Constants, // Constants the VM will use
-    CallStack: VM_CallStack,
+    CallStack: VM_StackFrame[],
     CurrFrame: VM_StackFrame,
 };

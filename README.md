@@ -14,6 +14,46 @@ $ npx webpack
 $ node ./build/bundle.js
 ```
 
+## VM Structure
+
+The C0VM's "state" is defined as follow in `types.d.ts`
+
+```typescript
+type VM_State = {
+    P: C0ByteCode,
+    C: VM_Constants, // Constants the VM will use
+    CallStack: VM_StackFrame[],
+    CurrFrame: VM_StackFrame,
+};
+```
+
+| Field       | Explanation/Representation                                   |
+| ----------- | ------------------------------------------------------------ |
+| `P`         | The program that C0VM is currently exeucting                 |
+| `C`         | The constants that the VM will use. Currently, there's only `string_pool_ptr` that marks the position of string pool in heap memory. |
+| `CallStack` | The stack of function stack frames of C0VM                   |
+| `CurrFrame` | The function frame that is currently executed by the C0VM    |
+
+Where each `VM_StackFrame` is defined as
+
+```typescript
+type VM_StackFrame = {
+    PC: number,
+    S: C0Value[],
+    V: (C0Value | undefined)[],
+    P: C0Function
+};
+```
+
+| Field | Explanation/Representation                                   |
+| ----- | ------------------------------------------------------------ |
+| `PC`  | Program Counter                                              |
+| `S`   | Operand Stack                                                |
+| `V`   | Array that stores the Local Variables. When a local variable is not initialized, its value will be `undefined`. |
+| `P`   | The function that is currently executing                     |
+
+When returned, the function will push its return value back to the operand stack of previous stack frame.
+
 ## Heap Allocator
 
 > See `./utility/memory.ts`
@@ -64,7 +104,7 @@ The `deref` function is a simulation of the `*` operator in C.
 
 Given a `C0Pointer`, the `deref` function will return a `DataView` that is an alias of the `ArrayBuffer` of the memory block that pointer is pointing to.
 
-> Example: For some pointer `0x0000_0000_0070_00FF`, passing it to `deref` will return you a DataView of hte segment `[0x0000_0070, 0x0000_00FF)`.
+> Example: For some pointer `0x0000_0000_0070_00FF`, passing it to `deref` will return you a `DataView` of the segment `[0x0000_0070, 0x0000_00FF)`.
 >
 > ```
 > 0x0000_0000                            0x0000_00FF
@@ -99,7 +139,7 @@ export class VM_Memory implements C0HeapAllocator {
 }
 ```
 
-Written in `./utility/memory.ts`, the `VM_Memory` class is a naive implementation to the `C0HeapAllocator` interface.
+Written in `./utility/memory.ts`, the `VM_Memory` class is a naïve implementation to the `C0HeapAllocator` interface.
 
 The private property `heap_top_address` will keep track of the boundary between allocated and unallocated parts of the memory pool. Whenever a `malloc` is called to allocate `n` bytes of heap memory, the allocator will give the memory segment `[heap_top, heap_top + n)`  to the caller and make `heap_top += n`.
 
@@ -160,7 +200,7 @@ is defined in `utility/pointer_ops.ts`. Giving the function a `C0Pointer` (which
 > | Offset  | `0x0000` to `0xFFFF` |
 > | Size    | `0x0000`             |
 >
-> to represent a function pointer. This will present one more constraint on the C0 (C1) Functions - there can have at most `65535` functions in a C1 program.
+> to represent a function pointer. This will present one more constraint on the C1 Functions - there can have at most `65535` functions in a C1 program.
 
 ### Int, Boolean and Char `t`
 
@@ -346,4 +386,3 @@ The list of native functions is listed below:
 | NATIVE_STRING_TERMINATED     | :hourglass:        |
 | NATIVE_STRING_TO_CHARARRAY   | :hourglass:        |
 | NATIVE_STRING_TOLOWER        | :hourglass:        |
-
