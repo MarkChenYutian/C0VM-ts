@@ -321,7 +321,7 @@ The list of native functions is listed below:
 | NATIVE_ARGS_PARSE  | :hourglass: |
 | NATIVE_ARGS_STRING | :hourglass: |
 
-### Standard IO
+### Standard I/O
 
 | Native Functions | Support?           |
 | ---------------- | ------------------ |
@@ -334,7 +334,7 @@ The list of native functions is listed below:
 | NATIVE_PRINTLN   | :white_check_mark: |
 | NATIVE_READLINE  | :hourglass:        |
 
-### Curses :x:
+### Cursor :x:
 
 > There are no recent plans to implement native functions in this category (`NATIVE_INDEX = [12, 54]`)
 
@@ -351,7 +351,7 @@ The list of native functions is listed below:
 | NATIVE_ITOD      | :hourglass: |
 | NATIVE_PRINT_DUB | :hourglass: |
 
-### File IO :x:
+### File I/O :x:
 
 > There are no recent plans to implement native functions in this category (`NATIVE_INDEX=[62, 67)`)
 
