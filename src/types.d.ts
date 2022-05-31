@@ -76,7 +76,7 @@ declare const enum C0ValueVMType {
 }
 
 type C0ValueType = "<unknown>" | "int" | "char" | "boolean";
-type C0PointerType = "<unknown>" | "<unknown>[]" | "string" | "struct" | "int[]" | "string[]" | "char[]" | "boolean[]" | "struct[]";
+type C0PointerType = "<unknown>" | "<unknown>[]" | "string" | "struct" | "int[]" | "string[]" | "char[]" | "boolean[]" | "struct[]" | C0ValueType;
 
 // C0Value type with some stronger constraints
 /**
@@ -97,7 +97,7 @@ type C0Value<T extends C0ValueVMType> =
     } : 
     T extends C0ValueVMType.ptr ? {
         vm_type: T;
-        type: C0PointerType | C0ValueType;  // Everything can have a pointer
+        type: C0PointerType;  // Everything can have a pointer
         value: C0Pointer
     } : 
     never;

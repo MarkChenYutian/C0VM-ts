@@ -18,11 +18,13 @@ globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
 globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
 ///////////////////////////////
 
-const data = fs.readFileSync("./src/test/rec.bc0", 'utf8');
+const fileName = process.argv[2];
+const data = fs.readFileSync("./src/test/" + fileName, 'utf8');
 const code = parse(data);
 
 
-const heap = createHeap(VM_Memory);
+// Miniature, 64-byte heap memory for debug
+const heap = createHeap(VM_Memory, 64);
 const handle = new ConsoleEmitter();
 
 const constant: VM_Constants = {
@@ -44,4 +46,9 @@ const state: VM_State = {
 let cont = true;
 while (cont) {
     cont = step(state, heap, handle);
+}
+
+if (global.DEBUG) {
+    console.log("\n\n==========\nDEBUG - Heap Memory Dump:");
+    console.log(heap.debug_getMemPool());
 }

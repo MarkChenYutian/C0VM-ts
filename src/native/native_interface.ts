@@ -1,4 +1,15 @@
-import { cvt_c0_value } from "../utility/c0_value";
+/**
+ * @author Yutian Chen <yutianch@andrew.cmu.edu>
+ * @abstract Load the native functions into C0ByteCode object returned by parser
+ * @description The native function loader will add the native function
+ * to the native function pool when the parser is parsing bc0 file.
+ * The number of arguments is "injected" from the information in bc0 file
+ * since it is recorded in the native pool part.
+ * 
+ * This file only contains the native function loader & header, the actual 
+ * functions are defined in other files in this folder.
+ */
+import { js_cvt2_c0_value } from "../utility/c0_value";
 import { vm_error, vm_instruct_error } from "../utility/errors";
 import * as StringNative from "./native_strings";
 import * as IONative from "./native_io";
@@ -64,7 +75,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                     if (arg1.vm_type !== C0ValueVMType.ptr) {
                         throw new vm_error("Print can only receive a pointer argument");
                     }
-                    return cvt_c0_value(IONative.c0_print(mem, arg1));
+                    return js_cvt2_c0_value(IONative.c0_print(mem, arg1));
                 }
             }
         case 7:
@@ -75,7 +86,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                     if (arg1.vm_type !== C0ValueVMType.value) {
                         throw new vm_error("PrintBool can only receive a value argument");
                     }
-                    return cvt_c0_value(IONative.c0_print_bool(mem, arg1));
+                    return js_cvt2_c0_value(IONative.c0_print_bool(mem, arg1));
                 }
             }
         case 8:
@@ -86,7 +97,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                     if (arg1.vm_type !== C0ValueVMType.value) {
                         throw new vm_error("PrintChar can only receive a value argument");
                     }
-                    return cvt_c0_value(IONative.c0_print_char(mem, arg1));
+                    return js_cvt2_c0_value(IONative.c0_print_char(mem, arg1));
                 }
             }
         case 9:
@@ -97,7 +108,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                     if (arg1.vm_type !== C0ValueVMType.value) {
                         throw new vm_error("PrintInt can only receive a value argument");
                     }
-                    return cvt_c0_value(IONative.c0_print_int(mem, arg1));
+                    return js_cvt2_c0_value(IONative.c0_print_int(mem, arg1));
                 }
             }
         case 10:
@@ -108,7 +119,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                     if (arg1.vm_type !== C0ValueVMType.ptr) {
                         throw new vm_error("PrintLn can only receive a pointer argument");
                     }
-                    return cvt_c0_value(IONative.c0_println(mem, arg1));
+                    return js_cvt2_c0_value(IONative.c0_println(mem, arg1));
                 }
             }
         case 11:
@@ -318,7 +329,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                     if (arg1.vm_type !== C0ValueVMType.ptr || arg2.vm_type !== C0ValueVMType.ptr) {
                         throw new vm_error("NATIVE_STRING_COMPARE only accepts C0Pointer input");
                     }
-                    return cvt_c0_value(StringNative.c0_string_compare(mem, arg1, arg2));
+                    return js_cvt2_c0_value(StringNative.c0_string_compare(mem, arg1, arg2));
                 }
             }
         }
@@ -330,7 +341,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                     if (arg1.vm_type !== C0ValueVMType.ptr || arg2.vm_type !== C0ValueVMType.ptr) {
                         throw new vm_error("NATIVE_STRING_EQUAL only accepts C0Pointer input");
                     }
-                    return cvt_c0_value(StringNative.c0_string_equal(mem, arg1, arg2));
+                    return js_cvt2_c0_value(StringNative.c0_string_equal(mem, arg1, arg2));
                 }
             }
         }

@@ -97,7 +97,7 @@ export class VM_Memory implements C0HeapAllocator {
             );
         }
         new DataView(this.memory_pool).setUint8(
-            address + offset, value.getUint8(0)
+            address + offset, value.getUint8(3)
         );
     }
 
@@ -111,7 +111,7 @@ export class VM_Memory implements C0HeapAllocator {
                 `Tried to read 1 byte @${address + offset}, but the segment is only allocated as [${address}, ${address + size})`
             );
         }
-        const result = new Uint8Array([new DataView(this.memory_pool).getUint8(address + offset)]);
+        const result = new Uint8Array([0, 0, 0, new DataView(this.memory_pool).getUint8(address + offset)]);
         return new DataView(result.buffer);
     }
 

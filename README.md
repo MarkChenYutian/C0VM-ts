@@ -10,8 +10,12 @@ The project is setup to be compiled to `CommonJS` using `webpack`.
 
 ```bash
 $ npx webpack
-% execute the project
-$ node ./build/bundle.js
+```
+
+To execute the `hello.bc0` file in `./src/test/` folder, use
+
+```
+$ node ./build/bundle.js hello.bc0
 ```
 
 ## VM Structure
@@ -404,3 +408,8 @@ The list of native functions is listed below:
 | NATIVE_STRING_TERMINATED     | :hourglass:        |
 | NATIVE_STRING_TO_CHARARRAY   | :hourglass:        |
 | NATIVE_STRING_TOLOWER        | :hourglass:        |
+
+## Project Progress
+
+* Currently, the C0VM.ts has implemented all the features required for `C0` language.
+* We are working on type inference part of the C0VM.ts

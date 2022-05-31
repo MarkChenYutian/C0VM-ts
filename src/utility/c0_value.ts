@@ -1,6 +1,12 @@
 import { vm_error } from "./errors";
+import { read_ptr } from "./pointer_ops";
 
-export function cvt_c0_value(value: boolean | number | string): C0Value<C0ValueVMType.value>{
+/**
+ * Converting JavaScript primitive into C0Value
+ * @param value The JavaScript value that is going to be converted into C0Value
+ * @returns A C0Value<C0ValueVMType.value>
+ */
+export function js_cvt2_c0_value(value: boolean | number | string): C0Value<C0ValueVMType.value> {
     let view = new DataView(new ArrayBuffer(4));
     switch (typeof value) {
         case "boolean":
@@ -32,14 +38,59 @@ export function cvt_c0_value(value: boolean | number | string): C0Value<C0ValueV
     }
 }
 
+/**
+ * Converting C0Value back to JS Value
+ * 
+ * * C0Value<C0ValueVMType.ptr> => number - the address the pointer is pointing at
+ * * C0Value<C0ValueVMType.value> => number | string | boolean - depends on the type, 
+ * if <type> is <unknown>, then return the number (`getInt32(0)`) directly.
+ * @param value The C0 Value that is going to be converted to a JS value
+ */
+export function c0_cvt2_js_value(value: C0Value<C0ValueVMType>): number | string | boolean {
+    if (value.vm_type === C0ValueVMType.ptr) {
+        const [addr, offset, size] = read_ptr(value.value);
+        return addr + offset;
+    } else {
+        switch (value.type) {
+            case "int": {
+                return value.value.getInt32(0);
+            }
+            case "char": {
+                const dec = new TextDecoder();
+                const str = dec.decode(value.value.buffer.slice(3,));
+                return str;
+            }
+            case "boolean": {
+                return value.value.getUint32(0) !== 0;
+            }
+            case "<unknown>": {
+                return value.value.getInt32(0);
+            }
+        }
+    }
+}
+
+
+/**
+ * Wrap up a C0Pointer into a C0Value<C0ValueVMType.ptr>
+ * @param value The C0Pointer that is going to be wrapped into C0Value
+ * @param t Optional - the type of object that the pointer is pointing to
+ * @returns A constructed C0Value
+ */
 export function build_c0_ptrValue(value: C0Pointer, t?: C0PointerType): C0Value<C0ValueVMType.ptr> {
     return {
         value: value,
         type: t ? t : "<unknown>",
         vm_type: C0ValueVMType.ptr
-    }    
+    }
 }
 
+/**
+ * Wrap up a DataView into a C0Value<C0ValueVMType.value>
+ * @param value The Dataview that is going to be wrapped into C0Value
+ * @param t Optional - the type of object that represented by the DataView passed in
+ * @returns A constructed C0Value
+ */
 export function build_c0_value(value: DataView, t?: C0ValueType): C0Value<C0ValueVMType.value> {
     return {
         value: value,
@@ -48,9 +99,12 @@ export function build_c0_value(value: DataView, t?: C0ValueType): C0Value<C0Valu
     };
 }
 
+/**
+ * Compares whether two dataview have the same data.
+ */
 export function is_same_value(x: DataView, y: DataView): boolean {
     if (x.byteLength !== y.byteLength) return false;
-    for (let i = 0; i < x.byteLength; i ++) {
+    for (let i = 0; i < x.byteLength; i++) {
         if (x.getUint8(i) !== y.getUint8(i)) return false;
     }
     return true;

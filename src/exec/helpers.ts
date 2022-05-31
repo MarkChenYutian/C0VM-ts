@@ -11,3 +11,51 @@ export function safe_pop_stack(S: VM_OperandStack): C0Value<C0ValueVMType> {
     return S.pop();
 }
 
+
+export function ptr2val_type_inference(T: C0PointerType): C0ValueType {
+    switch (T) {
+        case "<unknown>":
+        case "<unknown>[]": 
+        case "struct":
+            return "<unknown>";
+        case "boolean":
+        case "boolean[]":
+            return "boolean";
+        case "char":
+        case "char[]": 
+            return "char";
+        case "int":
+        case "int[]":
+            return "int";
+        default: 
+            throw new vm_error(`Unexpected pointer type ${T}`);
+    }
+}
+
+export function ptr2ptr_type_inference(T: C0PointerType): C0PointerType {
+    switch (T) {
+        case "<unknown>":
+        case "<unknown>[]":
+            return "<unknown>";
+        
+        case "boolean":
+        case "boolean[]":
+            return "boolean";
+        
+        case "char":
+        case "char[]":
+            return "char";
+        
+        case "int":
+        case "int[]":
+            return "int";
+        
+        case "string":
+        case "string[]":
+            return "string";
+        
+        case "struct":
+        case "struct[]":
+            return "struct";
+    }
+}

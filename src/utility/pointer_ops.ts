@@ -31,9 +31,9 @@ export function read_ptr(ptr: C0Pointer): [number, number, number] {
 
 
 /**
- * Shift the pointer either forward (positive offset) or backward (negative offset)
+ * Shift the pointer forward (positive offset)
  * @param ptr Pointer to be manipulated
- * @param offset The additional offset to be appplied on the pointer (can be negative/positive)
+ * @param offset The additional offset to be appplied on the pointer (can only be positive)
  * @returns A new pointer with offset applied on it
  * @throws `c0_memory_error` when applying such offset will let a pointer point outside of the current memory block.
  * That is, pointing to somewhere not in interval [address, address + block_size)
@@ -57,6 +57,21 @@ export function shift_ptr(ptr: C0Pointer, offset: number): C0Pointer {
     return new_ptr;
 }
 
+/**
+ * Check if a pointer is NULL
+ * @param ptr Pointer to be checked
+ * @returns `true` if the given pointer is NULL
+ */
 export function isNullPtr(ptr: C0Pointer): boolean {
     return ptr.getBigUint64(0) === BigInt(0);
+}
+
+
+export function build_ptr(addr: number, offset: number, size: number) {
+    const p_buf = new Uint8Array(8).buffer;
+    const p = new DataView(p_buf);
+    p.setUint32(0, addr);
+    p.setUint16(4, offset);
+    p.setUint16(4, size);
+    return p;
 }

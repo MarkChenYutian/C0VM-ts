@@ -23,10 +23,5 @@ export function c0_print_bool(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.
 }
 
 export function c0_print_char(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>): boolean {
-    const dec = new TextDecoder();
-    let res = true;
-    res = res && internal_print("'");
-    res = res && internal_print(dec.decode(arg1.value));
-    res = res && internal_print("'");
-    return res;
+    return internal_print(String.fromCharCode(arg1.value.getUint8(3)));
 }
