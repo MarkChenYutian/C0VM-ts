@@ -5,7 +5,7 @@ import { step } from './exec/exec';
 import ConsoleEmitter from './gui/console_emitter';
 import { VM_Memory, createHeap } from './utility/memory';
 import parse from './parser/parse';
-import { loadStringPool } from './exec/string_loader';
+import { loadStringPool } from './utility/string_utility';
 
 
 // Initialize global variables
@@ -18,8 +18,9 @@ globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
 globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
 ///////////////////////////////
 
-const data = fs.readFileSync("./src/test/task1.bc0", 'utf8');
+const data = fs.readFileSync("./src/test/rec.bc0", 'utf8');
 const code = parse(data);
+
 
 const heap = createHeap(VM_Memory);
 const handle = new ConsoleEmitter();
@@ -42,6 +43,5 @@ const state: VM_State = {
 
 let cont = true;
 while (cont) {
-    // console.log(state.CurrFrame);
     cont = step(state, heap, handle);
 }

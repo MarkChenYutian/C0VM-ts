@@ -1,6 +1,7 @@
 import { cvt_c0_value } from "../utility/c0_value";
-import { vm_instruct_error } from "../utility/errors";
+import { vm_error, vm_instruct_error } from "../utility/errors";
 import * as StringNative from "./native_strings";
+import * as IONative from "./native_io";
 
 /**
  * Load the C0Native Functions from bytecode to C0VM.
@@ -59,31 +60,56 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_PRINT",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.ptr) {
+                        throw new vm_error("Print can only receive a pointer argument");
+                    }
+                    return cvt_c0_value(IONative.c0_print(mem, arg1));
+                }
             }
         case 7:
             return {
                 functionType: "NATIVE_PRINTBOOL",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.value) {
+                        throw new vm_error("PrintBool can only receive a value argument");
+                    }
+                    return cvt_c0_value(IONative.c0_print_bool(mem, arg1));
+                }
             }
         case 8:
             return {
                 functionType: "NATIVE_PRINTCHAR",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.value) {
+                        throw new vm_error("PrintChar can only receive a value argument");
+                    }
+                    return cvt_c0_value(IONative.c0_print_char(mem, arg1));
+                }
             }
         case 9:
             return {
                 functionType: "NATIVE_PRINTINT",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.value) {
+                        throw new vm_error("PrintInt can only receive a value argument");
+                    }
+                    return cvt_c0_value(IONative.c0_print_int(mem, arg1));
+                }
             }
         case 10:
             return {
                 functionType: "NATIVE_PRINTLN",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.ptr) {
+                        throw new vm_error("PrintLn can only receive a pointer argument");
+                    }
+                    return cvt_c0_value(IONative.c0_println(mem, arg1));
+                }
             }
         case 11:
             return {
@@ -288,7 +314,10 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_STRING_COMPARE",
                 numArgs: 0,
-                f: (mem, arg1, arg2) => {
+                f: (mem, arg1: C0Value<C0ValueVMType>, arg2: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.ptr || arg2.vm_type !== C0ValueVMType.ptr) {
+                        throw new vm_error("NATIVE_STRING_COMPARE only accepts C0Pointer input");
+                    }
                     return cvt_c0_value(StringNative.c0_string_compare(mem, arg1, arg2));
                 }
             }
@@ -297,7 +326,10 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_STRING_EQUAL",
                 numArgs: 0,
-                f: (mem, arg1, arg2) => {
+                f: (mem, arg1: C0Value<C0ValueVMType>, arg2: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.ptr || arg2.vm_type !== C0ValueVMType.ptr) {
+                        throw new vm_error("NATIVE_STRING_EQUAL only accepts C0Pointer input");
+                    }
                     return cvt_c0_value(StringNative.c0_string_equal(mem, arg1, arg2));
                 }
             }

@@ -1,7 +1,7 @@
 export class c0_user_error extends Error {
     public readonly name: "C0UserError" = "C0UserError";
-    constructor() {
-        super("C0 User Error (user actively called 'error' function)");
+    constructor(msg: string) {
+        super("C0 User Error: " + msg);
     }
 }
 

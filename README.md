@@ -221,31 +221,49 @@ For any type `t` with size $s$, we can create an array of it. The array is descr
 
 ## C0Value
 
+`C0Value` is a wrapper for the actual values in C0VM with fancy type declaration that allow us to put more constrint on value of its fields.
+
 ```typescript
-type C0ValueVMType = "value" | "ptr";
-type C0ValueType = "<unknown>" | "int" | "string" | "char" | "boolean" | "struct";
-
-type C0Value = {
-    vm_type: C0ValueVMType;
-    type: C0ValueType;
-    value: DataView;
+declare const enum C0ValueVMType {
+    "value" = 0,
+    "ptr" = 1
 }
-```
+type C0ValueType = "<unknown>" | "int" | "char" | "boolean";
+type C0PointerType = "<unknown>" | "<unknown>[]" | "string"| "struct" | "int[]" | "string[]" | "char[]" | "boolean[]" | "struct[]";
 
-`C0Value` is a wrapper for the actual values in C0VM.
+type C0Value<T extends C0ValueVMType> = 
+    T extends C0ValueVMType.value ? {
+        vm_type: T;
+        type: C0ValueType;
+        value: DataView
+    } : 
+    T extends C0ValueVMType.ptr ? {
+        vm_type: T;
+        type: C0PointerType;
+        value: C0Pointer
+    } : 
+    never;
+```
 
 The `vm_type` property is a reflection to the `w32`/`*` type in original C0VM.
 
-The `type` is the inferenced data type that can be used for visualiation and type constraint propagation. By default, the `type` will be `<unknown>`. But when additional information are available, the `type` property will be assigned.
+The `type` is the inferenced data type that can be used for visualization and type constraint propagation. By default, the `type` will be `<unknown>`. But when additional information are available, the `type` property will be assigned.
 
-The `value` is the DataView of actual data
+| Value of `vm_type`    | Allowed value for `type`                          |
+| --------------------- | ------------------------------------------------- |
+| `C0ValueVMType.value` | `"<unknown>" `, `"int"`, `"char"`, or `"boolean"` |
+| `C0ValueVMType.ptr`   | `C0PointerType` or `C0ValueType`                  |
+
+> :construction: In the future, some more options will be added to the `vm_type` to make it compatible with `tagged_pointer` and `func_pointer`.
+
+The `value` is the `DataView` of actual data
+
+> :warning: There is no guarantee on the length of `ArrayBuffer` (since TypeScript does not support type constraint on length of array and it's impossible to be checked at compile type). So every time one need to read a pointer or value, it's recommended to use `read_ptr` (in `utility/pointer_ops.ts`) or `read_i32_with_check` (in `utility/arithmetic.ts`) since they will check the length of array buffer passed in internally.
 
 | `vm_type` | Length of `ArrayBuffer` in `value` |
 | --------- | ---------------------------------- |
 | `value`   | 4                                  |
 | `ptr`     | 8                                  |
-
-> :construction: In the future, some more options will be added to the `vm_type` to make it compatible with `tagged_pointer` and `func_pointer`.
 
 ## Arithmetic Operations
 
@@ -305,16 +323,16 @@ The list of native functions is listed below:
 
 ### Standard IO
 
-| Native Functions | Support?    |
-| ---------------- | ----------- |
-| NATIVE_EOF       | :hourglass: |
-| NATIVE_FLUSH     | :hourglass: |
-| NATIVE_PRINT     | :hourglass: |
-| NATIVE_PRINTBOOL | :hourglass: |
-| NATIVE_PRINTCHAR | :hourglass: |
-| NATIVE_PRINTINT  | :hourglass: |
-| NATIVE_PRINTLN   | :hourglass: |
-| NATIVE_READLINE  | :hourglass: |
+| Native Functions | Support?           |
+| ---------------- | ------------------ |
+| NATIVE_EOF       | :hourglass:        |
+| NATIVE_FLUSH     | :hourglass:        |
+| NATIVE_PRINT     | :white_check_mark: |
+| NATIVE_PRINTBOOL | :white_check_mark: |
+| NATIVE_PRINTCHAR | :white_check_mark: |
+| NATIVE_PRINTINT  | :white_check_mark: |
+| NATIVE_PRINTLN   | :white_check_mark: |
+| NATIVE_READLINE  | :hourglass:        |
 
 ### Curses :x:
 

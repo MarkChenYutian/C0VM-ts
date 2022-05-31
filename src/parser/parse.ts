@@ -9,9 +9,10 @@ import { nativeFuncLoader } from "../native/native_interface";
  * @throws `bc0_format_error` in many situations - mostly due to discrepency in 
  * declared value (e.g. the size of int pool) and the actual value (actual length
  * of Uint32Array)
+ * @todo Known problem - the `parse` function will not be happy to deal with
+ * CRLF input. It can only parse files with LF line change character.
  */
 export default function parse(raw_file: string): C0ByteCode {
-    // raw_file = string_sanitizer(raw_file);
     const blocks = raw_file.trim().split("\n\n");
     if (blocks.length < 6) { throw new bc0_format_error(); }
 
@@ -96,16 +97,18 @@ export default function parse(raw_file: string): C0ByteCode {
             const [lineBytes, opcodeName, comment] = funcLines[lineNum].split("#")
                 .map((elem) => elem.trim());
 
-            funcCode = funcCode.concat(lineBytes.split(" ")
-                .map((elem: string) => parseInt(elem, 16))
-            );
+            if (lineBytes !== "") {
+                funcCode = funcCode.concat(lineBytes.split(" ")
+                    .map((elem: string) => parseInt(elem, 16))
+                );
+            }
 
             if (opcodeName !== undefined) {
                 if (opcodeName.startsWith("vload")) {
                     varNames[parseInt(opcodeName.split(" ")[1])] = comment;
                 } else if (opcodeName.startsWith("vstore")) {
                     varNames[parseInt(opcodeName.split(" ")[1])] =
-                        comment.split("=")[0].trim();
+                        comment.split(" ")[0].trim();
                 }
             }
         }
@@ -120,6 +123,7 @@ export default function parse(raw_file: string): C0ByteCode {
         for (let lineNum = 4; lineNum < funcLines.length; lineNum++) {
             const [lineBytes, opcodeName, comment] = funcLines[lineNum].split("#")
                 .map((elem) => elem.trim());
+            if (lineBytes === "") continue;
             if (opcodeName.startsWith("bipush")) {
                 let type: "int" | "boolean" | "char";
                 if (int_comment_regex.test(comment)) {

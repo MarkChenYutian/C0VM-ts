@@ -8,7 +8,7 @@
 
 import { c0_arith_error, vm_error } from "./errors";
 
-function read_i32_with_check(x: DataView): number {
+export function read_i32_with_check(x: DataView): number {
     if (x.byteLength < 4) {
         throw new vm_error("Bad Addition: arguments passed in are less than 4 bytes long");
     }

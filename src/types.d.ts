@@ -40,7 +40,8 @@ type C0Native = {
     // functionIndex: number;
     readonly functionType: C0NativeFuncType;
     // name: number;
-    readonly f: (mem: C0HeapAllocator, ...args: C0Value[]) => C0Value;
+    readonly f: (mem: C0HeapAllocator, ...args: C0Value<C0ValueVMType>[]) => 
+        C0Value<C0ValueVMType>;
 };
 
 type C0ByteCode = {
@@ -69,64 +70,84 @@ type C0ByteCode = {
 type C0Pointer = DataView;
 
 
-type C0ValueVMType = "value" | "ptr";
-type C0ValueType = "<unknown>" | "int" | "char" | "boolean" 
-    | "string"| "struct" | "int[]" | "string[]" | "char[]" | "boolean[]" | "struct[]";
-
-type C0Value = {
-    vm_type: C0ValueVMType;
-    // type:
-    // Preserved for the visualization part - we need to know the 
-    // type to display corresponding value.
-    type: C0ValueType;
-    value: DataView;
+declare const enum C0ValueVMType {
+    "value" = "value",
+    "ptr" = "ptr"
 }
 
+type C0ValueType = "<unknown>" | "int" | "char" | "boolean";
+type C0PointerType = "<unknown>" | "<unknown>[]" | "string" | "struct" | "int[]" | "string[]" | "char[]" | "boolean[]" | "struct[]";
+
+// C0Value type with some stronger constraints
+/**
+ * If 
+ * vm_type = value, then 
+ *      type must be "int", "char" or "boolean"
+ * Else if
+ * vm_type = ptr, then
+ *      type must be "<unknown>", ..., "<unknown>[]", ...
+ * Else if
+ * never happens (in future, tagged ptr / func ptr)
+ */
+type C0Value<T extends C0ValueVMType> = 
+    T extends C0ValueVMType.value ? {
+        vm_type: T;
+        type: C0ValueType;                  // Some types can't fit in C0Value directly
+        value: DataView
+    } : 
+    T extends C0ValueVMType.ptr ? {
+        vm_type: T;
+        type: C0PointerType | C0ValueType;  // Everything can have a pointer
+        value: C0Pointer
+    } : 
+    never;
+
 // Enum Types for C0VM Instructions
-type OpCode =
-    | 0x60 // IADD
-    | 0x7e // IAND
-    | 0x6c // IDIV
-    | 0x68 // IMUL
-    | 0x80 // IOR
-    | 0x70 // IREM
-    | 0x78 // ISHL
-    | 0x7a // ISHR
-    | 0x64 // ISUB
-    | 0x82 // IXOR
-    | 0x59 // DUP
-    | 0x57 // POP
-    | 0x5f // SWAP
-    | 0xbc // NEWARRAY
-    | 0xbe // ARRAYLENGTH
-    | 0xbb // NEW
-    | 0x62 // AADDF
-    | 0x63 // AADDS
-    | 0x2e // IMLOAD
-    | 0x2f // AMLOAD
-    | 0x4e // IMSTORE
-    | 0x4f // AMSTORE
-    | 0x34 // CMLOAD
-    | 0x55 // CMSTORE
-    | 0x15 // VLOAD
-    | 0x36 // VSTORE
-    | 0x01 // ACONST
-    | 0x10 // BIPUSH
-    | 0x13 // ILDC
-    | 0x14 // ALDC
-    | 0x00 // NOP
-    | 0x9f // IF_CMPEQ
-    | 0xa0 // IF_CMPNE
-    | 0xa1 // IF_ICMPLT
-    | 0xa2 // IF_ICMPGE
-    | 0xa3 // IF_ICMPGT
-    | 0xa4 // IF_ICMPLE
-    | 0xa7 // GOTO
-    | 0xbf // ATHROW
-    | 0xcf // ASSERT
-    | 0xb8 // INVOKESTATIC
-    | 0xb7 // INVOKENATIVE
-    | 0xb0; // RETURN
+declare const enum OpCode {
+    IADD = 0x60,
+    IAND = 0x7e,
+    IDIV = 0x6c,
+    IMUL = 0x68,
+    IOR = 0x80,
+    IREM = 0x70,
+    ISHL = 0x78,
+    ISHR = 0x7a,
+    ISUB = 0x64,
+    IXOR = 0x82,
+    DUP = 0x59,
+    POP = 0x57,
+    SWAP = 0x5f,
+    NEWARRAY = 0xbc,
+    ARRAYLENGTH = 0xbe,
+    NEW = 0xbb,
+    AADDF = 0x62,
+    AADDS = 0x63,
+    IMLOAD = 0x2e,
+    AMLOAD = 0x2f,
+    IMSTORE = 0x4e,
+    AMSTORE = 0x4f,
+    CMLOAD = 0x34,
+    CMSTORE = 0x55,
+    VLOAD = 0x15,
+    VSTORE = 0x36,
+    ACONST = 0x01,
+    BIPUSH = 0x10,
+    ILDC = 0x13,
+    ALDC = 0x14,
+    NOP = 0x00,
+    IF_CMPEQ = 0x9f,
+    IF_CMPNE = 0xa0,
+    IF_ICMPLT = 0xa1,
+    IF_ICMPGE = 0xa2,
+    IF_ICMPGT = 0xa3,
+    IF_ICMPLE = 0xa4,
+    GOTO = 0xa7,
+    ATHROW = 0xbf,
+    ASSERT = 0xcf,
+    INVOKESTATIC = 0xb8,
+    INVOKENATIVE = 0xb7,
+    RETURN = 0xb0,
+}
 
 // use_official name instead of internal name.
 type C0NativeFuncType =
@@ -245,11 +266,8 @@ type C0NativeFuncType =
     | "NATIVE_STRING_TO_CHARARRAY"
     | "NATIVE_STRING_TOLOWER";
 
-
-
-
-type VM_OperandStack = C0Value[];
-type VM_LocalVariables = (C0Value | undefined)[];
+type VM_OperandStack = C0Value<C0ValueVMType>[];
+type VM_LocalVariables = (C0Value<C0ValueVMType> | undefined)[];
 type VM_Constants = {
     // The pointer that points to the start of string pool in heap allocator
     stringPoolPtr: C0Pointer
