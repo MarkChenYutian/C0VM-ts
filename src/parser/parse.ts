@@ -38,7 +38,7 @@ export default function parse(raw_file: string): C0ByteCode {
                 .map((row) => row.split(" ")))
         ).map(
             (elem: string) => parseInt(elem, 16)
-        ))
+        )).buffer
     );
 
     // console.log("Int Pool Size:", intpoolSize);

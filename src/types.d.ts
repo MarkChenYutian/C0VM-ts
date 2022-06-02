@@ -285,3 +285,13 @@ type VM_State = {
     CallStack: VM_StackFrame[],
     CurrFrame: VM_StackFrame,
 };
+
+
+declare abstract class C0VM_RT {
+    public emitter: MessageEmitter;
+    
+    abstract step_forward(): boolean;
+    abstract restart(): void;
+    abstract debug(): any;
+}
+

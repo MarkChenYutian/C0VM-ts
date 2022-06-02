@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <title>C0VM.ts Alpha Version</title>
+    <link rel="stylesheet" href="index.css">
+    </link>
+    <script src="../build/bundle.js"></script>
+    <script src="https://kit.fontawesome.com/4434981fa1.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <div class="page-framework">
+        <h1 style="margin-top: 0;">C0VM.ts Alpha Version</h1>
+        <div class="main-control">
+            <button class="base-btn main-btn unselectable" onclick="window.c0vm_ts.initialize_runtime();">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Load
+            </button>
+            <button class="base-btn success-btn unselectable" onclick="window.c0vm_ts.step_runtime();">
+                <i class="fas fa-step-forward"></i> Step
+            </button>
+            <button class="base-btn success-btn unselectable" onclick="window.c0vm_ts.run_runtime();">
+                <i class="fas fa-fast-forward"></i> Run
+            </button>
+            <button class="base-btn danger-btn unselectable" onclick="window.c0vm_ts.reset_runtime();">
+                <i class="fas fa-undo"></i> Restart
+            </button>
+        </div>
+        <div id="message-terminal"></div>
+        <div class="main-ui-framework">
+            <div class="code-editor">
+                <h3 style="margin-top: 0;">C0 Bytecode (.bc0 file):</h3>
+                <label style="display: none;">Code Area</label>
+                <textarea type="text" id="c0-code-input" title="Input your code here" class="code-input"></textarea>
+            </div>
+            <div class="io-area">
+                <h3 style="margin-top: 0;">Printout (Standard Output)</h3>
+                <pre id="c0-output"></pre>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.c0vm_ts.init_env();
+    </script>
+</body>
+
+</html>

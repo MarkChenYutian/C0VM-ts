@@ -55,18 +55,23 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 f: nativeNotImplemented
             }
         /* Native Standard I/O Functions */
-        case 4:
-            return {
-                functionType: "NATIVE_EOF",
-                numArgs: 0,
-                f: nativeNotImplemented
-            }
+        // case 4:
+        //     Not implemented since it's dealing with file I/Os
+        //     return {
+        //         functionType: "NATIVE_EOF",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented
+        //     }
         case 5:
             return {
                 functionType: "NATIVE_FLUSH",
                 numArgs: 0,
                 f: nativeNotImplemented
             }
+            /**
+             * TODO:
+             * Force to print the current content from buffer to the screen
+             */
         case 6:
             return {
                 functionType: "NATIVE_PRINT",
@@ -124,6 +129,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             }
         case 11:
             return {
+                //TODO: This will implicitly flush the buffer
                 functionType: "NATIVE_READLINE",
                 numArgs: 0,
                 f: nativeNotImplemented
@@ -419,6 +425,8 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return undefined;   // Everything not (planned to be) implemented yet goes here.
     }
 }
+
+// TODO: fancy error for user - not supporting XXX_FUNCTION
 
 function nativeNotImplemented(): never {
     throw new vm_instruct_error("Native function not support yet.");

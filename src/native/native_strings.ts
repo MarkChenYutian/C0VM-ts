@@ -14,4 +14,3 @@ export function c0_string_compare(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMT
 export function c0_string_equal(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>, arg2: C0Value<C0ValueVMType.ptr>): boolean {
     return c0_string_compare(mem, arg1, arg2) === 0;
 }
-
