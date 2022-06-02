@@ -232,8 +232,6 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const idx = (c1 << 8) | c2;
 
             state.CurrFrame.PC += 3;
-            console.log(new DataView(state.P.intPool.buffer).getInt32(idx, false));
-            console.log(state.P.intPool);
 
             // Sorry, things are ugly when endianness came in
             state.CurrFrame.S.push(js_cvt2_c0_value(

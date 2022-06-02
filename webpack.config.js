@@ -9,7 +9,7 @@ module.exports = {
     main: "./src/main.ts",
   },
   output: {
-    path: path.resolve(__dirname, './build'),
+    path: path.resolve(__dirname, './public'),
     filename: "bundle.js",
     library: "c0vm_ts",
     libraryTarget: "window",

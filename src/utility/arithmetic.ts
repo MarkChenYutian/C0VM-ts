@@ -9,7 +9,6 @@
 import { c0_arith_error, vm_error } from "./errors";
 
 export function read_i32_with_check(x: DataView): number {
-    console.log(x);
     if (x.byteLength < 4) {
         throw new vm_error("Bad Addition: arguments passed in are less than 4 bytes long");
     }
@@ -61,13 +60,11 @@ export function c_mul(x: DataView, y: DataView, Issue_Handler: MessageEmitter): 
     const x_i32 = read_i32_with_check(x);
     const y_i32 = read_i32_with_check(y);
     const res = x_i32 * y_i32;
-    console.log(x_i32, y_i32, res > Number.MAX_SAFE_INTEGER || res < Number.MIN_SAFE_INTEGER);
     if (res > Number.MAX_SAFE_INTEGER || res < Number.MIN_SAFE_INTEGER) {
         Issue_Handler.warn(
             "Inevitable Precision Lost Detected",
             `When calculating ${x_i32} * ${y_i32}, inevitable precison lost is very likely to happened since its value is too big for JavaScript to handle. The result might be inaccurate.`
         );
-        console.log("!");
         // adding a fall-back here?
         // TODO: helper function here
     }
