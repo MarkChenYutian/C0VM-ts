@@ -1,6 +1,7 @@
 declare global {
     var DEBUG: boolean;
     var DEBUG_DUMP_MEM: boolean;
+    var DEBUG_DUMP_STEP: boolean;
 
     var MEM_BLOCK_MAX_SIZE: number;
 
@@ -16,6 +17,9 @@ declare global {
     var UI_ERR_DISPLAY_TIME_MS: number;
     var UI_WARN_DISPLAY_TIME_MS: number;
     var UI_OK_DISPLAY_TIME_MS: number;
+
+    var C0_BYTECODE_MAX_LENGTH: number;
+    var C0_ENVIR_MODE: "web" | "nodejs";
 
     var C0_RUNTIME: undefined | C0VM_RT;
     var MSG_EMITTER: MessageEmitter;

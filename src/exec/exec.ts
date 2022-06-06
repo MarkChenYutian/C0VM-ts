@@ -1,12 +1,16 @@
 import * as arithmetic from "../utility/arithmetic";
 import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value } from "../utility/c0_value";
 import { c0_user_error, vm_error } from "../utility/errors";
-import { build_ptr, read_ptr, shift_ptr } from "../utility/pointer_ops";
+import { read_ptr, shift_ptr } from "../utility/pointer_ops";
 import { loadString } from "../utility/string_utility";
 import { ptr2ptr_type_inference, ptr2val_type_inference, safe_pop_stack } from "./helpers";
 
 export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: MessageEmitter): boolean {
     const F = state.CurrFrame.P; // the function that is currently running on
+    if (globalThis.DEBUG_DUMP_STEP) {
+        console.log(`Executing OpCode: ${F.code[state.CurrFrame.PC]}@${state.CurrFrame.PC}.`);
+        console.log(state.CurrFrame);
+    }
     
     switch (F.code[state.CurrFrame.PC]) {
         // dup

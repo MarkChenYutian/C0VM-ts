@@ -25,6 +25,9 @@ export default class MaterialEmitter implements MessageEmitter {
   }
 
   err(msg: string, detail?: string): void {
+    if (globalThis.DEBUG) {
+      console.error(msg, "\n", detail);
+    }
     const tobe_removed_id = "message-id-" + this.msg_counter;
     const new_msg = this.createElement(
       "div",

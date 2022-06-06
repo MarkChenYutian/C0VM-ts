@@ -1,0 +1,15 @@
+#use <conio>
+
+int main() {
+    int[] arr = alloc_array(int, 4);
+    arr[0] = 10;
+    arr[1] = 24;
+    arr[2] = 1;
+    arr[3] = 2;
+    print("[");
+    for (int i = 0; i < 4; i ++) {
+        printf("%d, ", arr[i]);
+    }
+    print("]");
+    return 0;
+}

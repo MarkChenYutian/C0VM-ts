@@ -1,8 +1,13 @@
 #use <conio>
+#use <string>
 
 int main() {
-    int i = 0;
-    printf("%d Hello world!\n", i);
+    string testStr = "test-file";
+    int l = string_length(testStr);
+    char[] arr = string_to_chararray(testStr);
+    for (int i = 0; i < l; i ++) {
+        printf("%c-", arr[i]);
+    }
     return 0;
 }
 

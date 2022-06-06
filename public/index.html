@@ -3,8 +3,7 @@
 
 <head>
     <title>C0VM.ts Alpha Version</title>
-    <link rel="stylesheet" href="index.css">
-    </link>
+    <link rel="stylesheet" href="index.css"></link>
     <script src="./bundle.js"></script>
     <script src="https://kit.fontawesome.com/4434981fa1.js" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,7 +31,8 @@
             <div class="code-editor">
                 <h3 style="margin-top: 0;">C0 Bytecode (.bc0 file):</h3>
                 <label style="display: none;">Code Area</label>
-                <textarea type="text" id="c0-code-input" title="Input your code here" class="code-input" ondrop="window.c0vm_ts.drag_init_runtime(event);"></textarea>
+                <textarea type="text" id="c0-code-input" title="Input your code here" class="code-input"
+                    ondrop="window.c0vm_ts.drag_init_runtime(event);" ondragenter="window.c0vm_ts.drag_hint_ui();"></textarea>
             </div>
             <div class="io-area">
                 <h3 style="margin-top: 0;">Printout (Standard Output)</h3>

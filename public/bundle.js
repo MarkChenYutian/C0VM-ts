@@ -28,6 +28,10 @@ var string_utility_1 = __webpack_require__(/*! ../utility/string_utility */ "./s
 var helpers_1 = __webpack_require__(/*! ./helpers */ "./src/exec/helpers.ts");
 function step(state, allocator, msg_handle) {
     var F = state.CurrFrame.P;
+    if (globalThis.DEBUG_DUMP_STEP) {
+        console.log("Executing OpCode: ".concat(F.code[state.CurrFrame.PC], "@").concat(state.CurrFrame.PC, "."));
+        console.log(state.CurrFrame);
+    }
     switch (F.code[state.CurrFrame.PC]) {
         case 89: {
             state.CurrFrame.PC += 1;
@@ -633,6 +637,9 @@ var MaterialEmitter = (function () {
         return elem;
     };
     MaterialEmitter.prototype.err = function (msg, detail) {
+        if (globalThis.DEBUG) {
+            console.error(msg, "\n", detail);
+        }
         var tobe_removed_id = "message-id-" + this.msg_counter;
         var new_msg = this.createElement("div", {
             id: tobe_removed_id,
@@ -1189,8 +1196,13 @@ exports.__esModule = true;
 exports.c0_print_char = exports.c0_print_bool = exports.c0_print_int = exports.c0_println = exports.c0_print = void 0;
 var string_utility_1 = __webpack_require__(/*! ../utility/string_utility */ "./src/utility/string_utility.ts");
 function internal_print(s) {
-    document.getElementById(globalThis.UI_PRINTOUT_ID).innerHTML += s;
-    return true;
+    if (globalThis.C0_ENVIR_MODE === "nodejs") {
+        return process.stdout.write(s);
+    }
+    else {
+        document.getElementById(globalThis.UI_PRINTOUT_ID).innerHTML += s;
+        return true;
+    }
 }
 function c0_print(mem, arg1) {
     return internal_print((0, string_utility_1.loadString)(arg1, mem));
@@ -1279,7 +1291,7 @@ function c0_string_to_chararray(mem, arg1) {
     var str = (0, string_utility_1.loadString)(arg1, mem);
     var ptr = mem.malloc(str.length + 1 + 4);
     var mem_block = mem.deref(ptr);
-    mem_block.setUint8(0, 1);
+    mem_block.setUint32(0, 1);
     for (var i = 0; i < str.length; i++) {
         mem_block.setUint8(4 + i, str.charCodeAt(i));
     }
@@ -2014,16 +2026,17 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 var exports = __webpack_exports__;
-/*!*********************!*\
-  !*** ./src/main.ts ***!
-  \*********************/
+/*!*************************!*\
+  !*** ./src/web_main.ts ***!
+  \*************************/
 
 exports.__esModule = true;
 var state_1 = __webpack_require__(/*! ./exec/state */ "./src/exec/state.ts");
 var material_emitter_1 = __webpack_require__(/*! ./gui/material_emitter */ "./src/gui/material_emitter.ts");
 function init_env() {
     globalThis.DEBUG = true;
-    globalThis.DEBUG_DUMP_MEM = true;
+    globalThis.DEBUG_DUMP_MEM = false;
+    globalThis.DEBUG_DUMP_STEP = false;
     globalThis.MEM_POOL_SIZE = 64;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
     globalThis.MEM_POOL_MAX_SIZE = 4294967294;
@@ -2035,11 +2048,13 @@ function init_env() {
     globalThis.UI_ERR_DISPLAY_TIME_MS = 10000;
     globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
     globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
+    globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
+    globalThis.C0_ENVIR_MODE = "web";
     globalThis.C0_RUNTIME = undefined;
     globalThis.MSG_EMITTER = new material_emitter_1["default"]();
     console.log("[C0VM.ts] Environment initialized.");
     if (globalThis.DEBUG) {
-        console.log("\nC0VM.ts Configuration Report:\n    Supported Language Level: C0-language-level\n    Supported Native Group: standard I/O, string operation\n\n    Debug Configuration:\n        Debug Mode: ".concat(globalThis.DEBUG, "\n        Dump heap memory: ").concat(globalThis.DEBUG_DUMP_MEM, "\n\n    Heap Memory Configuration:\n        Heap memory current size: ").concat(globalThis.MEM_POOL_SIZE, "\n        Heap memory default size: ").concat(globalThis.MEM_POOL_DEFAULT_SIZE, "\n        Heap memory max size: ").concat(globalThis.MEM_POOL_MAX_SIZE, "\n        Heap memory min size: ").concat(globalThis.MEM_POOL_MIN_SIZE, "\n        Heap memory block max size: ").concat(globalThis.MEM_BLOCK_MAX_SIZE, "\n"));
+        console.log("\nC0VM.ts Configuration Report:\n    General Configuration:\n        Supported Language Level: C0-language-level\n        Supported Native Group: standard Output, string operation\n        Environment Mode: ".concat(globalThis.C0_ENVIR_MODE, "\n        C0 Bytecode Max Size: ").concat(globalThis.C0_BYTECODE_MAX_LENGTH, "\n\n    Debug Configuration:\n        Debug Mode: ").concat(globalThis.DEBUG, "\n        Dump heap memory: ").concat(globalThis.DEBUG_DUMP_MEM, "\n        Dump VM Step: ").concat(globalThis.DEBUG_DUMP_STEP, "\n\n    Heap Memory Configuration:\n        Heap memory current size: ").concat(globalThis.MEM_POOL_SIZE, "\n        Heap memory default size: ").concat(globalThis.MEM_POOL_DEFAULT_SIZE, "\n        Heap memory max size: ").concat(globalThis.MEM_POOL_MAX_SIZE, "\n        Heap memory min size: ").concat(globalThis.MEM_POOL_MIN_SIZE, "\n        Heap memory block max size: ").concat(globalThis.MEM_BLOCK_MAX_SIZE, "\n"));
     }
 }
 function initialize_runtime() {
@@ -2117,6 +2132,10 @@ function drag_init_runtime(e) {
             return;
         }
         var res = fr.result.toString();
+        if (res.length > globalThis.C0_BYTECODE_MAX_LENGTH) {
+            globalThis.MSG_EMITTER.err("Input file is too large for C0VM.ts!", "The input file size is " + res.length + ", but the maximum accepted size is " + globalThis.C0_BYTECODE_MAX_LENGTH);
+            return;
+        }
         document.getElementById(globalThis.UI_INPUT_ID).value = res;
         try {
             globalThis.C0_RUNTIME = new state_1["default"](res, globalThis.MEM_POOL_SIZE);
@@ -2134,13 +2153,17 @@ function drag_init_runtime(e) {
         globalThis.MSG_EMITTER.ok("Program is loaded into C0VM", "Press STEP or RUN to execute the program.");
     };
 }
+function drag_hint_ui() {
+    document.getElementById(globalThis.UI_INPUT_ID).value = "Drop .bc0 file here to load bytecode.";
+}
 exports["default"] = {
     init_env: init_env,
     initialize_runtime: initialize_runtime,
     step_runtime: step_runtime,
     run_runtime: run_runtime,
     reset_runtime: reset_runtime,
-    drag_init_runtime: drag_init_runtime
+    drag_init_runtime: drag_init_runtime,
+    drag_hint_ui: drag_hint_ui
 };
 
 })();

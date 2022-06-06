@@ -5,7 +5,8 @@ import MaterialEmitter from "./gui/material_emitter";
 function init_env() {
     // Initialize global variables
     globalThis.DEBUG = true;
-    globalThis.DEBUG_DUMP_MEM = true;
+    globalThis.DEBUG_DUMP_MEM = false;
+    globalThis.DEBUG_DUMP_STEP = false;
 
     globalThis.MEM_POOL_SIZE = 64;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
@@ -22,6 +23,9 @@ function init_env() {
     globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
     globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
 
+    globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
+    globalThis.C0_ENVIR_MODE = "web";
+
     globalThis.C0_RUNTIME = undefined;
     globalThis.MSG_EMITTER = new MaterialEmitter();
     ///////////////////////////////
@@ -29,12 +33,16 @@ function init_env() {
     if (globalThis.DEBUG) {
         console.log(`
 C0VM.ts Configuration Report:
-    Supported Language Level: C0-language-level
-    Supported Native Group: standard I/O, string operation
+    General Configuration:
+        Supported Language Level: C0-language-level
+        Supported Native Group: standard Output, string operation
+        Environment Mode: ${globalThis.C0_ENVIR_MODE}
+        C0 Bytecode Max Size: ${globalThis.C0_BYTECODE_MAX_LENGTH}
 
     Debug Configuration:
         Debug Mode: ${globalThis.DEBUG}
         Dump heap memory: ${globalThis.DEBUG_DUMP_MEM}
+        Dump VM Step: ${globalThis.DEBUG_DUMP_STEP}
 
     Heap Memory Configuration:
         Heap memory current size: ${globalThis.MEM_POOL_SIZE}
@@ -119,7 +127,7 @@ function run_runtime() {
             globalThis.C0_RUNTIME = undefined;
             return;
         }
-        
+
     }
     globalThis.MSG_EMITTER.ok(
         "Program Execution Finished!",
@@ -162,7 +170,13 @@ function drag_init_runtime(e: DragEvent) {
             return;
         }
         const res = fr.result.toString();
-
+        if (res.length > globalThis.C0_BYTECODE_MAX_LENGTH) {
+            globalThis.MSG_EMITTER.err(
+                "Input file is too large for C0VM.ts!",
+                "The input file size is " + res.length + ", but the maximum accepted size is " + globalThis.C0_BYTECODE_MAX_LENGTH
+            );
+            return;
+        }
         (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value = res;
 
         try {
@@ -195,11 +209,16 @@ function drag_init_runtime(e: DragEvent) {
     }
 }
 
+function drag_hint_ui() {
+    (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value = "Drop .bc0 file here to load bytecode.";
+}
+
 export default {
     init_env,
     initialize_runtime,
     step_runtime,
     run_runtime,
     reset_runtime,
-    drag_init_runtime
+    drag_init_runtime,
+    drag_hint_ui
 };

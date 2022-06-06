@@ -2,8 +2,12 @@ import { loadString } from "../utility/string_utility";
 
 
 function internal_print(s: string): boolean {
-    document.getElementById(globalThis.UI_PRINTOUT_ID).innerHTML += s;
-    return true;
+    if (globalThis.C0_ENVIR_MODE === "nodejs") {
+        return process.stdout.write(s);
+    } else {
+        document.getElementById(globalThis.UI_PRINTOUT_ID).innerHTML += s;
+        return true;
+    }
 }
 
 export function c0_print(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>): boolean {

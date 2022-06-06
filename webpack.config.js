@@ -1,20 +1,9 @@
 const path = require('path');
 
-module.exports = {
+
+var config = {
   mode: "development",
-  // target: "node",
-  // devtool: "inline-source-map",
-  devtool: false,
-  entry: {
-    main: "./src/main.ts",
-  },
-  output: {
-    path: path.resolve(__dirname, './public'),
-    filename: "bundle.js",
-    library: "c0vm_ts",
-    libraryTarget: "window",
-    libraryExport: "default"
-  },
+  watch: true,
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
   },
@@ -26,4 +15,32 @@ module.exports = {
       }
     ]
   }
-};
+}
+
+var htmlConfig = Object.assign({}, config, {
+  devtool: false,
+  entry: {
+    main: "./src/web_main.ts",
+  },
+  output: {
+    path: path.resolve(__dirname, './public'),
+    filename: "bundle.js",
+    library: "c0vm_ts",
+    libraryTarget: "window",
+    libraryExport: "default"
+  }
+})
+
+var consoleConfig = Object.assign({}, config, {
+  devtool: "inline-source-map",
+  target: "node",
+  entry: {
+    main: "./src/console_main.ts",
+  },
+  output: {
+    path: path.resolve(__dirname, './public'),
+    filename: "console_bundle.js"
+  }
+})
+
+module.exports = [htmlConfig, consoleConfig];

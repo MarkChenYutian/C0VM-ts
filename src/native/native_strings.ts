@@ -61,7 +61,7 @@ export function c0_string_to_chararray(mem: C0HeapAllocator, arg1: C0Value<C0Val
     const str = loadString(arg1, mem);
     const ptr = mem.malloc(str.length + 1 + 4);
     const mem_block = mem.deref(ptr);
-    mem_block.setUint8(0, 1);   // Each char use 4 bytes of space
+    mem_block.setUint32(0, 1);   // Each char use 4 bytes of space
     for (let i = 0; i < str.length; i ++) {
         mem_block.setUint8(4 + i, str.charCodeAt(i));   // Fill in the data
     }
