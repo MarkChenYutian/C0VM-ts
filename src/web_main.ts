@@ -209,8 +209,12 @@ function drag_init_runtime(e: DragEvent) {
     }
 }
 
-function drag_hint_ui() {
+function drag_hint_enter_ui() {
     (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value = "Drop .bc0 file here to load bytecode.";
+}
+
+function drag_hint_leave_ui() {
+    (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value = "";
 }
 
 export default {
@@ -220,5 +224,6 @@ export default {
     run_runtime,
     reset_runtime,
     drag_init_runtime,
-    drag_hint_ui
+    drag_hint_enter_ui,
+    drag_hint_leave_ui
 };

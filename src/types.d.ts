@@ -92,12 +92,12 @@ type C0PointerType = "<unknown>" | "<unknown>[]" | "string" | "struct" | "int[]"
 type C0Value<T extends C0ValueVMType> = 
     T extends C0ValueVMType.value ? {
         vm_type: T;
-        type: C0ValueType;                  // Some types can't fit in C0Value directly
+        type: C0ValueType;// Some types can't fit in C0Value directly
         value: DataView
     } : 
     T extends C0ValueVMType.ptr ? {
         vm_type: T;
-        type: C0PointerType;  // Everything can have a pointer
+        type: C0PointerType;// Everything can have a corresponding pointer type
         value: C0Pointer
     } : 
     never;

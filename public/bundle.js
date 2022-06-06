@@ -2153,8 +2153,11 @@ function drag_init_runtime(e) {
         globalThis.MSG_EMITTER.ok("Program is loaded into C0VM", "Press STEP or RUN to execute the program.");
     };
 }
-function drag_hint_ui() {
+function drag_hint_enter_ui() {
     document.getElementById(globalThis.UI_INPUT_ID).value = "Drop .bc0 file here to load bytecode.";
+}
+function drag_hint_leave_ui() {
+    document.getElementById(globalThis.UI_INPUT_ID).value = "";
 }
 exports["default"] = {
     init_env: init_env,
@@ -2163,7 +2166,8 @@ exports["default"] = {
     run_runtime: run_runtime,
     reset_runtime: reset_runtime,
     drag_init_runtime: drag_init_runtime,
-    drag_hint_ui: drag_hint_ui
+    drag_hint_enter_ui: drag_hint_enter_ui,
+    drag_hint_leave_ui: drag_hint_leave_ui
 };
 
 })();

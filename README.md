@@ -1,22 +1,57 @@
 # C0VM.ts Documentation
 
+## Demo
+
+Visit [C0VM.ts Alpha Version (markchenyutian.github.io)](https://markchenyutian.github.io/C0VM-ts/public/) here for the demo of this project!
+
 ## Compile & Execute Project
 
-The entry point of this projcet is at `/src/main.ts`.
+There are two entry points / compile target for this project. One entry point, `console_main.ts` will compile the project to a node.js application for local execution. The other entry point `web_main.ts` will compile the project to a webpack library that loaded on the `globalThis` (which is `window` in browser) and allows program to be loaded & executed in modern browsers.
 
-The project is setup to be compiled to `CommonJS` using `webpack`.
-
-> :warning: Currently, we set the compile target to `node` in `webpack.config.js` in order to use some NodeJS utility like `fs`.
+To compile the project, use command
 
 ```bash
 $ npx webpack
 ```
 
-To execute the `hello.bc0` file in `./src/test/` folder, use
+This command will also `watch` the directory and automatically rebuild the project when changes are detected.
+
+### Node.js Compile Target
+
+The `node.js` compile target uses `console_main.ts` as entry point and will save the output to `./public/console_bundle.js`.
+
+To execute the `hello.bc0` file in `./src/test/` folder, use 
 
 ```
-$ node ./build/bundle.js hello.bc0
+$ node ./public/console_bundle.js hello.bc0
 ```
+
+### Browser Compile Target
+
+The `browser` compile target uses `web_main.ts` as entry point and will save the output to `./public/bundle.js`.
+
+To open the project, visit [C0VM.ts Alpha Version (markchenyutian.github.io)](https://markchenyutian.github.io/C0VM-ts/public/) or open a server on your computer and access the `public/index.html`.
+
+## Configurations
+
+Configurations are generally set up using global variables declared under `options.d.ts`. To change the configuration, change the assignment of global variables in `web_main.ts` or `console_main.ts`.
+
+| Option                   | Explanation                                                  |
+| ------------------------ | ------------------------------------------------------------ |
+| `DEBUG`                  | `boolean` value, `true` to turn on debug features            |
+| `DEBUG_DUMP_MEM`         | `boolean` value, `true` to dump the heap memory to console on the beginning of every execution. |
+| `DEBUG_DUMP_STEP`        | `boolean` value, `true` to log the `currFrame` and `PC` of each step |
+| `MEM_BLOCK_MAX_SIZE`     | `number`, the maximum size of heap memory                    |
+| `MEM_POOL_SIZE`          | `number`, the current size of heap memory                    |
+| `MEM_POOL_MIN_SIZE`      | `number`, the minimum allowed size of heap memory            |
+| `MEM_POOL_MAX_SIZE`      | `number`, the maximum allowed size of heap memory            |
+| `MEM_POOL_DEFAULT_SIZE`  | `number`, the default (fallback value for) the size of heap memory |
+| `UI_INPUT_ID`            | `string`, used by `browser` compile target only, the ID of HTMLElement that provides bytecode input. |
+| `UI_PRINTOUT_ID`         | `string`, used by `browser` compile target only, the ID of HTMLElement that act as standard output. |
+| `UI_MSG_ID`              | `string`, used by `browser` compile target only, the ID of HTMLElement that shows all the output messages (ok, warn and error). |
+| `C0_BYTECODE_MAX_LENGTH` | `number`, used by `browser` compile target only, the maximum allowed size of byte code input when using drag&drop upload method. |
+| `C0_ENVIR_MODE`          | `"nodejs" | "web"`, used by some native functions to deploy different implementations based on different compile target. |
+| `MSG_EMITTER`            | `MessageEmitter`, determine the way that C0VM.ts emit message to user. |
 
 ## VM Structure
 
@@ -413,3 +448,5 @@ The list of native functions is listed below:
 
 * Currently, the C0VM.ts has implemented all the features required for `C0` language.
 * We are working on type inference part of the C0VM.ts
+    * Specifically, we are working on type inference of `struct` and `array`.
+* In the future, we will support the `C1` language standard.
