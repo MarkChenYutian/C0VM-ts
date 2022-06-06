@@ -18,6 +18,10 @@ function init_env() {
     globalThis.UI_PRINTOUT_ID = "c0-output";
     globalThis.UI_MSG_ID = "message-terminal";
 
+    globalThis.UI_ERR_DISPLAY_TIME_MS = 10000;
+    globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
+    globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
+
     globalThis.C0_RUNTIME = undefined;
     globalThis.MSG_EMITTER = new MaterialEmitter();
     ///////////////////////////////
@@ -43,14 +47,27 @@ C0VM.ts Configuration Report:
 }
 
 function initialize_runtime() {
-    console.log(document.getElementById(globalThis.UI_INPUT_ID) as HTMLInputElement);
-    globalThis.C0_RUNTIME = new C0VM_RuntimeState(
-        (document.getElementById(globalThis.UI_INPUT_ID) as HTMLInputElement).value, globalThis.MEM_POOL_SIZE
-    );
+    try {
+        globalThis.C0_RUNTIME = new C0VM_RuntimeState(
+            (document.getElementById(globalThis.UI_INPUT_ID) as HTMLInputElement).value, globalThis.MEM_POOL_SIZE
+        );
+    } catch (e) {
+        globalThis.MSG_EMITTER.err(
+            e.name,
+            e.message
+        );
+        return;
+    }
     if (globalThis.DEBUG_DUMP_MEM) {
         console.log("[DEBUG] Memory dump:")
         console.log(globalThis.C0_RUNTIME.debug());
     }
+
+    document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
+    document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(
+        (e) => document.getElementById(globalThis.UI_MSG_ID).removeChild(e)
+    );
+
     globalThis.MSG_EMITTER.ok(
         "Program is loaded into C0VM",
         "Press STEP or RUN to execute the program."
@@ -65,10 +82,18 @@ function step_runtime() {
         );
         return;
     }
-    if (!globalThis.C0_RUNTIME.step_forward()) {
-        globalThis.MSG_EMITTER.ok(
-            "Program Execution Finished!",
-            "Load the program again if you want to rerun the program."
+    try {
+        if (!globalThis.C0_RUNTIME.step_forward()) {
+            globalThis.MSG_EMITTER.ok(
+                "Program Execution Finished!",
+                "Load the program again if you want to rerun the program."
+            );
+            globalThis.C0_RUNTIME = undefined;
+        }
+    } catch (e) {
+        globalThis.MSG_EMITTER.err(
+            (e as Error).name,
+            (e as Error).message
         );
         globalThis.C0_RUNTIME = undefined;
     }
@@ -84,7 +109,17 @@ function run_runtime() {
     }
     let res = true;
     while (res) {
-        res = globalThis.C0_RUNTIME.step_forward();
+        try {
+            res = globalThis.C0_RUNTIME.step_forward();
+        } catch (e) {
+            globalThis.MSG_EMITTER.err(
+                (e as Error).name,
+                (e as Error).message
+            )
+            globalThis.C0_RUNTIME = undefined;
+            return;
+        }
+        
     }
     globalThis.MSG_EMITTER.ok(
         "Program Execution Finished!",
@@ -99,10 +134,65 @@ function reset_runtime() {
     }
     globalThis.C0_RUNTIME.restart();
     document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
+    document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(
+        (e) => document.getElementById(globalThis.UI_MSG_ID).removeChild(e)
+    );
     globalThis.MSG_EMITTER.ok(
         "C0VM Restart Successfully",
         "Your program will be executed again from the beginning."
     );
+}
+
+function drag_init_runtime(e: DragEvent) {
+    e.preventDefault();
+    if (!e.dataTransfer.items) return;
+
+    if (e.dataTransfer.items.length !== 1) {
+        globalThis.MSG_EMITTER.err(
+            "Unsupported Feature",
+            "We only support uploading one .bc0 file into the C0VM.ts now."
+        );
+    }
+
+    const fr = new FileReader();
+    fr.readAsText(e.dataTransfer.items[0].getAsFile(), "utf-8");
+    fr.onloadend = (e) => {
+        if (fr.result === null) {
+            globalThis.MSG_EMITTER.err("Unable to read the file.");
+            return;
+        }
+        const res = fr.result.toString();
+
+        (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value = res;
+
+        try {
+            globalThis.C0_RUNTIME = new C0VM_RuntimeState(
+                res, globalThis.MEM_POOL_SIZE
+            );
+        }
+        catch (e) {
+            globalThis.MSG_EMITTER.err(
+                e.name,
+                e.message
+            );
+            return;
+        }
+
+        document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
+        document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(
+            (e) => document.getElementById(globalThis.UI_MSG_ID).removeChild(e)
+        );
+
+        if (globalThis.DEBUG_DUMP_MEM) {
+            console.log("[DEBUG] Memory dump:")
+            console.log(globalThis.C0_RUNTIME.debug());
+        }
+
+        globalThis.MSG_EMITTER.ok(
+            "Program is loaded into C0VM",
+            "Press STEP or RUN to execute the program."
+        );
+    }
 }
 
 export default {
@@ -110,5 +200,6 @@ export default {
     initialize_runtime,
     step_runtime,
     run_runtime,
-    reset_runtime
+    reset_runtime,
+    drag_init_runtime
 };

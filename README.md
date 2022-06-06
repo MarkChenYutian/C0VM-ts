@@ -329,7 +329,7 @@ The list of native functions is listed below:
 
 | Native Functions | Support?           |
 | ---------------- | ------------------ |
-| NATIVE_EOF       | :hourglass:        |
+| NATIVE_EOF       | :x:                |
 | NATIVE_FLUSH     | :hourglass:        |
 | NATIVE_PRINT     | :white_check_mark: |
 | NATIVE_PRINTBOOL | :white_check_mark: |
@@ -398,15 +398,15 @@ The list of native functions is listed below:
 | NATIVE_STRING_CHARAT         | :hourglass:        |
 | NATIVE_STRING_COMPARE        | :white_check_mark: |
 | NATIVE_STRING_EQUAL          | :white_check_mark: |
-| NATIVE_STRING_FROM_CHARARRAY | :hourglass:        |
-| NATIVE_STRING_FROMBOOL       | :hourglass:        |
-| NATIVE_STRING_FROMCHAR       | :hourglass:        |
-| NATIVE_STRING_FROMINT        | :hourglass:        |
-| NATIVE_STRING_JOIN           | :hourglass:        |
-| NATIVE_STRING_LENGTH         | :hourglass:        |
+| NATIVE_STRING_FROM_CHARARRAY | :white_check_mark: |
+| NATIVE_STRING_FROMBOOL       | :white_check_mark: |
+| NATIVE_STRING_FROMCHAR       | :white_check_mark: |
+| NATIVE_STRING_FROMINT        | :white_check_mark: |
+| NATIVE_STRING_JOIN           | :white_check_mark: |
+| NATIVE_STRING_LENGTH         | :white_check_mark: |
 | NATIVE_STRING_SUB            | :hourglass:        |
 | NATIVE_STRING_TERMINATED     | :hourglass:        |
-| NATIVE_STRING_TO_CHARARRAY   | :hourglass:        |
+| NATIVE_STRING_TO_CHARARRAY   | :white_check_mark: |
 | NATIVE_STRING_TOLOWER        | :hourglass:        |
 
 ## Project Progress

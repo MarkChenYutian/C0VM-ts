@@ -661,7 +661,7 @@ var MaterialEmitter = (function () {
         setTimeout(function () {
             var pending_remove = document.querySelector("div#" + tobe_removed_id);
             pending_remove.parentNode.removeChild(pending_remove);
-        }, 4000);
+        }, globalThis.UI_ERR_DISPLAY_TIME_MS);
         this.msg_counter++;
     };
     MaterialEmitter.prototype.warn = function (msg, detail) {
@@ -693,7 +693,7 @@ var MaterialEmitter = (function () {
         setTimeout(function () {
             var pending_remove = document.querySelector("div#" + tobe_removed_id);
             pending_remove.parentNode.removeChild(pending_remove);
-        }, 4000);
+        }, globalThis.UI_WARN_DISPLAY_TIME_MS);
         this.msg_counter++;
     };
     MaterialEmitter.prototype.ok = function (msg, detail) {
@@ -725,7 +725,7 @@ var MaterialEmitter = (function () {
         setTimeout(function () {
             var pending_remove = document.querySelector("div#" + tobe_removed_id);
             pending_remove.parentNode.removeChild(pending_remove);
-        }, 4000);
+        }, globalThis.UI_OK_DISPLAY_TIME_MS);
         this.msg_counter++;
     };
     return MaterialEmitter;
@@ -1066,42 +1066,72 @@ function nativeFuncMapping(index) {
             return {
                 functionType: "NATIVE_STRING_FROM_CHARARRAY",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: function (mem, arg1) {
+                    if (arg1.vm_type !== "ptr") {
+                        throw new errors_1.vm_error("NATIVE_STRING_FROM_CHARARRAY only accepts pointer as input");
+                    }
+                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_to_chararray(mem, arg1), "string");
+                }
             };
         }
         case 97: {
             return {
                 functionType: "NATIVE_STRING_FROMBOOL",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: function (mem, arg1) {
+                    if (arg1.vm_type !== "value") {
+                        throw new errors_1.vm_error("NATIVE_STRING_FROMBOOL only accepts value as input");
+                    }
+                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_frombool(mem, arg1), "string");
+                }
             };
         }
         case 98: {
             return {
                 functionType: "NATIVE_STRING_FROMCHAR",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: function (mem, arg1) {
+                    if (arg1.vm_type !== "value") {
+                        throw new errors_1.vm_error("NATIVE_STRING_FROMCHAR only accepts value as input");
+                    }
+                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_fromchar(mem, arg1), "string");
+                }
             };
         }
         case 99: {
             return {
                 functionType: "NATIVE_STRING_FROMINT",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: function (mem, arg1) {
+                    if (arg1.vm_type !== "value") {
+                        throw new errors_1.vm_error("NATIVE_STRING_FROMINT only accepts value as input");
+                    }
+                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_fromint(mem, arg1), "string");
+                }
             };
         }
         case 100: {
             return {
                 functionType: "NATIVE_STRING_JOIN",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: function (mem, arg1, arg2) {
+                    if (arg1.vm_type !== "ptr" || arg2.vm_type !== "ptr") {
+                        throw new errors_1.vm_error("NATIVE_STRING_JOIN only accepts pointers as input");
+                    }
+                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_join(mem, arg1, arg2), "string");
+                }
             };
         }
         case 101: {
             return {
                 functionType: "NATIVE_STRING_LENGTH",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: function (mem, arg1) {
+                    if (arg1.vm_type !== "ptr") {
+                        throw new errors_1.vm_error("NATIVE_STRING_LENGTH only accepts pointers as input");
+                    }
+                    return (0, c0_value_1.js_cvt2_c0_value)(StringNative.c0_string_length(mem, arg1));
+                }
             };
         }
         case 102: {
@@ -1122,7 +1152,12 @@ function nativeFuncMapping(index) {
             return {
                 functionType: "NATIVE_STRING_TO_CHARARRAY",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: function (mem, arg1) {
+                    if (arg1.vm_type !== "ptr") {
+                        throw new errors_1.vm_error("NATIVE_STRING_TO_CHARARRAY only accepts pointer as input");
+                    }
+                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_to_chararray(mem, arg1), "char[]");
+                }
             };
         }
         case 105: {
@@ -1190,8 +1225,20 @@ exports.c0_print_char = c0_print_char;
 
 
 exports.__esModule = true;
-exports.c0_string_equal = exports.c0_string_compare = void 0;
+exports.c0_string_from_chararray = exports.c0_string_to_chararray = exports.c0_string_length = exports.c0_string_join = exports.c0_string_fromint = exports.c0_string_fromchar = exports.c0_string_frombool = exports.c0_string_equal = exports.c0_string_compare = void 0;
+var c0_value_1 = __webpack_require__(/*! ../utility/c0_value */ "./src/utility/c0_value.ts");
+var errors_1 = __webpack_require__(/*! ../utility/errors */ "./src/utility/errors.ts");
 var pointer_ops_1 = __webpack_require__(/*! ../utility/pointer_ops */ "./src/utility/pointer_ops.ts");
+var string_utility_1 = __webpack_require__(/*! ../utility/string_utility */ "./src/utility/string_utility.ts");
+function allocate_js_string(mem, s) {
+    var ptr = mem.malloc(s.length + 1);
+    var block = mem.deref(ptr);
+    for (var i = 0; i < s.length; i++) {
+        block.setUint8(i, s.charCodeAt(i));
+    }
+    block.setUint8(s.length, 0);
+    return ptr;
+}
 function c0_string_compare(mem, arg1, arg2) {
     var byte_arr_1 = (0, pointer_ops_1.isNullPtr)(arg1.value) ? new DataView(new ArrayBuffer(0)) : mem.deref(arg1.value);
     var byte_arr_2 = (0, pointer_ops_1.isNullPtr)(arg1.value) ? new DataView(new ArrayBuffer(0)) : mem.deref(arg2.value);
@@ -1205,6 +1252,54 @@ function c0_string_equal(mem, arg1, arg2) {
     return c0_string_compare(mem, arg1, arg2) === 0;
 }
 exports.c0_string_equal = c0_string_equal;
+function c0_string_frombool(mem, arg1) {
+    arg1.type = "boolean";
+    return allocate_js_string(mem, (0, c0_value_1.c0_cvt2_js_value)(arg1) ? "true" : "false");
+}
+exports.c0_string_frombool = c0_string_frombool;
+function c0_string_fromchar(mem, arg1) {
+    arg1.type = "char";
+    return allocate_js_string(mem, (0, c0_value_1.c0_cvt2_js_value)(arg1));
+}
+exports.c0_string_fromchar = c0_string_fromchar;
+function c0_string_fromint(mem, arg1) {
+    arg1.type = "int";
+    return allocate_js_string(mem, "" + (0, c0_value_1.c0_cvt2_js_value)(arg1));
+}
+exports.c0_string_fromint = c0_string_fromint;
+function c0_string_join(mem, arg1, arg2) {
+    return allocate_js_string(mem, (0, string_utility_1.loadString)(arg1, mem) + (0, string_utility_1.loadString)(arg2, mem));
+}
+exports.c0_string_join = c0_string_join;
+function c0_string_length(mem, arg1) {
+    return (0, string_utility_1.loadString)(arg1, mem).length;
+}
+exports.c0_string_length = c0_string_length;
+function c0_string_to_chararray(mem, arg1) {
+    var str = (0, string_utility_1.loadString)(arg1, mem);
+    var ptr = mem.malloc(str.length + 1 + 4);
+    var mem_block = mem.deref(ptr);
+    mem_block.setUint8(0, 1);
+    for (var i = 0; i < str.length; i++) {
+        mem_block.setUint8(4 + i, str.charCodeAt(i));
+    }
+    mem_block.setUint8(str.length + 4, 0);
+    return ptr;
+}
+exports.c0_string_to_chararray = c0_string_to_chararray;
+function c0_string_from_chararray(mem, arg1) {
+    var mem_block = mem.deref(arg1.value);
+    if (mem_block.getUint8(0) !== 1)
+        throw new errors_1.vm_error("String from Chararray receive array with elem size other than 1");
+    var _a = (0, pointer_ops_1.read_ptr)(arg1.value), addr = _a[0], offset = _a[1], size = _a[2];
+    var length = size - offset;
+    var str = "";
+    for (var i = 0; i < length; i++) {
+        str = str + String.fromCharCode(mem_block.getUint8(4 + i));
+    }
+    return allocate_js_string(mem, str);
+}
+exports.c0_string_from_chararray = c0_string_from_chararray;
 
 
 /***/ }),
@@ -1499,9 +1594,7 @@ function c0_cvt2_js_value(value) {
                 return value.value.getInt32(0);
             }
             case "char": {
-                var dec = new TextDecoder();
-                var str = dec.decode(value.value.buffer.slice(3));
-                return str;
+                return String.fromCharCode(value.value.getUint8(3));
             }
             case "boolean": {
                 return value.value.getUint32(0) !== 0;
@@ -1939,6 +2032,9 @@ function init_env() {
     globalThis.UI_INPUT_ID = "c0-code-input";
     globalThis.UI_PRINTOUT_ID = "c0-output";
     globalThis.UI_MSG_ID = "message-terminal";
+    globalThis.UI_ERR_DISPLAY_TIME_MS = 10000;
+    globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
+    globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
     globalThis.C0_RUNTIME = undefined;
     globalThis.MSG_EMITTER = new material_emitter_1["default"]();
     console.log("[C0VM.ts] Environment initialized.");
@@ -1947,12 +2043,19 @@ function init_env() {
     }
 }
 function initialize_runtime() {
-    console.log(document.getElementById(globalThis.UI_INPUT_ID));
-    globalThis.C0_RUNTIME = new state_1["default"](document.getElementById(globalThis.UI_INPUT_ID).value, globalThis.MEM_POOL_SIZE);
+    try {
+        globalThis.C0_RUNTIME = new state_1["default"](document.getElementById(globalThis.UI_INPUT_ID).value, globalThis.MEM_POOL_SIZE);
+    }
+    catch (e) {
+        globalThis.MSG_EMITTER.err(e.name, e.message);
+        return;
+    }
     if (globalThis.DEBUG_DUMP_MEM) {
         console.log("[DEBUG] Memory dump:");
         console.log(globalThis.C0_RUNTIME.debug());
     }
+    document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
+    document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(function (e) { return document.getElementById(globalThis.UI_MSG_ID).removeChild(e); });
     globalThis.MSG_EMITTER.ok("Program is loaded into C0VM", "Press STEP or RUN to execute the program.");
 }
 function step_runtime() {
@@ -1960,8 +2063,14 @@ function step_runtime() {
         globalThis.MSG_EMITTER.err("C0VM has not load any bytecode yet!", "After input bytecode, press Load to load the bytecode before executing.");
         return;
     }
-    if (!globalThis.C0_RUNTIME.step_forward()) {
-        globalThis.MSG_EMITTER.ok("Program Execution Finished!", "Load the program again if you want to rerun the program.");
+    try {
+        if (!globalThis.C0_RUNTIME.step_forward()) {
+            globalThis.MSG_EMITTER.ok("Program Execution Finished!", "Load the program again if you want to rerun the program.");
+            globalThis.C0_RUNTIME = undefined;
+        }
+    }
+    catch (e) {
+        globalThis.MSG_EMITTER.err(e.name, e.message);
         globalThis.C0_RUNTIME = undefined;
     }
 }
@@ -1972,7 +2081,14 @@ function run_runtime() {
     }
     var res = true;
     while (res) {
-        res = globalThis.C0_RUNTIME.step_forward();
+        try {
+            res = globalThis.C0_RUNTIME.step_forward();
+        }
+        catch (e) {
+            globalThis.MSG_EMITTER.err(e.name, e.message);
+            globalThis.C0_RUNTIME = undefined;
+            return;
+        }
     }
     globalThis.MSG_EMITTER.ok("Program Execution Finished!", "Load the program again if you want to rerun the program.");
     globalThis.C0_RUNTIME = undefined;
@@ -1983,14 +2099,48 @@ function reset_runtime() {
     }
     globalThis.C0_RUNTIME.restart();
     document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
+    document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(function (e) { return document.getElementById(globalThis.UI_MSG_ID).removeChild(e); });
     globalThis.MSG_EMITTER.ok("C0VM Restart Successfully", "Your program will be executed again from the beginning.");
+}
+function drag_init_runtime(e) {
+    e.preventDefault();
+    if (!e.dataTransfer.items)
+        return;
+    if (e.dataTransfer.items.length !== 1) {
+        globalThis.MSG_EMITTER.err("Unsupported Feature", "We only support uploading one .bc0 file into the C0VM.ts now.");
+    }
+    var fr = new FileReader();
+    fr.readAsText(e.dataTransfer.items[0].getAsFile(), "utf-8");
+    fr.onloadend = function (e) {
+        if (fr.result === null) {
+            globalThis.MSG_EMITTER.err("Unable to read the file.");
+            return;
+        }
+        var res = fr.result.toString();
+        document.getElementById(globalThis.UI_INPUT_ID).value = res;
+        try {
+            globalThis.C0_RUNTIME = new state_1["default"](res, globalThis.MEM_POOL_SIZE);
+        }
+        catch (e) {
+            globalThis.MSG_EMITTER.err(e.name, e.message);
+            return;
+        }
+        document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
+        document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(function (e) { return document.getElementById(globalThis.UI_MSG_ID).removeChild(e); });
+        if (globalThis.DEBUG_DUMP_MEM) {
+            console.log("[DEBUG] Memory dump:");
+            console.log(globalThis.C0_RUNTIME.debug());
+        }
+        globalThis.MSG_EMITTER.ok("Program is loaded into C0VM", "Press STEP or RUN to execute the program.");
+    };
 }
 exports["default"] = {
     init_env: init_env,
     initialize_runtime: initialize_runtime,
     step_runtime: step_runtime,
     run_runtime: run_runtime,
-    reset_runtime: reset_runtime
+    reset_runtime: reset_runtime,
+    drag_init_runtime: drag_init_runtime
 };
 
 })();

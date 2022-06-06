@@ -34,32 +34,32 @@ export default class MaterialEmitter implements MessageEmitter {
       },
       detail === undefined
         ? [
-            this.createElement("h4", {}, [
-                this.createElement("i", {
-                    className: "fas fa-exclamation-circle",
-                    style: "color: rgb(239, 83, 80);"
-                }),"   ",
-                msg
-            ])
+          this.createElement("h4", {}, [
+            this.createElement("i", {
+              className: "fas fa-exclamation-circle",
+              style: "color: rgb(239, 83, 80);"
+            }), "   ",
+            msg
+          ])
         ]
         : [
-            this.createElement("h4", {}, [
-                this.createElement("i", {
-                    className: "fas fa-exclamation-circle",
-                    style: "color: rgb(239, 83, 80);"
-                }),"   ",
-                msg
-            ]),
-            this.createElement("p", {}, detail),
-          ]
+          this.createElement("h4", {}, [
+            this.createElement("i", {
+              className: "fas fa-exclamation-circle",
+              style: "color: rgb(239, 83, 80);"
+            }), "   ",
+            msg
+          ]),
+          this.createElement("p", {}, detail),
+        ]
     );
     this.msg_root.appendChild(new_msg);
 
     // Remove this message after 4000ms.
     setTimeout(() => {
-      const pending_remove = document.querySelector("div#" + tobe_removed_id);
+      const pending_remove = document.querySelector("div#" + tobe_removed_id) as HTMLElement;
       pending_remove.parentNode.removeChild(pending_remove);
-    }, 4000);
+    }, globalThis.UI_ERR_DISPLAY_TIME_MS);
     this.msg_counter++;
   }
 
@@ -73,35 +73,35 @@ export default class MaterialEmitter implements MessageEmitter {
       },
       detail === undefined
         ? [
-            this.createElement("h4", {}, [
-                this.createElement("i", {
-                    className: "fas fa-exclamation-triangle",
-                    style: "color: rgb(255, 152, 0);"
-                }),"   ",
-                msg
-            ])
+          this.createElement("h4", {}, [
+            this.createElement("i", {
+              className: "fas fa-exclamation-triangle",
+              style: "color: rgb(255, 152, 0);"
+            }), "   ",
+            msg
+          ])
         ]
         : [
-            this.createElement("h4", {}, [
-                this.createElement("i", {
-                    className: "fas fa-exclamation-triangle",
-                    style: "color: rgb(255, 152, 0);"
-                }),"   ",
-                msg
-            ]),
-            this.createElement("p", {}, detail),
-          ]
+          this.createElement("h4", {}, [
+            this.createElement("i", {
+              className: "fas fa-exclamation-triangle",
+              style: "color: rgb(255, 152, 0);"
+            }), "   ",
+            msg
+          ]),
+          this.createElement("p", {}, detail),
+        ]
     );
     this.msg_root.appendChild(new_msg);
 
     // Remove this message after 4000ms.
     setTimeout(() => {
-      const pending_remove = document.querySelector("div#" + tobe_removed_id);
+      const pending_remove = document.querySelector("div#" + tobe_removed_id) as HTMLElement;
       pending_remove.parentNode.removeChild(pending_remove);
-    }, 4000);
+    }, globalThis.UI_WARN_DISPLAY_TIME_MS);
     this.msg_counter++;
   }
-    //   <i class="fas fa-check-circle"></i>
+  //   <i class="fas fa-check-circle"></i>
   ok(msg: string, detail?: string): void {
     const tobe_removed_id = "message-id-" + this.msg_counter;
     const new_msg = this.createElement(
@@ -111,33 +111,33 @@ export default class MaterialEmitter implements MessageEmitter {
         className: "ok-msg",
       },
       detail === undefined
-      ? [
+        ? [
           this.createElement("h4", {}, [
-              this.createElement("i", {
-                  className: "fas fa-check-circle",
-                  style: "color: rgb(76, 175, 80);"
-              }),"   ",
-              msg
+            this.createElement("i", {
+              className: "fas fa-check-circle",
+              style: "color: rgb(76, 175, 80);"
+            }), "   ",
+            msg
           ])
-      ]
-      : [
+        ]
+        : [
           this.createElement("h4", {}, [
-              this.createElement("i", {
-                  className: "fas fa-check-circle",
-                  style: "color: rgb(76, 175, 80);"
-              }),"   ",
-              msg
+            this.createElement("i", {
+              className: "fas fa-check-circle",
+              style: "color: rgb(76, 175, 80);"
+            }), "   ",
+            msg
           ]),
           this.createElement("p", {}, detail),
         ]
-  );
+    );
     this.msg_root.appendChild(new_msg);
 
-    // Remove this message after 4000ms.
+    // Remove this message after UI_OK_DISPLAY_TIME_MS.
     setTimeout(() => {
-      const pending_remove = document.querySelector("div#" + tobe_removed_id);
+      const pending_remove = document.querySelector("div#" + tobe_removed_id) as HTMLElement;
       pending_remove.parentNode.removeChild(pending_remove);
-    }, 4000);
+    }, globalThis.UI_OK_DISPLAY_TIME_MS);
     this.msg_counter++;
   }
 }

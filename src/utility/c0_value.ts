@@ -56,9 +56,7 @@ export function c0_cvt2_js_value(value: C0Value<C0ValueVMType>): number | string
                 return value.value.getInt32(0);
             }
             case "char": {
-                const dec = new TextDecoder();
-                const str = dec.decode(value.value.buffer.slice(3,));
-                return str;
+                return String.fromCharCode(value.value.getUint8(3));                
             }
             case "boolean": {
                 return value.value.getUint32(0) !== 0;

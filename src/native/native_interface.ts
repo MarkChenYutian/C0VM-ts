@@ -9,7 +9,7 @@
  * This file only contains the native function loader & header, the actual 
  * functions are defined in other files in this folder.
  */
-import { js_cvt2_c0_value } from "../utility/c0_value";
+import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value } from "../utility/c0_value";
 import { vm_error, vm_instruct_error } from "../utility/errors";
 import * as StringNative from "./native_strings";
 import * as IONative from "./native_io";
@@ -355,42 +355,84 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_STRING_FROM_CHARARRAY",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem, arg1: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.ptr) {
+                        throw new vm_error("NATIVE_STRING_FROM_CHARARRAY only accepts pointer as input");
+                    }
+                    return build_c0_ptrValue(
+                        StringNative.c0_string_to_chararray(mem, arg1), "string"
+                    );
+                }
             }
         }
         case 97: {
             return {
                 functionType: "NATIVE_STRING_FROMBOOL",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem, arg1: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.value) {
+                        throw new vm_error("NATIVE_STRING_FROMBOOL only accepts value as input");
+                    }
+                    return build_c0_ptrValue(
+                        StringNative.c0_string_frombool(mem, arg1), "string"
+                    );
+                }
             }
         }
         case 98: {
             return {
                 functionType: "NATIVE_STRING_FROMCHAR",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem, arg1: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.value) {
+                        throw new vm_error("NATIVE_STRING_FROMCHAR only accepts value as input");
+                    }
+                    return build_c0_ptrValue(
+                        StringNative.c0_string_fromchar(mem, arg1), "string"
+                    );
+                }
             }
         }
         case 99: {
             return {
                 functionType: "NATIVE_STRING_FROMINT",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem, arg1: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.value) {
+                        throw new vm_error("NATIVE_STRING_FROMINT only accepts value as input");
+                    }
+                    return build_c0_ptrValue(
+                        StringNative.c0_string_fromint(mem, arg1), "string"
+                    );
+                }
             }
         }
         case 100: {
             return {
                 functionType: "NATIVE_STRING_JOIN",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem, arg1: C0Value<C0ValueVMType>, arg2: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.ptr || arg2.vm_type !== C0ValueVMType.ptr) {
+                        throw new vm_error("NATIVE_STRING_JOIN only accepts pointers as input");
+                    }
+                    return build_c0_ptrValue(
+                        StringNative.c0_string_join(mem, arg1, arg2), "string"
+                    );
+                }
             }
         }
         case 101: {
             return {
                 functionType: "NATIVE_STRING_LENGTH",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem, arg1) => {
+                    if (arg1.vm_type !== C0ValueVMType.ptr) {
+                        throw new vm_error("NATIVE_STRING_LENGTH only accepts pointers as input");
+                    }
+                    return js_cvt2_c0_value(
+                        StringNative.c0_string_length(mem, arg1)
+                    );
+                }
             }
         }
         case 102: {
@@ -411,7 +453,14 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_STRING_TO_CHARARRAY",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem, arg1: C0Value<C0ValueVMType>) => {
+                    if (arg1.vm_type !== C0ValueVMType.ptr) {
+                        throw new vm_error("NATIVE_STRING_TO_CHARARRAY only accepts pointer as input");
+                    }
+                    return build_c0_ptrValue(
+                        StringNative.c0_string_to_chararray(mem, arg1), "char[]"
+                    );
+                }
             }
         }
         case 105: {

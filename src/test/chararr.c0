@@ -1,0 +1,8 @@
+#use <conio>
+
+int main() {
+    int i = 0;
+    printf("%d Hello world!\n", i);
+    return 0;
+}
+
