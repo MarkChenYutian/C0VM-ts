@@ -1,6 +1,6 @@
-import C0VM_RuntimeState from "./exec/state";
 import MaterialEmitter from "./gui/material_emitter";
-
+import { compile } from "./web_handle/web_handler";
+import init_runtime from "./web_handle/web_runtime_init";
 
 function init_env() {
     // Initialize global variables
@@ -22,6 +22,8 @@ function init_env() {
     globalThis.UI_ERR_DISPLAY_TIME_MS = 10000;
     globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
     globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
+
+    globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8081/compile";
 
     globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
     globalThis.C0_ENVIR_MODE = "web";
@@ -54,32 +56,8 @@ C0VM.ts Configuration Report:
     }
 }
 
-function initialize_runtime() {
-    try {
-        globalThis.C0_RUNTIME = new C0VM_RuntimeState(
-            (document.getElementById(globalThis.UI_INPUT_ID) as HTMLInputElement).value, globalThis.MEM_POOL_SIZE
-        );
-    } catch (e) {
-        globalThis.MSG_EMITTER.err(
-            e.name,
-            e.message
-        );
-        return;
-    }
-    if (globalThis.DEBUG_DUMP_MEM) {
-        console.log("[DEBUG] Memory dump:")
-        console.log(globalThis.C0_RUNTIME.debug());
-    }
-
-    document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
-    document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(
-        (e) => document.getElementById(globalThis.UI_MSG_ID).removeChild(e)
-    );
-
-    globalThis.MSG_EMITTER.ok(
-        "Program is loaded into C0VM",
-        "Press STEP or RUN to execute the program."
-    );
+function init_from_input() {
+    init_runtime((document.getElementById(globalThis.UI_INPUT_ID) as HTMLInputElement).value);
 }
 
 function step_runtime() {
@@ -151,7 +129,7 @@ function reset_runtime() {
     );
 }
 
-function drag_init_runtime(e: DragEvent) {
+function init_from_drag(e: DragEvent) {
     e.preventDefault();
     if (!e.dataTransfer.items) return;
 
@@ -178,34 +156,7 @@ function drag_init_runtime(e: DragEvent) {
             return;
         }
         (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value = res;
-
-        try {
-            globalThis.C0_RUNTIME = new C0VM_RuntimeState(
-                res, globalThis.MEM_POOL_SIZE
-            );
-        }
-        catch (e) {
-            globalThis.MSG_EMITTER.err(
-                e.name,
-                e.message
-            );
-            return;
-        }
-
-        document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
-        document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(
-            (e) => document.getElementById(globalThis.UI_MSG_ID).removeChild(e)
-        );
-
-        if (globalThis.DEBUG_DUMP_MEM) {
-            console.log("[DEBUG] Memory dump:")
-            console.log(globalThis.C0_RUNTIME.debug());
-        }
-
-        globalThis.MSG_EMITTER.ok(
-            "Program is loaded into C0VM",
-            "Press STEP or RUN to execute the program."
-        );
+        // init_runtime(res);
     }
 }
 
@@ -217,13 +168,21 @@ function drag_hint_leave_ui() {
     (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value = "";
 }
 
+function web_compile() {
+    compile(
+        (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value
+        , []
+    );
+}
+
 export default {
     init_env,
-    initialize_runtime,
+    init_from_drag,
+    init_from_input,
     step_runtime,
     run_runtime,
     reset_runtime,
-    drag_init_runtime,
     drag_hint_enter_ui,
-    drag_hint_leave_ui
+    drag_hint_leave_ui,
+    web_compile
 };

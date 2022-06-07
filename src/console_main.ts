@@ -28,6 +28,8 @@ globalThis.UI_ERR_DISPLAY_TIME_MS = 10000;
 globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
 globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
 
+globalThis.COMPILER_BACKEND_URL = "";
+
 globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
 globalThis.C0_ENVIR_MODE = "nodejs";
 

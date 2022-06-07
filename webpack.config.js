@@ -15,7 +15,7 @@ var config = {
       }
     ]
   }
-}
+};
 
 var htmlConfig = Object.assign({}, config, {
   devtool: false,
@@ -29,7 +29,7 @@ var htmlConfig = Object.assign({}, config, {
     libraryTarget: "window",
     libraryExport: "default"
   }
-})
+});
 
 var consoleConfig = Object.assign({}, config, {
   devtool: "inline-source-map",
@@ -39,8 +39,8 @@ var consoleConfig = Object.assign({}, config, {
   },
   output: {
     path: path.resolve(__dirname, './public'),
-    filename: "console_bundle.js"
+    filename: "console_test.js"
   }
-})
+});
 
 module.exports = [htmlConfig, consoleConfig];

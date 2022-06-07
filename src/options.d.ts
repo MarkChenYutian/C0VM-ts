@@ -10,6 +10,8 @@ declare global {
     var MEM_POOL_MAX_SIZE: number;
     var MEM_POOL_DEFAULT_SIZE: number;
 
+    var COMPILER_BACKEND_URL: string;
+
     var UI_INPUT_ID: string;
     var UI_PRINTOUT_ID: string;
     var UI_MSG_ID: string;

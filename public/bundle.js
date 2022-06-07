@@ -667,7 +667,8 @@ var MaterialEmitter = (function () {
         this.msg_root.appendChild(new_msg);
         setTimeout(function () {
             var pending_remove = document.querySelector("div#" + tobe_removed_id);
-            pending_remove.parentNode.removeChild(pending_remove);
+            if (pending_remove !== null)
+                pending_remove.parentNode.removeChild(pending_remove);
         }, globalThis.UI_ERR_DISPLAY_TIME_MS);
         this.msg_counter++;
     };
@@ -699,7 +700,8 @@ var MaterialEmitter = (function () {
         this.msg_root.appendChild(new_msg);
         setTimeout(function () {
             var pending_remove = document.querySelector("div#" + tobe_removed_id);
-            pending_remove.parentNode.removeChild(pending_remove);
+            if (pending_remove !== null)
+                pending_remove.parentNode.removeChild(pending_remove);
         }, globalThis.UI_WARN_DISPLAY_TIME_MS);
         this.msg_counter++;
     };
@@ -731,7 +733,8 @@ var MaterialEmitter = (function () {
         this.msg_root.appendChild(new_msg);
         setTimeout(function () {
             var pending_remove = document.querySelector("div#" + tobe_removed_id);
-            pending_remove.parentNode.removeChild(pending_remove);
+            if (pending_remove !== null)
+                pending_remove.parentNode.removeChild(pending_remove);
         }, globalThis.UI_OK_DISPLAY_TIME_MS);
         this.msg_counter++;
     };
@@ -1993,6 +1996,68 @@ function loadString(ptr, allocator) {
 exports.loadString = loadString;
 
 
+/***/ }),
+
+/***/ "./src/web_handle/web_handler.ts":
+/*!***************************************!*\
+  !*** ./src/web_handle/web_handler.ts ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+exports.__esModule = true;
+exports.compile = void 0;
+var web_runtime_init_1 = __webpack_require__(/*! ./web_runtime_init */ "./src/web_handle/web_runtime_init.ts");
+function compile(s, flags) {
+    fetch(globalThis.COMPILER_BACKEND_URL, {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "code": s,
+            "flags": flags
+        })
+    }).then(function (res) { return res.json(); }).then(function (res) {
+        (0, web_runtime_init_1["default"])(res.bytecode);
+    })["catch"](function (e) {
+        globalThis.MSG_EMITTER.err("Failed to compile given C0 code", e.message);
+    });
+}
+exports.compile = compile;
+
+
+/***/ }),
+
+/***/ "./src/web_handle/web_runtime_init.ts":
+/*!********************************************!*\
+  !*** ./src/web_handle/web_runtime_init.ts ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+exports.__esModule = true;
+var state_1 = __webpack_require__(/*! ../exec/state */ "./src/exec/state.ts");
+function init_runtime(s) {
+    try {
+        globalThis.C0_RUNTIME = new state_1["default"](s, globalThis.MEM_POOL_SIZE);
+    }
+    catch (e) {
+        globalThis.MSG_EMITTER.err(e.name, e.message);
+        return;
+    }
+    if (globalThis.DEBUG_DUMP_MEM) {
+        console.log("[DEBUG] Memory dump:");
+        console.log(globalThis.C0_RUNTIME.debug());
+    }
+    document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
+    document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(function (e) { return document.getElementById(globalThis.UI_MSG_ID).removeChild(e); });
+    globalThis.MSG_EMITTER.ok("Program is loaded into C0VM", "Press STEP or RUN to execute the program.");
+}
+exports["default"] = init_runtime;
+
+
 /***/ })
 
 /******/ 	});
@@ -2031,8 +2096,9 @@ var exports = __webpack_exports__;
   \*************************/
 
 exports.__esModule = true;
-var state_1 = __webpack_require__(/*! ./exec/state */ "./src/exec/state.ts");
 var material_emitter_1 = __webpack_require__(/*! ./gui/material_emitter */ "./src/gui/material_emitter.ts");
+var web_handler_1 = __webpack_require__(/*! ./web_handle/web_handler */ "./src/web_handle/web_handler.ts");
+var web_runtime_init_1 = __webpack_require__(/*! ./web_handle/web_runtime_init */ "./src/web_handle/web_runtime_init.ts");
 function init_env() {
     globalThis.DEBUG = true;
     globalThis.DEBUG_DUMP_MEM = false;
@@ -2048,6 +2114,7 @@ function init_env() {
     globalThis.UI_ERR_DISPLAY_TIME_MS = 10000;
     globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
     globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
+    globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8081/compile";
     globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
     globalThis.C0_ENVIR_MODE = "web";
     globalThis.C0_RUNTIME = undefined;
@@ -2057,21 +2124,8 @@ function init_env() {
         console.log("\nC0VM.ts Configuration Report:\n    General Configuration:\n        Supported Language Level: C0-language-level\n        Supported Native Group: standard Output, string operation\n        Environment Mode: ".concat(globalThis.C0_ENVIR_MODE, "\n        C0 Bytecode Max Size: ").concat(globalThis.C0_BYTECODE_MAX_LENGTH, "\n\n    Debug Configuration:\n        Debug Mode: ").concat(globalThis.DEBUG, "\n        Dump heap memory: ").concat(globalThis.DEBUG_DUMP_MEM, "\n        Dump VM Step: ").concat(globalThis.DEBUG_DUMP_STEP, "\n\n    Heap Memory Configuration:\n        Heap memory current size: ").concat(globalThis.MEM_POOL_SIZE, "\n        Heap memory default size: ").concat(globalThis.MEM_POOL_DEFAULT_SIZE, "\n        Heap memory max size: ").concat(globalThis.MEM_POOL_MAX_SIZE, "\n        Heap memory min size: ").concat(globalThis.MEM_POOL_MIN_SIZE, "\n        Heap memory block max size: ").concat(globalThis.MEM_BLOCK_MAX_SIZE, "\n"));
     }
 }
-function initialize_runtime() {
-    try {
-        globalThis.C0_RUNTIME = new state_1["default"](document.getElementById(globalThis.UI_INPUT_ID).value, globalThis.MEM_POOL_SIZE);
-    }
-    catch (e) {
-        globalThis.MSG_EMITTER.err(e.name, e.message);
-        return;
-    }
-    if (globalThis.DEBUG_DUMP_MEM) {
-        console.log("[DEBUG] Memory dump:");
-        console.log(globalThis.C0_RUNTIME.debug());
-    }
-    document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
-    document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(function (e) { return document.getElementById(globalThis.UI_MSG_ID).removeChild(e); });
-    globalThis.MSG_EMITTER.ok("Program is loaded into C0VM", "Press STEP or RUN to execute the program.");
+function init_from_input() {
+    (0, web_runtime_init_1["default"])(document.getElementById(globalThis.UI_INPUT_ID).value);
 }
 function step_runtime() {
     if (globalThis.C0_RUNTIME === undefined) {
@@ -2117,7 +2171,7 @@ function reset_runtime() {
     document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(function (e) { return document.getElementById(globalThis.UI_MSG_ID).removeChild(e); });
     globalThis.MSG_EMITTER.ok("C0VM Restart Successfully", "Your program will be executed again from the beginning.");
 }
-function drag_init_runtime(e) {
+function init_from_drag(e) {
     e.preventDefault();
     if (!e.dataTransfer.items)
         return;
@@ -2137,20 +2191,6 @@ function drag_init_runtime(e) {
             return;
         }
         document.getElementById(globalThis.UI_INPUT_ID).value = res;
-        try {
-            globalThis.C0_RUNTIME = new state_1["default"](res, globalThis.MEM_POOL_SIZE);
-        }
-        catch (e) {
-            globalThis.MSG_EMITTER.err(e.name, e.message);
-            return;
-        }
-        document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
-        document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(function (e) { return document.getElementById(globalThis.UI_MSG_ID).removeChild(e); });
-        if (globalThis.DEBUG_DUMP_MEM) {
-            console.log("[DEBUG] Memory dump:");
-            console.log(globalThis.C0_RUNTIME.debug());
-        }
-        globalThis.MSG_EMITTER.ok("Program is loaded into C0VM", "Press STEP or RUN to execute the program.");
     };
 }
 function drag_hint_enter_ui() {
@@ -2159,15 +2199,19 @@ function drag_hint_enter_ui() {
 function drag_hint_leave_ui() {
     document.getElementById(globalThis.UI_INPUT_ID).value = "";
 }
+function web_compile() {
+    (0, web_handler_1.compile)(document.getElementById(globalThis.UI_INPUT_ID).value, []);
+}
 exports["default"] = {
     init_env: init_env,
-    initialize_runtime: initialize_runtime,
+    init_from_drag: init_from_drag,
+    init_from_input: init_from_input,
     step_runtime: step_runtime,
     run_runtime: run_runtime,
     reset_runtime: reset_runtime,
-    drag_init_runtime: drag_init_runtime,
     drag_hint_enter_ui: drag_hint_enter_ui,
-    drag_hint_leave_ui: drag_hint_leave_ui
+    drag_hint_leave_ui: drag_hint_leave_ui,
+    web_compile: web_compile
 };
 
 })();

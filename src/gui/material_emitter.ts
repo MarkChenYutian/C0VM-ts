@@ -61,7 +61,7 @@ export default class MaterialEmitter implements MessageEmitter {
     // Remove this message after 4000ms.
     setTimeout(() => {
       const pending_remove = document.querySelector("div#" + tobe_removed_id) as HTMLElement;
-      pending_remove.parentNode.removeChild(pending_remove);
+      if (pending_remove !== null) pending_remove.parentNode.removeChild(pending_remove);
     }, globalThis.UI_ERR_DISPLAY_TIME_MS);
     this.msg_counter++;
   }
@@ -100,7 +100,7 @@ export default class MaterialEmitter implements MessageEmitter {
     // Remove this message after 4000ms.
     setTimeout(() => {
       const pending_remove = document.querySelector("div#" + tobe_removed_id) as HTMLElement;
-      pending_remove.parentNode.removeChild(pending_remove);
+      if (pending_remove !== null) pending_remove.parentNode.removeChild(pending_remove);
     }, globalThis.UI_WARN_DISPLAY_TIME_MS);
     this.msg_counter++;
   }
@@ -139,7 +139,7 @@ export default class MaterialEmitter implements MessageEmitter {
     // Remove this message after UI_OK_DISPLAY_TIME_MS.
     setTimeout(() => {
       const pending_remove = document.querySelector("div#" + tobe_removed_id) as HTMLElement;
-      pending_remove.parentNode.removeChild(pending_remove);
+      if (pending_remove !== null) pending_remove.parentNode.removeChild(pending_remove);
     }, globalThis.UI_OK_DISPLAY_TIME_MS);
     this.msg_counter++;
   }

@@ -13,8 +13,11 @@
     <div class="page-framework">
         <h1 style="margin-top: 0;">C0VM.ts Alpha Version</h1>
         <div class="main-control">
-            <button class="base-btn main-btn unselectable" onclick="window.c0vm_ts.initialize_runtime();">
-                <i class="fa-solid fa-cloud-arrow-up"></i> Load
+            <button class="base-btn main-btn unselectable" onclick="window.c0vm_ts.web_compile();">
+                Compile & Load (from c0)
+            </button>
+            <button class="base-btn main-btn unselectable" onclick="window.c0vm_ts.init_from_input();">
+                Load (from bc0)
             </button>
             <button class="base-btn success-btn unselectable" onclick="window.c0vm_ts.step_runtime();">
                 <i class="fas fa-step-forward"></i> Step
@@ -29,10 +32,10 @@
         <div id="message-terminal"></div>
         <div class="main-ui-framework">
             <div class="code-editor">
-                <h3 style="margin-top: 0;">C0 Bytecode (.bc0 file):</h3>
+                <h3 style="margin-top: 0;">C0/C0 Bytecode:</h3>
                 <label style="display: none;">Code Area</label>
                 <textarea type="text" id="c0-code-input" title="Input your code here" class="code-input"
-                    ondrop="window.c0vm_ts.drag_init_runtime(event);" ondragenter="window.c0vm_ts.drag_hint_enter_ui();" ondragleave="window.c0vm_ts.drag_hint_leave_ui();"></textarea>
+                    ondrop="window.c0vm_ts.init_from_drag(event);" ondragenter="window.c0vm_ts.drag_hint_enter_ui();" ondragleave="window.c0vm_ts.drag_hint_leave_ui();"></textarea>
             </div>
             <div class="io-area">
                 <h3 style="margin-top: 0;">Printout (Standard Output)</h3>
