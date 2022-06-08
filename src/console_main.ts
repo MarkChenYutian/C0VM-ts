@@ -47,7 +47,7 @@ const heap = createHeap(VM_Memory, 64);
 
 const constant: VM_Constants = {
     stringPoolPtr: loadStringPool(code.stringPool, heap)
-} ;
+};
 
 const state: VM_State = {
     P: code,
@@ -62,11 +62,17 @@ const state: VM_State = {
 };
 
 let cont = true;
-while (cont) {
-    cont = step(state, heap, globalThis.MSG_EMITTER);
-}
-
-if (global.DEBUG) {
-    console.log("\n\n==========\nDEBUG - Heap Memory Dump:");
+try {
+    while (cont) {
+        cont = step(state, heap, globalThis.MSG_EMITTER);
+        if (global.DEBUG_DUMP_STEP) {
+            console.log("==========\nDEBUG - Heap Memory Dump:");
+            console.log(heap.debug_getMemPool());
+        }
+        console.log("\n\n\n\n");
+    }
+} catch (e) {
+    console.log(e);
+    console.log("\n\n==========\nDEBUG - Program Crashed! Heap Memory Dump:");
     console.log(heap.debug_getMemPool());
 }

@@ -1,0 +1,53 @@
+C0 C0 FF EE       # magic number
+00 17             # version 11, arch = 1 (64 bits)
+
+00 00             # int pool count
+# int pool
+
+00 10             # string pool total size
+# string pool
+28 70 72 6F 67 72 61 6D 20 73 74 61 72 74 29 00  # "(program start)"
+
+00 01             # function count
+# function_pool
+
+#<main>
+00                # number of arguments = 0
+04                # number of local variables = 4
+00 38             # code length = 56 bytes
+14 00 00 # aldc 0             # s[0] = "(program start)"
+36 00    # vstore 0           # _caller = "(program start)";
+10 00    # bipush 0           # 0
+36 03    # vstore 3           # sum = 0;
+10 0F    # bipush 15          # 15
+36 02    # vstore 2           # i = 15;
+# <00:loop>
+A7 00 03 # goto +3            # goto <01:body>
+# <01:body>
+15 02    # vload 2            # i
+10 7A    # bipush 122         # 122
+A4 00 06 # if_icmple +6       # if (i <= 122) goto <03:then>
+A7 00 14 # goto +20           # goto <04:else>
+# <03:then>
+15 03    # vload 3            # sum
+15 02    # vload 2            # i
+60       # iadd               # 
+36 03    # vstore 3           # sum += i;
+15 02    # vload 2            # i
+10 01    # bipush 1           # 1
+60       # iadd               # 
+36 02    # vstore 2           # i += 1;
+A7 00 06 # goto +6            # goto <05:endif>
+# <04:else>
+A7 00 06 # goto +6            # break
+# <05:endif>
+A7 FF DF # goto -33           # goto <00:loop>
+# <02:exit>
+15 03    # vload 3            # sum
+36 01    # vstore 1           # _result = sum;
+15 01    # vload 1            # _result
+B0       # return             # 
+
+00 00             # native count
+# native pool
+

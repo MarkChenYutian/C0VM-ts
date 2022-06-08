@@ -22,6 +22,7 @@ declare global {
 
     var C0_BYTECODE_MAX_LENGTH: number;
     var C0_ENVIR_MODE: "web" | "nodejs";
+    var C0_MAX_RECURSION: number;
 
     var C0_RUNTIME: undefined | C0VM_RT;
     var MSG_EMITTER: MessageEmitter;

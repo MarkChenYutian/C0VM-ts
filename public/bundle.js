@@ -135,7 +135,7 @@ function step(state, allocator, msg_handle) {
             break;
         }
         case 16: {
-            var b = F.code[state.CurrFrame.PC + 1];
+            var b = new DataView(F.code.buffer).getInt8(state.CurrFrame.PC + 1);
             var rebuild_type = F.comment.get(state.CurrFrame.PC).dataType;
             if (rebuild_type === undefined) {
                 rebuild_type = "<unknown>";
@@ -349,6 +349,9 @@ function step(state, allocator, msg_handle) {
                 called_F_vars[i] = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
             }
             state.CallStack.push(state.CurrFrame);
+            if (state.CallStack.length > globalThis.C0_MAX_RECURSION) {
+                throw new errors_1.c0_memory_error("Maximum Recursion Depth Exceeded (current maximum: " + globalThis.C0_MAX_RECURSION + " )");
+            }
             state.CurrFrame = {
                 PC: 0,
                 S: [],
@@ -398,8 +401,8 @@ function step(state, allocator, msg_handle) {
             state.CurrFrame.PC += 1;
             var x = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
             var a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (x.vm_type !== "value" || a.vm_type !== "ptr") {
-                throw new errors_1.vm_error("Type unmatch, expected to have {ptr, value}");
+            if (x.vm_type !== "ptr" || a.vm_type !== "ptr") {
+                throw new errors_1.vm_error("Type unmatch, expected to have {ptr, ptr}");
             }
             allocator.amstore(a.value, x.value);
             break;
@@ -1384,7 +1387,7 @@ function parse(raw_file) {
         }
         var code_byte_counter = 0;
         var comment_mapping = new Map();
-        var int_comment_regex = /\d+/;
+        var int_comment_regex = /(\d+)|(dummy return value)/;
         var bool_comment_regex = /(true)|(false)/;
         var char_comment_regex = /'.*'/;
         for (var lineNum = 4; lineNum < funcLines.length; lineNum++) {
@@ -2101,9 +2104,9 @@ var web_handler_1 = __webpack_require__(/*! ./web_handle/web_handler */ "./src/w
 var web_runtime_init_1 = __webpack_require__(/*! ./web_handle/web_runtime_init */ "./src/web_handle/web_runtime_init.ts");
 function init_env() {
     globalThis.DEBUG = true;
-    globalThis.DEBUG_DUMP_MEM = false;
+    globalThis.DEBUG_DUMP_MEM = true;
     globalThis.DEBUG_DUMP_STEP = false;
-    globalThis.MEM_POOL_SIZE = 64;
+    globalThis.MEM_POOL_SIZE = 1024 * 50;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
     globalThis.MEM_POOL_MAX_SIZE = 4294967294;
     globalThis.MEM_POOL_MIN_SIZE = 1;
@@ -2117,6 +2120,7 @@ function init_env() {
     globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8081/compile";
     globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
     globalThis.C0_ENVIR_MODE = "web";
+    globalThis.C0_MAX_RECURSION = 999;
     globalThis.C0_RUNTIME = undefined;
     globalThis.MSG_EMITTER = new material_emitter_1["default"]();
     console.log("[C0VM.ts] Environment initialized.");

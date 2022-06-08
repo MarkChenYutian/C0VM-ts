@@ -1,6 +1,6 @@
 import * as arithmetic from "../utility/arithmetic";
 import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value } from "../utility/c0_value";
-import { c0_user_error, vm_error } from "../utility/errors";
+import { c0_memory_error, c0_user_error, vm_error } from "../utility/errors";
 import { read_ptr, shift_ptr } from "../utility/pointer_ops";
 import { loadString } from "../utility/string_utility";
 import { ptr2ptr_type_inference, ptr2val_type_inference, safe_pop_stack } from "./helpers";
@@ -209,7 +209,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
         // bipush
         case OpCode.BIPUSH: {
             // in this case, we will have sign extension
-            const b = F.code[state.CurrFrame.PC + 1];
+            const b = new DataView(F.code.buffer).getInt8(state.CurrFrame.PC + 1);
             let rebuild_type: C0ValueType = F.comment.get(state.CurrFrame.PC).dataType;
 
             if (rebuild_type === undefined) {
@@ -487,6 +487,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             }
             // Switch Context
             state.CallStack.push(state.CurrFrame);
+            if (state.CallStack.length > globalThis.C0_MAX_RECURSION) {
+                throw new c0_memory_error("Maximum Recursion Depth Exceeded (current maximum: " + globalThis.C0_MAX_RECURSION + " )");
+            }
             state.CurrFrame = {
                 PC: 0,
                 S: [],
@@ -552,8 +555,8 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             
             const x = safe_pop_stack(state.CurrFrame.S);
             const a = safe_pop_stack(state.CurrFrame.S);
-            if (x.vm_type !== C0ValueVMType.value || a.vm_type !== C0ValueVMType.ptr) {
-                throw new vm_error("Type unmatch, expected to have {ptr, value}");
+            if (x.vm_type !== C0ValueVMType.ptr || a.vm_type !== C0ValueVMType.ptr) {
+                throw new vm_error("Type unmatch, expected to have {ptr, ptr}");
             }
             allocator.amstore( a.value, x.value );
             break;

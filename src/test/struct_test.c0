@@ -1,0 +1,17 @@
+#use <conio>
+#use <string>
+
+struct test {
+    int a;
+    string s;
+};
+
+typedef struct test test_t;
+
+int main() {
+    test_t* str = alloc(test_t);
+    str -> a = 10;
+    str -> s = "Hi!";
+    printf("{%d, %s}", str -> a, str -> s);
+    return 0;
+}

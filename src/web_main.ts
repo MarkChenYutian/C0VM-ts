@@ -5,10 +5,10 @@ import init_runtime from "./web_handle/web_runtime_init";
 function init_env() {
     // Initialize global variables
     globalThis.DEBUG = true;
-    globalThis.DEBUG_DUMP_MEM = false;
+    globalThis.DEBUG_DUMP_MEM = true;
     globalThis.DEBUG_DUMP_STEP = false;
 
-    globalThis.MEM_POOL_SIZE = 64;
+    globalThis.MEM_POOL_SIZE = 1024 * 50;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
     globalThis.MEM_POOL_MAX_SIZE = 0xFFFF_FFFE;
     globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
@@ -27,6 +27,7 @@ function init_env() {
 
     globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
     globalThis.C0_ENVIR_MODE = "web";
+    globalThis.C0_MAX_RECURSION = 999;
 
     globalThis.C0_RUNTIME = undefined;
     globalThis.MSG_EMITTER = new MaterialEmitter();

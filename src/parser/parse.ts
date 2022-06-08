@@ -116,7 +116,7 @@ export default function parse(raw_file: string): C0ByteCode {
         let code_byte_counter = 0;
 
         const comment_mapping = new Map<number, CodeComment>();
-        const int_comment_regex = /\d+/;
+        const int_comment_regex = /(\d+)|(dummy return value)/;
         const bool_comment_regex = /(true)|(false)/;
         const char_comment_regex = /'.*'/;
 

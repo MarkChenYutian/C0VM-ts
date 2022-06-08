@@ -1,0 +1,28 @@
+C0 C0 FF EE       # magic number
+00 17             # version 11, arch = 1 (64 bits)
+
+00 00             # int pool count
+# int pool
+
+00 13             # string pool total size
+# string pool
+74 65 73 74 00  # "test"
+74 65 73 74 2D 6D 65 73 73 61 67 65 21 00  # "test-message!"
+
+00 01             # function count
+# function_pool
+
+#<main>
+00                # number of arguments = 0
+00                # number of local variables = 0
+00 0B             # code length = 11 bytes
+14 00 00 # aldc 0             # s[0] = "test"
+B7 00 00 # invokenative 0     # print("test")
+57       # pop                # (ignore result)
+14 00 05 # aldc 5             # s[5] = "test-message!"
+BF       # athrow             # error "test-message!"
+
+00 01             # native count
+# native pool
+00 01 00 06       # print
+
