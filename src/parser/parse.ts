@@ -72,8 +72,16 @@ export default function parse(raw_file: string): C0ByteCode {
     /* Load Functions */
     const functionPool: C0Function[] = [];
     for (let i = 4; i < 4 + functionNumber; i++) {
+        let global_line_offset = blocks.slice(0,i).reduce(
+            (p:number, curr: string): number => p + curr.split("\n").length,
+            0
+        ) + i;
+
         let funcLines = blocks[i].split("\n");
-        if (funcLines[0] == "") funcLines = funcLines.slice(1,);
+        if (funcLines[0] == ""){
+            funcLines = funcLines.slice(1,);
+            global_line_offset += 1;
+        }
 
         const funcName = funcLines[0].slice(2, -1);
         const funcNumArgs = parseInt(funcLines[1].split("#")[0].trim(), 16);
@@ -124,8 +132,8 @@ export default function parse(raw_file: string): C0ByteCode {
             const [lineBytes, opcodeName, comment] = funcLines[lineNum].split("#")
                 .map((elem) => elem.trim());
             if (lineBytes === "") continue;
+            let type: "int" | "boolean" | "char" | undefined = undefined;
             if (opcodeName.startsWith("bipush")) {
-                let type: "int" | "boolean" | "char";
                 if (int_comment_regex.test(comment)) {
                     type = "int";
                 } else if (bool_comment_regex.test(comment)) {
@@ -133,14 +141,15 @@ export default function parse(raw_file: string): C0ByteCode {
                 } else if (char_comment_regex.test(comment)) {
                     type = "char";
                 } else {
-                    throw new vm_error("Failed to inference value type from bipush comment:\n" + comment);
+                    console.error("Failed to inference value type from bipush comment:\n" + funcLines[lineNum]);
                 }
-                comment_mapping.set(code_byte_counter, 
-                    {
-                        dataType: type
-                    }
-                );
             }
+            comment_mapping.set(code_byte_counter, 
+                {
+                    dataType: type,
+                    lineNumber: global_line_offset + lineNum + 1
+                }
+            );
             code_byte_counter += lineBytes.split(" ").length;
         }
 

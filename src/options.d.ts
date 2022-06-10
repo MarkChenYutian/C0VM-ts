@@ -1,5 +1,5 @@
-import { EditorView } from "@codemirror/view";
-
+import { EditorView } from "codemirror";
+import C0VM_RuntimeState from "./exec/state";
 declare global {
     var DEBUG: boolean;
     var DEBUG_DUMP_MEM: boolean;
@@ -16,6 +16,7 @@ declare global {
 
     var EDITOR_CONTENT: string;
     var EDITOR_VIEW: EditorView;
+    var EDITOR_BREAKPOINTS: Set<number>;
     
     var UI_INPUT_ID: string;
     var UI_PRINTOUT_ID: string;
@@ -29,7 +30,7 @@ declare global {
     var C0_ENVIR_MODE: "web" | "nodejs";
     var C0_MAX_RECURSION: number;
 
-    var C0_RUNTIME: undefined | C0VM_RT;
+    var C0_RUNTIME: undefined | C0VM_RuntimeState;
     var MSG_EMITTER: MessageEmitter;
 }
 

@@ -17,6 +17,7 @@ function init_env() {
     globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
 
     globalThis.EDITOR_CONTENT = "";
+    globalThis.EDITOR_BREAKPOINTS = new Set<number>();
 
     globalThis.UI_INPUT_ID = "c0-code-input";
     globalThis.UI_PRINTOUT_ID = "c0-output";
@@ -104,7 +105,14 @@ function run_runtime() {
     while (res) {
         try {
             res = globalThis.C0_RUNTIME.step_forward();
+            if (res == false) continue;
+            if (globalThis.EDITOR_BREAKPOINTS.has(C0_RUNTIME.state.CurrLineNumber)) {
+                return;
+            }
         } catch (e) {
+            if (globalThis.DEBUG) {
+                console.error((e as Error).stack);
+            }
             globalThis.MSG_EMITTER.err(
                 (e as Error).name,
                 (e as Error).message
@@ -112,7 +120,6 @@ function run_runtime() {
             globalThis.C0_RUNTIME = undefined;
             return;
         }
-
     }
     globalThis.MSG_EMITTER.ok(
         "Program Execution Finished!",
@@ -138,8 +145,7 @@ function reset_runtime() {
 
 function web_compile() {
     compile(
-        (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value
-        , []
+        globalThis.EDITOR_CONTENT, []
     );
 }
 

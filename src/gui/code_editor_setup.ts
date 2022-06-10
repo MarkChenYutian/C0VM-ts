@@ -1,36 +1,23 @@
-import { EditorState } from "@codemirror/state";
-import { EditorView, gutter, lineNumbers, GutterMarker, keymap } from "@codemirror/view";
+import { keymap } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
-
-class emptyMarker extends GutterMarker {
-    toDOM() { return document.createTextNode("📦") }
-};
-
+import { EditorView, basicSetup } from "codemirror";
+import funcHeadGutter from "./extensions/funchead_marker";
+import { indentUnit } from "@codemirror/language";
+import breakpointGutter from "./extensions/breakpoint_marker";
+import execLineHighlighter from "./extensions/exec_position";
 
 export function editor_init() {
-    console.log("initializing C0 Editor...");
-
-    const emptyLineGutter = gutter({
-        lineMarker(view, line) {
-            const s = view.state.doc.toString().slice(line.from, line.to);
-            const func_regex = /(int|string|boolean|char|void)(\*|\[\])* [^(=|+|-|*|/)]+\s*\(.*\).*/;
-            return func_regex.test(s) ? new emptyMarker : null;
-        },
-        initialSpacer: () => new emptyMarker()
-    });
-
-    const editorState = EditorState.create({
+    globalThis.EDITOR_VIEW = new EditorView({
+        parent: document.getElementById(globalThis.UI_INPUT_ID),
         extensions: [
-            emptyLineGutter,
-            lineNumbers(),
+            breakpointGutter,
+            basicSetup,
+            funcHeadGutter,
+            execLineHighlighter,
             keymap.of([indentWithTab]),
+            indentUnit.of("    "),
             EditorView.updateListener.of((e) => { globalThis.EDITOR_CONTENT = e.state.doc.toString(); })
         ]
     });
-
-    const view = new EditorView({
-        parent: document.getElementById(globalThis.UI_INPUT_ID),
-        state: editorState
-    });
-    globalThis.EDITOR_VIEW = view;
+    console.log(`C0 Editor Initialized.`);
 }

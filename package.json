@@ -6,7 +6,11 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "@codemirror/basic-setup": "^0.20.0",
-    "@codemirror/lang-javascript": "^6.0.0"
+    "@codemirror/commands": "^6.0.0",
+    "@codemirror/lang-javascript": "^6.0.0",
+    "@codemirror/language": "^6.0.0",
+    "@codemirror/state": "^6.0.0",
+    "@codemirror/view": "^6.0.0",
+    "codemirror": "^6.0.0"
   }
 }

@@ -8,9 +8,12 @@ import { ptr2ptr_type_inference, ptr2val_type_inference, safe_pop_stack } from "
 export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: MessageEmitter): boolean {
     const F = state.CurrFrame.P; // the function that is currently running on
     if (globalThis.DEBUG_DUMP_STEP) {
-        console.log(`Executing OpCode: ${F.code[state.CurrFrame.PC]}@${state.CurrFrame.PC}.`);
+        console.log(`Executing OpCode: ${F.code[state.CurrFrame.PC]}@${state.CurrFrame.PC}. Mapped from ${F.comment.get(state.CurrFrame.PC).lineNumber}`);
         console.log(state.CurrFrame);
     }
+    state.CurrLineNumber = F.comment.get(state.CurrFrame.PC).lineNumber;
+    // Trigger an update in Editor to flush the exec-line highlighting
+    window.EDITOR_VIEW.update([window.EDITOR_VIEW.state.update()]);
     
     switch (F.code[state.CurrFrame.PC]) {
         // dup

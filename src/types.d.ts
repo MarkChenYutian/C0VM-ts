@@ -31,7 +31,8 @@ type C0Function = {
 // Information extracted from comment during parsing phase
 // Facilitate type inference etc.
 type CodeComment = {
-    dataType?: "char" | "boolean" | "int"
+    dataType?: "char" | "boolean" | "int",
+    lineNumber: number
 }
 
 
@@ -76,10 +77,10 @@ declare const enum C0ValueVMType {
 }
 
 //TODO: 
-type C0Type<T> = {
-    type: "ptr" | "arr" | "int" | "char" | "boolean" | "string" | "NULL",
-    value: C0Type;
-}
+// type C0Type<T> = {
+//     type: "ptr" | "arr" | "int" | "char" | "boolean" | "string" | "NULL",
+//     value: C0Type;
+// }
 
 type C0ValueType = "<unknown>" | "int" | "char" | "boolean";
 type C0PointerType = "<unknown>" | "<unknown>[]" | "string" | "struct" | "int[]" | "string[]" | "char[]" | "boolean[]" | "struct[]" | C0ValueType;
@@ -290,6 +291,7 @@ type VM_State = {
     C: VM_Constants, // Constants the VM will use
     CallStack: VM_StackFrame[],
     CurrFrame: VM_StackFrame,
+    CurrLineNumber: number
 };
 
 

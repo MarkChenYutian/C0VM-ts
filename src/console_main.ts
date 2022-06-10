@@ -58,7 +58,8 @@ const state: VM_State = {
         S: [],
         V: new Array(code.functionPool[0].numVars).fill(undefined),
         P: code.functionPool[0]
-    }
+    },
+    CurrLineNumber: code.functionPool[0].comment.get(0).lineNumber
 };
 
 let cont = true;

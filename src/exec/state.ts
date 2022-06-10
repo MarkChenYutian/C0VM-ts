@@ -26,7 +26,8 @@ export default class C0VM_RuntimeState implements C0VM_RT{
                 S: [],
                 V: new Array(this.code.functionPool[0].numVars).fill(undefined),
                 P: this.code.functionPool[0]
-            }
+            },
+            CurrLineNumber: this.code.functionPool[0].comment.get(0).lineNumber
         };
     }
 
@@ -48,7 +49,8 @@ export default class C0VM_RuntimeState implements C0VM_RT{
                 S: [],
                 V: new Array(this.code.functionPool[0].numVars).fill(undefined),
                 P: this.code.functionPool[0]
-            }
+            },
+            CurrLineNumber: this.code.functionPool[0].comment.get(0).lineNumber
         };
     }
 
