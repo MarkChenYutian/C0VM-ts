@@ -1,3 +1,4 @@
+import html_init from "./gui/html_init";
 import MaterialEmitter from "./gui/material_emitter";
 import { compile } from "./web_handle/web_handler";
 import init_runtime from "./web_handle/web_runtime_init";
@@ -14,6 +15,8 @@ function init_env() {
     globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
 
     globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
+
+    globalThis.EDITOR_CONTENT = "";
 
     globalThis.UI_INPUT_ID = "c0-code-input";
     globalThis.UI_PRINTOUT_ID = "c0-output";
@@ -55,10 +58,13 @@ C0VM.ts Configuration Report:
         Heap memory block max size: ${globalThis.MEM_BLOCK_MAX_SIZE}
 `);
     }
+    ////////////////////////////
+    // Load Event on HTML DOM
+    html_init();
 }
 
 function init_from_input() {
-    init_runtime((document.getElementById(globalThis.UI_INPUT_ID) as HTMLInputElement).value);
+    init_runtime(globalThis.EDITOR_CONTENT);
 }
 
 function step_runtime() {
@@ -130,45 +136,6 @@ function reset_runtime() {
     );
 }
 
-function init_from_drag(e: DragEvent) {
-    e.preventDefault();
-    if (!e.dataTransfer.items) return;
-
-    if (e.dataTransfer.items.length !== 1) {
-        globalThis.MSG_EMITTER.err(
-            "Unsupported Feature",
-            "We only support uploading one .bc0 file into the C0VM.ts now."
-        );
-    }
-
-    const fr = new FileReader();
-    fr.readAsText(e.dataTransfer.items[0].getAsFile(), "utf-8");
-    fr.onloadend = (e) => {
-        if (fr.result === null) {
-            globalThis.MSG_EMITTER.err("Unable to read the file.");
-            return;
-        }
-        const res = fr.result.toString();
-        if (res.length > globalThis.C0_BYTECODE_MAX_LENGTH) {
-            globalThis.MSG_EMITTER.err(
-                "Input file is too large for C0VM.ts!",
-                "The input file size is " + res.length + ", but the maximum accepted size is " + globalThis.C0_BYTECODE_MAX_LENGTH
-            );
-            return;
-        }
-        (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value = res;
-        // init_runtime(res);
-    }
-}
-
-function drag_hint_enter_ui() {
-    (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value = "Drop .bc0 file here to load bytecode.";
-}
-
-function drag_hint_leave_ui() {
-    (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value = "";
-}
-
 function web_compile() {
     compile(
         (document.getElementById(globalThis.UI_INPUT_ID) as HTMLTextAreaElement).value
@@ -178,12 +145,9 @@ function web_compile() {
 
 export default {
     init_env,
-    init_from_drag,
     init_from_input,
     step_runtime,
     run_runtime,
     reset_runtime,
-    drag_hint_enter_ui,
-    drag_hint_leave_ui,
     web_compile
 };

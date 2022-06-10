@@ -31,11 +31,20 @@
         </div>
         <div id="message-terminal"></div>
         <div class="main-ui-framework">
-            <div class="code-editor">
+            <div class="code-editor"
+            >
                 <h3 style="margin-top: 0;">C0/C0 Bytecode:</h3>
                 <label style="display: none;">Code Area</label>
-                <textarea type="text" id="c0-code-input" title="Input your code here" class="code-input"
-                    ondrop="window.c0vm_ts.init_from_drag(event);" ondragenter="window.c0vm_ts.drag_hint_enter_ui();" ondragleave="window.c0vm_ts.drag_hint_leave_ui();"></textarea>
+                <!-- <textarea type="text" id="c0-code-input" title="Input your code here" class="code-input"
+                    ondrop="window.c0vm_ts.init_from_drag(event);" 
+                    ondragenter="window.c0vm_ts.drag_hint_enter_ui();" 
+                    ondragleave="window.c0vm_ts.drag_hint_leave_ui();"
+                    spellcheck="false"
+                    autocapitalize="false"
+                    autocomplete="off"
+                    autocorrect="off"
+                ></textarea> -->
+                <div id="c0-code-input"></div>
             </div>
             <div class="io-area">
                 <h3 style="margin-top: 0;">Printout (Standard Output)</h3>

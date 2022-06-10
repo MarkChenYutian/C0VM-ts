@@ -18,7 +18,7 @@ var config = {
 };
 
 var htmlConfig = Object.assign({}, config, {
-  devtool: false,
+  devtool: "inline-source-map",
   entry: {
     main: "./src/web_main.ts",
   },

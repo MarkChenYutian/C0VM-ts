@@ -75,6 +75,12 @@ declare const enum C0ValueVMType {
     "ptr" = "ptr"
 }
 
+//TODO: 
+type C0Type<T> = {
+    type: "ptr" | "arr" | "int" | "char" | "boolean" | "string" | "NULL",
+    value: C0Type;
+}
+
 type C0ValueType = "<unknown>" | "int" | "char" | "boolean";
 type C0PointerType = "<unknown>" | "<unknown>[]" | "string" | "struct" | "int[]" | "string[]" | "char[]" | "boolean[]" | "struct[]" | C0ValueType;
 

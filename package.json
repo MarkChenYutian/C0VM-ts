@@ -6,6 +6,7 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "node-fetch": "^3.2.5"
+    "@codemirror/basic-setup": "^0.20.0",
+    "@codemirror/lang-javascript": "^6.0.0"
   }
 }

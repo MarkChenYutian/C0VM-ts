@@ -1,3 +1,5 @@
+import { EditorView } from "@codemirror/view";
+
 declare global {
     var DEBUG: boolean;
     var DEBUG_DUMP_MEM: boolean;
@@ -12,6 +14,9 @@ declare global {
 
     var COMPILER_BACKEND_URL: string;
 
+    var EDITOR_CONTENT: string;
+    var EDITOR_VIEW: EditorView;
+    
     var UI_INPUT_ID: string;
     var UI_PRINTOUT_ID: string;
     var UI_MSG_ID: string;
