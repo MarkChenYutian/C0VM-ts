@@ -499,13 +499,23 @@ By clicking on the left of line number, one can activate/deactivate a breakpoint
 
 When a breakpoint on a specific line is activated, a 🔴 sign will be displayed on the left of line number, as shown below:
 
+<img width="398" alt="Screenshot 2022-06-10 234630" src="https://user-images.githubusercontent.com/47029019/173171386-5e226244-e260-482a-b8f3-4b041210891a.png">
+
 ### funcHeadGutter
 
 Defined in `/gui/extensions/funchead_marker.ts`, this extension will use regex to match the line content. When appropriate, it will display a *f* on the left of function header, and ↪ on the left of bytecode `jmp` labels.
 
+<img width="371" alt="Screenshot 2022-06-10 234526" src="https://user-images.githubusercontent.com/47029019/173171401-9c525081-7f15-4054-9586-c0f2338d1df7.png">
+<img width="307" alt="Screenshot 2022-06-10 234548" src="https://user-images.githubusercontent.com/47029019/173171402-48d6b098-4093-493c-9f54-f8ce27bd8568.png">
+
+
 ### execLineHighlighter
 
 Defined in `/gui/extensions/exec_position.ts`, this extension will read the `lineNumber` from `C0_RUNTIME` global variable and render a yellow highlight on the line currently being executed.
+
+<img width="387" alt="Screenshot 2022-06-10 234906" src="https://user-images.githubusercontent.com/47029019/173171395-2a55f3d4-23fa-4901-bae7-a8383d038503.png">
+
+*The yellow highlight indicate that Line 19 is just executed in C0VM*
 
 ## Project Progress
 
