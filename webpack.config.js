@@ -2,7 +2,7 @@ const path = require('path');
 
 
 var config = {
-  mode: "development",
+  mode: "production",
   watch: true,
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
@@ -18,9 +18,13 @@ var config = {
 };
 
 var htmlConfig = Object.assign({}, config, {
-  devtool: "inline-source-map",
+  devtool: false,
   entry: {
     main: "./src/web_main.ts",
+  },
+  optimization: {
+    concatenateModules: true,
+    minimize: true
   },
   output: {
     path: path.resolve(__dirname, './public'),
