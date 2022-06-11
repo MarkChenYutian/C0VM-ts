@@ -4,6 +4,20 @@
 
 Visit [C0VM.ts Alpha Version (markchenyutian.github.io)](https://markchenyutian.github.io/C0VM-ts/public/) here for the demo of this project!
 
+## Project Structure
+
+* **C0VM-ts** is the main repository of this project, it contains the `C0VM` frontend GUI and the actual code of `C0VM`.
+
+  [MarkChenYutian/C0VM-ts (github.com)](https://github.com/MarkChenYutian/C0VM-ts)
+
+* **C0VM-ts-server** is the backend server that receives `C0` source code and compile it to `bc0` bytecode for the frontend C0VM to execute.
+
+  [MarkChenYutian/C0VM-ts-server (github.com)](https://github.com/MarkChenYutian/C0VM-ts-server)
+
+* **C0VM-ts-bc0-syntax** is the parser-generator configuration for `bc0` bytecode file format. It's build product is used to perform syntax highlighting in the code editor of C0VM-ts.
+
+  [MarkChenYutian/c0vm-ts-bc0-syntax (github.com)](https://github.com/MarkChenYutian/c0vm-ts-bc0-syntax)
+
 ## Compile & Execute Project
 
 There are two entry points / compile target for this project. One entry point, `console_main.ts` will compile the project to a node.js application for local execution. The other entry point `web_main.ts` will compile the project to a webpack library that loaded on the `globalThis` (which is `window` in browser) and allows program to be loaded & executed in modern browsers.
@@ -41,16 +55,28 @@ Configurations are generally set up using global variables declared under `optio
 | `DEBUG`                  | `boolean` value, `true` to turn on debug features            |
 | `DEBUG_DUMP_MEM`         | `boolean` value, `true` to dump the heap memory to console on the beginning of every execution. |
 | `DEBUG_DUMP_STEP`        | `boolean` value, `true` to log the `currFrame` and `PC` of each step |
+|                          |                                                              |
 | `MEM_BLOCK_MAX_SIZE`     | `number`, the maximum size of heap memory                    |
 | `MEM_POOL_SIZE`          | `number`, the current size of heap memory                    |
 | `MEM_POOL_MIN_SIZE`      | `number`, the minimum allowed size of heap memory            |
 | `MEM_POOL_MAX_SIZE`      | `number`, the maximum allowed size of heap memory            |
 | `MEM_POOL_DEFAULT_SIZE`  | `number`, the default (fallback value for) the size of heap memory |
-| `UI_INPUT_ID`            | `string`, used by `browser` compile target only, the ID of HTMLElement that provides bytecode input. |
+|                          |                                                              |
+| `COMPILER_BACKEND_URL`   | `string`, the server address to send "compile" request to    |
+|                          |                                                              |
+| `EDITOR_CONTENT`         | `string`, the plain string of contents in editor             |
+| `EDITOR_VIEW`            | `EditorView`, the `EditorView` of mirrorcode code editor object |
+| `EDITOR_BREAKPOINTS`     | `Set<number>`, the line numbers that has breakpoints toggled |
+|                          |                                                              |
+| `UI_INPUT_ID`            | `string`, used by `browser` compile target only, the ID of HTMLElement that act as the root of C0-editor. |
 | `UI_PRINTOUT_ID`         | `string`, used by `browser` compile target only, the ID of HTMLElement that act as standard output. |
 | `UI_MSG_ID`              | `string`, used by `browser` compile target only, the ID of HTMLElement that shows all the output messages (ok, warn and error). |
+|                          |                                                              |
 | `C0_BYTECODE_MAX_LENGTH` | `number`, used by `browser` compile target only, the maximum allowed size of byte code input when using drag&drop upload method. |
 | `C0_ENVIR_MODE`          | `"nodejs" | "web"`, used by some native functions to deploy different implementations based on different compile target. |
+| `C0_MAX_RECURSION`       | `number`, the maximum level of recursion allowed. Exceeding this recursion level (having function stack greater than this size) will lead to `c0_memory_error`. |
+| `C0_RUNTIME`             | `undefined | C0VM_RuntimeState`, when bytecode is loaded, this variable will store the state of C0VM. When program's execution is finished / error occurs, it will be set to `undefined` |
+|                          |                                                              |
 | `MSG_EMITTER`            | `MessageEmitter`, determine the way that C0VM.ts emit message to user. |
 
 ## VM Structure
@@ -63,15 +89,17 @@ type VM_State = {
     C: VM_Constants, // Constants the VM will use
     CallStack: VM_StackFrame[],
     CurrFrame: VM_StackFrame,
+    CurrLineNumber: number
 };
 ```
 
-| Field       | Explanation/Representation                                   |
-| ----------- | ------------------------------------------------------------ |
-| `P`         | The program that C0VM is currently exeucting                 |
-| `C`         | The constants that the VM will use. Currently, there's only `string_pool_ptr` that marks the position of string pool in heap memory. |
-| `CallStack` | The stack of function stack frames of C0VM                   |
-| `CurrFrame` | The function frame that is currently executed by the C0VM    |
+| Field            | Explanation/Representation                                   |
+| ---------------- | ------------------------------------------------------------ |
+| `P`              | The program that C0VM is currently exeucting                 |
+| `C`              | The constants that the VM will use. Currently, there's only `string_pool_ptr` that marks the position of string pool in heap memory. |
+| `CallStack`      | The stack of function stack frames of C0VM                   |
+| `CurrFrame`      | The function frame that is currently executed by the C0VM    |
+| `CurrLineNumber` | The line number of bytecode currently being executed in `.bc0` file |
 
 Where each `VM_StackFrame` is defined as
 
@@ -443,6 +471,41 @@ The list of native functions is listed below:
 | NATIVE_STRING_TERMINATED     | :hourglass:        |
 | NATIVE_STRING_TO_CHARARRAY   | :white_check_mark: |
 | NATIVE_STRING_TOLOWER        | :hourglass:        |
+
+## C0 Code Editor
+
+We have implemented the C0 Code editor using [CodeMirror 6](https://codemirror.net/). The editor is initialized in `editor_init()` function in `/src/gui/code_editor_setup.ts` file.
+
+The extensions we have used are shown below
+
+```typescript
+extensions: [
+    breakpointGutter,
+    basicSetup,
+    funcHeadGutter,
+    execLineHighlighter,
+    keymap.of([indentWithTab]),
+    indentUnit.of("    "),
+    EditorView.updateListener.of((e) => { globalThis.EDITOR_CONTENT = e.state.doc.toString(); }),
+    language.of(BC0Language)
+]
+```
+
+### breakpointGutter
+
+Defined in `/gui/extensions/breakpoint_marker.ts`, this extension will handle the toggle, display and disable of `breakpoints` in the bc0 code.
+
+By clicking on the left of line number, one can activate/deactivate a breakpoint on a specific line.
+
+When a breakpoint on a specific line is activated, a 🔴 sign will be displayed on the left of line number, as shown below:
+
+### funcHeadGutter
+
+Defined in `/gui/extensions/funchead_marker.ts`, this extension will use regex to match the line content. When appropriate, it will display a *f* on the left of function header, and ↪ on the left of bytecode `jmp` labels.
+
+### execLineHighlighter
+
+Defined in `/gui/extensions/exec_position.ts`, this extension will read the `lineNumber` from `C0_RUNTIME` global variable and render a yellow highlight on the line currently being executed.
 
 ## Project Progress
 
