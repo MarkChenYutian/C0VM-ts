@@ -30,3 +30,7 @@ export function c0_print_bool(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.
 export function c0_print_char(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>): boolean {
     return internal_print(String.fromCharCode(arg1.value.getUint8(3)));
 }
+
+export function c0_readline(mem: C0HeapAllocator): string {
+    return prompt("C0VM.ts Input:");
+}

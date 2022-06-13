@@ -70,12 +70,9 @@ function init_from_input() {
 
 function step_runtime() {
     if (globalThis.C0_RUNTIME === undefined) {
-        globalThis.MSG_EMITTER.err(
-            "C0VM has not load any bytecode yet!",
-            "After input bytecode, press Load to load the bytecode before executing."
-        );
-        return;
+        init_from_input();
     }
+    if (globalThis.C0_RUNTIME === undefined) return;
     try {
         if (!globalThis.C0_RUNTIME.step_forward()) {
             globalThis.MSG_EMITTER.ok(
@@ -95,12 +92,9 @@ function step_runtime() {
 
 function run_runtime() {
     if (globalThis.C0_RUNTIME === undefined) {
-        globalThis.MSG_EMITTER.err(
-            "C0VM has not load any bytecode yet!",
-            "After input bytecode, press Load to load the bytecode before executing."
-        );
-        return;
+        init_from_input();
     }
+    if (globalThis.C0_RUNTIME === undefined) return;
     let res = true;
     while (res) {
         try {
@@ -129,10 +123,13 @@ function run_runtime() {
 }
 
 function reset_runtime() {
-    if (globalThis.C0_RUNTIME === undefined) {
-        return;
-    }
-    globalThis.C0_RUNTIME.restart();
+    init_from_input();
+
+    if (globalThis.C0_RUNTIME === undefined) return;
+    
+    // Force refresh editor to update exechighlight extension
+    window.EDITOR_VIEW.update([window.EDITOR_VIEW.state.update()]);
+
     document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
     document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(
         (e) => document.getElementById(globalThis.UI_MSG_ID).removeChild(e)
@@ -151,7 +148,6 @@ function web_compile() {
 
 export default {
     init_env,
-    init_from_input,
     step_runtime,
     run_runtime,
     reset_runtime,

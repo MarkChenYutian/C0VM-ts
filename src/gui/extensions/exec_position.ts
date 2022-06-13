@@ -13,7 +13,8 @@ const execLineHighlighter = ViewPlugin.fromClass(class {
         return;
     }
     getDeco(view: EditorView) {
-        if (globalThis.C0_RUNTIME === undefined) {
+        if (globalThis.C0_RUNTIME === undefined || 
+            globalThis.EDITOR_VIEW.state.doc.lines < globalThis.C0_RUNTIME.state.CurrLineNumber) {
             return Decoration.none; // When we are not running, no line to highlight
         }
         const execLineStart = view.state.doc.line(globalThis.C0_RUNTIME.state.CurrLineNumber).from;

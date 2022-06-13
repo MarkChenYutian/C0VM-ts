@@ -153,6 +153,8 @@ export default function parse(raw_file: string): C0ByteCode {
             code_byte_counter += lineBytes.split(" ").length;
         }
 
+        if (funcSize !== funcCode.length) throw new bc0_format_error();
+
         functionPool.push({
             name: funcName,
             size: funcSize,

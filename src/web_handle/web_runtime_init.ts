@@ -7,6 +7,7 @@ export default function init_runtime(s: string) {
             s, globalThis.MEM_POOL_SIZE
         );
     } catch (e) {
+        globalThis.C0_RUNTIME = undefined;
         globalThis.MSG_EMITTER.err(
             e.name,
             e.message

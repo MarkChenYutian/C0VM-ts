@@ -1,0 +1,7 @@
+#use <conio>
+
+int main() {
+    string s = readline();
+    printf("%s\n", s);
+    return 0;
+}

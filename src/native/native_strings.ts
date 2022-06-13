@@ -3,7 +3,7 @@ import { vm_error } from "../utility/errors";
 import { isNullPtr, read_ptr } from "../utility/pointer_ops";
 import { loadString } from "../utility/string_utility";
 
-function allocate_js_string(mem: C0HeapAllocator, s: string): C0Pointer {
+export function allocate_js_string(mem: C0HeapAllocator, s: string): C0Pointer {
     const ptr = mem.malloc(s.length + 1);
     const block = mem.deref(ptr);
     for (let i = 0; i < s.length; i ++) {

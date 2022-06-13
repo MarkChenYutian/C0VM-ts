@@ -129,10 +129,13 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             }
         case 11:
             return {
-                //TODO: This will implicitly flush the buffer
                 functionType: "NATIVE_READLINE",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: (mem: C0HeapAllocator) => {
+                    const str = IONative.c0_readline(mem);
+                    const ptr: C0Pointer = StringNative.allocate_js_string(mem, str);
+                    return build_c0_ptrValue(ptr, "string");
+                }
             }
         /** Double Type calculation */
         case 54: {

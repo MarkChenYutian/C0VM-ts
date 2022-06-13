@@ -6,6 +6,7 @@ import { indentUnit, language } from "@codemirror/language";
 import breakpointGutter from "./extensions/breakpoint_marker";
 import execLineHighlighter from "./extensions/exec_position";
 import { BC0Language } from "./syntax/bc0";
+import LoadDocumentPlugin from "./extensions/loader_ui";
 
 export function editor_init() {
     globalThis.EDITOR_VIEW = new EditorView({
@@ -15,6 +16,7 @@ export function editor_init() {
             basicSetup,
             funcHeadGutter,
             execLineHighlighter,
+            LoadDocumentPlugin,
             keymap.of([indentWithTab]),
             indentUnit.of("    "),
             EditorView.updateListener.of((e) => { globalThis.EDITOR_CONTENT = e.state.doc.toString(); }),
