@@ -2,3 +2,4 @@ node_modules/
 build/
 console_test.js
 *.bc0
+*.out

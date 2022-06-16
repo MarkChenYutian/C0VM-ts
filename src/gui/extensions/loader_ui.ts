@@ -21,7 +21,7 @@ tmp.onclick = onLoadFile;
 tmp.textContent = "Load Manually"
 load_dom.appendChild(tmp);
 load_dom.appendChild(document.createElement("br"));
-load_dom.appendChild(document.createTextNode("Or type anything in editor to remove this message."))
+load_dom.appendChild(document.createTextNode("Or type anything in the editor to remove this message."))
 load_dom.className = "editor-load-hint";
 
 // Reference: https://codemirror.net/examples/decoration/
