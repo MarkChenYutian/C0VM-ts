@@ -1,0 +1,9 @@
+#use <conio>
+
+int main() {
+    int* I = alloc(int);
+    *I = 1024;
+    printint(*I);
+    print("\n");
+    return 0;
+}

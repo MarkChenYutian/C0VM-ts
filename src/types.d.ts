@@ -31,7 +31,7 @@ type C0Function = {
 // Information extracted from comment during parsing phase
 // Facilitate type inference etc.
 type CodeComment = {
-    dataType?: "char" | "boolean" | "int",
+    dataType: C0Type,
     lineNumber: number
 }
 
@@ -82,8 +82,24 @@ declare const enum C0ValueVMType {
 //     value: C0Type;
 // }
 
-type C0ValueType = "<unknown>" | "int" | "char" | "boolean";
-type C0PointerType = "<unknown>" | "<unknown>[]" | "string" | "struct" | "int[]" | "string[]" | "char[]" | "boolean[]" | "struct[]" | C0ValueType;
+type C0ValueType = "<unknown>" | "int" | "char" | "boolean" | "string" | "void";
+
+type C0PointerNames = "arr" | "ptr" | "struct";
+
+type C0PointerType<T extends C0PointerNames> = 
+    T extends "arr" | "ptr" ? {
+        val: C0ValueType | C0PointerType<C0PointerNames>,
+        type: "pointer",
+        name: T
+    } : 
+    T extends "struct" ? {
+        type: "struct",
+        name: string,
+        offset: number
+    } : never
+;
+
+type C0Type = C0ValueType | C0PointerType<C0PointerNames>;
 
 // C0Value type with some stronger constraints
 /**
@@ -104,7 +120,7 @@ type C0Value<T extends C0ValueVMType> =
     } : 
     T extends C0ValueVMType.ptr ? {
         vm_type: T;
-        type: C0PointerType;// Everything can have a corresponding pointer type
+        type: C0PointerType<C0PointerNames>;// Everything can have a corresponding pointer type
         value: C0Pointer
     } : 
     never;

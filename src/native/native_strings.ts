@@ -46,18 +46,18 @@ export function c0_string_fromint(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMT
     );
 }
 
-export function c0_string_join(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>, arg2: C0Value<C0ValueVMType.ptr>): C0Pointer {
+export function c0_string_join(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>, arg2: C0Value<C0ValueVMType.value>): C0Pointer {
     return allocate_js_string(
         mem,
         loadString(arg1, mem) + loadString(arg2, mem)
     );
 }
 
-export function c0_string_length(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>): number {
+export function c0_string_length(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>): number {
     return loadString(arg1, mem).length;
 }
 
-export function c0_string_to_chararray(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>): C0Pointer {
+export function c0_string_to_chararray(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>): C0Pointer {
     const str = loadString(arg1, mem);
     const ptr = mem.malloc(str.length + 1 + 4);
     const mem_block = mem.deref(ptr);

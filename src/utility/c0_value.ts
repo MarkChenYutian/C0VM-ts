@@ -75,10 +75,10 @@ export function c0_cvt2_js_value(value: C0Value<C0ValueVMType>): number | string
  * @param t Optional - the type of object that the pointer is pointing to
  * @returns A constructed C0Value
  */
-export function build_c0_ptrValue(value: C0Pointer, t?: C0PointerType): C0Value<C0ValueVMType.ptr> {
+export function build_c0_ptrValue(value: C0Pointer, t: C0PointerType<C0PointerNames>): C0Value<C0ValueVMType.ptr> {
     return {
         value: value,
-        type: t ? t : "<unknown>",
+        type: t,
         vm_type: C0ValueVMType.ptr
     }
 }
@@ -89,10 +89,10 @@ export function build_c0_ptrValue(value: C0Pointer, t?: C0PointerType): C0Value<
  * @param t Optional - the type of object that represented by the DataView passed in
  * @returns A constructed C0Value
  */
-export function build_c0_value(value: DataView, t?: C0ValueType): C0Value<C0ValueVMType.value> {
+export function build_c0_value(value: DataView, t: C0ValueType): C0Value<C0ValueVMType.value> {
     return {
         value: value,
-        type: t ? t : "<unknown>",
+        type: t,
         vm_type: C0ValueVMType.value
     };
 }

@@ -1,7 +1,14 @@
-import { bc0_format_error, vm_error } from "../utility/errors";
+import { bc0_format_error, vm_error, vm_instruct_error } from "../utility/errors";
 import { nativeFuncLoader } from "../native/native_interface";
+import { string2type } from "../types/utility";
 
-//TODO: use regex instead of hardcoding
+const alloc_array_regex = /^alloc_array\(([a-zA-z_\-0-9]+), \d+\)/gm;
+const alloc_struct_regex = /^alloc\(([a-zA-Z_\-0-9]+)\)/gm;
+const int_comment_regex = /(\d+)|(dummy return value)/;
+const bool_comment_regex = /(true)|(false)/;
+const char_comment_regex = /'.*'/;
+
+
 /**
  * Parse the bc0 text into byte arrays, load Native Functions from Native Pool
  * @param raw_file A .bc0 string compiled by cc0 with -b flag
@@ -124,15 +131,12 @@ export default function parse(raw_file: string): C0ByteCode {
         let code_byte_counter = 0;
 
         const comment_mapping = new Map<number, CodeComment>();
-        const int_comment_regex = /(\d+)|(dummy return value)/;
-        const bool_comment_regex = /(true)|(false)/;
-        const char_comment_regex = /'.*'/;
 
         for (let lineNum = 4; lineNum < funcLines.length; lineNum++) {
             const [lineBytes, opcodeName, comment] = funcLines[lineNum].split("#")
                 .map((elem) => elem.trim());
             if (lineBytes === "") continue;
-            let type: "int" | "boolean" | "char" | undefined = undefined;
+            let type: C0Type | undefined = undefined;
             if (opcodeName.startsWith("bipush")) {
                 if (int_comment_regex.test(comment)) {
                     type = "int";
@@ -143,6 +147,10 @@ export default function parse(raw_file: string): C0ByteCode {
                 } else {
                     console.error("Failed to inference value type from bipush comment:\n" + funcLines[lineNum]);
                 }
+            } else if (opcodeName.startsWith("newarray")) {
+                type = string2type(alloc_array_regex.exec(comment)[1]);
+            } else if (opcodeName.startsWith("new")) {
+                type = string2type(alloc_struct_regex.exec(comment)[1]);
             }
             comment_mapping.set(code_byte_counter, 
                 {
@@ -178,7 +186,11 @@ export default function parse(raw_file: string): C0ByteCode {
             parseInt(row[2] + row[3], 16)
         ]
     ).map(
-        row => nativeFuncLoader(row[1], row[0])
+        row => {
+            const nativef = nativeFuncLoader(row[1], row[0])
+            if (nativef === undefined) throw new vm_instruct_error("Native function not implemented.");
+            return nativef
+        }
     )
     if (nativeFuncs.length != nativeCount) {
         throw new bc0_format_error();

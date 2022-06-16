@@ -22,8 +22,8 @@ export function loadStringPool(stringPool: Uint8Array, allocator: C0HeapAllocato
  * @param allocator HeapAllocator that manages the heap memory
  * @returns The decoded string (with utf-8 decoding by default)
  */
-export function loadString(ptr: C0Value<C0ValueVMType.ptr>, allocator: C0HeapAllocator): string {
-    if (ptr.type !== "<unknown>" && ptr.type !== "string") {
+export function loadString(ptr: C0Value<C0ValueVMType.value>, allocator: C0HeapAllocator): string {
+    if (ptr.type !== "string") {
         throw new vm_error("Type error. Unable to extract string from type" + ptr.type);
     }
     const mem_block = allocator.deref(ptr.value);

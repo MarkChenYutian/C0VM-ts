@@ -164,7 +164,7 @@ pre#c0-output {
 .cm-gutters { margin: 1px; }
 .cm-scroller { overflow: auto; }
 .cm-editor { border: 1px solid silver; }
-.cm-execLine { background-color: #FDFF32;  }
+.cm-execLine { background-color: #fcff32dd;  }
 
 #message-terminal {
     position: absolute;

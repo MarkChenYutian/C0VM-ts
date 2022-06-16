@@ -10,11 +10,11 @@ function internal_print(s: string): boolean {
     }
 }
 
-export function c0_print(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>): boolean {
+export function c0_print(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>): boolean {
     return internal_print(loadString(arg1, mem));
 }
 
-export function c0_println(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>): boolean {
+export function c0_println(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>): boolean {
     c0_print(mem, arg1);
     return internal_print("<br>");
 }

@@ -77,8 +77,8 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 functionType: "NATIVE_PRINT",
                 numArgs: 0,
                 f: (mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType>) => {
-                    if (arg1.vm_type !== C0ValueVMType.ptr) {
-                        throw new vm_error("Print can only receive a pointer argument");
+                    if (arg1.vm_type !== C0ValueVMType.value) {
+                        throw new vm_error("Print can only receive a string argument");
                     }
                     return js_cvt2_c0_value(IONative.c0_print(mem, arg1));
                 }
@@ -121,8 +121,9 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 functionType: "NATIVE_PRINTLN",
                 numArgs: 0,
                 f: (mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType>) => {
-                    if (arg1.vm_type !== C0ValueVMType.ptr) {
-                        throw new vm_error("PrintLn can only receive a pointer argument");
+                    if (arg1.vm_type !== C0ValueVMType.value
+                        || arg1.type !== "string") {
+                        throw new vm_error("PrintLn can only receive a string argument");
                     }
                     return js_cvt2_c0_value(IONative.c0_println(mem, arg1));
                 }
@@ -134,7 +135,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 f: (mem: C0HeapAllocator) => {
                     const str = IONative.c0_readline(mem);
                     const ptr: C0Pointer = StringNative.allocate_js_string(mem, str);
-                    return build_c0_ptrValue(ptr, "string");
+                    return build_c0_value(ptr, "string");
                 }
             }
         /** Double Type calculation */
@@ -359,11 +360,14 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 functionType: "NATIVE_STRING_FROM_CHARARRAY",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0ValueVMType>) => {
-                    if (arg1.vm_type !== C0ValueVMType.ptr) {
-                        throw new vm_error("NATIVE_STRING_FROM_CHARARRAY only accepts pointer as input");
+                    if (arg1.vm_type !== C0ValueVMType.ptr
+                        || arg1.type.type !== "pointer"
+                        || arg1.type.name !== "arr"
+                        || arg1.type.val !== "char") {
+                        throw new vm_error("NATIVE_STRING_FROM_CHARARRAY only accepts pointer[arr[char]] as input");
                     }
-                    return build_c0_ptrValue(
-                        StringNative.c0_string_to_chararray(mem, arg1), "string"
+                    return build_c0_value(
+                        StringNative.c0_string_from_chararray(mem, arg1), "string"
                     );
                 }
             }
@@ -373,10 +377,11 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 functionType: "NATIVE_STRING_FROMBOOL",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0ValueVMType>) => {
-                    if (arg1.vm_type !== C0ValueVMType.value) {
+                    if (arg1.vm_type !== C0ValueVMType.value
+                        || arg1.type !== "boolean") {
                         throw new vm_error("NATIVE_STRING_FROMBOOL only accepts value as input");
                     }
-                    return build_c0_ptrValue(
+                    return build_c0_value(
                         StringNative.c0_string_frombool(mem, arg1), "string"
                     );
                 }
@@ -387,10 +392,10 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 functionType: "NATIVE_STRING_FROMCHAR",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0ValueVMType>) => {
-                    if (arg1.vm_type !== C0ValueVMType.value) {
-                        throw new vm_error("NATIVE_STRING_FROMCHAR only accepts value as input");
+                    if (arg1.vm_type !== C0ValueVMType.value || arg1.type !== "char") {
+                        throw new vm_error("NATIVE_STRING_FROMCHAR only accepts char as input");
                     }
-                    return build_c0_ptrValue(
+                    return build_c0_value(
                         StringNative.c0_string_fromchar(mem, arg1), "string"
                     );
                 }
@@ -404,7 +409,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                     if (arg1.vm_type !== C0ValueVMType.value) {
                         throw new vm_error("NATIVE_STRING_FROMINT only accepts value as input");
                     }
-                    return build_c0_ptrValue(
+                    return build_c0_value(
                         StringNative.c0_string_fromint(mem, arg1), "string"
                     );
                 }
@@ -415,10 +420,13 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 functionType: "NATIVE_STRING_JOIN",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0ValueVMType>, arg2: C0Value<C0ValueVMType>) => {
-                    if (arg1.vm_type !== C0ValueVMType.ptr || arg2.vm_type !== C0ValueVMType.ptr) {
-                        throw new vm_error("NATIVE_STRING_JOIN only accepts pointers as input");
+                    if (arg1.vm_type !== C0ValueVMType.value 
+                        || arg2.vm_type !== C0ValueVMType.value
+                        || arg1.type !== "string"
+                        || arg2.type !== "string") {
+                        throw new vm_error("NATIVE_STRING_JOIN only accepts (string, string) as input");
                     }
-                    return build_c0_ptrValue(
+                    return build_c0_value(
                         StringNative.c0_string_join(mem, arg1, arg2), "string"
                     );
                 }
@@ -429,8 +437,8 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 functionType: "NATIVE_STRING_LENGTH",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== C0ValueVMType.ptr) {
-                        throw new vm_error("NATIVE_STRING_LENGTH only accepts pointers as input");
+                    if (arg1.vm_type !== C0ValueVMType.value || arg1.type !== "string") {
+                        throw new vm_error("NATIVE_STRING_LENGTH only accepts string as input");
                     }
                     return js_cvt2_c0_value(
                         StringNative.c0_string_length(mem, arg1)
@@ -457,11 +465,15 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 functionType: "NATIVE_STRING_TO_CHARARRAY",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0ValueVMType>) => {
-                    if (arg1.vm_type !== C0ValueVMType.ptr) {
-                        throw new vm_error("NATIVE_STRING_TO_CHARARRAY only accepts pointer as input");
+                    if (arg1.vm_type !== C0ValueVMType.value) {
+                        throw new vm_error("NATIVE_STRING_TO_CHARARRAY only accepts value as input");
                     }
                     return build_c0_ptrValue(
-                        StringNative.c0_string_to_chararray(mem, arg1), "char[]"
+                        StringNative.c0_string_to_chararray(mem, arg1), {
+                            type: "pointer",
+                            name: "arr",
+                            val: "char"
+                        }
                     );
                 }
             }

@@ -390,16 +390,16 @@ The list of native functions is listed below:
 
 ### Standard I/O
 
-| Native Functions | Support?           |
-| ---------------- | ------------------ |
-| NATIVE_EOF       | :x:                |
-| NATIVE_FLUSH     | :hourglass:        |
-| NATIVE_PRINT     | :white_check_mark: |
-| NATIVE_PRINTBOOL | :white_check_mark: |
-| NATIVE_PRINTCHAR | :white_check_mark: |
-| NATIVE_PRINTINT  | :white_check_mark: |
-| NATIVE_PRINTLN   | :white_check_mark: |
-| NATIVE_READLINE  | :hourglass:        |
+| Native Functions | Support?                                     |
+| ---------------- | -------------------------------------------- |
+| NATIVE_EOF       | :x: - This is part of file-reading interface |
+| NATIVE_FLUSH     | :hourglass:                                  |
+| NATIVE_PRINT     | :white_check_mark:                           |
+| NATIVE_PRINTBOOL | :white_check_mark:                           |
+| NATIVE_PRINTCHAR | :white_check_mark:                           |
+| NATIVE_PRINTINT  | :white_check_mark:                           |
+| NATIVE_PRINTLN   | :white_check_mark:                           |
+| NATIVE_READLINE  | :white_check_mark:                           |
 
 ### Cursor :x:
 
@@ -476,7 +476,9 @@ The list of native functions is listed below:
 
 We have implemented the C0 Code editor using [CodeMirror 6](https://codemirror.net/). The editor is initialized in `editor_init()` function in `/src/gui/code_editor_setup.ts` file.
 
-The extensions we have used are shown below
+All the functionalities of editor are loaded through the **extension** interface.
+
+The extensions we have used are shown below:
 
 ```typescript
 extensions: [
@@ -490,6 +492,8 @@ extensions: [
     language.of(BC0Language)
 ]
 ```
+
+Among them, the `breakpointGutter`, `funcHeadGutter` and `execLineHighlighter` extensions are implemented in `/gui/extensions` folder. The `BC0Language` is an extension for BC0 syntax highlighting and is defined in `/gui/syntax/bc0`.
 
 ### breakpointGutter
 

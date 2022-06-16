@@ -1,9 +1,10 @@
+import { clone_type } from "../types/utility";
 import * as arithmetic from "../utility/arithmetic";
 import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value } from "../utility/c0_value";
 import { c0_memory_error, c0_user_error, vm_error } from "../utility/errors";
 import { read_ptr, shift_ptr } from "../utility/pointer_ops";
 import { loadString } from "../utility/string_utility";
-import { ptr2ptr_type_inference, ptr2val_type_inference, safe_pop_stack } from "./helpers";
+import { safe_pop_stack } from "./helpers";
 
 export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: MessageEmitter): boolean {
     const F = state.CurrFrame.P; // the function that is currently running on
@@ -27,7 +28,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
                 {
                     value: new DataView(v.value.buffer.slice(v.value.byteOffset, v.value.byteLength)),
                     vm_type: v.vm_type,
-                    type: v.type
+                    type: (clone_type(v.type) as C0PointerType<C0PointerNames>)
                 } : 
                 {
                     value: new DataView(v.value.buffer.slice(v.value.byteOffset, v.value.byteLength)),
@@ -213,7 +214,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
         case OpCode.BIPUSH: {
             // in this case, we will have sign extension
             const b = new DataView(F.code.buffer).getInt8(state.CurrFrame.PC + 1);
-            let rebuild_type: C0ValueType = F.comment.get(state.CurrFrame.PC).dataType;
+            let rebuild_type: C0ValueType = (F.comment.get(state.CurrFrame.PC).dataType as C0ValueType);
 
             if (rebuild_type === undefined) {
                 rebuild_type = "<unknown>"
@@ -256,7 +257,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             state.CurrFrame.PC += 3;
 
             state.CurrFrame.S.push(
-                build_c0_ptrValue(
+                build_c0_value(
                     shift_ptr(state.C.stringPoolPtr, idx),
                     "string"
                 )
@@ -272,7 +273,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             state.CurrFrame.S.push(
                 build_c0_ptrValue(
                     new DataView(null_ptr.buffer),
-                    "<unknown>"
+                    {
+                        type: "pointer", name: "ptr", val: "void"
+                    }
                 )
             );
             break;
@@ -324,8 +327,8 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             state.CurrFrame.PC += 1;
 
             const str_ptr = safe_pop_stack(state.CurrFrame.S);
-            if (str_ptr.vm_type !== C0ValueVMType.ptr) {
-                throw new vm_error(`Type unmatch: expected a pointer in C0Value, received a ${str_ptr.vm_type}`);
+            if (str_ptr.vm_type !== C0ValueVMType.value || str_ptr.type !== "string") {
+                throw new vm_error(`Type unmatch: expected a string in C0Value, received a ${str_ptr.vm_type}`);
             }
             throw new c0_user_error(loadString(str_ptr, allocator));
         }
@@ -335,8 +338,8 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             state.CurrFrame.PC += 1;
 
             const str_ptr = safe_pop_stack(state.CurrFrame.S);
-            if (str_ptr.vm_type !== C0ValueVMType.ptr) {
-                throw new vm_error(`Type unmatch: expected a pointer in C0Value, received a ${str_ptr.vm_type}`);
+            if (str_ptr.vm_type !== C0ValueVMType.value || str_ptr.type !== "string") {
+                throw new vm_error(`Type unmatch: expected a string in C0Value, received a ${str_ptr.vm_type}`);
             }
             const val = safe_pop_stack(state.CurrFrame.S);
             if (val.vm_type !== C0ValueVMType.value) {
@@ -508,7 +511,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
             const ptr = allocator.malloc(s);
             state.CurrFrame.S.push(
-                build_c0_ptrValue(ptr)
+                build_c0_ptrValue(ptr, {
+                    type: "pointer",
+                    name: "ptr",
+                    val: F.comment.get(state.CurrFrame.PC - 2).dataType
+                })
             );
             break;
         }
@@ -518,11 +525,12 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
             const a = safe_pop_stack(state.CurrFrame.S);
             if (a.vm_type !== C0ValueVMType.ptr) {
-                throw new vm_error("Type unmatch, expect to receive a pointer");
+                throw new vm_error("Type unmatch, expect to have IMLOAD(ptr|struct)");
             }
             const mem_block = allocator.imload(a.value);
             state.CurrFrame.S.push(
-                build_c0_value(mem_block, ptr2val_type_inference(a.type))
+                // Sorry for the "as" here, TS's type inference is too strict
+                build_c0_value(mem_block, (a.type.val as C0ValueType))
             );
             break;
         }
@@ -533,7 +541,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             const a = safe_pop_stack(state.CurrFrame.S);
             if (x.vm_type !== C0ValueVMType.value || a.vm_type !== C0ValueVMType.ptr) {
-                throw new vm_error("Type unmatch, expected to have {ptr, value}");
+                throw new vm_error("Type unmatch, expected to IMSTORE(ptr, value)");
             }
             allocator.imstore( a.value, x.value );
             break;
@@ -543,12 +551,16 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             state.CurrFrame.PC += 1;
             
             const a = safe_pop_stack(state.CurrFrame.S);
-            if (a.vm_type !== C0ValueVMType.ptr) {
-                throw new vm_error("Type unmatch, expect to receive a pointer");
+            if (a.vm_type !== C0ValueVMType.ptr
+                || a.type.type !== "pointer"
+                || a.type.name !== "ptr") {
+                throw new vm_error("Type unmatch, expect to have AMLOAD(ptr)");
             }
             const mem_block = allocator.amload(a.value);
             state.CurrFrame.S.push(
-                build_c0_ptrValue(mem_block, ptr2ptr_type_inference(a.type))
+                typeof a.type.val === "string" ? 
+                    build_c0_value(mem_block, a.type.val)
+                    : build_c0_ptrValue(mem_block, a.type.val)
             );
             break;
         }
@@ -558,8 +570,8 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             
             const x = safe_pop_stack(state.CurrFrame.S);
             const a = safe_pop_stack(state.CurrFrame.S);
-            if (x.vm_type !== C0ValueVMType.ptr || a.vm_type !== C0ValueVMType.ptr) {
-                throw new vm_error("Type unmatch, expected to have {ptr, ptr}");
+            if ((x.vm_type !== C0ValueVMType.ptr && x.type !== "string") || a.vm_type !== C0ValueVMType.ptr) {
+                throw new vm_error("Type unmatch, expected to have AMSTORE(ptr, ptr)");
             }
             allocator.amstore( a.value, x.value );
             break;
@@ -620,7 +632,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             
             allocator.deref(ptr).setUint32(0, f);
             state.CurrFrame.S.push(
-                build_c0_ptrValue(ptr, "<unknown>[]")
+                build_c0_ptrValue(ptr, {
+                    type: "pointer",
+                    name: "arr",
+                    val: F.comment.get(state.CurrFrame.PC - 2).dataType
+                })
             );
             break;
         }
@@ -647,17 +663,30 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
 
             const i = safe_pop_stack(state.CurrFrame.S);
             const a = safe_pop_stack(state.CurrFrame.S);
-            if (i.vm_type !== C0ValueVMType.value || a.vm_type !== C0ValueVMType.ptr) {
-                throw new vm_error("Type unmatch, expected to have {ptr, value}");
+            if (i.vm_type !== C0ValueVMType.value
+                || a.vm_type !== C0ValueVMType.ptr
+                || a.type.type !== "pointer"
+                || a.type.name !== "arr") {
+                throw new vm_error("Type unmatch, expected to have {ptr[arr], value}");
             }
 
             const s = allocator.deref(a.value).getUint32(0);
-            state.CurrFrame.S.push(
-                build_c0_ptrValue(
-                    shift_ptr(a.value, 4 + s * i.value.getUint32(0)), 
-                    ptr2ptr_type_inference(a.type)
-                )
-            );
+            if (typeof a.type.val === "string") {
+                state.CurrFrame.S.push(
+                    build_c0_ptrValue(
+                        shift_ptr(a.value, 4 + s * i.value.getUint32(0)), 
+                        a.type
+                    )
+                );
+            } else {
+                state.CurrFrame.S.push(
+                    build_c0_ptrValue(
+                        shift_ptr(a.value, 4 + s * i.value.getUint32(0)), 
+                        a.type.val
+                    )
+                );
+            }
+            
             break;
         }
 
