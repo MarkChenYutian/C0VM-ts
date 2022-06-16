@@ -1,5 +1,5 @@
 import { c0_cvt2_js_value } from "../utility/c0_value";
-import { vm_error } from "../utility/errors";
+import { c0_memory_error, vm_error } from "../utility/errors";
 import { isNullPtr, read_ptr } from "../utility/pointer_ops";
 import { loadString } from "../utility/string_utility";
 
@@ -14,12 +14,15 @@ export function allocate_js_string(mem: C0HeapAllocator, s: string): C0Pointer {
 }
 
 export function c0_string_compare(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>, arg2: C0Value<C0ValueVMType.ptr>): number {
-    const byte_arr_1 = isNullPtr(arg1.value) ? new DataView(new ArrayBuffer(0)) : mem.deref(arg1.value);
-    const byte_arr_2 = isNullPtr(arg1.value) ? new DataView(new ArrayBuffer(0)) : mem.deref(arg2.value);
+    if (isNullPtr(arg1.value) || isNullPtr(arg2.value)) {
+        throw new c0_memory_error("string_compare receives NULL pointer");
+    }
 
-    const dec = new TextDecoder();
-    const str_1 = dec.decode(byte_arr_1);
-    const str_2 = dec.decode(byte_arr_2);
+    const str_1 = loadString(arg1, mem);
+    const str_2 = loadString(arg2, mem);
+
+    console.log(str_1, str_2);
+
     return str_1 < str_2 ? -1 : (str_1 > str_2 ? 1 : 0)
 }
 

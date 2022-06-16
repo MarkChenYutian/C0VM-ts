@@ -210,7 +210,7 @@ function step(state, allocator, msg_handle) {
             if (val.vm_type !== "value") {
                 throw new errors_1.vm_error(`Type unmatch: expected a value in C0Value, received a ${str_ptr.vm_type}`);
             }
-            if (val.value.getBigUint64(0) === BigInt(0)) {
+            if (val.value.getUint32(0) === 0) {
                 throw new errors_1.c0_user_error((0, string_utility_1.loadString)(str_ptr, allocator));
             }
             break;
@@ -1564,11 +1564,12 @@ function allocate_js_string(mem, s) {
 }
 exports.allocate_js_string = allocate_js_string;
 function c0_string_compare(mem, arg1, arg2) {
-    const byte_arr_1 = (0, pointer_ops_1.isNullPtr)(arg1.value) ? new DataView(new ArrayBuffer(0)) : mem.deref(arg1.value);
-    const byte_arr_2 = (0, pointer_ops_1.isNullPtr)(arg1.value) ? new DataView(new ArrayBuffer(0)) : mem.deref(arg2.value);
-    const dec = new TextDecoder();
-    const str_1 = dec.decode(byte_arr_1);
-    const str_2 = dec.decode(byte_arr_2);
+    if ((0, pointer_ops_1.isNullPtr)(arg1.value) || (0, pointer_ops_1.isNullPtr)(arg2.value)) {
+        throw new errors_1.c0_memory_error("string_compare receives NULL pointer");
+    }
+    const str_1 = (0, string_utility_1.loadString)(arg1, mem);
+    const str_2 = (0, string_utility_1.loadString)(arg2, mem);
+    console.log(str_1, str_2);
     return str_1 < str_2 ? -1 : (str_1 > str_2 ? 1 : 0);
 }
 exports.c0_string_compare = c0_string_compare;
@@ -45861,7 +45862,7 @@ const web_runtime_init_1 = __webpack_require__(/*! ./web_handle/web_runtime_init
 function init_env() {
     globalThis.DEBUG = true;
     globalThis.DEBUG_DUMP_MEM = true;
-    globalThis.DEBUG_DUMP_STEP = false;
+    globalThis.DEBUG_DUMP_STEP = true;
     globalThis.MEM_POOL_SIZE = 1024 * 50;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
     globalThis.MEM_POOL_MAX_SIZE = 4294967294;

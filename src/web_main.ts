@@ -7,7 +7,7 @@ function init_env() {
     // Initialize global variables
     globalThis.DEBUG = true;
     globalThis.DEBUG_DUMP_MEM = true;
-    globalThis.DEBUG_DUMP_STEP = false;
+    globalThis.DEBUG_DUMP_STEP = true;
 
     globalThis.MEM_POOL_SIZE = 1024 * 50;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;

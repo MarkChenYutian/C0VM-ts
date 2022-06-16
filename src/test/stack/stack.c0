@@ -1,0 +1,151 @@
+/*
+ * Stacks
+ *
+ * 15-122 Principles of Imperative Computation */
+
+#use <conio>
+
+/************************************************************************/
+/************************* BEGIN IMPLEMENTATION *************************/
+
+/* Aux structure of linked lists */
+typedef struct list_node list;
+struct list_node {
+  string data;
+  list* next;
+};
+
+bool is_acyclic(list* start) {
+  if (start == NULL) return true;
+  list* h = start->next;         // hare
+  list* t = start;               // tortoise
+  while (h != t) {
+    if (h == NULL || h->next == NULL) return true;
+    h = h->next->next;
+    //@assert t != NULL; // hare is faster and hits NULL quicker
+    t = t->next;
+  }
+  //@assert h == t;
+  return false;
+}
+
+/* is_segment(start, end) will diverge if list is circular! */
+bool is_segment(list* start, list* end) {
+  if (start == NULL) return false;
+  if (start == end) return true;
+  return is_segment(start->next, end);
+}
+
+// Will run for ever if the segment is circular
+void print_segment(list* start, list* end)
+//requires start != NULL;
+{
+  for (list* p = start; p != end; p = p->next) {
+    printf("%s", p->data);
+    if (p != end) printf("->");
+  }
+}
+
+
+/* Stacks */
+
+typedef struct stack_header stack;
+struct stack_header {
+  list* top;
+  list* floor;
+};
+
+void stack_print_unsafe(stack* S)
+{
+  printf("[top] ");
+  print_segment(S->top, S->floor);
+}
+
+bool is_stack(stack* S) {
+  return S != NULL
+      && is_acyclic(S->top)
+      && is_segment(S->top, S->floor);
+}
+
+void stack_print_internal(stack* S)
+//@requires is_stack(S);
+{
+  stack_print_unsafe(S);
+}
+
+bool stack_empty(stack* S)
+//@requires is_stack(S);
+{
+  return S->top == S->floor;
+}
+
+stack* stack_new()
+//@ensures is_stack(\result);
+//@ensures stack_empty(\result);
+{
+  stack* S = alloc(stack);
+  list* l = alloc(list);
+  S->top = l;
+  S->floor = l;
+  return S;
+}
+
+void push(stack* S, string x)
+//@requires is_stack(S);
+//@ensures is_stack(S);
+//@ensures !stack_empty(S);
+{
+  list* l = alloc(list);
+  l->data = x;
+  l->next = S->top;
+  S->top = l;
+}
+
+string pop(stack* S)
+//@requires is_stack(S);
+//@requires !stack_empty(S);
+//@ensures is_stack(S);
+{
+  string e = S->top->data;
+  S->top = S->top->next;
+  return e;
+}
+
+void stack_print(stack* S)
+//@requires is_stack(S);
+{
+  printf("TOP: ");
+  for (list* l = S->top; l != S->floor; l = l->next) {
+    printf("%s", l->data);
+    if (l->next != S->floor) printf(" | ");
+  }
+}
+
+// Client type
+typedef stack* stack_t;
+
+/************************** END IMPLEMENTATION **************************/
+/************************************************************************/
+
+/************************************************************************/
+/******************************* Interface ******************************/
+
+// typedef ______* stack_t;
+
+bool stack_empty(stack_t S)       /* O(1) */
+/*@requires S != NULL; @*/ ;
+
+stack_t stack_new()               /* O(1) */
+/*@ensures \result != NULL; @*/
+/*@ensures stack_empty(\result); @*/ ;
+
+void push(stack_t S, string x)    /* O(1) */
+/*@requires S != NULL; @*/
+/*@ensures !stack_empty(S); @*/ ;
+
+string pop(stack_t S)             /* O(1) */
+/*@requires S != NULL; @*/
+/*@requires !stack_empty(S); @*/ ;
+
+void stack_print(stack_t S)       /* O(n) */
+/*@requires S != NULL; @*/ ;

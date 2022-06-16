@@ -342,7 +342,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             if (val.vm_type !== C0ValueVMType.value) {
                 throw new vm_error(`Type unmatch: expected a value in C0Value, received a ${str_ptr.vm_type}`);
             }
-            if (val.value.getBigUint64(0) === BigInt(0)) {
+            if (val.value.getUint32(0) === 0) {
                 throw new c0_user_error(loadString(str_ptr, allocator));
             }
             break;
