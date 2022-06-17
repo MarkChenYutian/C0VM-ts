@@ -80,6 +80,7 @@ function step_runtime() {
                 "Load the program again if you want to rerun the program."
             );
             globalThis.C0_RUNTIME = undefined;
+            update_editor();
         }
     } catch (e) {
         globalThis.MSG_EMITTER.err(
@@ -120,6 +121,7 @@ function run_runtime() {
         "Load the program again if you want to rerun the program."
     );
     globalThis.C0_RUNTIME = undefined;
+    update_editor();
 }
 
 function reset_runtime() {
@@ -144,6 +146,12 @@ function web_compile() {
     compile(
         globalThis.EDITOR_CONTENT, []
     );
+}
+
+function update_editor() {
+    if (globalThis.C0_ENVIR_MODE === "web") {
+        window.EDITOR_VIEW.update([window.EDITOR_VIEW.state.update()]);
+    }
 }
 
 export default {

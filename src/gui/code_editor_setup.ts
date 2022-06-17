@@ -19,7 +19,9 @@ export function editor_init() {
             LoadDocumentPlugin,
             keymap.of([indentWithTab]),
             indentUnit.of("    "),
-            EditorView.updateListener.of((e) => { globalThis.EDITOR_CONTENT = e.state.doc.toString(); }),
+            EditorView.updateListener.of((e) => {
+                if (e.docChanged) globalThis.EDITOR_CONTENT = e.state.doc.toString(); 
+            }),
             language.of(BC0Language)
         ]
     });
