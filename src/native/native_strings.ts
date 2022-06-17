@@ -14,6 +14,7 @@ export function allocate_js_string(mem: C0HeapAllocator, s: string): C0Pointer {
 }
 
 export function c0_string_compare(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>, arg2: C0Value<C0ValueVMType.ptr>): number {
+    //TODO: requires string
     const byte_arr_1 = isNullPtr(arg1.value) ? new DataView(new ArrayBuffer(0)) : mem.deref(arg1.value);
     const byte_arr_2 = isNullPtr(arg1.value) ? new DataView(new ArrayBuffer(0)) : mem.deref(arg2.value);
 

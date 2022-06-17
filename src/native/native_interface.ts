@@ -336,6 +336,8 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 functionType: "NATIVE_STRING_COMPARE",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0ValueVMType>, arg2: C0Value<C0ValueVMType>) => {
+                    arg1.type = "string";
+                    arg2.type = "string";
                     if (arg1.vm_type !== C0ValueVMType.ptr || arg2.vm_type !== C0ValueVMType.ptr) {
                         throw new vm_error("NATIVE_STRING_COMPARE only accepts C0Pointer input");
                     }

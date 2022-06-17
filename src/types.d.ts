@@ -82,9 +82,9 @@ declare const enum C0ValueVMType {
 //     value: C0Type;
 // }
 
-type C0ValueType = "<unknown>" | "int" | "char" | "boolean" | "string" | "void";
+type C0ValueType = "<unknown>" | "int" | "char" | "boolean" | "void";
 
-type C0PointerNames = "arr" | "ptr" | "struct";
+type C0PointerNames = "arr" | "ptr" | "struct" | "string";
 
 type C0PointerType<T extends C0PointerNames> = 
     T extends "arr" | "ptr" ? {
@@ -96,6 +96,9 @@ type C0PointerType<T extends C0PointerNames> =
         type: "struct",
         name: string,
         offset: number
+    } : 
+    T extends "string" ? {
+        type: "string"
     } : never
 ;
 
