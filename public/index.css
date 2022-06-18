@@ -64,7 +64,7 @@ body {
     flex-grow: 1;
     max-width: calc(100vw - 2rem);
     min-width: 20rem;
-    height: calc(100vh - 13rem);
+    height: calc(100vh - 11rem);
 }
 
 .io-area {
@@ -72,14 +72,20 @@ body {
     min-width: calc(50vw - 3rem);
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 13rem);
+    height: calc(100vh - 11rem);
 }
 
 footer {
     flex-grow: 1;
-    padding: 1rem 3vw 0.5rem 3vw;
-    background-color: #EEEEEE;
-    color: #777;
+    padding: 0 3vw;
+    background-color: #3577C1;
+    color: #EEEEEE;
+}
+
+footer a {
+    cursor: pointer;
+    color: #fffba8;
+    text-decoration: underline;
 }
 
 ul > li {
@@ -105,7 +111,7 @@ footer > ul {
 /* Editor Style */
 
 .cm-content, .cm-gutter, .cm-gutters, .cm-scroller, .cm-editor {
-    height: calc(100vh - 16rem);
+    height: calc(100vh - 19rem);
     min-height: 10rem;
 }
 .cm-editor {
@@ -132,9 +138,9 @@ i.editor-load-hint {
 pre#c0-output {
     padding: 1rem;
     border-radius: 0.3rem;
-    background-color: #333;
+    background-color: #202030;
     color: #eee;
-    height: 30vh;
+    height: 25vh;
     overflow: auto;
     margin: 0
 }
@@ -182,7 +188,7 @@ pre#c0-output {
 .disable-btn {
     color: #777 !important;
     border: 1px dashed rgba(0, 0, 0, 0.3) !important;
-    background-color: rgba(0, 0, 0, 0.042) !important;
+    background-color: rgba(0, 0, 0, 0.025) !important;
     pointer-events: none;
 }
 
@@ -209,7 +215,7 @@ pre#c0-output {
 }
 
 .err-msg {
-    background: rgba(253, 237, 237);
+    background: rgba(253, 237, 237, 80%);
     color: rgb(121, 43, 42);
 }
 
@@ -219,7 +225,7 @@ pre#c0-output {
 }
 
 .warn-msg {
-    background: rgb(255, 244, 229);
+    background: rgb(255, 244, 229, 80%);
     color: rgb(132, 83, 15);
 }
 
@@ -229,7 +235,7 @@ pre#c0-output {
 }
 
 .ok-msg {
-    background: rgba(237, 247, 237);
+    background: rgba(237, 247, 237, 80%);
     color: rgb(30, 70, 32);
 }
 
@@ -241,7 +247,7 @@ pre#c0-output {
 /* Animation */
 @keyframes show {
     100% {
-        opacity: 0.8;
+        opacity: 1;
         transform: none;
     }
 }

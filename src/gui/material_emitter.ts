@@ -38,19 +38,13 @@ export default class MaterialEmitter implements MessageEmitter {
       detail === undefined
         ? [
           this.createElement("h4", {}, [
-            this.createElement("i", {
-              className: "fas fa-exclamation-circle",
-              style: "color: rgb(239, 83, 80);"
-            }), "   ",
+            this.createElement("i", { className: "fas fa-exclamation-circle", style: "color: rgb(239, 83, 80);" }), "   ",
             msg
           ])
         ]
         : [
           this.createElement("h4", {}, [
-            this.createElement("i", {
-              className: "fas fa-exclamation-circle",
-              style: "color: rgb(239, 83, 80);"
-            }), "   ",
+            this.createElement("i", { className: "fas fa-exclamation-circle", style: "color: rgb(239, 83, 80);" }), "   ",
             msg
           ]),
           this.createElement("p", {}, detail),
@@ -61,7 +55,9 @@ export default class MaterialEmitter implements MessageEmitter {
     // Remove this message after 4000ms.
     setTimeout(() => {
       const pending_remove = document.querySelector("div#" + tobe_removed_id) as HTMLElement;
-      if (pending_remove !== null) pending_remove.parentNode.removeChild(pending_remove);
+      if (pending_remove !== null) {
+        pending_remove.remove();
+      }
     }, globalThis.UI_ERR_DISPLAY_TIME_MS);
     this.msg_counter++;
   }
@@ -77,19 +73,13 @@ export default class MaterialEmitter implements MessageEmitter {
       detail === undefined
         ? [
           this.createElement("h4", {}, [
-            this.createElement("i", {
-              className: "fas fa-exclamation-triangle",
-              style: "color: rgb(255, 152, 0);"
-            }), "   ",
+            this.createElement("i", { className: "fas fa-exclamation-triangle", style: "color: rgb(255, 152, 0);" }), "   ",
             msg
           ])
         ]
         : [
           this.createElement("h4", {}, [
-            this.createElement("i", {
-              className: "fas fa-exclamation-triangle",
-              style: "color: rgb(255, 152, 0);"
-            }), "   ",
+            this.createElement("i", { className: "fas fa-exclamation-triangle", style: "color: rgb(255, 152, 0);" }), "   ",
             msg
           ]),
           this.createElement("p", {}, detail),
@@ -100,7 +90,7 @@ export default class MaterialEmitter implements MessageEmitter {
     // Remove this message after 4000ms.
     setTimeout(() => {
       const pending_remove = document.querySelector("div#" + tobe_removed_id) as HTMLElement;
-      if (pending_remove !== null) pending_remove.parentNode.removeChild(pending_remove);
+      if (pending_remove !== null) pending_remove.remove();
     }, globalThis.UI_WARN_DISPLAY_TIME_MS);
     this.msg_counter++;
   }
@@ -116,19 +106,13 @@ export default class MaterialEmitter implements MessageEmitter {
       detail === undefined
         ? [
           this.createElement("h4", {}, [
-            this.createElement("i", {
-              className: "fas fa-check-circle",
-              style: "color: rgb(76, 175, 80);"
-            }), "   ",
+            this.createElement("i", { className: "fas fa-check-circle", style: "color: rgb(76, 175, 80);"}), "   ",
             msg
           ])
         ]
         : [
           this.createElement("h4", {}, [
-            this.createElement("i", {
-              className: "fas fa-check-circle",
-              style: "color: rgb(76, 175, 80);"
-            }), "   ",
+            this.createElement("i", { className: "fas fa-check-circle", style: "color: rgb(76, 175, 80);"}), "   ",
             msg
           ]),
           this.createElement("p", {}, detail),
@@ -139,7 +123,7 @@ export default class MaterialEmitter implements MessageEmitter {
     // Remove this message after UI_OK_DISPLAY_TIME_MS.
     setTimeout(() => {
       const pending_remove = document.querySelector("div#" + tobe_removed_id) as HTMLElement;
-      if (pending_remove !== null) pending_remove.parentNode.removeChild(pending_remove);
+      if (pending_remove !== null) pending_remove.remove();
     }, globalThis.UI_OK_DISPLAY_TIME_MS);
     this.msg_counter++;
   }
