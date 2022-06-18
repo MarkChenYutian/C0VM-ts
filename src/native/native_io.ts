@@ -16,7 +16,7 @@ export function c0_print(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>)
 
 export function c0_println(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>): boolean {
     c0_print(mem, arg1);
-    return internal_print("<br>");
+    return internal_print(globalThis.C0_ENVIR_MODE === "nodejs" ? "\n" : "<br>");
 }
 
 export function c0_print_int(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>): boolean {

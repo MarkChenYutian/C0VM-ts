@@ -13,46 +13,64 @@
     <div class="page-framework">
         <div class="main-control">
             <h3 class="unselectable">C0VM.<img src="./assets/ts-logo-128.svg" style="display: inline-block; height: 1.2rem; margin-bottom: -0.1rem;"/></h3>
-            <button class="base-btn main-btn unselectable" onclick="window.c0vm_ts.web_compile();">
-                Compile
-            </button>
-            <button class="base-btn success-btn unselectable" onclick="window.c0vm_ts.step_runtime();">
-                <i class="fas fa-step-forward"></i> Step
-            </button>
-            <button class="base-btn success-btn unselectable" onclick="window.c0vm_ts.run_runtime();">
-                <i class="fas fa-fast-forward"></i> Run
-            </button>
-            <button class="base-btn danger-btn unselectable" onclick="window.c0vm_ts.reset_runtime();">
-                <i class="fas fa-undo"></i> Restart
-            </button>
+            <div class="control-btn-group">
+                <button
+                    class="base-btn main-btn unselectable"
+                    onclick="window.c0vm_ts.web_compile();"
+                    id="ctr-btn-compile"
+                >
+                    <i class="fa-solid fa-screwdriver-wrench hide-in-mobile"></i> Compile
+                </button>
+                <button
+                    class="base-btn success-btn unselectable"
+                    onclick="window.c0vm_ts.step_runtime();"
+                    id="ctr-btn-step"
+                >
+                    <i class="fas fa-step-forward hide-in-mobile"></i> Step
+                </button>
+                <button
+                    class="base-btn success-btn unselectable"
+                    onclick="window.c0vm_ts.run_runtime();"
+                    id="ctr-btn-run"
+                >
+                    <i class="fas fa-fast-forward hide-in-mobile"></i> Run
+                </button>
+                <button
+                    class="base-btn danger-btn unselectable"
+                    onclick="window.c0vm_ts.reset_runtime();"
+                    id="ctr-btn-restart"
+                >
+                    <i class="fas fa-undo hide-in-mobile"> </i> Restart
+                </button>
+            </div>
         </div>
         <div id="message-terminal"></div>
         <div class="main-ui-framework">
             <div class="code-editor"
             >
-                <h3 style="margin-top: 0;">C0/C0 Bytecode:</h3>
+                <h3 style="margin-top: 0;"><i class="fa-solid fa-code"></i> C0/C0 Bytecode</h3>
                 <label style="display: none;">Code Area</label>
                 <div id="c0-code-input"></div>
             </div>
             <div class="io-area">
-                <h3 style="margin-top: 0;">Printout (Std Output)</h3>
+                <h3 style="margin-top: 0;"><i class="fa-solid fa-toggle-off"></i> Compiler Options</h3>
+                <div>
+                    <button
+                        class="base-btn main-btn"
+                        id="compiler-flag-d"
+                        onclick="window.c0vm_ts.on_clickflag('-d');"
+                    >[-d] Check Contract</button>
+                </div>
+                <h3><i class="fa-solid fa-print"></i> Standard Output</h3>
                 <pre id="c0-output"></pre>
             </div>
         </div>
         <footer>
             <ul>
-                <li>
-                    <i class="fa-brands fa-github"></i>  <a class="active-href" href="https://github.com/MarkChenYutian/C0VM-ts">GitHub Repo</a>
-                </li>
-                <li>
-                    <i class="fa-solid fa-file-lines"></i>  <a class="active-href" href="https://markchenyutian.github.io/C0VM-ts/">Documentation</a>
-                </li>
+                <li><i class="fa-brands fa-github"></i>  <a class="active-href" href="https://github.com/MarkChenYutian/C0VM-ts">GitHub Repo</a></li>
+                <li><i class="fa-solid fa-file-lines"></i>  <a class="active-href" href="https://markchenyutian.github.io/C0VM-ts/">Documentation</a></li>
                 <li>C0VM.ts, the C0 Virtual Machine on Modern Browser.</li>
             </ul>
-            
-            
-            
-            
         </footer>
     </div>
     <script>

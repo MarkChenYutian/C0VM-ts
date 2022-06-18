@@ -12,6 +12,7 @@ import funcHeadGutter from "./extensions/funchead_marker";
 import breakpointGutter from "./extensions/breakpoint_marker";
 import execLineHighlighter from "./extensions/exec_position";
 import LoadDocumentPlugin from "./extensions/loader_ui";
+import { disable_ctrbtn, enable_ctrbtn } from "./ui_handler";
 
 
 // Auto-detect language
@@ -44,7 +45,16 @@ export function editor_init() {
             keymap.of([indentWithTab]),
             indentUnit.of("    "),
             EditorView.updateListener.of((e) => {
-                if (e.docChanged) globalThis.EDITOR_CONTENT = e.state.doc.toString(); 
+                if (e.docChanged) {
+                    globalThis.EDITOR_CONTENT = e.state.doc.toString();
+                    if (globalThis.EDITOR_CONTENT.slice(0, 11).toUpperCase().startsWith("C0 C0 FF EE")){
+                        enable_ctrbtn("run"); enable_ctrbtn("step"); disable_ctrbtn("compile");
+                    } else if (globalThis.EDITOR_CONTENT.length !== 0) {
+                        disable_ctrbtn("run"); disable_ctrbtn("step"); enable_ctrbtn("compile");
+                    } else {
+                        disable_ctrbtn("run"); disable_ctrbtn("step"); disable_ctrbtn("compile");
+                    }
+                }
             }),
             // languageConf.of(BC0()),
             language.of(BC0Language),

@@ -24,9 +24,6 @@ function step(state, allocator, msg_handle) {
         console.log(state.CurrFrame);
     }
     state.CurrLineNumber = F.comment.get(state.CurrFrame.PC).lineNumber;
-    if (globalThis.C0_ENVIR_MODE === "web") {
-        window.EDITOR_VIEW.update([window.EDITOR_VIEW.state.update()]);
-    }
     switch (F.code[state.CurrFrame.PC]) {
         case 89: {
             state.CurrFrame.PC += 1;
@@ -629,6 +626,7 @@ const funchead_marker_1 = __webpack_require__(/*! ./extensions/funchead_marker *
 const breakpoint_marker_1 = __webpack_require__(/*! ./extensions/breakpoint_marker */ "./src/gui/extensions/breakpoint_marker.ts");
 const exec_position_1 = __webpack_require__(/*! ./extensions/exec_position */ "./src/gui/extensions/exec_position.ts");
 const loader_ui_1 = __webpack_require__(/*! ./extensions/loader_ui */ "./src/gui/extensions/loader_ui.ts");
+const ui_handler_1 = __webpack_require__(/*! ./ui_handler */ "./src/gui/ui_handler.ts");
 const languageConf = new state_1.Compartment();
 const autoLanguage = state_1.EditorState.transactionExtender.of(tr => {
     if (!tr.docChanged)
@@ -654,8 +652,24 @@ function editor_init() {
             view_1.keymap.of([commands_1.indentWithTab]),
             language_1.indentUnit.of("    "),
             codemirror_1.EditorView.updateListener.of((e) => {
-                if (e.docChanged)
+                if (e.docChanged) {
                     globalThis.EDITOR_CONTENT = e.state.doc.toString();
+                    if (globalThis.EDITOR_CONTENT.slice(0, 11).toUpperCase().startsWith("C0 C0 FF EE")) {
+                        (0, ui_handler_1.enable_ctrbtn)("run");
+                        (0, ui_handler_1.enable_ctrbtn)("step");
+                        (0, ui_handler_1.disable_ctrbtn)("compile");
+                    }
+                    else if (globalThis.EDITOR_CONTENT.length !== 0) {
+                        (0, ui_handler_1.disable_ctrbtn)("run");
+                        (0, ui_handler_1.disable_ctrbtn)("step");
+                        (0, ui_handler_1.enable_ctrbtn)("compile");
+                    }
+                    else {
+                        (0, ui_handler_1.disable_ctrbtn)("run");
+                        (0, ui_handler_1.disable_ctrbtn)("step");
+                        (0, ui_handler_1.disable_ctrbtn)("compile");
+                    }
+                }
             }),
             language_1.language.of(bc0_1.BC0Language),
         ]
@@ -1078,6 +1092,40 @@ class MaterialEmitter {
     }
 }
 exports["default"] = MaterialEmitter;
+
+
+/***/ }),
+
+/***/ "./src/gui/ui_handler.ts":
+/*!*******************************!*\
+  !*** ./src/gui/ui_handler.ts ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.enable_ctrbtn = exports.disable_ctrbtn = exports.on_clickflag = void 0;
+function on_clickflag(flag) {
+    if (globalThis.COMPILER_FLAGS[flag]) {
+        document.getElementById("compiler-flag" + flag).classList.remove("flag-selected");
+    }
+    else {
+        document.getElementById("compiler-flag" + flag).classList.add("flag-selected");
+    }
+    globalThis.COMPILER_FLAGS[flag] = !globalThis.COMPILER_FLAGS[flag];
+}
+exports.on_clickflag = on_clickflag;
+function disable_ctrbtn(name) {
+    const btn = document.getElementById("ctr-btn-" + name);
+    btn.classList.contains("disable-btn") ? 0 : btn.classList.add("disable-btn");
+}
+exports.disable_ctrbtn = disable_ctrbtn;
+function enable_ctrbtn(name) {
+    const btn = document.getElementById("ctr-btn-" + name);
+    btn.classList.contains("disable-btn") ? btn.classList.remove("disable-btn") : 0;
+}
+exports.enable_ctrbtn = enable_ctrbtn;
 
 
 /***/ }),
@@ -1556,7 +1604,7 @@ function c0_print(mem, arg1) {
 exports.c0_print = c0_print;
 function c0_println(mem, arg1) {
     c0_print(mem, arg1);
-    return internal_print("<br>");
+    return internal_print(globalThis.C0_ENVIR_MODE === "nodejs" ? "\n" : "<br>");
 }
 exports.c0_println = c0_println;
 function c0_print_int(mem, arg1) {
@@ -1681,6 +1729,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const errors_1 = __webpack_require__(/*! ../utility/errors */ "./src/utility/errors.ts");
 const native_interface_1 = __webpack_require__(/*! ../native/native_interface */ "./src/native/native_interface.ts");
 function parse(raw_file) {
+    if (globalThis.C0_ENVIR_MODE === "nodejs") {
+        raw_file = raw_file.replace(/\r\n/g, "\n");
+    }
     const blocks = raw_file.trim().split("\n\n");
     if (blocks.length < 6) {
         throw new errors_1.bc0_format_error();
@@ -2341,7 +2392,7 @@ function compile(s, flags) {
         },
         body: JSON.stringify({
             "code": s,
-            "flags": flags
+            "d-flag": globalThis.COMPILER_FLAGS["-d"]
         }),
     }).then((res) => res.json()).then((res) => {
         (0, web_runtime_init_1.default)(res.bytecode);
@@ -48056,12 +48107,13 @@ var exports = __webpack_exports__;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const html_init_1 = __webpack_require__(/*! ./gui/html_init */ "./src/gui/html_init.ts");
 const material_emitter_1 = __webpack_require__(/*! ./gui/material_emitter */ "./src/gui/material_emitter.ts");
+const ui_handler_1 = __webpack_require__(/*! ./gui/ui_handler */ "./src/gui/ui_handler.ts");
 const web_handler_1 = __webpack_require__(/*! ./web_handle/web_handler */ "./src/web_handle/web_handler.ts");
 const web_runtime_init_1 = __webpack_require__(/*! ./web_handle/web_runtime_init */ "./src/web_handle/web_runtime_init.ts");
 function init_env() {
     globalThis.DEBUG = true;
     globalThis.DEBUG_DUMP_MEM = true;
-    globalThis.DEBUG_DUMP_STEP = true;
+    globalThis.DEBUG_DUMP_STEP = false;
     globalThis.MEM_POOL_SIZE = 1024 * 50;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
     globalThis.MEM_POOL_MAX_SIZE = 4294967294;
@@ -48076,6 +48128,9 @@ function init_env() {
     globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
     globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
     globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8081/compile";
+    globalThis.COMPILER_FLAGS = {
+        "-d": false
+    };
     globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
     globalThis.C0_ENVIR_MODE = "web";
     globalThis.C0_MAX_RECURSION = 999;
@@ -48119,8 +48174,8 @@ function step_runtime() {
         if (!globalThis.C0_RUNTIME.step_forward()) {
             globalThis.MSG_EMITTER.ok("Program Execution Finished!", "Load the program again if you want to rerun the program.");
             globalThis.C0_RUNTIME = undefined;
-            update_editor();
         }
+        update_editor();
     }
     catch (e) {
         globalThis.MSG_EMITTER.err(e.name, e.message);
@@ -48140,6 +48195,7 @@ function run_runtime() {
             if (res == false)
                 continue;
             if (globalThis.EDITOR_BREAKPOINTS.has(C0_RUNTIME.state.CurrLineNumber)) {
+                update_editor();
                 return;
             }
         }
@@ -48149,6 +48205,7 @@ function run_runtime() {
             }
             globalThis.MSG_EMITTER.err(e.name, e.message);
             globalThis.C0_RUNTIME = undefined;
+            update_editor();
             return;
         }
     }
@@ -48178,7 +48235,8 @@ exports["default"] = {
     step_runtime,
     run_runtime,
     reset_runtime,
-    web_compile
+    web_compile,
+    on_clickflag: ui_handler_1.on_clickflag
 };
 
 })();

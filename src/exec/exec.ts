@@ -12,10 +12,6 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
         console.log(state.CurrFrame);
     }
     state.CurrLineNumber = F.comment.get(state.CurrFrame.PC).lineNumber;
-    // Trigger an update in Editor to flush the exec-line highlighting
-    if (globalThis.C0_ENVIR_MODE === "web") {
-        window.EDITOR_VIEW.update([window.EDITOR_VIEW.state.update()]);
-    }
     switch (F.code[state.CurrFrame.PC]) {
         // dup
         case OpCode.DUP: {

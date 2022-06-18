@@ -13,6 +13,7 @@ declare global {
     var MEM_POOL_DEFAULT_SIZE: number;
 
     var COMPILER_BACKEND_URL: string;
+    var COMPILER_FLAGS: Record<string, boolean>;
 
     var EDITOR_CONTENT: string;
     var EDITOR_VIEW: EditorView;

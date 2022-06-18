@@ -1,5 +1,6 @@
 import html_init from "./gui/html_init";
 import MaterialEmitter from "./gui/material_emitter";
+import { on_clickflag } from "./gui/ui_handler";
 import { compile } from "./web_handle/web_handler";
 import init_runtime from "./web_handle/web_runtime_init";
 
@@ -7,7 +8,7 @@ function init_env() {
     // Initialize global variables
     globalThis.DEBUG = true;
     globalThis.DEBUG_DUMP_MEM = true;
-    globalThis.DEBUG_DUMP_STEP = true;
+    globalThis.DEBUG_DUMP_STEP = false;
 
     globalThis.MEM_POOL_SIZE = 1024 * 50;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
@@ -28,6 +29,9 @@ function init_env() {
     globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
 
     globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8081/compile";
+    globalThis.COMPILER_FLAGS = {
+        "-d": false
+    };
 
     globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
     globalThis.C0_ENVIR_MODE = "web";
@@ -80,8 +84,8 @@ function step_runtime() {
                 "Load the program again if you want to rerun the program."
             );
             globalThis.C0_RUNTIME = undefined;
-            update_editor();
         }
+        update_editor();
     } catch (e) {
         globalThis.MSG_EMITTER.err(
             (e as Error).name,
@@ -102,6 +106,7 @@ function run_runtime() {
             res = globalThis.C0_RUNTIME.step_forward();
             if (res == false) continue;
             if (globalThis.EDITOR_BREAKPOINTS.has(C0_RUNTIME.state.CurrLineNumber)) {
+                update_editor();
                 return;
             }
         } catch (e) {
@@ -113,6 +118,7 @@ function run_runtime() {
                 (e as Error).message
             )
             globalThis.C0_RUNTIME = undefined;
+            update_editor();
             return;
         }
     }
@@ -159,5 +165,6 @@ export default {
     step_runtime,
     run_runtime,
     reset_runtime,
-    web_compile
+    web_compile,
+    on_clickflag
 };

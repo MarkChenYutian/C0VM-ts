@@ -10,7 +10,7 @@ import { loadStringPool } from './utility/string_utility';
 
 // Initialize global variables
 globalThis.DEBUG = true;
-globalThis.DEBUG_DUMP_MEM = true;
+globalThis.DEBUG_DUMP_MEM = false;
 globalThis.DEBUG_DUMP_STEP = true;
 
 globalThis.MEM_POOL_SIZE = 64;
