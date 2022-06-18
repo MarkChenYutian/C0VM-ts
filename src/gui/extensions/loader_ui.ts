@@ -1,8 +1,29 @@
 import { EditorView } from "codemirror";
 import { Decoration, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
 
+function loadFileThroughDialog(e: Event) {
+    const F = (e.target as HTMLInputElement).files[0];
+    const reader = new FileReader();
+    reader.onloadend = (e) => {
+        if (reader.result === null) {
+            globalThis.MSG_EMITTER.err("Unable to read the selected file.");
+        }
+        const res = reader.result.toString();
+        globalThis.EDITOR_VIEW.dispatch({
+            changes: {
+                from: 0, insert: res
+            }
+        });
+    };
+    reader.readAsText(F, "utf-8");
+}
+
 function onLoadFile() {
-    globalThis.MSG_EMITTER.err("Not Implemented Yet!");
+    const inputElem = document.createElement("input");
+    inputElem.type = "file";
+    inputElem.accept = ".c0,.bc0";
+    inputElem.onchange = loadFileThroughDialog;
+    inputElem.click();
 }
 
 // Initialize a dom object
@@ -12,9 +33,6 @@ let tmp = document.createElement("b");
 tmp.textContent = "Drag & Drop"
 load_dom.appendChild(tmp);
 load_dom.appendChild(document.createTextNode(" or "));
-// tmp = document.createElement("input");
-// tmp.setAttribute("type", "file");
-// tmp.style.display = "none";
 tmp = document.createElement("a");
 tmp.className = "active-href";
 tmp.onclick = onLoadFile;

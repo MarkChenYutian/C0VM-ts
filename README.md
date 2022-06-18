@@ -399,7 +399,7 @@ The list of native functions is listed below:
 | NATIVE_PRINTCHAR | :white_check_mark: |
 | NATIVE_PRINTINT  | :white_check_mark: |
 | NATIVE_PRINTLN   | :white_check_mark: |
-| NATIVE_READLINE  | :hourglass:        |
+| NATIVE_READLINE  | :white_check_mark: |
 
 ### Cursor :x:
 
@@ -516,6 +516,10 @@ Defined in `/gui/extensions/exec_position.ts`, this extension will read the `lin
 <img width="387" alt="Screenshot 2022-06-10 234906" src="https://user-images.githubusercontent.com/47029019/173171395-2a55f3d4-23fa-4901-bae7-a8383d038503.png">
 
 *The yellow highlight indicate that Line 19 is just executed in C0VM*
+
+### LoadDocumentPlugin
+
+Defined in `/gui/extensions/loader_ui.ts`, this extension will show up a prompt to guide user to import files into the C0VM code editor.
 
 ## Project Progress
 

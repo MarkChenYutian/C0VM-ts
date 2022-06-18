@@ -33,7 +33,7 @@ export default class MaterialEmitter implements MessageEmitter {
       "div",
       {
         id: tobe_removed_id,
-        className: "err-msg",
+        className: "err-msg msg-base",
       },
       detail === undefined
         ? [
@@ -72,7 +72,7 @@ export default class MaterialEmitter implements MessageEmitter {
       "div",
       {
         id: tobe_removed_id,
-        className: "warn-msg",
+        className: "warn-msg msg-base",
       },
       detail === undefined
         ? [
@@ -111,7 +111,7 @@ export default class MaterialEmitter implements MessageEmitter {
       "div",
       {
         id: tobe_removed_id,
-        className: "ok-msg",
+        className: "ok-msg msg-base",
       },
       detail === undefined
         ? [

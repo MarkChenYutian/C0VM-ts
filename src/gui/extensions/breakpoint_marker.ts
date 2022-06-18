@@ -68,9 +68,9 @@ const breakpointGutter = [
     ".cm-breakpoint-gutter .cm-gutterElement": {
       color: "red",
       paddingLeft: "1px",
-      paddingTop: "1px",
+      paddingTop: "1.5px",
       cursor: "pointer",
-      "font-size": "0.7rem",
+      "font-size": "0.6rem",
     },
   }),
 ];
