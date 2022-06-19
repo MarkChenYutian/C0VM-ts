@@ -1,0 +1,10 @@
+int main() {
+    int a = 1024;
+    int b = 2048;
+    int c = 4096;
+    int d = 4096 * 2;
+    int e = d * 2;
+    int f = e * 2;
+    int g = f * 2;
+    return 0;
+}

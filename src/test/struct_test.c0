@@ -12,6 +12,8 @@ int main() {
     test_t* str = alloc(test_t);
     str -> a = 10;
     str -> s = "Hi!";
-    printf("{%d, %s}", str -> a, str -> s);
+    int a = str -> a;
+    string s = str -> s;
+    printf("{%d, %s}", a, s);
     return 0;
 }

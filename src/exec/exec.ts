@@ -1,4 +1,4 @@
-import { CloneType, String2Type } from "../types/c0type_utility";
+import { CloneType, getType, String2Type } from "../types/c0type_utility";
 import * as arithmetic from "../utility/arithmetic";
 import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value, build_c0_stringValue } from "../utility/c0_value";
 import { c0_memory_error, c0_user_error, vm_error } from "../utility/errors";
@@ -540,9 +540,23 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
                 throw new vm_error("Type unmatch, AMLOAD expect to receive a pointer");
             }
             const mem_block = allocator.amload(a.value);
-            state.CurrFrame.S.push(
-                {value: mem_block, type: {type: C0TypeClass.unknown}}
-            );
+            if (a.type.type === C0TypeClass.ptr) {
+                if (a.type.kind === "struct") {
+                    state.CurrFrame.S.push(
+                        // @ts-ignore
+                        {value: mem_block, type: (getType(a.type) as C0Type<C0TypeClass>)}
+                    )
+                } else {
+                    state.CurrFrame.S.push(
+                        {value: mem_block, type: (a.type.value as C0Type<C0TypeClass.ptr>)}
+                    );
+                }
+            } else {
+                state.CurrFrame.S.push(
+                    {value: mem_block, type: {type: C0TypeClass.unknown}}
+                );
+            }
+            
             break;
         }
 
@@ -558,6 +572,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
                 throw new vm_error("Type unmatch, AMSTORE expected to have {ptr|string, ptr|string}");
             }
             allocator.amstore( a.value, x.value );
+            if (a.type.type === C0TypeClass.ptr && a.type.kind === "struct") {
+                if (state.TypeRecord.get(a.type.value) === undefined) state.TypeRecord.set(a.type.value, new Map())
+                state.TypeRecord.get(a.type.value).set(a.type.offset, x.type);
+            }
             break;
         }
 

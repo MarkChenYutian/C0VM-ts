@@ -393,7 +393,17 @@ function step(state, allocator, msg_handle) {
                 throw new errors_1.vm_error("Type unmatch, AMLOAD expect to receive a pointer");
             }
             const mem_block = allocator.amload(a.value);
-            state.CurrFrame.S.push({ value: mem_block, type: { type: "<unknown>" } });
+            if (a.type.type === "ptr") {
+                if (a.type.kind === "struct") {
+                    state.CurrFrame.S.push({ value: mem_block, type: (0, c0type_utility_1.getType)(a.type) });
+                }
+                else {
+                    state.CurrFrame.S.push({ value: mem_block, type: a.type.value });
+                }
+            }
+            else {
+                state.CurrFrame.S.push({ value: mem_block, type: { type: "<unknown>" } });
+            }
             break;
         }
         case 79: {
@@ -406,6 +416,11 @@ function step(state, allocator, msg_handle) {
                 throw new errors_1.vm_error("Type unmatch, AMSTORE expected to have {ptr|string, ptr|string}");
             }
             allocator.amstore(a.value, x.value);
+            if (a.type.type === "ptr" && a.type.kind === "struct") {
+                if (state.TypeRecord.get(a.type.value) === undefined)
+                    state.TypeRecord.set(a.type.value, new Map());
+                state.TypeRecord.get(a.type.value).set(a.type.offset, x.type);
+            }
             break;
         }
         case 52: {
@@ -574,7 +589,8 @@ class C0VM_RuntimeState {
                 V: new Array(this.code.functionPool[0].numVars).fill(undefined),
                 P: this.code.functionPool[0]
             },
-            CurrLineNumber: this.code.functionPool[0].comment.get(0).lineNumber
+            CurrLineNumber: this.code.functionPool[0].comment.get(0).lineNumber,
+            TypeRecord: new Map()
         };
     }
     step_forward() {
@@ -595,7 +611,8 @@ class C0VM_RuntimeState {
                 V: new Array(this.code.functionPool[0].numVars).fill(undefined),
                 P: this.code.functionPool[0]
             },
-            CurrLineNumber: this.code.functionPool[0].comment.get(0).lineNumber
+            CurrLineNumber: this.code.functionPool[0].comment.get(0).lineNumber,
+            TypeRecord: new Map()
         };
     }
     debug() {
@@ -1081,6 +1098,51 @@ exports["default"] = MaterialEmitter;
 
 /***/ }),
 
+/***/ "./src/gui/show_variable.ts":
+/*!**********************************!*\
+  !*** ./src/gui/show_variable.ts ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.updateDebugConsole = void 0;
+const c0type_utility_1 = __webpack_require__(/*! ../types/c0type_utility */ "./src/types/c0type_utility.ts");
+const c0_value_1 = __webpack_require__(/*! ../utility/c0_value */ "./src/utility/c0_value.ts");
+const string_utility_1 = __webpack_require__(/*! ../utility/string_utility */ "./src/utility/string_utility.ts");
+function updateDebugConsole() {
+    const outputArea = document.getElementById(globalThis.UI_DEBUG_OUTPUT_ID);
+    while (outputArea.lastElementChild) {
+        outputArea.removeChild(outputArea.lastElementChild);
+    }
+    if (globalThis.C0_RUNTIME === undefined) {
+        return;
+    }
+    for (let i = 0; i < globalThis.C0_RUNTIME.state.CurrFrame.P.numVars; i++) {
+        if (globalThis.C0_RUNTIME.state.CurrFrame.V[i] === undefined)
+            continue;
+        const nameElem = document.createElement("p");
+        nameElem.innerHTML = `<code>${globalThis.C0_RUNTIME.state.CurrFrame.P.varName[i]}</code>`;
+        const typeElem = document.createElement("p");
+        typeElem.innerHTML = `<code>${(0, c0type_utility_1.Type2String)(globalThis.C0_RUNTIME.state.CurrFrame.V[i].type)}</code>`;
+        const valElem = document.createElement("p");
+        if (globalThis.C0_RUNTIME.state.CurrFrame.V[i].type.type === "value") {
+            valElem.innerText = "" + (0, c0_value_1.c0_cvt2_js_value)(globalThis.C0_RUNTIME.state.CurrFrame.V[i]);
+        }
+        else if (globalThis.C0_RUNTIME.state.CurrFrame.V[i].type.type === "string") {
+            valElem.innerText = "\"" + (0, string_utility_1.loadString)(globalThis.C0_RUNTIME.state.CurrFrame.V[i], globalThis.C0_RUNTIME.allocator) + "\"";
+        }
+        outputArea.appendChild(nameElem);
+        outputArea.appendChild(typeElem);
+        outputArea.appendChild(valElem);
+    }
+}
+exports.updateDebugConsole = updateDebugConsole;
+
+
+/***/ }),
+
 /***/ "./src/gui/ui_handler.ts":
 /*!*******************************!*\
   !*** ./src/gui/ui_handler.ts ***!
@@ -1178,6 +1240,7 @@ function nativeFuncMapping(index) {
                         return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_print(mem, arg1));
                     }
                     else {
+                        console.log(arg1);
                         throw new errors_1.vm_error("NATIVE_PRINT can only receive a string argument");
                     }
                 }
@@ -1724,8 +1787,8 @@ const native_interface_1 = __webpack_require__(/*! ../native/native_interface */
 const int_comment_regex = /(\d+)|(dummy return value)/;
 const bool_comment_regex = /(true)|(false)/;
 const char_comment_regex = /'.*'/;
-const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-]+),\s+\d+\)/;
-const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-]+)\)/;
+const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-\*\[\]]+),\s+\d+\)/;
+const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-\*\[\]]+)\)/;
 function parse(raw_file) {
     if (globalThis.C0_ENVIR_MODE === "nodejs") {
         raw_file = raw_file.replace(/\r\n/g, "\n");
@@ -1808,7 +1871,7 @@ function parse(raw_file) {
                 }
             }
             else if (opcodeName.startsWith("newarray")) {
-                const [_, t_res] = arr_comment_regex.exec(comment)[1];
+                const [_, t_res] = arr_comment_regex.exec(comment);
                 type = t_res;
             }
             else if (opcodeName.startsWith("new")) {
@@ -1868,7 +1931,7 @@ exports["default"] = parse;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.String2Type = exports.Type2String = exports.CloneType = void 0;
+exports.getType = exports.String2Type = exports.Type2String = exports.CloneType = void 0;
 function CloneType(T) {
     switch (T.type) {
         case "value":
@@ -1893,7 +1956,7 @@ function Type2String(T) {
             if (T.kind === "ptr")
                 return Type2String(T.value) + "*";
             if (T.kind === "struct")
-                return T.value;
+                return T.value + "*";
         case "string":
             return "string";
         case "<unknown>":
@@ -1921,6 +1984,18 @@ function String2Type(S) {
     }
 }
 exports.String2Type = String2Type;
+function getType(T) {
+    if (T.type === "ptr" && T.kind === "struct") {
+        const struct_fields = globalThis.C0_RUNTIME.state.TypeRecord.get(T.value);
+        if (struct_fields === undefined)
+            return { type: "<unknown>" };
+        return struct_fields.get(T.offset) === undefined ? { type: "<unknown>" } : struct_fields.get(T.offset);
+    }
+    else {
+        return T;
+    }
+}
+exports.getType = getType;
 
 
 /***/ }),
@@ -2446,7 +2521,7 @@ function loadString(ptr, allocator) {
         i++;
     }
     const dec = new TextDecoder();
-    return dec.decode(mem_block.buffer.slice(mem_block.byteOffset, mem_block.byteOffset + i + 1));
+    return dec.decode(mem_block.buffer.slice(mem_block.byteOffset, mem_block.byteOffset + i));
 }
 exports.loadString = loadString;
 
@@ -2478,9 +2553,8 @@ function compile(s, flags) {
     }).then((res) => res.json()).then((res) => {
         (0, web_runtime_init_1.default)(res.bytecode);
     }).catch((e) => {
-        if (globalThis.DEBUG) {
+        if (globalThis.DEBUG)
             console.error(e);
-        }
         globalThis.MSG_EMITTER.err("Failed to compile given C0 code", e.message);
     });
 }
@@ -2505,9 +2579,8 @@ function init_runtime(s) {
     }
     catch (e) {
         globalThis.C0_RUNTIME = undefined;
-        if (globalThis.DEBUG) {
+        if (globalThis.DEBUG)
             console.error(e);
-        }
         globalThis.MSG_EMITTER.err(e.name, e.message);
         return;
     }
@@ -48194,6 +48267,7 @@ var exports = __webpack_exports__;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const html_init_1 = __webpack_require__(/*! ./gui/html_init */ "./src/gui/html_init.ts");
 const material_emitter_1 = __webpack_require__(/*! ./gui/material_emitter */ "./src/gui/material_emitter.ts");
+const show_variable_1 = __webpack_require__(/*! ./gui/show_variable */ "./src/gui/show_variable.ts");
 const ui_handler_1 = __webpack_require__(/*! ./gui/ui_handler */ "./src/gui/ui_handler.ts");
 const web_handler_1 = __webpack_require__(/*! ./web_handle/web_handler */ "./src/web_handle/web_handler.ts");
 const web_runtime_init_1 = __webpack_require__(/*! ./web_handle/web_runtime_init */ "./src/web_handle/web_runtime_init.ts");
@@ -48211,6 +48285,7 @@ function init_env() {
     globalThis.UI_INPUT_ID = "c0-code-input";
     globalThis.UI_PRINTOUT_ID = "c0-output";
     globalThis.UI_MSG_ID = "message-terminal";
+    globalThis.UI_DEBUG_OUTPUT_ID = "debug-output";
     globalThis.UI_ERR_DISPLAY_TIME_MS = 10000;
     globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
     globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
@@ -48247,6 +48322,7 @@ C0VM.ts Configuration Report:
 `);
     }
     (0, html_init_1.default)();
+    update_editor();
 }
 function init_from_input() {
     (0, web_runtime_init_1.default)(globalThis.EDITOR_CONTENT);
@@ -48265,6 +48341,8 @@ function step_runtime() {
         update_editor();
     }
     catch (e) {
+        if (globalThis.DEBUG)
+            console.error(e);
         globalThis.MSG_EMITTER.err(e.name, e.message);
         globalThis.C0_RUNTIME = undefined;
     }
@@ -48287,9 +48365,8 @@ function run_runtime() {
             }
         }
         catch (e) {
-            if (globalThis.DEBUG) {
-                console.error(e.stack);
-            }
+            if (globalThis.DEBUG)
+                console.error(e);
             globalThis.MSG_EMITTER.err(e.name, e.message);
             globalThis.C0_RUNTIME = undefined;
             update_editor();
@@ -48301,12 +48378,16 @@ function run_runtime() {
     update_editor();
 }
 function reset_runtime() {
-    init_from_input();
-    if (globalThis.C0_RUNTIME === undefined)
-        return;
     window.EDITOR_VIEW.update([window.EDITOR_VIEW.state.update()]);
     document.getElementById(globalThis.UI_PRINTOUT_ID).textContent = "";
     document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach((e) => document.getElementById(globalThis.UI_MSG_ID).removeChild(e));
+    const outputArea = document.getElementById(globalThis.UI_DEBUG_OUTPUT_ID);
+    while (outputArea.lastElementChild) {
+        outputArea.removeChild(outputArea.lastElementChild);
+    }
+    if (globalThis.C0_RUNTIME === undefined)
+        return;
+    init_from_input();
     globalThis.MSG_EMITTER.ok("C0VM Restart Successfully", "Your program will be executed again from the beginning.");
 }
 function web_compile() {
@@ -48315,6 +48396,7 @@ function web_compile() {
 function update_editor() {
     if (globalThis.C0_ENVIR_MODE === "web") {
         window.EDITOR_VIEW.update([window.EDITOR_VIEW.state.update()]);
+        (0, show_variable_1.updateDebugConsole)();
     }
 }
 exports["default"] = {

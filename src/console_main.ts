@@ -59,7 +59,8 @@ const state: VM_State = {
         V: new Array(code.functionPool[0].numVars).fill(undefined),
         P: code.functionPool[0]
     },
-    CurrLineNumber: code.functionPool[0].comment.get(0).lineNumber
+    CurrLineNumber: code.functionPool[0].comment.get(0).lineNumber,
+    TypeRecord: new Map<string, Map<number, C0Type<C0TypeClass>>>()
 };
 
 let cont = true;

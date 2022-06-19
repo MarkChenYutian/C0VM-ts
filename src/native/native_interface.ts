@@ -81,6 +81,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                         // TODO: For some unknown reason, the if condition above does not provide enough type narrowing
                         return js_cvt2_c0_value(IONative.c0_print(mem, (arg1 as C0Value<C0TypeClass.string>)));
                     } else {
+                        console.log(arg1);
                         throw new vm_error("NATIVE_PRINT can only receive a string argument");
                     }
                 }

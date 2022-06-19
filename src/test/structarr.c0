@@ -1,0 +1,38 @@
+#use <conio>
+
+struct ll_node {
+    int val;
+    struct ll_node* next;
+};
+
+typedef struct ll_node ll_node_t;
+
+void print_node(ll_node_t* L) {
+    if (L == NULL) {
+        print("NULL");
+        return;
+    } 
+    printf("[%d, ", L -> val);
+    print_node(L -> next);
+    print("]");
+}
+
+int main() {
+    ll_node_t*[] Ls = alloc_array(ll_node_t*, 3);
+    Ls[0] = alloc(ll_node_t);
+    Ls[1] = alloc(ll_node_t);
+    Ls[2] = alloc(ll_node_t);
+
+    ll_node_t* L0 = Ls[0];
+    ll_node_t* L1 = Ls[1];
+    ll_node_t* L2 = Ls[2];
+
+    L0->next = L2;
+    L2->next = L1;
+    L0->val = -1;
+    L1->val = 3;
+    L2->val = 4;
+    // L1 -> next -> next = L1;
+    print_node(Ls[0]);
+    return 0;
+}

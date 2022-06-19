@@ -28,5 +28,5 @@ export function loadString(ptr: C0Value<Maybe<C0TypeClass.string>>, allocator: C
         i ++;
     }
     const dec = new TextDecoder();
-    return dec.decode(mem_block.buffer.slice(mem_block.byteOffset, mem_block.byteOffset + i + 1));
+    return dec.decode(mem_block.buffer.slice(mem_block.byteOffset, mem_block.byteOffset + i));
 }

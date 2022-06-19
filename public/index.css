@@ -261,3 +261,24 @@ pre#c0-output {
     -ms-user-select: none !important;
     user-select: none !important;
 }
+
+/* Debug */
+.debug-console {
+    display: grid;
+    grid-template-columns: 2fr 2fr 5fr;
+    align-items: center;
+    column-gap: 1rem;
+}
+
+.debug-console p {
+    margin: 0.3rem 0 0.3rem 0;
+}
+
+code {
+    background-color: #EEE;
+    box-sizing: content-box;
+    padding: 3px;
+    border-radius: 0.3rem;
+    color: #ce1c1c;
+}
+

@@ -279,7 +279,8 @@ type VM_State = {
     C: VM_Constants, // Constants the VM will use
     CallStack: VM_StackFrame[],
     CurrFrame: VM_StackFrame,
-    CurrLineNumber: number
+    CurrLineNumber: number,
+    TypeRecord: Map<string, Map<number, C0Type<C0TypeClass>>>
 };
 
 

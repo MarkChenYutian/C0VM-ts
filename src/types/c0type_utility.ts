@@ -19,7 +19,7 @@ export function Type2String(T: C0Type<C0TypeClass>): string {
         case C0TypeClass.ptr:
             if (T.kind === "arr") return Type2String(T.value) + "[]";
             if (T.kind === "ptr") return Type2String(T.value) + "*";
-            if (T.kind === "struct") return T.value;
+            if (T.kind === "struct") return T.value + "*";
         case C0TypeClass.string:
             return "string";
         case C0TypeClass.unknown:
@@ -40,5 +40,15 @@ export function String2Type(S: string): C0Type<C0TypeClass> {
         return { type: C0TypeClass.value, value: S };
     } else {
         return { type: C0TypeClass.ptr, kind: "struct", value: S, offset: 0 };
+    }
+}
+
+export function getType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
+    if (T.type === C0TypeClass.ptr && T.kind === "struct") {
+        const struct_fields = globalThis.C0_RUNTIME.state.TypeRecord.get(T.value);
+        if (struct_fields === undefined) return { type: C0TypeClass.unknown }
+        return struct_fields.get(T.offset) === undefined ? {type: C0TypeClass.unknown} : struct_fields.get(T.offset);
+    } else {
+        return T;
     }
 }

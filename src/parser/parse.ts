@@ -6,8 +6,8 @@ const int_comment_regex = /(\d+)|(dummy return value)/;
 const bool_comment_regex = /(true)|(false)/;
 const char_comment_regex = /'.*'/;
 
-const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-]+),\s+\d+\)/;
-const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-]+)\)/;
+const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-\*\[\]]+),\s+\d+\)/;
+const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-\*\[\]]+)\)/;
 
 /**
  * Parse the bc0 text into byte arrays, load Native Functions from Native Pool
@@ -152,7 +152,7 @@ export default function parse(raw_file: string): C0ByteCode {
                     console.error("Failed to inference value type from bipush comment:\n" + funcLines[lineNum]);
                 }
             } else if (opcodeName.startsWith("newarray")) {
-                const [_, t_res] = arr_comment_regex.exec(comment)[1];
+                const [_, t_res] = arr_comment_regex.exec(comment);
                 type = t_res;
             } else if (opcodeName.startsWith("new")) {
                 const [_, t_res] = new_comment_regex.exec(comment);

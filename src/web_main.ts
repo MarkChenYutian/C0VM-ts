@@ -1,5 +1,6 @@
 import html_init from "./gui/html_init";
 import MaterialEmitter from "./gui/material_emitter";
+import { updateDebugConsole } from "./gui/show_variable";
 import { on_clickflag } from "./gui/ui_handler";
 import { compile } from "./web_handle/web_handler";
 import init_runtime from "./web_handle/web_runtime_init";
@@ -23,6 +24,7 @@ function init_env() {
     globalThis.UI_INPUT_ID = "c0-code-input";
     globalThis.UI_PRINTOUT_ID = "c0-output";
     globalThis.UI_MSG_ID = "message-terminal";
+    globalThis.UI_DEBUG_OUTPUT_ID = "debug-output";
 
     globalThis.UI_ERR_DISPLAY_TIME_MS = 10000;
     globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
@@ -66,6 +68,7 @@ C0VM.ts Configuration Report:
     ////////////////////////////
     // Load Event on HTML DOM
     html_init();
+    update_editor();
 }
 
 function init_from_input() {
@@ -87,6 +90,7 @@ function step_runtime() {
         }
         update_editor();
     } catch (e) {
+        if (globalThis.DEBUG) console.error(e);
         globalThis.MSG_EMITTER.err(
             (e as Error).name,
             (e as Error).message
@@ -110,9 +114,7 @@ function run_runtime() {
                 return;
             }
         } catch (e) {
-            if (globalThis.DEBUG) {
-                console.error((e as Error).stack);
-            }
+            if (globalThis.DEBUG) console.error(e);
             globalThis.MSG_EMITTER.err(
                 (e as Error).name,
                 (e as Error).message
@@ -131,10 +133,6 @@ function run_runtime() {
 }
 
 function reset_runtime() {
-    init_from_input();
-
-    if (globalThis.C0_RUNTIME === undefined) return;
-    
     // Force refresh editor to update exechighlight extension
     window.EDITOR_VIEW.update([window.EDITOR_VIEW.state.update()]);
 
@@ -142,6 +140,16 @@ function reset_runtime() {
     document.getElementById(globalThis.UI_MSG_ID).childNodes.forEach(
         (e) => document.getElementById(globalThis.UI_MSG_ID).removeChild(e)
     );
+
+    const outputArea = document.getElementById(globalThis.UI_DEBUG_OUTPUT_ID);
+    while (outputArea.lastElementChild) {
+        outputArea.removeChild(outputArea.lastElementChild);
+    }
+
+    if (globalThis.C0_RUNTIME === undefined) return;
+
+    init_from_input();
+
     globalThis.MSG_EMITTER.ok(
         "C0VM Restart Successfully",
         "Your program will be executed again from the beginning."
@@ -157,6 +165,7 @@ function web_compile() {
 function update_editor() {
     if (globalThis.C0_ENVIR_MODE === "web") {
         window.EDITOR_VIEW.update([window.EDITOR_VIEW.state.update()]);
+        updateDebugConsole();
     }
 }
 

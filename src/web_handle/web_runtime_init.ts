@@ -8,9 +8,7 @@ export default function init_runtime(s: string) {
         );
     } catch (e) {
         globalThis.C0_RUNTIME = undefined;
-        if (globalThis.DEBUG) {
-            console.error(e);
-        }
+        if (globalThis.DEBUG) console.error(e);
         globalThis.MSG_EMITTER.err(
             e.name,
             e.message

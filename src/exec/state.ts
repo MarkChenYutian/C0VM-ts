@@ -27,7 +27,8 @@ export default class C0VM_RuntimeState implements C0VM_RT{
                 V: new Array(this.code.functionPool[0].numVars).fill(undefined),
                 P: this.code.functionPool[0]
             },
-            CurrLineNumber: this.code.functionPool[0].comment.get(0).lineNumber
+            CurrLineNumber: this.code.functionPool[0].comment.get(0).lineNumber,
+            TypeRecord: new Map<string, Map<number, C0Type<C0TypeClass>>>()
         };
     }
 
@@ -50,7 +51,8 @@ export default class C0VM_RuntimeState implements C0VM_RT{
                 V: new Array(this.code.functionPool[0].numVars).fill(undefined),
                 P: this.code.functionPool[0]
             },
-            CurrLineNumber: this.code.functionPool[0].comment.get(0).lineNumber
+            CurrLineNumber: this.code.functionPool[0].comment.get(0).lineNumber,
+            TypeRecord: new Map<string, Map<number, C0Type<C0TypeClass>>>()
         };
     }
 

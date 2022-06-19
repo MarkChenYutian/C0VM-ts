@@ -22,6 +22,7 @@ declare global {
     var UI_INPUT_ID: string;
     var UI_PRINTOUT_ID: string;
     var UI_MSG_ID: string;
+    var UI_DEBUG_OUTPUT_ID: string;
 
     var UI_ERR_DISPLAY_TIME_MS: number;
     var UI_WARN_DISPLAY_TIME_MS: number;
