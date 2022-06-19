@@ -1,5 +1,3 @@
-import { vm_error } from "./errors";
-
 /**
  * Load the string pool to C0VM Heap memory (in order to implement ALDC command)
  * @param stringPool string pool that is being loaded in the C0 Heap
@@ -22,10 +20,7 @@ export function loadStringPool(stringPool: Uint8Array, allocator: C0HeapAllocato
  * @param allocator HeapAllocator that manages the heap memory
  * @returns The decoded string (with utf-8 decoding by default)
  */
-export function loadString(ptr: C0Value<C0ValueVMType.ptr>, allocator: C0HeapAllocator): string {
-    if (ptr.type !== "<unknown>" && ptr.type !== "string") {
-        throw new vm_error("Type error. Unable to extract string from type" + ptr.type);
-    }
+export function loadString(ptr: C0Value<Maybe<C0TypeClass.string>>, allocator: C0HeapAllocator): string {
     const mem_block = allocator.deref(ptr.value);
     // stop at NUL character
     let i = 0;

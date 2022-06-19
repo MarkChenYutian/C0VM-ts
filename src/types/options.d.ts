@@ -1,5 +1,5 @@
 import { EditorView } from "codemirror";
-import C0VM_RuntimeState from "./exec/state";
+import C0VM_RuntimeState from "../exec/state";
 declare global {
     var DEBUG: boolean;
     var DEBUG_DUMP_MEM: boolean;

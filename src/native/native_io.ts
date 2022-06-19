@@ -10,24 +10,24 @@ function internal_print(s: string): boolean {
     }
 }
 
-export function c0_print(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>): boolean {
+export function c0_print(mem: C0HeapAllocator, arg1: C0Value<Maybe<C0TypeClass.string>>): boolean {
     return internal_print(loadString(arg1, mem));
 }
 
-export function c0_println(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.ptr>): boolean {
+export function c0_println(mem: C0HeapAllocator, arg1: C0Value<Maybe<C0TypeClass.string>>): boolean {
     c0_print(mem, arg1);
     return internal_print(globalThis.C0_ENVIR_MODE === "nodejs" ? "\n" : "<br>");
 }
 
-export function c0_print_int(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>): boolean {
+export function c0_print_int(mem: C0HeapAllocator, arg1: C0Value<Maybe<C0TypeClass.value>>): boolean {
     return internal_print("" + arg1.value.getInt32(0));
 }
 
-export function c0_print_bool(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>): boolean {
+export function c0_print_bool(mem: C0HeapAllocator, arg1: C0Value<Maybe<C0TypeClass.value>>): boolean {
     return internal_print(arg1.value.getUint32(0) === 0 ? "false" : "true");
 }
 
-export function c0_print_char(mem: C0HeapAllocator, arg1: C0Value<C0ValueVMType.value>): boolean {
+export function c0_print_char(mem: C0HeapAllocator, arg1: C0Value<Maybe<C0TypeClass.value>>): boolean {
     return internal_print(String.fromCharCode(arg1.value.getUint8(3)));
 }
 

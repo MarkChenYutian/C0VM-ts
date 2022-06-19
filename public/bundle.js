@@ -11,6 +11,7 @@
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.step = void 0;
+const c0type_utility_1 = __webpack_require__(/*! ../types/c0type_utility */ "./src/types/c0type_utility.ts");
 const arithmetic = __webpack_require__(/*! ../utility/arithmetic */ "./src/utility/arithmetic.ts");
 const c0_value_1 = __webpack_require__(/*! ../utility/c0_value */ "./src/utility/c0_value.ts");
 const errors_1 = __webpack_require__(/*! ../utility/errors */ "./src/utility/errors.ts");
@@ -28,17 +29,10 @@ function step(state, allocator, msg_handle) {
         case 89: {
             state.CurrFrame.PC += 1;
             const v = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            const nv = v.vm_type === "ptr" ?
-                {
-                    value: new DataView(v.value.buffer.slice(v.value.byteOffset, v.value.byteLength)),
-                    vm_type: v.vm_type,
-                    type: v.type
-                } :
-                {
-                    value: new DataView(v.value.buffer.slice(v.value.byteOffset, v.value.byteLength)),
-                    vm_type: v.vm_type,
-                    type: v.type
-                };
+            const nv = {
+                value: new DataView(v.value.buffer.slice(v.value.byteOffset, v.value.byteLength)),
+                type: (0, c0type_utility_1.CloneType)(v.type)
+            };
             state.CurrFrame.S.push(v);
             state.CurrFrame.S.push(nv);
             break;
@@ -128,14 +122,16 @@ function step(state, allocator, msg_handle) {
         }
         case 16: {
             const b = new DataView(F.code.buffer).getInt8(state.CurrFrame.PC + 1);
-            let rebuild_type = F.comment.get(state.CurrFrame.PC).dataType;
-            if (rebuild_type === undefined) {
-                rebuild_type = "<unknown>";
-            }
+            const type_note = F.comment.get(state.CurrFrame.PC).dataType;
             state.CurrFrame.PC += 2;
             const v = new DataView(new ArrayBuffer(4));
             v.setInt32(0, b);
-            state.CurrFrame.S.push((0, c0_value_1.build_c0_value)(v, rebuild_type));
+            if (type_note === undefined) {
+                state.CurrFrame.S.push({ value: v, type: { type: "<unknown>" } });
+            }
+            else {
+                state.CurrFrame.S.push((0, c0_value_1.build_c0_value)(v, type_note));
+            }
             break;
         }
         case 19: {
@@ -151,13 +147,16 @@ function step(state, allocator, msg_handle) {
             const c2 = F.code[state.CurrFrame.PC + 2];
             const idx = (c1 << 8) | c2;
             state.CurrFrame.PC += 3;
-            state.CurrFrame.S.push((0, c0_value_1.build_c0_ptrValue)((0, pointer_ops_1.shift_ptr)(state.C.stringPoolPtr, idx), "string"));
+            state.CurrFrame.S.push((0, c0_value_1.build_c0_stringValue)((0, pointer_ops_1.shift_ptr)(state.C.stringPoolPtr, idx)));
             break;
         }
         case 1: {
             state.CurrFrame.PC += 1;
             const null_ptr = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]);
-            state.CurrFrame.S.push((0, c0_value_1.build_c0_ptrValue)(new DataView(null_ptr.buffer), "<unknown>"));
+            state.CurrFrame.S.push({
+                value: new DataView(null_ptr.buffer),
+                type: { type: "<unknown>" }
+            });
             break;
         }
         case 21: {
@@ -194,20 +193,20 @@ function step(state, allocator, msg_handle) {
         case 191: {
             state.CurrFrame.PC += 1;
             const str_ptr = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (str_ptr.vm_type !== "ptr") {
-                throw new errors_1.vm_error(`Type unmatch: expected a pointer in C0Value, received a ${str_ptr.vm_type}`);
+            if (str_ptr.type.type !== "string" && str_ptr.type.type !== "<unknown>") {
+                throw new errors_1.vm_error(`Type unmatch: expected a pointer in C0Value, received a ${str_ptr.type.type}`);
             }
             throw new errors_1.c0_user_error((0, string_utility_1.loadString)(str_ptr, allocator));
         }
         case 207: {
             state.CurrFrame.PC += 1;
             const str_ptr = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (str_ptr.vm_type !== "ptr") {
-                throw new errors_1.vm_error(`Type unmatch: expected a pointer in C0Value, received a ${str_ptr.vm_type}`);
+            if (str_ptr.type.type !== "string" && str_ptr.type.type !== "<unknown>") {
+                throw new errors_1.vm_error(`Type unmatch: expected a pointer in C0Value, received a ${str_ptr.type.type}`);
             }
             const val = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (val.vm_type !== "value") {
-                throw new errors_1.vm_error(`Type unmatch: expected a value in C0Value, received a ${str_ptr.vm_type}`);
+            if (val.type.type !== "value" && val.type.type !== "<unknown>") {
+                throw new errors_1.vm_error(`Type unmatch: expected a value in C0Value, received a ${str_ptr.type.type}`);
             }
             if (val.value.getUint32(0) === 0) {
                 throw new errors_1.c0_user_error((0, string_utility_1.loadString)(str_ptr, allocator));
@@ -356,25 +355,33 @@ function step(state, allocator, msg_handle) {
             const s = F.code[state.CurrFrame.PC + 1];
             state.CurrFrame.PC += 2;
             const ptr = allocator.malloc(s);
-            state.CurrFrame.S.push((0, c0_value_1.build_c0_ptrValue)(ptr));
+            const T = (0, c0type_utility_1.String2Type)(F.comment.get(state.CurrFrame.PC - 2).dataType);
+            if (T.type === "ptr" && T.kind === "struct") {
+                state.CurrFrame.S.push({ value: ptr, type: T });
+            }
+            else {
+                state.CurrFrame.S.push((0, c0_value_1.build_c0_ptrValue)(ptr, "ptr", T));
+            }
             break;
         }
         case 46: {
             state.CurrFrame.PC += 1;
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (a.vm_type !== "ptr") {
-                throw new errors_1.vm_error("Type unmatch, expect to receive a pointer");
+            if (a.type.type !== "ptr" && a.type.type !== "<unknown>") {
+                throw new errors_1.vm_error("Type unmatch, IMLOAD expect to receive a pointer");
             }
             const mem_block = allocator.imload(a.value);
-            state.CurrFrame.S.push((0, c0_value_1.build_c0_value)(mem_block, (0, helpers_1.ptr2val_type_inference)(a.type)));
+            state.CurrFrame.S.push((0, c0_value_1.build_c0_value)(mem_block, "int"));
             break;
         }
         case 78: {
             state.CurrFrame.PC += 1;
             const x = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (x.vm_type !== "value" || a.vm_type !== "ptr") {
-                throw new errors_1.vm_error("Type unmatch, expected to have {ptr, value}");
+            if ((x.type.type !== "value" && x.type.type !== "<unknown>")
+                ||
+                    (a.type.type !== "ptr" && a.type.type !== "<unknown>")) {
+                throw new errors_1.vm_error("Type unmatch, IMSTORE expected to have {ptr, value}");
             }
             allocator.imstore(a.value, x.value);
             break;
@@ -382,19 +389,21 @@ function step(state, allocator, msg_handle) {
         case 47: {
             state.CurrFrame.PC += 1;
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (a.vm_type !== "ptr") {
-                throw new errors_1.vm_error("Type unmatch, expect to receive a pointer");
+            if (a.type.type !== "ptr" && a.type.type !== "<unknown>") {
+                throw new errors_1.vm_error("Type unmatch, AMLOAD expect to receive a pointer");
             }
             const mem_block = allocator.amload(a.value);
-            state.CurrFrame.S.push((0, c0_value_1.build_c0_ptrValue)(mem_block, (0, helpers_1.ptr2ptr_type_inference)(a.type)));
+            state.CurrFrame.S.push({ value: mem_block, type: { type: "<unknown>" } });
             break;
         }
         case 79: {
             state.CurrFrame.PC += 1;
             const x = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (x.vm_type !== "ptr" || a.vm_type !== "ptr") {
-                throw new errors_1.vm_error("Type unmatch, expected to have {ptr, ptr}");
+            if ((x.type.type !== "ptr" && x.type.type !== "<unknown>" && x.type.type !== "string")
+                ||
+                    (a.type.type !== "ptr" && a.type.type !== "<unknown>" && a.type.type !== "string")) {
+                throw new errors_1.vm_error("Type unmatch, AMSTORE expected to have {ptr|string, ptr|string}");
             }
             allocator.amstore(a.value, x.value);
             break;
@@ -402,8 +411,9 @@ function step(state, allocator, msg_handle) {
         case 52: {
             state.CurrFrame.PC += 1;
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (a.vm_type !== "ptr") {
-                throw new errors_1.vm_error("Type unmatch, expect to receive a pointer");
+            if (a.type.type !== "ptr" && a.type.type !== "<unknown>") {
+                console.log(a);
+                throw new errors_1.vm_error("Type unmatch, CMLOAD expect to receive a pointer");
             }
             const mem_block = allocator.cmload(a.value);
             state.CurrFrame.S.push((0, c0_value_1.build_c0_value)(mem_block, "char"));
@@ -413,8 +423,10 @@ function step(state, allocator, msg_handle) {
             state.CurrFrame.PC += 1;
             const x = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (x.vm_type !== "value" || a.vm_type !== "ptr") {
-                throw new errors_1.vm_error("Type unmatch, expected to have {ptr, value}");
+            if ((x.type.type !== "value" && x.type.type !== "<unknown>")
+                ||
+                    (a.type.type !== "ptr" && a.type.type !== "<unknown>")) {
+                throw new errors_1.vm_error("Type unmatch, CMSTORE expected to have {ptr, value}");
             }
             allocator.cmstore(a.value, x.value);
             break;
@@ -423,29 +435,41 @@ function step(state, allocator, msg_handle) {
             const f = F.code[state.CurrFrame.PC + 1];
             state.CurrFrame.PC += 2;
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (a.vm_type !== "ptr") {
-                throw new errors_1.vm_error("Type unmatch, expect to receive a pointer");
+            if (a.type.type !== "ptr" && a.type.type !== "<unknown>") {
+                throw new errors_1.vm_error("Type unmatch, AADDF expect to receive a pointer");
             }
             const off_ptr = (0, pointer_ops_1.shift_ptr)(a.value, f);
-            state.CurrFrame.S.push((0, c0_value_1.build_c0_ptrValue)(off_ptr, a.type));
+            if (a.type.type === "ptr") {
+                const new_type = (0, c0type_utility_1.CloneType)(a.type);
+                if (new_type.kind !== "struct")
+                    throw new errors_1.vm_error("AADDF should only be applied on a struct pointer");
+                new_type.offset += f;
+                state.CurrFrame.S.push({
+                    value: off_ptr,
+                    type: new_type
+                });
+            }
+            else {
+                state.CurrFrame.S.push({ value: off_ptr, type: { type: "<unknown>" } });
+            }
             break;
         }
         case 188: {
             const f = F.code[state.CurrFrame.PC + 1];
             state.CurrFrame.PC += 2;
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (a.vm_type !== "value") {
-                throw new errors_1.vm_error("Type unmatch, expect to receive a value");
+            if (a.type.type !== "value" && a.type.type !== "<unknown>") {
+                throw new errors_1.vm_error("Type unmatch, NEWARRAY expect to receive a value");
             }
             const ptr = allocator.malloc(f * a.value.getUint32(0) + 4);
             allocator.deref(ptr).setUint32(0, f);
-            state.CurrFrame.S.push((0, c0_value_1.build_c0_ptrValue)(ptr, "<unknown>[]"));
+            state.CurrFrame.S.push((0, c0_value_1.build_c0_ptrValue)(ptr, "arr", (0, c0type_utility_1.String2Type)(F.comment.get(state.CurrFrame.PC - 2).dataType)));
             break;
         }
         case 190: {
             state.CurrFrame.PC += 1;
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (a.vm_type !== "ptr") {
+            if (a.type.type !== "ptr" && a.type.type !== "<unknown>") {
                 throw new errors_1.vm_error("Type unmatch, expected to have pointer");
             }
             const [addr, offset, size] = (0, pointer_ops_1.read_ptr)(a.value);
@@ -458,11 +482,32 @@ function step(state, allocator, msg_handle) {
             state.CurrFrame.PC += 1;
             const i = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            if (i.vm_type !== "value" || a.vm_type !== "ptr") {
+            if ((i.type.type !== "value" && i.type.type !== "<unknown>")
+                || a.type.type !== "ptr") {
                 throw new errors_1.vm_error("Type unmatch, expected to have {ptr, value}");
             }
             const s = allocator.deref(a.value).getUint32(0);
-            state.CurrFrame.S.push((0, c0_value_1.build_c0_ptrValue)((0, pointer_ops_1.shift_ptr)(a.value, 4 + s * i.value.getUint32(0)), (0, helpers_1.ptr2ptr_type_inference)(a.type)));
+            if (a.type.kind === "arr") {
+                if (a.type.value.type === "value" || a.type.value.type === "string") {
+                    state.CurrFrame.S.push({
+                        value: (0, pointer_ops_1.shift_ptr)(a.value, 4 + s * i.value.getUint32(0)),
+                        type: {
+                            type: "ptr",
+                            kind: "ptr",
+                            value: a.type.value
+                        }
+                    });
+                }
+                else {
+                    state.CurrFrame.S.push({
+                        value: (0, pointer_ops_1.shift_ptr)(a.value, 4 + s * i.value.getUint32(0)),
+                        type: a.type.value
+                    });
+                }
+            }
+            else {
+                throw new errors_1.vm_error("AADDS is only expected to apply on ptr<arr> type.");
+            }
             break;
         }
         default: {
@@ -485,7 +530,7 @@ exports.step = step;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ptr2ptr_type_inference = exports.ptr2val_type_inference = exports.safe_pop_stack = void 0;
+exports.safe_pop_stack = void 0;
 const errors_1 = __webpack_require__(/*! ../utility/errors */ "./src/utility/errors.ts");
 function safe_pop_stack(S) {
     if (S.length < 1)
@@ -493,49 +538,6 @@ function safe_pop_stack(S) {
     return S.pop();
 }
 exports.safe_pop_stack = safe_pop_stack;
-function ptr2val_type_inference(T) {
-    switch (T) {
-        case "<unknown>":
-        case "<unknown>[]":
-        case "struct":
-            return "<unknown>";
-        case "boolean":
-        case "boolean[]":
-            return "boolean";
-        case "char":
-        case "char[]":
-            return "char";
-        case "int":
-        case "int[]":
-            return "int";
-        default:
-            throw new errors_1.vm_error(`Unexpected pointer type ${T}`);
-    }
-}
-exports.ptr2val_type_inference = ptr2val_type_inference;
-function ptr2ptr_type_inference(T) {
-    switch (T) {
-        case "<unknown>":
-        case "<unknown>[]":
-            return "<unknown>";
-        case "boolean":
-        case "boolean[]":
-            return "boolean";
-        case "char":
-        case "char[]":
-            return "char";
-        case "int":
-        case "int[]":
-            return "int";
-        case "string":
-        case "string[]":
-            return "string";
-        case "struct":
-        case "struct[]":
-            return "struct";
-    }
-}
-exports.ptr2ptr_type_inference = ptr2ptr_type_inference;
 
 
 /***/ }),
@@ -1172,10 +1174,12 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_PRINT",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "ptr") {
-                        throw new errors_1.vm_error("Print can only receive a pointer argument");
+                    if (arg1.type.type === "<unknown>" || arg1.type.type === "string") {
+                        return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_print(mem, arg1));
                     }
-                    return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_print(mem, arg1));
+                    else {
+                        throw new errors_1.vm_error("NATIVE_PRINT can only receive a string argument");
+                    }
                 }
             };
         case 7:
@@ -1183,10 +1187,10 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_PRINTBOOL",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "value") {
-                        throw new errors_1.vm_error("PrintBool can only receive a value argument");
+                    if (arg1.type.type === "<unknown>" || arg1.type.type === "value") {
+                        return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_print_bool(mem, arg1));
                     }
-                    return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_print_bool(mem, arg1));
+                    throw new errors_1.vm_error("NATIVE_PRINTBOOL can only receive a value argument");
                 }
             };
         case 8:
@@ -1194,10 +1198,10 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_PRINTCHAR",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "value") {
-                        throw new errors_1.vm_error("PrintChar can only receive a value argument");
+                    if (arg1.type.type === "<unknown>" || arg1.type.type === "value") {
+                        return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_print_char(mem, arg1));
                     }
-                    return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_print_char(mem, arg1));
+                    throw new errors_1.vm_error("PrintChar can only receive a value argument");
                 }
             };
         case 9:
@@ -1205,10 +1209,10 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_PRINTINT",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "value") {
-                        throw new errors_1.vm_error("PrintInt can only receive a value argument");
+                    if (arg1.type.type === "<unknown>" || arg1.type.type === "value") {
+                        return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_print_int(mem, arg1));
                     }
-                    return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_print_int(mem, arg1));
+                    throw new errors_1.vm_error("PrintInt can only receive a value argument");
                 }
             };
         case 10:
@@ -1216,10 +1220,10 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_PRINTLN",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "ptr") {
-                        throw new errors_1.vm_error("PrintLn can only receive a pointer argument");
+                    if (arg1.type.type === "<unknown>" || arg1.type.type === "string") {
+                        return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_println(mem, arg1));
                     }
-                    return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_println(mem, arg1));
+                    throw new errors_1.vm_error("PrintLn can only receive a pointer argument");
                 }
             };
         case 11:
@@ -1229,7 +1233,7 @@ function nativeFuncMapping(index) {
                 f: (mem) => {
                     const str = IONative.c0_readline(mem);
                     const ptr = StringNative.allocate_js_string(mem, str);
-                    return (0, c0_value_1.build_c0_ptrValue)(ptr, "string");
+                    return (0, c0_value_1.build_c0_stringValue)(ptr);
                 }
             };
         case 54: {
@@ -1426,10 +1430,12 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_STRING_COMPARE",
                 numArgs: 0,
                 f: (mem, arg1, arg2) => {
-                    if (arg1.vm_type !== "ptr" || arg2.vm_type !== "ptr") {
-                        throw new errors_1.vm_error("NATIVE_STRING_COMPARE only accepts C0Pointer input");
+                    if ((arg1.type.type === "string" || arg1.type.type === "<unknown>")
+                        &&
+                            (arg2.type.type === "string" || arg2.type.type === "<unknown>")) {
+                        return (0, c0_value_1.js_cvt2_c0_value)(StringNative.c0_string_compare(mem, arg1, arg2));
                     }
-                    return (0, c0_value_1.js_cvt2_c0_value)(StringNative.c0_string_compare(mem, arg1, arg2));
+                    throw new errors_1.vm_error("NATIVE_STRING_COMPARE only accepts (string, string) as input");
                 }
             };
         }
@@ -1438,10 +1444,12 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_STRING_EQUAL",
                 numArgs: 0,
                 f: (mem, arg1, arg2) => {
-                    if (arg1.vm_type !== "ptr" || arg2.vm_type !== "ptr") {
-                        throw new errors_1.vm_error("NATIVE_STRING_EQUAL only accepts C0Pointer input");
+                    if ((arg1.type.type === "string" || arg1.type.type === "<unknown>")
+                        &&
+                            (arg2.type.type === "string" || arg2.type.type === "<unknown>")) {
+                        return (0, c0_value_1.js_cvt2_c0_value)(StringNative.c0_string_equal(mem, arg1, arg2));
                     }
-                    return (0, c0_value_1.js_cvt2_c0_value)(StringNative.c0_string_equal(mem, arg1, arg2));
+                    throw new errors_1.vm_error("NATIVE_STRING_EQUAL only accepts (string, string) as input");
                 }
             };
         }
@@ -1450,10 +1458,10 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_STRING_FROM_CHARARRAY",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "ptr") {
-                        throw new errors_1.vm_error("NATIVE_STRING_FROM_CHARARRAY only accepts pointer as input");
+                    if (arg1.type.type === "ptr" || arg1.type.type === "<unknown>") {
+                        return (0, c0_value_1.build_c0_stringValue)(StringNative.c0_string_from_chararray(mem, arg1));
                     }
-                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_to_chararray(mem, arg1), "string");
+                    throw new errors_1.vm_error("NATIVE_STRING_FROM_CHARARRAY only accepts ptr as input");
                 }
             };
         }
@@ -1462,10 +1470,10 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_STRING_FROMBOOL",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "value") {
-                        throw new errors_1.vm_error("NATIVE_STRING_FROMBOOL only accepts value as input");
+                    if (arg1.type.type === "value" || arg1.type.type === "<unknown>") {
+                        return (0, c0_value_1.build_c0_stringValue)(StringNative.c0_string_frombool(mem, arg1));
                     }
-                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_frombool(mem, arg1), "string");
+                    throw new errors_1.vm_error("NATIVE_STRING_FROMBOOL only accepts value as input");
                 }
             };
         }
@@ -1474,10 +1482,10 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_STRING_FROMCHAR",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "value") {
-                        throw new errors_1.vm_error("NATIVE_STRING_FROMCHAR only accepts value as input");
+                    if (arg1.type.type === "value" || arg1.type.type === "<unknown>") {
+                        return (0, c0_value_1.build_c0_stringValue)(StringNative.c0_string_fromchar(mem, arg1));
                     }
-                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_fromchar(mem, arg1), "string");
+                    throw new errors_1.vm_error("NATIVE_STRING_FROMCHAR only accepts value as input");
                 }
             };
         }
@@ -1486,10 +1494,10 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_STRING_FROMINT",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "value") {
-                        throw new errors_1.vm_error("NATIVE_STRING_FROMINT only accepts value as input");
+                    if (arg1.type.type === "value" || arg1.type.type === "<unknown>") {
+                        return (0, c0_value_1.build_c0_stringValue)(StringNative.c0_string_fromint(mem, arg1));
                     }
-                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_fromint(mem, arg1), "string");
+                    throw new errors_1.vm_error("NATIVE_STRING_FROMINT only accepts value as input");
                 }
             };
         }
@@ -1498,10 +1506,12 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_STRING_JOIN",
                 numArgs: 0,
                 f: (mem, arg1, arg2) => {
-                    if (arg1.vm_type !== "ptr" || arg2.vm_type !== "ptr") {
-                        throw new errors_1.vm_error("NATIVE_STRING_JOIN only accepts pointers as input");
+                    if ((arg1.type.type === "string" || arg1.type.type === "<unknown>")
+                        &&
+                            (arg2.type.type === "string" || arg2.type.type === "<unknown>")) {
+                        return (0, c0_value_1.build_c0_stringValue)(StringNative.c0_string_join(mem, arg1, arg2));
                     }
-                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_join(mem, arg1, arg2), "string");
+                    throw new errors_1.vm_error("NATIVE_STRING_JOIN only accepts (string, string) as input");
                 }
             };
         }
@@ -1510,10 +1520,10 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_STRING_LENGTH",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "ptr") {
-                        throw new errors_1.vm_error("NATIVE_STRING_LENGTH only accepts pointers as input");
+                    if (arg1.type.type === "string" || arg1.type.type == "<unknown>") {
+                        return (0, c0_value_1.js_cvt2_c0_value)(StringNative.c0_string_length(mem, arg1));
                     }
-                    return (0, c0_value_1.js_cvt2_c0_value)(StringNative.c0_string_length(mem, arg1));
+                    throw new errors_1.vm_error("NATIVE_STRING_LENGTH only accepts string as input");
                 }
             };
         }
@@ -1536,10 +1546,10 @@ function nativeFuncMapping(index) {
                 functionType: "NATIVE_STRING_TO_CHARARRAY",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.vm_type !== "ptr") {
-                        throw new errors_1.vm_error("NATIVE_STRING_TO_CHARARRAY only accepts pointer as input");
+                    if (arg1.type.type === "<unknown>" || arg1.type.type === "string") {
+                        return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_to_chararray(mem, arg1), "arr", { type: "value", value: "char" });
                     }
-                    return (0, c0_value_1.build_c0_ptrValue)(StringNative.c0_string_to_chararray(mem, arg1), "char[]");
+                    throw new errors_1.vm_error("NATIVE_STRING_TO_CHARARRAY only accepts pointer as input");
                 }
             };
         }
@@ -1649,17 +1659,17 @@ function c0_string_equal(mem, arg1, arg2) {
 }
 exports.c0_string_equal = c0_string_equal;
 function c0_string_frombool(mem, arg1) {
-    arg1.type = "boolean";
+    arg1.type = { type: "value", value: "boolean" };
     return allocate_js_string(mem, (0, c0_value_1.c0_cvt2_js_value)(arg1) ? "true" : "false");
 }
 exports.c0_string_frombool = c0_string_frombool;
 function c0_string_fromchar(mem, arg1) {
-    arg1.type = "char";
+    arg1.type = { type: "value", value: "char" };
     return allocate_js_string(mem, (0, c0_value_1.c0_cvt2_js_value)(arg1));
 }
 exports.c0_string_fromchar = c0_string_fromchar;
 function c0_string_fromint(mem, arg1) {
-    arg1.type = "int";
+    arg1.type = { type: "value", value: "int" };
     return allocate_js_string(mem, "" + (0, c0_value_1.c0_cvt2_js_value)(arg1));
 }
 exports.c0_string_fromint = c0_string_fromint;
@@ -1711,6 +1721,11 @@ exports.c0_string_from_chararray = c0_string_from_chararray;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const errors_1 = __webpack_require__(/*! ../utility/errors */ "./src/utility/errors.ts");
 const native_interface_1 = __webpack_require__(/*! ../native/native_interface */ "./src/native/native_interface.ts");
+const int_comment_regex = /(\d+)|(dummy return value)/;
+const bool_comment_regex = /(true)|(false)/;
+const char_comment_regex = /'.*'/;
+const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-]+),\s+\d+\)/;
+const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-]+)\)/;
 function parse(raw_file) {
     if (globalThis.C0_ENVIR_MODE === "nodejs") {
         raw_file = raw_file.replace(/\r\n/g, "\n");
@@ -1772,9 +1787,6 @@ function parse(raw_file) {
         }
         let code_byte_counter = 0;
         const comment_mapping = new Map();
-        const int_comment_regex = /(\d+)|(dummy return value)/;
-        const bool_comment_regex = /(true)|(false)/;
-        const char_comment_regex = /'.*'/;
         for (let lineNum = 4; lineNum < funcLines.length; lineNum++) {
             const [lineBytes, opcodeName, comment] = funcLines[lineNum].split("#")
                 .map((elem) => elem.trim());
@@ -1794,6 +1806,14 @@ function parse(raw_file) {
                 else {
                     console.error("Failed to inference value type from bipush comment:\n" + funcLines[lineNum]);
                 }
+            }
+            else if (opcodeName.startsWith("newarray")) {
+                const [_, t_res] = arr_comment_regex.exec(comment)[1];
+                type = t_res;
+            }
+            else if (opcodeName.startsWith("new")) {
+                const [_, t_res] = new_comment_regex.exec(comment);
+                type = t_res;
             }
             comment_mapping.set(code_byte_counter, {
                 dataType: type,
@@ -1835,6 +1855,72 @@ function parse(raw_file) {
     };
 }
 exports["default"] = parse;
+
+
+/***/ }),
+
+/***/ "./src/types/c0type_utility.ts":
+/*!*************************************!*\
+  !*** ./src/types/c0type_utility.ts ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.String2Type = exports.Type2String = exports.CloneType = void 0;
+function CloneType(T) {
+    switch (T.type) {
+        case "value":
+            return { type: T.type, value: T.value };
+        case "ptr":
+            if (T.kind === "struct")
+                return { type: T.type, kind: T.kind, value: T.value, offset: T.offset };
+            else
+                return { type: T.type, kind: T.kind, value: CloneType(T.value) };
+        case "string":
+            return { type: T.type, value: T.value };
+        case "<unknown>":
+            return { type: T.type };
+    }
+}
+exports.CloneType = CloneType;
+function Type2String(T) {
+    switch (T.type) {
+        case "ptr":
+            if (T.kind === "arr")
+                return Type2String(T.value) + "[]";
+            if (T.kind === "ptr")
+                return Type2String(T.value) + "*";
+            if (T.kind === "struct")
+                return T.value;
+        case "string":
+            return "string";
+        case "<unknown>":
+            return "<unknown_type>";
+        case "value":
+            return T.value;
+    }
+}
+exports.Type2String = Type2String;
+function String2Type(S) {
+    if (S.endsWith("*")) {
+        return { type: "ptr", kind: "ptr", value: String2Type(S.slice(0, S.length - 1)) };
+    }
+    else if (S.endsWith("[]")) {
+        return { type: "ptr", kind: "arr", value: String2Type(S.slice(0, S.length - 2)) };
+    }
+    else if (S === "string") {
+        return { type: "string", value: "string" };
+    }
+    else if (S === "int" || S === "char" || S === "boolean") {
+        return { type: "value", value: S };
+    }
+    else {
+        return { type: "ptr", kind: "struct", value: S, offset: 0 };
+    }
+}
+exports.String2Type = String2Type;
 
 
 /***/ }),
@@ -1956,24 +2042,21 @@ exports.c_xor = c_xor;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.is_same_value = exports.build_c0_value = exports.build_c0_ptrValue = exports.c0_cvt2_js_value = exports.js_cvt2_c0_value = void 0;
+exports.is_same_value = exports.build_c0_stringValue = exports.build_c0_structPtrValue = exports.build_c0_ptrValue = exports.build_c0_value = exports.c0_cvt2_js_value = exports.js_cvt2_c0_value = void 0;
 const errors_1 = __webpack_require__(/*! ./errors */ "./src/utility/errors.ts");
-const pointer_ops_1 = __webpack_require__(/*! ./pointer_ops */ "./src/utility/pointer_ops.ts");
 function js_cvt2_c0_value(value) {
     let view = new DataView(new ArrayBuffer(4));
     switch (typeof value) {
         case "boolean":
             view.setUint32(0, value ? 1 : 0);
             return ({
-                vm_type: "value",
-                type: "boolean",
+                type: { type: "value", value: "boolean" },
                 value: view
             });
         case "number":
             view.setUint32(0, value);
             return ({
-                vm_type: "value",
-                type: "int",
+                type: { type: "value", value: "int" },
                 value: view
             });
         case "string":
@@ -1984,52 +2067,71 @@ function js_cvt2_c0_value(value) {
             }
             view.setUint8(3, ascii_code);
             return ({
-                vm_type: "value",
-                type: "char",
+                type: { type: "value", value: "char" },
                 value: view
             });
     }
 }
 exports.js_cvt2_c0_value = js_cvt2_c0_value;
 function c0_cvt2_js_value(value) {
-    if (value.vm_type === "ptr") {
-        const [addr, offset, size] = (0, pointer_ops_1.read_ptr)(value.value);
-        return addr + offset;
+    if (value.type.type === "<unknown>") {
+        return value.value.getInt32(0);
     }
-    else {
-        switch (value.type) {
-            case "int": {
-                return value.value.getInt32(0);
-            }
-            case "char": {
-                return String.fromCharCode(value.value.getUint8(3));
-            }
-            case "boolean": {
-                return value.value.getUint32(0) !== 0;
-            }
-            case "<unknown>": {
-                return value.value.getInt32(0);
-            }
+    switch (value.type.value) {
+        case "int": {
+            return value.value.getInt32(0);
+        }
+        case "char": {
+            return String.fromCharCode(value.value.getUint8(3));
+        }
+        case "boolean": {
+            return value.value.getUint32(0) !== 0;
         }
     }
+    ;
 }
 exports.c0_cvt2_js_value = c0_cvt2_js_value;
-function build_c0_ptrValue(value, t) {
-    return {
-        value: value,
-        type: t ? t : "<unknown>",
-        vm_type: "ptr"
-    };
-}
-exports.build_c0_ptrValue = build_c0_ptrValue;
 function build_c0_value(value, t) {
+    if (t === undefined) {
+        return { value: value, type: { type: "<unknown>" } };
+    }
     return {
         value: value,
-        type: t ? t : "<unknown>",
-        vm_type: "value"
+        type: { type: "value", value: t }
     };
 }
 exports.build_c0_value = build_c0_value;
+function build_c0_ptrValue(value, kind, dest_type) {
+    return {
+        value: value,
+        type: {
+            type: "ptr", kind: kind, value: dest_type === undefined ? { type: "<unknown>" } : dest_type
+        }
+    };
+}
+exports.build_c0_ptrValue = build_c0_ptrValue;
+function build_c0_structPtrValue(value, name, offset) {
+    return {
+        value: value,
+        type: {
+            type: "ptr",
+            kind: "struct",
+            value: name,
+            offset: offset
+        }
+    };
+}
+exports.build_c0_structPtrValue = build_c0_structPtrValue;
+function build_c0_stringValue(value) {
+    return {
+        value: value,
+        type: {
+            type: "string",
+            value: "string"
+        }
+    };
+}
+exports.build_c0_stringValue = build_c0_stringValue;
 function is_same_value(x, y) {
     if (x.byteLength !== y.byteLength)
         return false;
@@ -2322,13 +2424,12 @@ exports.build_ptr = build_ptr;
 /*!***************************************!*\
   !*** ./src/utility/string_utility.ts ***!
   \***************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.loadString = exports.loadStringPool = void 0;
-const errors_1 = __webpack_require__(/*! ./errors */ "./src/utility/errors.ts");
 function loadStringPool(stringPool, allocator) {
     const ptr = allocator.malloc(stringPool.length);
     const mem_block = allocator.deref(ptr);
@@ -2339,9 +2440,6 @@ function loadStringPool(stringPool, allocator) {
 }
 exports.loadStringPool = loadStringPool;
 function loadString(ptr, allocator) {
-    if (ptr.type !== "<unknown>" && ptr.type !== "string") {
-        throw new errors_1.vm_error("Type error. Unable to extract string from type" + ptr.type);
-    }
     const mem_block = allocator.deref(ptr.value);
     let i = 0;
     while (i < mem_block.byteLength && mem_block.getUint8(i) !== 0) {
@@ -2380,6 +2478,9 @@ function compile(s, flags) {
     }).then((res) => res.json()).then((res) => {
         (0, web_runtime_init_1.default)(res.bytecode);
     }).catch((e) => {
+        if (globalThis.DEBUG) {
+            console.error(e);
+        }
         globalThis.MSG_EMITTER.err("Failed to compile given C0 code", e.message);
     });
 }
@@ -2404,6 +2505,9 @@ function init_runtime(s) {
     }
     catch (e) {
         globalThis.C0_RUNTIME = undefined;
+        if (globalThis.DEBUG) {
+            console.error(e);
+        }
         globalThis.MSG_EMITTER.err(e.name, e.message);
         return;
     }
@@ -48096,7 +48200,7 @@ const web_runtime_init_1 = __webpack_require__(/*! ./web_handle/web_runtime_init
 function init_env() {
     globalThis.DEBUG = true;
     globalThis.DEBUG_DUMP_MEM = true;
-    globalThis.DEBUG_DUMP_STEP = false;
+    globalThis.DEBUG_DUMP_STEP = true;
     globalThis.MEM_POOL_SIZE = 1024 * 50;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
     globalThis.MEM_POOL_MAX_SIZE = 4294967294;

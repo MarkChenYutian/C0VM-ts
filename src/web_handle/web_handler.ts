@@ -20,6 +20,9 @@ export function compile(s: string, flags: string[]): void {
         }
     ).catch(
         (e) => {
+            if (globalThis.DEBUG) {
+                console.error(e);
+            }
             globalThis.MSG_EMITTER.err(
                 "Failed to compile given C0 code",
                 (e as Error).message

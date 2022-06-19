@@ -6,21 +6,19 @@ import { read_ptr } from "./pointer_ops";
  * @param value The JavaScript value that is going to be converted into C0Value
  * @returns A C0Value<C0ValueVMType.value>
  */
-export function js_cvt2_c0_value(value: boolean | number | string): C0Value<C0ValueVMType.value> {
+export function js_cvt2_c0_value(value: boolean | number | string): C0Value<C0TypeClass.value> {
     let view = new DataView(new ArrayBuffer(4));
     switch (typeof value) {
         case "boolean":
             view.setUint32(0, value ? 1 : 0);
             return ({
-                vm_type: C0ValueVMType.value,
-                type: "boolean",
+                type: {type: C0TypeClass.value, value: "boolean"},
                 value: view
             });
         case "number":
             view.setUint32(0, value);
             return ({
-                vm_type: C0ValueVMType.value,
-                type: "int",
+                type: {type: C0TypeClass.value, value: "int"},
                 value: view
             });
         case "string":
@@ -31,8 +29,7 @@ export function js_cvt2_c0_value(value: boolean | number | string): C0Value<C0Va
             }
             view.setUint8(3, ascii_code);
             return ({
-                vm_type: C0ValueVMType.value,
-                type: "char",
+                type: {type: C0TypeClass.value, value: "char"},
                 value: view
             });
     }
@@ -46,41 +43,21 @@ export function js_cvt2_c0_value(value: boolean | number | string): C0Value<C0Va
  * if <type> is <unknown>, then return the number (`getInt32(0)`) directly.
  * @param value The C0 Value that is going to be converted to a JS value
  */
-export function c0_cvt2_js_value(value: C0Value<C0ValueVMType>): number | string | boolean {
-    if (value.vm_type === C0ValueVMType.ptr) {
-        const [addr, offset, size] = read_ptr(value.value);
-        return addr + offset;
-    } else {
-        switch (value.type) {
-            case "int": {
-                return value.value.getInt32(0);
-            }
-            case "char": {
-                return String.fromCharCode(value.value.getUint8(3));                
-            }
-            case "boolean": {
-                return value.value.getUint32(0) !== 0;
-            }
-            case "<unknown>": {
-                return value.value.getInt32(0);
-            }
+export function c0_cvt2_js_value(value: C0Value<Maybe<C0TypeClass.value>>): number | string | boolean {
+    if (value.type.type === C0TypeClass.unknown) {
+        return value.value.getInt32(0);
+    }
+    switch (value.type.value) {
+        case "int": {
+            return value.value.getInt32(0);
         }
-    }
-}
-
-
-/**
- * Wrap up a C0Pointer into a C0Value<C0ValueVMType.ptr>
- * @param value The C0Pointer that is going to be wrapped into C0Value
- * @param t Optional - the type of object that the pointer is pointing to
- * @returns A constructed C0Value
- */
-export function build_c0_ptrValue(value: C0Pointer, t?: C0PointerType): C0Value<C0ValueVMType.ptr> {
-    return {
-        value: value,
-        type: t ? t : "<unknown>",
-        vm_type: C0ValueVMType.ptr
-    }
+        case "char": {
+            return String.fromCharCode(value.value.getUint8(3));                
+        }
+        case "boolean": {
+            return value.value.getUint32(0) !== 0;
+        }
+    };
 }
 
 /**
@@ -89,11 +66,47 @@ export function build_c0_ptrValue(value: C0Pointer, t?: C0PointerType): C0Value<
  * @param t Optional - the type of object that represented by the DataView passed in
  * @returns A constructed C0Value
  */
-export function build_c0_value(value: DataView, t?: C0ValueType): C0Value<C0ValueVMType.value> {
+export function build_c0_value(value: DataView, t?: C0ValueTypes): C0Value<Maybe<C0TypeClass.value>> {
+    if (t === undefined) {
+        return { value: value, type: { type: C0TypeClass.unknown } }
+    }
     return {
         value: value,
-        type: t ? t : "<unknown>",
-        vm_type: C0ValueVMType.value
+        type: { type: C0TypeClass.value, value: t }
+    };
+}
+
+export function build_c0_ptrValue(value: C0Pointer, kind: "arr" | "ptr", dest_type?: C0Type<C0TypeClass>): C0Value<C0TypeClass.ptr> {
+    return {
+        value: value,
+        type: { 
+            type: C0TypeClass.ptr, kind: kind, value: 
+                dest_type === undefined ? { type: C0TypeClass.unknown } : dest_type
+        }
+    };
+}
+
+
+export function build_c0_structPtrValue(value: C0Pointer, name: string, offset: number): C0Value<C0TypeClass.ptr> {
+    return {
+        value: value,
+        type: {
+            type: C0TypeClass.ptr,
+            kind: "struct",
+            value: name,
+            offset: offset
+        }
+    };
+}
+
+
+export function build_c0_stringValue(value: C0Pointer): C0Value<C0TypeClass.string> {
+    return {
+        value: value,
+        type: {
+            type: C0TypeClass.string,
+            value: "string"
+        }
     };
 }
 

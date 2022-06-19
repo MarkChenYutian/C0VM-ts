@@ -1,7 +1,14 @@
-import { bc0_format_error, vm_error } from "../utility/errors";
+import { bc0_format_error } from "../utility/errors";
 import { nativeFuncLoader } from "../native/native_interface";
 
 //TODO: use regex instead of hardcoding
+const int_comment_regex = /(\d+)|(dummy return value)/;
+const bool_comment_regex = /(true)|(false)/;
+const char_comment_regex = /'.*'/;
+
+const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-]+),\s+\d+\)/;
+const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-]+)\)/;
+
 /**
  * Parse the bc0 text into byte arrays, load Native Functions from Native Pool
  * @param raw_file A .bc0 string compiled by cc0 with -b flag
@@ -128,15 +135,12 @@ export default function parse(raw_file: string): C0ByteCode {
         let code_byte_counter = 0;
 
         const comment_mapping = new Map<number, CodeComment>();
-        const int_comment_regex = /(\d+)|(dummy return value)/;
-        const bool_comment_regex = /(true)|(false)/;
-        const char_comment_regex = /'.*'/;
 
         for (let lineNum = 4; lineNum < funcLines.length; lineNum++) {
             const [lineBytes, opcodeName, comment] = funcLines[lineNum].split("#")
                 .map((elem) => elem.trim());
             if (lineBytes === "") continue;
-            let type: "int" | "boolean" | "char" | undefined = undefined;
+            let type: string | undefined = undefined;
             if (opcodeName.startsWith("bipush")) {
                 if (int_comment_regex.test(comment)) {
                     type = "int";
@@ -147,6 +151,12 @@ export default function parse(raw_file: string): C0ByteCode {
                 } else {
                     console.error("Failed to inference value type from bipush comment:\n" + funcLines[lineNum]);
                 }
+            } else if (opcodeName.startsWith("newarray")) {
+                const [_, t_res] = arr_comment_regex.exec(comment)[1];
+                type = t_res;
+            } else if (opcodeName.startsWith("new")) {
+                const [_, t_res] = new_comment_regex.exec(comment);
+                type = t_res;
             }
             comment_mapping.set(code_byte_counter, 
                 {
