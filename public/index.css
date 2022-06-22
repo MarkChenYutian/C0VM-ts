@@ -265,7 +265,7 @@ pre#c0-output {
 /* Debug */
 .debug-console {
     display: grid;
-    grid-template-columns: 2fr 2fr 5fr;
+    grid-template-columns: 2fr 7fr;
     align-items: center;
     column-gap: 1rem;
 }

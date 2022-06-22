@@ -6,7 +6,7 @@ const int_comment_regex = /(\d+)|(dummy return value)/;
 const bool_comment_regex = /(true)|(false)/;
 const char_comment_regex = /'.*'/;
 
-const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-\*\[\]]+),\s+\d+\)/;
+const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-\*\[\]]+),.+\)/;
 const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-\*\[\]]+)\)/;
 
 /**
@@ -149,14 +149,30 @@ export default function parse(raw_file: string): C0ByteCode {
                 } else if (char_comment_regex.test(comment)) {
                     type = "char";
                 } else {
-                    console.error("Failed to inference value type from bipush comment:\n" + funcLines[lineNum]);
+                    type = "<unknown>";
+                    if (DEBUG) {
+                        console.warn("Failed to inference value type from bipush comment:\n" + funcLines[lineNum]);
+                    }
                 }
             } else if (opcodeName.startsWith("newarray")) {
-                const [_, t_res] = arr_comment_regex.exec(comment);
-                type = t_res;
+                try{
+                    type = arr_comment_regex.exec(comment)[1];
+                } catch(e) {
+                    if (DEBUG) {
+                        console.error(e);
+                        console.log(funcLines[lineNum]);
+                    }
+                }
+                
             } else if (opcodeName.startsWith("new")) {
-                const [_, t_res] = new_comment_regex.exec(comment);
-                type = t_res;
+                try {
+                    type = new_comment_regex.exec(comment)[1];   
+                } catch (e) {
+                    if (DEBUG) {
+                        console.error(e);
+                        console.log(funcLines[lineNum]);
+                    }
+                }
             }
             comment_mapping.set(code_byte_counter, 
                 {

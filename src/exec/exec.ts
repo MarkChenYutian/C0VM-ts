@@ -289,8 +289,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             state.CurrFrame.PC += 1;
 
             const retval = safe_pop_stack(state.CurrFrame.S);
-            console.log(`return from <${state.CurrFrame.P.name}> with retval:`);
-            console.log(retval);
+            if (globalThis.DEBUG) {
+                console.log(`return from <${state.CurrFrame.P.name}> with retval:`);
+                console.log(retval);
+            }
             if (state.CallStack.length === 0) {
                 return false;
             } else {
@@ -584,7 +586,6 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             
             const a = safe_pop_stack(state.CurrFrame.S);
             if (a.type.type !== C0TypeClass.ptr && a.type.type !== C0TypeClass.unknown) {
-                console.log(a);
                 throw new vm_error("Type unmatch, CMLOAD expect to receive a pointer");
             }
             const mem_block = allocator.cmload(a.value);

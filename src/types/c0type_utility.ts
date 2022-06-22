@@ -38,6 +38,8 @@ export function String2Type(S: string): C0Type<C0TypeClass> {
         return { type: C0TypeClass.string, value: "string" };
     } else if (S === "int" || S === "char" || S === "boolean") {
         return { type: C0TypeClass.value, value: S };
+    } else if (S === "<unknown>") {
+        return { type: C0TypeClass.unknown };
     } else {
         return { type: C0TypeClass.ptr, kind: "struct", value: S, offset: 0 };
     }

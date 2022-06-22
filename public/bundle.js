@@ -178,8 +178,10 @@ function step(state, allocator, msg_handle) {
         case 176: {
             state.CurrFrame.PC += 1;
             const retval = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
-            console.log(`return from <${state.CurrFrame.P.name}> with retval:`);
-            console.log(retval);
+            if (globalThis.DEBUG) {
+                console.log(`return from <${state.CurrFrame.P.name}> with retval:`);
+                console.log(retval);
+            }
             if (state.CallStack.length === 0) {
                 return false;
             }
@@ -427,7 +429,6 @@ function step(state, allocator, msg_handle) {
             state.CurrFrame.PC += 1;
             const a = (0, helpers_1.safe_pop_stack)(state.CurrFrame.S);
             if (a.type.type !== "ptr" && a.type.type !== "<unknown>") {
-                console.log(a);
                 throw new errors_1.vm_error("Type unmatch, CMLOAD expect to receive a pointer");
             }
             const mem_block = allocator.cmload(a.value);
@@ -693,9 +694,67 @@ function editor_init() {
             language_1.language.of(bc0_1.BC0Language),
         ]
     });
-    console.log(`C0 Editor Initialized.`);
+    console.log(`[C0VM.ts] C0 Editor Initialized.`);
 }
 exports.editor_init = editor_init;
+
+
+/***/ }),
+
+/***/ "./src/gui/debug_console.ts":
+/*!**********************************!*\
+  !*** ./src/gui/debug_console.ts ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.updateDebugConsole = void 0;
+const c0type_utility_1 = __webpack_require__(/*! ../types/c0type_utility */ "./src/types/c0type_utility.ts");
+const c0_value_1 = __webpack_require__(/*! ../utility/c0_value */ "./src/utility/c0_value.ts");
+const pointer_ops_1 = __webpack_require__(/*! ../utility/pointer_ops */ "./src/utility/pointer_ops.ts");
+const string_utility_1 = __webpack_require__(/*! ../utility/string_utility */ "./src/utility/string_utility.ts");
+function updateDebugConsole() {
+    const outputArea = document.getElementById(globalThis.UI_DEBUG_OUTPUT_ID);
+    while (outputArea.lastElementChild) {
+        outputArea.removeChild(outputArea.lastElementChild);
+    }
+    if (globalThis.C0_RUNTIME === undefined) {
+        return;
+    }
+    for (let i = 0; i < globalThis.C0_RUNTIME.state.CurrFrame.P.numVars; i++) {
+        if (globalThis.C0_RUNTIME.state.CurrFrame.V[i] === undefined)
+            continue;
+        const nameElem = document.createElement("p");
+        nameElem.innerHTML = `<code>${(0, c0type_utility_1.Type2String)(globalThis.C0_RUNTIME.state.CurrFrame.V[i].type)} ${globalThis.C0_RUNTIME.state.CurrFrame.P.varName[i]}</code>`;
+        const valElem = document.createElement("p");
+        valElem.innerText = format_print_c0value(globalThis.C0_RUNTIME.allocator, globalThis.C0_RUNTIME.state.CurrFrame.V[i]);
+        outputArea.appendChild(nameElem);
+        outputArea.appendChild(valElem);
+    }
+}
+exports.updateDebugConsole = updateDebugConsole;
+function format_print_c0value(mem, V) {
+    switch (V.type.type) {
+        case "value":
+            return "" + (0, c0_value_1.c0_cvt2_js_value)(V);
+        case "string":
+            return `"${(0, string_utility_1.loadString)(V, mem)}"`;
+        case "ptr":
+            if ((0, pointer_ops_1.isNullPtr)(V.value))
+                return "NULL";
+            const [addr, offset, block_size] = (0, pointer_ops_1.read_ptr)(V.value);
+            if (V.type.kind === "arr") {
+                return `0x${(addr + offset).toString(16).padStart(8, "0")} with length ${(block_size - 4) / mem.deref(V.value).getInt32(0)}`;
+            }
+            else {
+                return `0x${(addr + offset).toString(16).padStart(8, "0")}, [0x${addr.toString(16).padStart(8, "0")}, 0x${(addr + block_size).toString(16).padStart(8, "0")})`;
+            }
+        default:
+            return `Can't evaluate unknown type`;
+    }
+}
 
 
 /***/ }),
@@ -1098,51 +1157,6 @@ exports["default"] = MaterialEmitter;
 
 /***/ }),
 
-/***/ "./src/gui/show_variable.ts":
-/*!**********************************!*\
-  !*** ./src/gui/show_variable.ts ***!
-  \**********************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.updateDebugConsole = void 0;
-const c0type_utility_1 = __webpack_require__(/*! ../types/c0type_utility */ "./src/types/c0type_utility.ts");
-const c0_value_1 = __webpack_require__(/*! ../utility/c0_value */ "./src/utility/c0_value.ts");
-const string_utility_1 = __webpack_require__(/*! ../utility/string_utility */ "./src/utility/string_utility.ts");
-function updateDebugConsole() {
-    const outputArea = document.getElementById(globalThis.UI_DEBUG_OUTPUT_ID);
-    while (outputArea.lastElementChild) {
-        outputArea.removeChild(outputArea.lastElementChild);
-    }
-    if (globalThis.C0_RUNTIME === undefined) {
-        return;
-    }
-    for (let i = 0; i < globalThis.C0_RUNTIME.state.CurrFrame.P.numVars; i++) {
-        if (globalThis.C0_RUNTIME.state.CurrFrame.V[i] === undefined)
-            continue;
-        const nameElem = document.createElement("p");
-        nameElem.innerHTML = `<code>${globalThis.C0_RUNTIME.state.CurrFrame.P.varName[i]}</code>`;
-        const typeElem = document.createElement("p");
-        typeElem.innerHTML = `<code>${(0, c0type_utility_1.Type2String)(globalThis.C0_RUNTIME.state.CurrFrame.V[i].type)}</code>`;
-        const valElem = document.createElement("p");
-        if (globalThis.C0_RUNTIME.state.CurrFrame.V[i].type.type === "value") {
-            valElem.innerText = "" + (0, c0_value_1.c0_cvt2_js_value)(globalThis.C0_RUNTIME.state.CurrFrame.V[i]);
-        }
-        else if (globalThis.C0_RUNTIME.state.CurrFrame.V[i].type.type === "string") {
-            valElem.innerText = "\"" + (0, string_utility_1.loadString)(globalThis.C0_RUNTIME.state.CurrFrame.V[i], globalThis.C0_RUNTIME.allocator) + "\"";
-        }
-        outputArea.appendChild(nameElem);
-        outputArea.appendChild(typeElem);
-        outputArea.appendChild(valElem);
-    }
-}
-exports.updateDebugConsole = updateDebugConsole;
-
-
-/***/ }),
-
 /***/ "./src/gui/ui_handler.ts":
 /*!*******************************!*\
   !*** ./src/gui/ui_handler.ts ***!
@@ -1240,7 +1254,6 @@ function nativeFuncMapping(index) {
                         return (0, c0_value_1.js_cvt2_c0_value)(IONative.c0_print(mem, arg1));
                     }
                     else {
-                        console.log(arg1);
                         throw new errors_1.vm_error("NATIVE_PRINT can only receive a string argument");
                     }
                 }
@@ -1708,12 +1721,8 @@ function allocate_js_string(mem, s) {
 }
 exports.allocate_js_string = allocate_js_string;
 function c0_string_compare(mem, arg1, arg2) {
-    if ((0, pointer_ops_1.isNullPtr)(arg1.value) || (0, pointer_ops_1.isNullPtr)(arg2.value)) {
-        throw new errors_1.c0_memory_error("string_compare receives NULL pointer");
-    }
     const str_1 = (0, string_utility_1.loadString)(arg1, mem);
     const str_2 = (0, string_utility_1.loadString)(arg2, mem);
-    console.log(str_1, str_2);
     return str_1 < str_2 ? -1 : (str_1 > str_2 ? 1 : 0);
 }
 exports.c0_string_compare = c0_string_compare;
@@ -1787,7 +1796,7 @@ const native_interface_1 = __webpack_require__(/*! ../native/native_interface */
 const int_comment_regex = /(\d+)|(dummy return value)/;
 const bool_comment_regex = /(true)|(false)/;
 const char_comment_regex = /'.*'/;
-const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-\*\[\]]+),\s+\d+\)/;
+const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-\*\[\]]+),.+\)/;
 const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-\*\[\]]+)\)/;
 function parse(raw_file) {
     if (globalThis.C0_ENVIR_MODE === "nodejs") {
@@ -1867,16 +1876,33 @@ function parse(raw_file) {
                     type = "char";
                 }
                 else {
-                    console.error("Failed to inference value type from bipush comment:\n" + funcLines[lineNum]);
+                    type = "<unknown>";
+                    if (DEBUG) {
+                        console.warn("Failed to inference value type from bipush comment:\n" + funcLines[lineNum]);
+                    }
                 }
             }
             else if (opcodeName.startsWith("newarray")) {
-                const [_, t_res] = arr_comment_regex.exec(comment);
-                type = t_res;
+                try {
+                    type = arr_comment_regex.exec(comment)[1];
+                }
+                catch (e) {
+                    if (DEBUG) {
+                        console.error(e);
+                        console.log(funcLines[lineNum]);
+                    }
+                }
             }
             else if (opcodeName.startsWith("new")) {
-                const [_, t_res] = new_comment_regex.exec(comment);
-                type = t_res;
+                try {
+                    type = new_comment_regex.exec(comment)[1];
+                }
+                catch (e) {
+                    if (DEBUG) {
+                        console.error(e);
+                        console.log(funcLines[lineNum]);
+                    }
+                }
             }
             comment_mapping.set(code_byte_counter, {
                 dataType: type,
@@ -1978,6 +2004,9 @@ function String2Type(S) {
     }
     else if (S === "int" || S === "char" || S === "boolean") {
         return { type: "value", value: S };
+    }
+    else if (S === "<unknown>") {
+        return { type: "<unknown>" };
     }
     else {
         return { type: "ptr", kind: "struct", value: S, offset: 0 };
@@ -2499,12 +2528,13 @@ exports.build_ptr = build_ptr;
 /*!***************************************!*\
   !*** ./src/utility/string_utility.ts ***!
   \***************************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.loadString = exports.loadStringPool = void 0;
+const pointer_ops_1 = __webpack_require__(/*! ./pointer_ops */ "./src/utility/pointer_ops.ts");
 function loadStringPool(stringPool, allocator) {
     const ptr = allocator.malloc(stringPool.length);
     const mem_block = allocator.deref(ptr);
@@ -2515,6 +2545,8 @@ function loadStringPool(stringPool, allocator) {
 }
 exports.loadStringPool = loadStringPool;
 function loadString(ptr, allocator) {
+    if ((0, pointer_ops_1.isNullPtr)(ptr.value))
+        return "";
     const mem_block = allocator.deref(ptr.value);
     let i = 0;
     while (i < mem_block.byteLength && mem_block.getUint8(i) !== 0) {
@@ -48267,14 +48299,14 @@ var exports = __webpack_exports__;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const html_init_1 = __webpack_require__(/*! ./gui/html_init */ "./src/gui/html_init.ts");
 const material_emitter_1 = __webpack_require__(/*! ./gui/material_emitter */ "./src/gui/material_emitter.ts");
-const show_variable_1 = __webpack_require__(/*! ./gui/show_variable */ "./src/gui/show_variable.ts");
+const debug_console_1 = __webpack_require__(/*! ./gui/debug_console */ "./src/gui/debug_console.ts");
 const ui_handler_1 = __webpack_require__(/*! ./gui/ui_handler */ "./src/gui/ui_handler.ts");
 const web_handler_1 = __webpack_require__(/*! ./web_handle/web_handler */ "./src/web_handle/web_handler.ts");
 const web_runtime_init_1 = __webpack_require__(/*! ./web_handle/web_runtime_init */ "./src/web_handle/web_runtime_init.ts");
 function init_env() {
     globalThis.DEBUG = true;
     globalThis.DEBUG_DUMP_MEM = true;
-    globalThis.DEBUG_DUMP_STEP = true;
+    globalThis.DEBUG_DUMP_STEP = false;
     globalThis.MEM_POOL_SIZE = 1024 * 50;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
     globalThis.MEM_POOL_MAX_SIZE = 4294967294;
@@ -48290,23 +48322,20 @@ function init_env() {
     globalThis.UI_WARN_DISPLAY_TIME_MS = 7000;
     globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
     globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8081/compile";
-    globalThis.COMPILER_FLAGS = {
-        "-d": false
-    };
-    globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
+    globalThis.COMPILER_FLAGS = { "-d": false };
     globalThis.C0_ENVIR_MODE = "web";
     globalThis.C0_MAX_RECURSION = 999;
     globalThis.C0_RUNTIME = undefined;
     globalThis.MSG_EMITTER = new material_emitter_1.default();
     console.log("[C0VM.ts] Environment initialized.");
     if (globalThis.DEBUG) {
-        console.log(`
-C0VM.ts Configuration Report:
+        console.log(`C0VM.ts Configuration Report:
+    Version: 0.1.0-alpha
     General Configuration:
-        Supported Language Level: C0-language-level
-        Supported Native Group: standard Output, string operation
+        Supported Language Level: C0
+        Supported Native Group: stdandard I/O, string operation
         Environment Mode: ${globalThis.C0_ENVIR_MODE}
-        C0 Bytecode Max Size: ${globalThis.C0_BYTECODE_MAX_LENGTH}
+        Max Recursion Depth: ${globalThis.C0_MAX_RECURSION}
 
     Debug Configuration:
         Debug Mode: ${globalThis.DEBUG}
@@ -48396,7 +48425,7 @@ function web_compile() {
 function update_editor() {
     if (globalThis.C0_ENVIR_MODE === "web") {
         window.EDITOR_VIEW.update([window.EDITOR_VIEW.state.update()]);
-        (0, show_variable_1.updateDebugConsole)();
+        (0, debug_console_1.updateDebugConsole)();
     }
 }
 exports["default"] = {

@@ -72,7 +72,6 @@ Configurations are generally set up using global variables declared under `optio
 | `UI_PRINTOUT_ID`         | `string`, used by `browser` compile target only, the ID of HTMLElement that act as standard output. |
 | `UI_MSG_ID`              | `string`, used by `browser` compile target only, the ID of HTMLElement that shows all the output messages (ok, warn and error). |
 |                          |                                                              |
-| `C0_BYTECODE_MAX_LENGTH` | `number`, used by `browser` compile target only, the maximum allowed size of byte code input when using drag&drop upload method. |
 | `C0_ENVIR_MODE`          | `"nodejs" | "web"`, used by some native functions to deploy different implementations based on different compile target. |
 | `C0_MAX_RECURSION`       | `number`, the maximum level of recursion allowed. Exceeding this recursion level (having function stack greater than this size) will lead to `c0_memory_error`. |
 | `C0_RUNTIME`             | `undefined | C0VM_RuntimeState`, when bytecode is loaded, this variable will store the state of C0VM. When program's execution is finished / error occurs, it will be set to `undefined` |

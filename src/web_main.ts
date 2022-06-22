@@ -1,6 +1,6 @@
 import html_init from "./gui/html_init";
 import MaterialEmitter from "./gui/material_emitter";
-import { updateDebugConsole } from "./gui/show_variable";
+import { updateDebugConsole } from "./gui/debug_console";
 import { on_clickflag } from "./gui/ui_handler";
 import { compile } from "./web_handle/web_handler";
 import init_runtime from "./web_handle/web_runtime_init";
@@ -9,7 +9,7 @@ function init_env() {
     // Initialize global variables
     globalThis.DEBUG = true;
     globalThis.DEBUG_DUMP_MEM = true;
-    globalThis.DEBUG_DUMP_STEP = true;
+    globalThis.DEBUG_DUMP_STEP = false;
 
     globalThis.MEM_POOL_SIZE = 1024 * 50;
     globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
@@ -31,11 +31,8 @@ function init_env() {
     globalThis.UI_OK_DISPLAY_TIME_MS = 4000;
 
     globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8081/compile";
-    globalThis.COMPILER_FLAGS = {
-        "-d": false
-    };
+    globalThis.COMPILER_FLAGS = { "-d": false };
 
-    globalThis.C0_BYTECODE_MAX_LENGTH = 20000;
     globalThis.C0_ENVIR_MODE = "web";
     globalThis.C0_MAX_RECURSION = 999;
 
@@ -44,13 +41,14 @@ function init_env() {
     ///////////////////////////////
     console.log("[C0VM.ts] Environment initialized.");
     if (globalThis.DEBUG) {
-        console.log(`
-C0VM.ts Configuration Report:
+        console.log(
+`C0VM.ts Configuration Report:
+    Version: 0.1.0-alpha
     General Configuration:
-        Supported Language Level: C0-language-level
-        Supported Native Group: standard Output, string operation
+        Supported Language Level: C0
+        Supported Native Group: stdandard I/O, string operation
         Environment Mode: ${globalThis.C0_ENVIR_MODE}
-        C0 Bytecode Max Size: ${globalThis.C0_BYTECODE_MAX_LENGTH}
+        Max Recursion Depth: ${globalThis.C0_MAX_RECURSION}
 
     Debug Configuration:
         Debug Mode: ${globalThis.DEBUG}

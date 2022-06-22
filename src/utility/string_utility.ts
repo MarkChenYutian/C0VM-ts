@@ -1,3 +1,5 @@
+import { isNullPtr } from "./pointer_ops";
+
 /**
  * Load the string pool to C0VM Heap memory (in order to implement ALDC command)
  * @param stringPool string pool that is being loaded in the C0 Heap
@@ -21,6 +23,7 @@ export function loadStringPool(stringPool: Uint8Array, allocator: C0HeapAllocato
  * @returns The decoded string (with utf-8 decoding by default)
  */
 export function loadString(ptr: C0Value<Maybe<C0TypeClass.string>>, allocator: C0HeapAllocator): string {
+    if (isNullPtr(ptr.value)) return "";
     const mem_block = allocator.deref(ptr.value);
     // stop at NUL character
     let i = 0;

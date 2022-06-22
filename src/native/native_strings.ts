@@ -16,12 +16,9 @@ export function allocate_js_string(mem: C0HeapAllocator, s: string): C0Pointer {
 export function c0_string_compare(mem: C0HeapAllocator,
         arg1: C0Value<Maybe<C0TypeClass.string>>,
         arg2: C0Value<Maybe<C0TypeClass.string>>): number {
-    if (isNullPtr(arg1.value) || isNullPtr(arg2.value)) { throw new c0_memory_error("string_compare receives NULL pointer"); }
 
     const str_1 = loadString(arg1, mem);
     const str_2 = loadString(arg2, mem);
-
-    console.log(str_1, str_2);
 
     return str_1 < str_2 ? -1 : (str_1 > str_2 ? 1 : 0)
 }

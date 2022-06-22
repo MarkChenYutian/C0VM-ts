@@ -61,6 +61,6 @@ export function editor_init() {
             // autoLanguage
         ]
     });
-    console.log(`C0 Editor Initialized.`);
+    console.log(`[C0VM.ts] C0 Editor Initialized.`);
 }
 

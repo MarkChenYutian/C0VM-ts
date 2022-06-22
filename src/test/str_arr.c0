@@ -1,0 +1,10 @@
+#use <conio>
+
+int main() {
+    string[] a = alloc_array(string, 3);
+    a[0] = "test";
+    println(a[0]);
+    println(a[1]);
+    println(a[2]);
+    return 0;
+}
