@@ -46,39 +46,45 @@ The `browser` compile target uses `web_main.ts` as entry point and will save the
 
 To open the project, visit [C0VM.ts Alpha Version (markchenyutian.github.io)](https://markchenyutian.github.io/C0VM-ts/public/) or open a server on your computer and access the `public/index.html`.
 
-## Configurations
+## Configurations (Global Variables)
 
-Configurations are generally set up using global variables declared under `options.d.ts`. To change the configuration, change the assignment of global variables in `web_main.ts` or `console_main.ts`.
+Declared in `./types/options.d.ts` as global variables under `globalThis`, the configurations can modify the parameter of C0VM runtime and turn on/off certain features accordingly.
 
-| Option                   | Explanation                                                  |
-| ------------------------ | ------------------------------------------------------------ |
-| `DEBUG`                  | `boolean` value, `true` to turn on debug features            |
-| `DEBUG_DUMP_MEM`         | `boolean` value, `true` to dump the heap memory to console on the beginning of every execution. |
-| `DEBUG_DUMP_STEP`        | `boolean` value, `true` to log the `currFrame` and `PC` of each step |
-|                          |                                                              |
-| `MEM_BLOCK_MAX_SIZE`     | `number`, the maximum size of heap memory                    |
-| `MEM_POOL_SIZE`          | `number`, the current size of heap memory                    |
-| `MEM_POOL_MIN_SIZE`      | `number`, the minimum allowed size of heap memory            |
-| `MEM_POOL_MAX_SIZE`      | `number`, the maximum allowed size of heap memory            |
-| `MEM_POOL_DEFAULT_SIZE`  | `number`, the default (fallback value for) the size of heap memory |
-|                          |                                                              |
-| `COMPILER_BACKEND_URL`   | `string`, the server address to send "compile" request to    |
-|                          |                                                              |
-| `EDITOR_CONTENT`         | `string`, the plain string of contents in editor             |
-| `EDITOR_VIEW`            | `EditorView`, the `EditorView` of mirrorcode code editor object |
-| `EDITOR_BREAKPOINTS`     | `Set<number>`, the line numbers that has breakpoints toggled |
-|                          |                                                              |
-| `UI_INPUT_ID`            | `string`, used by `browser` compile target only, the ID of HTMLElement that act as the root of C0-editor. |
-| `UI_PRINTOUT_ID`         | `string`, used by `browser` compile target only, the ID of HTMLElement that act as standard output. |
-| `UI_MSG_ID`              | `string`, used by `browser` compile target only, the ID of HTMLElement that shows all the output messages (ok, warn and error). |
-|                          |                                                              |
-| `C0_ENVIR_MODE`          | `"nodejs" | "web"`, used by some native functions to deploy different implementations based on different compile target. |
-| `C0_MAX_RECURSION`       | `number`, the maximum level of recursion allowed. Exceeding this recursion level (having function stack greater than this size) will lead to `c0_memory_error`. |
-| `C0_RUNTIME`             | `undefined | C0VM_RuntimeState`, when bytecode is loaded, this variable will store the state of C0VM. When program's execution is finished / error occurs, it will be set to `undefined` |
-|                          |                                                              |
-| `MSG_EMITTER`            | `MessageEmitter`, determine the way that C0VM.ts emit message to user. |
+To change the configuration, change the assignment of global variables in `web_main.ts` or `console_main.ts`.
 
-## VM Structure
+| Option                   | Type                          | Explanation                                                  |
+| ------------------------ | ----------------------------- | ------------------------------------------------------------ |
+| `DEBUG`                  | `boolean`                     | `true` to turn on debug features (print call stack when exception caught, logging function return value, etc.) |
+| `DEBUG_DUMP_MEM`         | `boolean`                     | `true` to dump the heap memory to console on the beginning of every execution. |
+| `DEBUG_DUMP_STEP`        | `boolean`                     | `true` to log the `currFrame` and `PC` of each step          |
+|                          |                               |                                                              |
+| `MEM_BLOCK_MAX_SIZE`     | `number`                      | The maximum size of a memory , related with the implementation of allocator. |
+| `MEM_POOL_SIZE`          | `number`                      | Current size of heap memory                                  |
+| `MEM_POOL_MIN_SIZE`      | `number`                      | Minimum allowed size of heap memory                          |
+| `MEM_POOL_MAX_SIZE`      | `number`                      | Maximum allowed size of heap memory                          |
+| `MEM_POOL_DEFAULT_SIZE`  | `number`                      | The default (fallback value for) the size of heap memory     |
+|                          |                               |                                                              |
+| `COMPILER_BACKEND_URL`\* | `string`                      | The server address to send "compile" request to              |
+| `COMPILER_FLAGS`\*       | `Record<string, boolean>`     | Stores whether a specific compile flag (e.g. `-d` is on/off) |
+|                          |                               |                                                              |
+| `EDITOR_CONTENT`\*       | `string`                      | The content in editor                                        |
+| `EDITOR_VIEW`\*          | `EditorView`                  | The `EditorView` of Mirrorcode code editor object            |
+| `EDITOR_BREAKPOINTS`\*   | `Set<number>`                 | The line numbers that has breakpoints toggled                |
+|                          |                               |                                                              |
+| `UI_INPUT_ID`\*          | `string`                      | The ID of HTMLElement that act as the root of C0-editor.     |
+| `UI_PRINTOUT_ID`\*       | `string`                      | The ID of HTMLElement that act as standard output.           |
+| `UI_MSG_ID`\*            | `string`                      | The ID of HTMLElement that shows all the output messages (ok, warn and error). |
+| `UI_DEBUG_OUTPUT_ID`\*   | `string`                      | The ID of HTMLElement that act as the output of debug console. |
+|                          |                               |                                                              |
+| `C0_ENVIR_MODE`          | `"nodejs"|"web"`              | Used by some native functions to deploy different implementations based on different compile target. |
+| `C0_MAX_RECURSION`       | `number`                      | The maximum level of recursion allowed. Exceeding this recursion level (having function stack greater than this size) will lead to `c0_memory_error`. |
+| `C0_RUNTIME`             | `undefined|C0VM_RuntimeState` | When bytecode is loaded, this variable will store the state of C0VM.<br />When program's execution is finished / error occurs, it will be set to `undefined` |
+|                          |                               |                                                              |
+| `MSG_EMITTER`            | `MessageEmitter`              | By calling interface's function, C0VM can emit message to user through various methods (console, GUI, etc.) |
+
+Variables with \* will only be used by the `web` compile target.
+
+## VM State
 
 The C0VM's "state" is defined as follow in `types.d.ts`
 
@@ -88,7 +94,8 @@ type VM_State = {
     C: VM_Constants, // Constants the VM will use
     CallStack: VM_StackFrame[],
     CurrFrame: VM_StackFrame,
-    CurrLineNumber: number
+    CurrLineNumber: number,
+    TypeRecord: Map<string, Map<number, C0Type<C0TypeClass>>>
 };
 ```
 
@@ -99,6 +106,7 @@ type VM_State = {
 | `CallStack`      | The stack of function stack frames of C0VM                   |
 | `CurrFrame`      | The function frame that is currently executed by the C0VM    |
 | `CurrLineNumber` | The line number of bytecode currently being executed in `.bc0` file |
+| `TypeRecord`     | The type information of `struct`s. Discussed further in *Type Inference* section |
 
 Where each `VM_StackFrame` is defined as
 
@@ -178,7 +186,9 @@ Given a `C0Pointer`, the `deref` function will return a `DataView` that is an al
 > ^- addr = 0x0000_0000 ^- offset = 0x0070
 > ```
 
-### VM_Memory
+:bulb: It is always recommended to use this function to access heap memory.
+
+### Class VM_Memory
 
 ```typescript
 export class VM_Memory implements C0HeapAllocator {
@@ -287,40 +297,27 @@ For any type `t` with size $s$, we can create an array of it. The array is descr
 
 ## C0Value
 
-`C0Value` is a wrapper for the actual values in C0VM with fancy type declaration that allow us to put more constrint on value of its fields.
+> Defined in `./src/types/types.d.ts`
+
+`C0Value` is a wrapper for the actual values in C0VM with type information recorder to allow us perform run-time type inference.
 
 ```typescript
-declare const enum C0ValueVMType {
-    "value" = 0,
-    "ptr" = 1
+declare const enum C0TypeClass {
+    unknown = "<unknown>",
+    value = "value",
+    ptr = "ptr",
+    string = "string"
 }
-type C0ValueType = "<unknown>" | "int" | "char" | "boolean";
-type C0PointerType = "<unknown>" | "<unknown>[]" | "string"| "struct" | "int[]" | "string[]" | "char[]" | "boolean[]" | "struct[]";
 
-type C0Value<T extends C0ValueVMType> = 
-    T extends C0ValueVMType.value ? {
-        vm_type: T;
-        type: C0ValueType;
-        value: DataView
-    } : 
-    T extends C0ValueVMType.ptr ? {
-        vm_type: T;
-        type: C0PointerType;
-        value: C0Pointer
-    } : 
-    never;
+type C0Value<T extends C0TypeClass> = {
+    type: C0Type<T>;
+    value: DataView;
+};
 ```
 
-The `vm_type` property is a reflection to the `w32`/`*` type in original C0VM.
+The `type` is the inferenced data type that can be used for visualization and debug console. This will be further discussed in the *Type Inference* section.
 
-The `type` is the inferenced data type that can be used for visualization and type constraint propagation. By default, the `type` will be `<unknown>`. But when additional information are available, the `type` property will be assigned.
-
-| Value of `vm_type`    | Allowed value for `type`                          |
-| --------------------- | ------------------------------------------------- |
-| `C0ValueVMType.value` | `"<unknown>" `, `"int"`, `"char"`, or `"boolean"` |
-| `C0ValueVMType.ptr`   | `C0PointerType` or `C0ValueType`                  |
-
-> :construction: In the future, some more options will be added to the `vm_type` to make it compatible with `tagged_pointer` and `func_pointer`.
+> :construction: In the future, some more options will be added to the `C0TypeClass` to make it compatible with `tagged_pointer` and `func_pointer`.
 
 The `value` is the `DataView` of actual data
 
@@ -330,6 +327,80 @@ The `value` is the `DataView` of actual data
 | --------- | ---------------------------------- |
 | `value`   | 4                                  |
 | `ptr`     | 8                                  |
+
+## Type Inference
+
+Most of the type information are lost when the C0 source code is compiled into the C0 bytecode. However, to perform visualization and show the value of local variable, we must know the type information of variables such that we can interpret the byte sequence accordingly.
+
+Luckily, not all information are wiped away during the compilation. The `.bc0` file contains a series of comments, which reveals the source or intention of a specific operation. The calling of native functions can also provide us with type information (e.g. `readline` must return a `string` type).
+
+Therefore, we developed a **Type Inference** system along side the `C0Value` to collect all the traces of type information and propagate the type constraint as C0VM executes.
+
+### C0Type Definition
+
+Defined in `/src/types/c0types.d.ts`, we have `C0Type<T extends C0TypeClass>` defined as:
+
+```typescript
+type C0Type<T extends C0TypeClass> = 
+    T extends C0TypeClass.value ? {
+        type: T,
+        value: C0ValueTypes
+    } : 
+    T extends (C0TypeClass.ptr) ? {
+        type: T,
+        kind: "arr"| "ptr",
+        value: C0Type<C0TypeClass>,
+    } | {
+        type: T,
+        kind: "struct",
+        value: string,	// The type name of struct
+        offset: number	// Offset from the start of struct
+    } : 
+    T extends (C0TypeClass.string) ? {
+        type: T,
+        value: "string"
+    } : 
+    T extends (C0TypeClass.unknown) ? {
+        type: T
+    } : never;
+```
+
+### C0TypeClass
+
+Unlike in C, where a variable is either on *stack* or *heap*, in C0 language, only **primitive types** and pointers are stored on stack. All aggregate type like `struct`, `array` must be stored on heap (a.k.a. "allocated memory space").
+
+Therefore, we classify all C0Types into three classes:
+
+* `value` - All primitive types
+* `ptr` - All the pointers, and array (and structures)
+* `string` - This is a special case. `string` is always stored on the heap, however, dereferencing a `string` type is not allowed in C0 language. Therefore, it is a "un-dereferenceable pointer" and we decide to put it into a separate class alone.
+* `unknown` - when the type information is unknown, we will mark it honestly as `<unknown>` type, which acts like the `any` type in TypeScript and is accepted by all functions without condition.
+
+> A `C0Type` is defined in a nested way. For instance, a type of `string[]` will be represented by
+>
+> ```typescript
+> {type: C0TypeClass.ptr, kind: "arr", value: {
+>     type: C0TypeClass.string, value: "string"
+> }}
+> ```
+
+### Conversion between Type and String
+
+The function defined in `./types/c0type_utility.ts` will convert C0Type to string and string to C0Type.
+
+```typescript
+"int*" <====> 
+{type: C0TypeClass.ptr, kind: "ptr", value: {type: C0TypeClass.value, value: "int"}}
+```
+
+### Type Information Source
+
+The type information comes from four main sources:
+
+1. The comment of `bipush` command - `bipush` must provide a C0 Value Type.
+2. The comment of `newarray` command - `alloc_array(<TYPENAME>, <ARRAY_LENGTH>)`
+3. The comment of `new` command - `alloc(<TYPENAME>)`
+4. Native Function outputs, Arithmetic Operations,  `imload/imstore`.
 
 ## Arithmetic Operations
 
@@ -471,7 +542,7 @@ The list of native functions is listed below:
 | NATIVE_STRING_TO_CHARARRAY   | :white_check_mark: |
 | NATIVE_STRING_TOLOWER        | :hourglass:        |
 
-## C0 Code Editor
+## GUI - C0 Code Editor
 
 We have implemented the C0 Code editor using [CodeMirror 6](https://codemirror.net/). The editor is initialized in `editor_init()` function in `/src/gui/code_editor_setup.ts` file.
 
@@ -479,15 +550,19 @@ The extensions we have used are shown below
 
 ```typescript
 extensions: [
-    breakpointGutter,
-    basicSetup,
-    funcHeadGutter,
-    execLineHighlighter,
-    keymap.of([indentWithTab]),
-    indentUnit.of("    "),
-    EditorView.updateListener.of((e) => { globalThis.EDITOR_CONTENT = e.state.doc.toString(); }),
-    language.of(BC0Language)
-]
+            breakpointGutter,
+            basicSetup,
+            funcHeadGutter,
+            execLineHighlighter,
+            LoadDocumentPlugin,
+            basicSetup,
+            keymap.of([indentWithTab]),
+            indentUnit.of("    "),
+            EditorView.updateListener.of((e) => {
+                onViewUpdate(e);
+            }),
+            language.of(BC0Language),
+        ]
 ```
 
 ### breakpointGutter
@@ -518,11 +593,14 @@ Defined in `/gui/extensions/exec_position.ts`, this extension will read the `lin
 
 ### LoadDocumentPlugin
 
-Defined in `/gui/extensions/loader_ui.ts`, this extension will show up a prompt to guide user to import files into the C0VM code editor.
+Defined in `/gui/extensions/loader_ui.ts`, this extension will show up a prompt to guide user to import files into the C0VM code editor through standard file-selection panel.
+
+### onViewUpdate
+
+Defined in `/gui/extensions/on_view_update.ts`, this function will update the UI (enable/disable certain button) and update the `globalThis.EDITOR_CONTENT` global variable.
 
 ## Project Progress
 
 * Currently, the C0VM.ts has implemented all the features required for `C0` language.
-* We are working on type inference part of the C0VM.ts
-    * Specifically, we are working on type inference of `struct` and `array`.
+* We are working on testing and debugging the C0VM to current checkpoint and also enhancing the debug console and UX.
 * In the future, we will support the `C1` language standard.

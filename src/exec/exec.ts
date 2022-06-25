@@ -1,4 +1,4 @@
-import { CloneType, getType, String2Type } from "../types/c0type_utility";
+import { CloneType, getType, maybeStringType, maybeValueType, String2Type } from "../types/c0type_utility";
 import * as arithmetic from "../utility/arithmetic";
 import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value, build_c0_stringValue } from "../utility/c0_value";
 import { c0_memory_error, c0_user_error, vm_error } from "../utility/errors";
@@ -19,8 +19,6 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             state.CurrFrame.PC += 1;
 
             const v = safe_pop_stack(state.CurrFrame.S);
-            // A constraint of Typescript ... (or I don't know how to deal with it elegantly)
-            // The type inference does not allow me to directly assign value to nv.
             const nv = {
                     value: new DataView(v.value.buffer.slice(v.value.byteOffset, v.value.byteLength)),
                     type: CloneType(v.type)
@@ -308,10 +306,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             state.CurrFrame.PC += 1;
 
             const str_ptr = safe_pop_stack(state.CurrFrame.S);
-            if (str_ptr.type.type !== C0TypeClass.string && str_ptr.type.type !== C0TypeClass.unknown) {
+            if (!maybeStringType(str_ptr)) {
                 throw new vm_error(`Type unmatch: expected a pointer in C0Value, received a ${str_ptr.type.type}`);
             }
-            throw new c0_user_error(loadString((str_ptr as C0Value<C0TypeClass.string>), allocator));
+            throw new c0_user_error(loadString(str_ptr, allocator));
         }
 
         // assert
@@ -319,15 +317,15 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             state.CurrFrame.PC += 1;
 
             const str_ptr = safe_pop_stack(state.CurrFrame.S);
-            if (str_ptr.type.type !== C0TypeClass.string && str_ptr.type.type !== C0TypeClass.unknown) {
-                throw new vm_error(`Type unmatch: expected a pointer in C0Value, received a ${str_ptr.type.type}`);
+            if (!maybeStringType(str_ptr)) {
+                throw new vm_error(`Type unmatch: expected a string in C0Value, received a ${str_ptr.type.type}`);
             }
             const val = safe_pop_stack(state.CurrFrame.S);
-            if (val.type.type !== C0TypeClass.value && val.type.type !== C0TypeClass.unknown) {
+            if (!maybeValueType(val)) {
                 throw new vm_error(`Type unmatch: expected a value in C0Value, received a ${str_ptr.type.type}`);
             }
             if (val.value.getUint32(0) === 0) {
-                throw new c0_user_error(loadString((str_ptr as C0Value<C0TypeClass.string>), allocator));
+                throw new c0_user_error(loadString(str_ptr, allocator));
             }
             break;
         }
@@ -589,9 +587,17 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
                 throw new vm_error("Type unmatch, CMLOAD expect to receive a pointer");
             }
             const mem_block = allocator.cmload(a.value);
-            state.CurrFrame.S.push(
-                build_c0_value(mem_block, "char")
-            );
+            if (a.type.type === C0TypeClass.ptr) {
+                state.CurrFrame.S.push({
+                    value: mem_block,
+                    type: (a.type.value as C0Type<C0TypeClass.value>)
+                });
+            } else {
+                state.CurrFrame.S.push({
+                    value: mem_block,
+                    type: {type: C0TypeClass.unknown}
+                });
+            }
             break;
         }
 

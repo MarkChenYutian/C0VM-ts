@@ -1,0 +1,8 @@
+#use <conio>
+
+int main() {
+    bool* B = alloc(bool);
+    *B = true;
+    bool C = *B;
+    return 0;
+}

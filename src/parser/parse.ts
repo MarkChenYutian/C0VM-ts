@@ -1,7 +1,6 @@
 import { bc0_format_error } from "../utility/errors";
 import { nativeFuncLoader } from "../native/native_interface";
 
-//TODO: use regex instead of hardcoding
 const int_comment_regex = /(\d+)|(dummy return value)/;
 const bool_comment_regex = /(true)|(false)/;
 const char_comment_regex = /'.*'/;

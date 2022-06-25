@@ -82,20 +82,10 @@ type C0Pointer = DataView;
  * Else if
  * never happens (in future, tagged ptr / func ptr)
  */
-type C0Value<T extends C0TypeClass> = 
-    T extends C0TypeClass.unknown ? {
-        type: C0Type<T>;
-        value: DataView;
-    } :
-    T extends C0TypeClass.value ? {
-        type: C0Type<T>;// Some types can't fit in C0Value directly
-        value: DataView;
-    } : 
-    T extends (C0TypeClass.ptr | C0TypeClass.string) ? {
-        type: C0Type<T>;// Everything can have a corresponding pointer type
-        value: C0Pointer;
-    } : 
-    never;
+type C0Value<T extends C0TypeClass> = {
+    type: C0Type<T>,
+    value: DataView,
+}
 
 // Enum Types for C0VM Instructions
 declare const enum OpCode {

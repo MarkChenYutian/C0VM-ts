@@ -33,3 +33,19 @@ export function loadString(ptr: C0Value<Maybe<C0TypeClass.string>>, allocator: C
     const dec = new TextDecoder();
     return dec.decode(mem_block.buffer.slice(mem_block.byteOffset, mem_block.byteOffset + i));
 }
+
+/**
+ * Helper Function
+ * @param mem Memory Allocator
+ * @param s The Javascript string you want to allocate into C0 heap memory space
+ * @returns The pointer to the allocated string
+ */
+ export function allocate_js_string(mem: C0HeapAllocator, s: string): C0Pointer {
+    const ptr = mem.malloc(s.length + 1);
+    const block = mem.deref(ptr);
+    for (let i = 0; i < s.length; i ++) {
+        block.setUint8(i, s.charCodeAt(i));
+    }
+    block.setUint8(s.length, 0);    // NUL Terminator
+    return ptr;
+}

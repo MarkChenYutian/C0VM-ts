@@ -5,8 +5,7 @@ declare const enum C0TypeClass {
     string = "string"
 }
 
-type C0ValueTypes = "int" | "char" | "boolean";
-type C0PointerKinds = "ptr" | "arr" | "struct";
+type C0ValueTypes = "int" | "char" | "bool";
 
 type Maybe<T extends C0TypeClass> = T | C0TypeClass.unknown;
 
@@ -15,22 +14,20 @@ type C0Type<T extends C0TypeClass> =
         type: T,
         value: C0ValueTypes
     } : 
-    T extends (C0TypeClass.ptr) ? {
+    T extends C0TypeClass.ptr ? {
         type: T,
         kind: "arr"| "ptr",
-        // If a pointer points to the struct, we record the 
-        // struct type name and offset
         value: C0Type<C0TypeClass>,
     } | {
         type: T,
         kind: "struct",
-        value: string,
-        offset: number
+        value: string,  // If a pointer points to the struct, we record the 
+        offset: number  // struct type name and offset
     } : 
-    T extends (C0TypeClass.string) ? {
+    T extends C0TypeClass.string ? {
         type: T,
         value: "string"
     } : 
-    T extends (C0TypeClass.unknown) ? {
+    T extends C0TypeClass.unknown ? {
         type: T
     } : never;

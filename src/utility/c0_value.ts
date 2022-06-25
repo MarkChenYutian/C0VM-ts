@@ -1,5 +1,4 @@
 import { vm_error } from "./errors";
-import { read_ptr } from "./pointer_ops";
 
 /**
  * Converting JavaScript primitive into C0Value
@@ -12,7 +11,7 @@ export function js_cvt2_c0_value(value: boolean | number | string): C0Value<C0Ty
         case "boolean":
             view.setUint32(0, value ? 1 : 0);
             return ({
-                type: {type: C0TypeClass.value, value: "boolean"},
+                type: {type: C0TypeClass.value, value: "bool"},
                 value: view
             });
         case "number":
@@ -54,7 +53,7 @@ export function c0_cvt2_js_value(value: C0Value<Maybe<C0TypeClass.value>>): numb
         case "char": {
             return String.fromCharCode(value.value.getUint8(3));                
         }
-        case "boolean": {
+        case "bool": {
             return value.value.getUint32(0) !== 0;
         }
     };
@@ -120,3 +119,4 @@ export function is_same_value(x: DataView, y: DataView): boolean {
     }
     return true;
 }
+

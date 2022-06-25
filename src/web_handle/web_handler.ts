@@ -1,6 +1,12 @@
 import init_runtime from "./web_runtime_init";
 
-export function compile(s: string, flags: string[]): void {
+/**
+ * Compile the given C0 Source code in backend server and load the 
+ * compiled bytecode into C0_RUNTIME accordingly.
+ * 
+ * @param s The C0 Source code string to be compiled
+ */
+export function compile(s: string): void {
     fetch(globalThis.COMPILER_BACKEND_URL, {
             method: "POST",
             cache: "no-cache",

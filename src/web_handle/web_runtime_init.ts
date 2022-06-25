@@ -1,6 +1,10 @@
 import C0VM_RuntimeState from "../exec/state";
 
-
+/**
+ * Set the globalThis.C0_RUNTIME based on given bytecode string
+ * @param s The bytecode string
+ * @returns void
+ */
 export default function init_runtime(s: string) {
     try {
         globalThis.C0_RUNTIME = new C0VM_RuntimeState(

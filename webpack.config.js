@@ -9,7 +9,7 @@ var config = {
   },
   module: {
     rules: [
-      { 
+      {
         test: /\.tsx?$/,
         loader: "ts-loader"
       }
@@ -23,12 +23,12 @@ var htmlConfig = Object.assign({}, config, {
     main: "./src/web_main.ts",
   },
   optimization: {
-    // concatenateModules: true,
-    // minimize: true
+    concatenateModules: true,
+    minimize: true
   },
   output: {
     path: path.resolve(__dirname, './public'),
-    filename: "bundle.js",
+    filename: "index.js",
     library: "c0vm_ts",
     libraryTarget: "window",
     libraryExport: "default"

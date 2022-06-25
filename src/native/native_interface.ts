@@ -5,22 +5,29 @@
  * to the native function pool when the parser is parsing bc0 file.
  * The number of arguments is "injected" from the information in bc0 file
  * since it is recorded in the native pool part.
- * 
- * This file only contains the native function loader & header, the actual 
+ *
+ * This file only contains the native function loader & header, the actual
  * functions are defined in other files in this folder.
  */
-import { build_c0_ptrValue, build_c0_stringValue, build_c0_value, js_cvt2_c0_value } from "../utility/c0_value";
+import {
+    build_c0_ptrValue,
+    build_c0_stringValue,
+    js_cvt2_c0_value,
+} from "../utility/c0_value";
 import { vm_error, vm_instruct_error } from "../utility/errors";
 import * as StringNative from "./native_strings";
 import * as IONative from "./native_io";
-
+import * as TypeUtil from "../types/c0type_utility";
 /**
  * Load the C0Native Functions from bytecode to C0VM.
  * @param index Load the native function with specific index
  * @param numArgs Number of arguments the native function requires
  * @returns The C0Native, if implemented, or undefined, if not implemented
  */
-export function nativeFuncLoader(index: number, numArgs: number): C0Native | undefined {
+export function nativeFuncLoader(
+    index: number,
+    numArgs: number
+): C0Native | undefined {
     const native = nativeFuncMapping(index);
     if (native === undefined) return native;
     native.numArgs = numArgs;
@@ -34,26 +41,26 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_ARGS_FLAG",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         case 1:
             return {
                 functionType: "NATIVE_ARGS_INT",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         case 2:
             return {
                 functionType: "NATIVE_ARGS_PARSE",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         case 3:
             return {
                 functionType: "NATIVE_ARGS_STRING",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         /* Native Standard I/O Functions */
         // case 4:
         //     Not implemented since it's dealing with file I/Os
@@ -66,436 +73,474 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_FLUSH",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
-            /**
-             * TODO:
-             * Force to print the current content from buffer to the screen
-             */
+                f: nativeNotImplemented,
+            };
+        /**
+         * TODO:
+         * Force to print the current content from buffer to the screen
+         */
         case 6:
             return {
                 functionType: "NATIVE_PRINT",
                 numArgs: 0,
                 f: (mem: C0HeapAllocator, arg1: C0Value<C0TypeClass>) => {
-                    if (arg1.type.type === C0TypeClass.unknown || arg1.type.type === C0TypeClass.string) {
-                        // TODO: For some unknown reason, the if condition above does not provide enough type narrowing
-                        return js_cvt2_c0_value(IONative.c0_print(mem, (arg1 as C0Value<C0TypeClass.string>)));
+                    if (TypeUtil.maybeStringType(arg1)) {
+                        return js_cvt2_c0_value(IONative.c0_print(mem, arg1));
                     } else {
-                        throw new vm_error("NATIVE_PRINT can only receive a string argument");
+                        throw new vm_error(
+                            "NATIVE_PRINT can only receive a string argument"
+                        );
                     }
-                }
-            }
+                },
+            };
         case 7:
             return {
                 functionType: "NATIVE_PRINTBOOL",
                 numArgs: 0,
                 f: (mem: C0HeapAllocator, arg1: C0Value<C0TypeClass>) => {
-                    if (arg1.type.type === C0TypeClass.unknown || arg1.type.type === C0TypeClass.value) {
-                        return js_cvt2_c0_value(IONative.c0_print_bool(mem, (arg1 as C0Value<C0TypeClass.value>)));
+                    if (TypeUtil.maybeValueType(arg1)) {
+                        return js_cvt2_c0_value(
+                            IONative.c0_print_bool(mem, arg1)
+                        );
                     }
-                    throw new vm_error("NATIVE_PRINTBOOL can only receive a value argument");
-                }
-            }
+                    throw new vm_error(
+                        "NATIVE_PRINTBOOL can only receive a value argument"
+                    );
+                },
+            };
         case 8:
             return {
                 functionType: "NATIVE_PRINTCHAR",
                 numArgs: 0,
                 f: (mem: C0HeapAllocator, arg1: C0Value<C0TypeClass>) => {
-                    if (arg1.type.type === C0TypeClass.unknown || arg1.type.type === C0TypeClass.value) {
-                        return js_cvt2_c0_value(IONative.c0_print_char(mem, (arg1 as C0Value<C0TypeClass.value>)));
+                    if (TypeUtil.maybeValueType(arg1)) {
+                        return js_cvt2_c0_value(
+                            IONative.c0_print_char(mem, arg1)
+                        );
                     }
-                    throw new vm_error("PrintChar can only receive a value argument");
-                }
-            }
+                    throw new vm_error(
+                        "PrintChar can only receive a value argument"
+                    );
+                },
+            };
         case 9:
             return {
                 functionType: "NATIVE_PRINTINT",
                 numArgs: 0,
                 f: (mem: C0HeapAllocator, arg1: C0Value<C0TypeClass>) => {
-                    if (arg1.type.type === C0TypeClass.unknown || arg1.type.type === C0TypeClass.value) {
-                        return js_cvt2_c0_value(IONative.c0_print_int(mem, (arg1 as C0Value<C0TypeClass.value>)));
+                    if (TypeUtil.maybeValueType(arg1)) {
+                        return js_cvt2_c0_value(
+                            IONative.c0_print_int(mem, arg1)
+                        );
                     }
-                    throw new vm_error("PrintInt can only receive a value argument");
-                }
-            }
+                    throw new vm_error(
+                        "PrintInt can only receive a value argument"
+                    );
+                },
+            };
         case 10:
             return {
                 functionType: "NATIVE_PRINTLN",
                 numArgs: 0,
                 f: (mem: C0HeapAllocator, arg1: C0Value<C0TypeClass>) => {
-                    if (arg1.type.type === C0TypeClass.unknown || arg1.type.type === C0TypeClass.string) {
-                        return js_cvt2_c0_value(IONative.c0_println(mem, (arg1 as C0Value<C0TypeClass.string>)));
+                    if (TypeUtil.maybeStringType(arg1)) {
+                        return js_cvt2_c0_value(IONative.c0_println(mem, arg1));
                     }
-                    throw new vm_error("PrintLn can only receive a pointer argument");
-                }
-            }
+                    throw new vm_error(
+                        "PrintLn can only receive a string argument"
+                    );
+                },
+            };
         case 11:
             return {
                 functionType: "NATIVE_READLINE",
                 numArgs: 0,
                 f: (mem: C0HeapAllocator) => {
-                    const str = IONative.c0_readline(mem);
-                    const ptr: C0Pointer = StringNative.allocate_js_string(mem, str);
+                    const ptr = IONative.c0_readline(mem);
                     return build_c0_stringValue(ptr);
-                }
-            }
+                },
+            };
         /** Double Type calculation */
         case 54: {
             return {
                 functionType: "NATIVE_DADD",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 55: {
             return {
                 functionType: "NATIVE_DDIV",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 56: {
             return {
                 functionType: "NATIVE_DLESS",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 57: {
             return {
                 functionType: "NATIVE_DMUL",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 59: {
             return {
                 functionType: "NATIVE_DSUB",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 60: {
             return {
                 functionType: "NATIVE_DTOI",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 61: {
             return {
                 functionType: "NATIVE_ITOD",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 62: {
             return {
                 functionType: "NATIVE_PRINT_DUB",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         /** Floating Point Operations */
         case 67: {
             return {
                 functionType: "NATIVE_FADD",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 68: {
             return {
                 functionType: "NATIVE_FDIV",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 69: {
             return {
                 functionType: "NATIVE_FLESS",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 70: {
             return {
                 functionType: "NATIVE_FMUL",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 71: {
             return {
                 functionType: "NATIVE_FSUB",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 72: {
             return {
                 functionType: "NATIVE_FTOI",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 73: {
             return {
                 functionType: "NATIVE_ITOF",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 74: {
             return {
                 functionType: "NATIVE_PRINT_FPT",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 75: {
             return {
                 functionType: "NATIVE_PRINT_HEX",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 76: {
             return {
                 functionType: "NATIVE_PRINT_INT",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         /** String Parsing Functions */
         case 85: {
             return {
                 functionType: "NATIVE_INT_TOKENS",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 86: {
             return {
                 functionType: "NATIVE_NUM_TOKENS",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 87: {
             return {
                 functionType: "NATIVE_PARSE_BOOL",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 88: {
             return {
                 functionType: "NATIVE_PARSE_INT",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 89: {
             return {
                 functionType: "NATIVE_PARSE_INTS",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 90: {
             return {
                 functionType: "NATIVE_PARSE_TOKENS",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         /** String and Char Operations */
         case 91: {
             return {
                 functionType: "NATIVE_CHAR_CHR",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 92: {
             return {
                 functionType: "NATIVE_CHAR_ORD",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 93: {
             return {
                 functionType: "NATIVE_STRING_CHARAT",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 94: {
             return {
                 functionType: "NATIVE_STRING_COMPARE",
                 numArgs: 0,
-                f: (mem, arg1: C0Value<C0TypeClass>, arg2: C0Value<C0TypeClass>) => {
-                    if ((arg1.type.type === C0TypeClass.string || arg1.type.type === C0TypeClass.unknown)
-                        &&
-                        (arg2.type.type === C0TypeClass.string || arg2.type.type === C0TypeClass.unknown)) 
-                        {
-                            return js_cvt2_c0_value(StringNative.c0_string_compare(
-                                mem, (arg1 as C0Value<C0TypeClass.string>), (arg2 as C0Value<C0TypeClass.string>)
-                            ));
-                        }
-                        throw new vm_error("NATIVE_STRING_COMPARE only accepts (string, string) as input");
-                }
-            }
+                f: (
+                    mem,
+                    arg1: C0Value<C0TypeClass>,
+                    arg2: C0Value<C0TypeClass>
+                ) => {
+                    if (
+                        TypeUtil.maybeStringType(arg1) &&
+                        TypeUtil.maybeStringType(arg2)
+                    ) {
+                        return js_cvt2_c0_value(
+                            StringNative.c0_string_compare(mem, arg1, arg2)
+                        );
+                    }
+                    throw new vm_error(
+                        "NATIVE_STRING_COMPARE only accepts (string, string) as input"
+                    );
+                },
+            };
         }
         case 95: {
             return {
                 functionType: "NATIVE_STRING_EQUAL",
                 numArgs: 0,
-                f: (mem, arg1: C0Value<C0TypeClass>, arg2: C0Value<C0TypeClass>) => {
-                    if ((arg1.type.type === C0TypeClass.string || arg1.type.type === C0TypeClass.unknown)
-                        &&
-                        (arg2.type.type === C0TypeClass.string || arg2.type.type === C0TypeClass.unknown)) {
-                            return js_cvt2_c0_value(StringNative.c0_string_equal(
-                                mem, (arg1 as C0Value<C0TypeClass.string>), (arg2 as C0Value<C0TypeClass.string>)
-                            ));
-                        }
-                        throw new vm_error("NATIVE_STRING_EQUAL only accepts (string, string) as input");
-                }
-            }
+                f: (
+                    mem,
+                    arg1: C0Value<C0TypeClass>,
+                    arg2: C0Value<C0TypeClass>
+                ) => {
+                    if (
+                        TypeUtil.maybeStringType(arg1) &&
+                        TypeUtil.maybeStringType(arg2)
+                    ) {
+                        return js_cvt2_c0_value(
+                            StringNative.c0_string_equal(mem, arg1, arg2)
+                        );
+                    }
+                    throw new vm_error(
+                        "NATIVE_STRING_EQUAL only accepts (string, string) as input"
+                    );
+                },
+            };
         }
         case 96: {
             return {
                 functionType: "NATIVE_STRING_FROM_CHARARRAY",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0TypeClass>) => {
-                    if (arg1.type.type === C0TypeClass.ptr || arg1.type.type === C0TypeClass.unknown) {
+                    if (TypeUtil.maybePointerType(arg1)) {
                         return build_c0_stringValue(
-                            StringNative.c0_string_from_chararray(mem, (arg1 as C0Value<C0TypeClass.ptr>))
+                            StringNative.c0_string_from_chararray(mem, arg1)
                         );
                     }
-                    throw new vm_error("NATIVE_STRING_FROM_CHARARRAY only accepts ptr as input");
-                }
-            }
+                    throw new vm_error(
+                        "NATIVE_STRING_FROM_CHARARRAY only accepts ptr as input"
+                    );
+                },
+            };
         }
         case 97: {
             return {
                 functionType: "NATIVE_STRING_FROMBOOL",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0TypeClass>) => {
-                    if (arg1.type.type === C0TypeClass.value || arg1.type.type === C0TypeClass.unknown) {
-                        return build_c0_stringValue(
-                            StringNative.c0_string_frombool(mem, (arg1 as C0Value<C0TypeClass.value>))
-                        );
+                    if (TypeUtil.maybeValueType(arg1)) {
+                        return build_c0_stringValue(StringNative.c0_string_frombool(mem, arg1));
                     }
-                    throw new vm_error("NATIVE_STRING_FROMBOOL only accepts value as input");
-                }
-            }
+                    throw new vm_error(
+                        "NATIVE_STRING_FROMBOOL only accepts value as input"
+                    );
+                },
+            };
         }
         case 98: {
             return {
                 functionType: "NATIVE_STRING_FROMCHAR",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0TypeClass>) => {
-                    if (arg1.type.type === C0TypeClass.value || arg1.type.type === C0TypeClass.unknown) {
+                    if (TypeUtil.maybeValueType(arg1)) {
                         return build_c0_stringValue(
-                            StringNative.c0_string_fromchar(mem, (arg1 as C0Value<C0TypeClass.value>))
+                            StringNative.c0_string_fromchar(mem, arg1)
                         );
                     }
-                    throw new vm_error("NATIVE_STRING_FROMCHAR only accepts value as input");
-                }
-            }
+                    throw new vm_error(
+                        "NATIVE_STRING_FROMCHAR only accepts value as input"
+                    );
+                },
+            };
         }
         case 99: {
             return {
                 functionType: "NATIVE_STRING_FROMINT",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0TypeClass>) => {
-                    if (arg1.type.type === C0TypeClass.value || arg1.type.type === C0TypeClass.unknown) {
+                    if (TypeUtil.maybeValueType(arg1)) {
                         return build_c0_stringValue(
-                            StringNative.c0_string_fromint(mem, (arg1 as C0Value<C0TypeClass.value>))
+                            StringNative.c0_string_fromint(mem, arg1)
                         );
                     }
-                    throw new vm_error("NATIVE_STRING_FROMINT only accepts value as input");
-                }
-            }
+                    throw new vm_error(
+                        "NATIVE_STRING_FROMINT only accepts value as input"
+                    );
+                },
+            };
         }
         case 100: {
             return {
                 functionType: "NATIVE_STRING_JOIN",
                 numArgs: 0,
-                f: (mem, arg1: C0Value<C0TypeClass>, arg2: C0Value<C0TypeClass>) => {
+                f: (
+                    mem,
+                    arg1: C0Value<C0TypeClass>,
+                    arg2: C0Value<C0TypeClass>
+                ) => {
                     if (
-                        (arg1.type.type === C0TypeClass.string || arg1.type.type === C0TypeClass.unknown)
-                        &&
-                        (arg2.type.type === C0TypeClass.string || arg2.type.type === C0TypeClass.unknown)
+                        TypeUtil.maybeStringType(arg1) &&
+                        TypeUtil.maybeStringType(arg2)
                     ) {
                         return build_c0_stringValue(
-                            StringNative.c0_string_join(mem,
-                                (arg1 as C0Value<C0TypeClass.string>),
-                                (arg2 as C0Value<C0TypeClass.string>)
-                            )
-                        );    
+                            StringNative.c0_string_join(mem, arg1, arg2)
+                        );
                     }
-                    throw new vm_error("NATIVE_STRING_JOIN only accepts (string, string) as input");
-                    
-                }
-            }
+                    throw new vm_error(
+                        "NATIVE_STRING_JOIN only accepts (string, string) as input"
+                    );
+                },
+            };
         }
         case 101: {
             return {
                 functionType: "NATIVE_STRING_LENGTH",
                 numArgs: 0,
                 f: (mem, arg1) => {
-                    if (arg1.type.type === C0TypeClass.string || arg1.type.type == C0TypeClass.unknown) {
+                    if (TypeUtil.maybeStringType(arg1)) {
                         return js_cvt2_c0_value(
-                            StringNative.c0_string_length(mem, (arg1 as C0Value<C0TypeClass.string>))
-                        );    
+                            StringNative.c0_string_length(mem, arg1)
+                        );
                     }
-                    throw new vm_error("NATIVE_STRING_LENGTH only accepts string as input");
-                }
-            }
+                    throw new vm_error(
+                        "NATIVE_STRING_LENGTH only accepts string as input"
+                    );
+                },
+            };
         }
         case 102: {
             return {
                 functionType: "NATIVE_STRING_SUB",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 103: {
             return {
                 functionType: "NATIVE_STRING_TERMINATED",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         case 104: {
             return {
                 functionType: "NATIVE_STRING_TO_CHARARRAY",
                 numArgs: 0,
                 f: (mem, arg1: C0Value<C0TypeClass>) => {
-                    if (arg1.type.type === C0TypeClass.unknown || arg1.type.type === C0TypeClass.string) {
+                    if (TypeUtil.maybeStringType(arg1)) {
                         return build_c0_ptrValue(
-                            StringNative.c0_string_to_chararray(mem, (arg1 as C0Value<C0TypeClass.string>)),
+                            StringNative.c0_string_to_chararray(mem, arg1),
                             "arr",
-                            {type: C0TypeClass.value, value: "char"}
-                        )    
+                            { type: C0TypeClass.value, value: "char" }
+                        );
                     }
-                    throw new vm_error("NATIVE_STRING_TO_CHARARRAY only accepts pointer as input");
-                }
-            }
+                    throw new vm_error(
+                        "NATIVE_STRING_TO_CHARARRAY only accepts pointer as input"
+                    );
+                },
+            };
         }
         case 105: {
             return {
                 functionType: "NATIVE_STRING_TOLOWER",
                 numArgs: 0,
-                f: nativeNotImplemented
-            }
+                f: nativeNotImplemented,
+            };
         }
         default:
-            return undefined;   // Everything not (planned to be) implemented yet goes here.
+            return undefined; // Everything not (planned to be) implemented yet goes here.
     }
 }
 

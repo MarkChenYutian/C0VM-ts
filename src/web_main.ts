@@ -8,7 +8,7 @@ import init_runtime from "./web_handle/web_runtime_init";
 function init_env() {
     // Initialize global variables
     globalThis.DEBUG = true;
-    globalThis.DEBUG_DUMP_MEM = true;
+    globalThis.DEBUG_DUMP_MEM = false;
     globalThis.DEBUG_DUMP_STEP = false;
 
     globalThis.MEM_POOL_SIZE = 1024 * 50;
@@ -155,9 +155,7 @@ function reset_runtime() {
 }
 
 function web_compile() {
-    compile(
-        globalThis.EDITOR_CONTENT, []
-    );
+    compile(globalThis.EDITOR_CONTENT);
 }
 
 function update_editor() {
