@@ -43,7 +43,7 @@ function format_print_c0value(mem: C0HeapAllocator, V: C0Value<C0TypeClass>): st
             if (V.type.kind === "arr") {
                 return `0x${(addr + offset).toString(16).padStart(8, "0")} with length ${(block_size - 4) / mem.deref(V.value).getInt32(0)}`
             } else {
-                return `0x${(addr + offset).toString(16).padStart(8, "0")}, [0x${addr.toString(16).padStart(8, "0")}, 0x${(addr + block_size).toString(16).padStart(8, "0")})`;
+                return `0x${(addr + offset).toString(16).padStart(8, "0")} with size of ${block_size} bytes`;
             }
         default:
             return `Can't evaluate unknown type`

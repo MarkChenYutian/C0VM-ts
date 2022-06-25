@@ -1,6 +1,8 @@
 /*! ../exec/state */
 
-/*! ../gui/material_emitter */
+/*! ../gui/code_editor_setup */
+
+/*! ../gui/extensions/on_view_update */
 
 /*! ../native/native_interface */
 

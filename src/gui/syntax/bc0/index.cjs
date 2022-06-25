@@ -32,12 +32,12 @@ const BC0Language = language.LRLanguage.define({
             }),
             highlight.styleTags({
                 Byte: highlight.tags.integer,
-                Comment: highlight.tags.comment,
+                Comment: highlight.tags.className,
                 FuncHeader: highlight.tags.definitionKeyword,
                 Identifier: highlight.tags.definitionKeyword,
                 BlockHeader: highlight.tags.definitionKeyword,
                 Commands: highlight.tags.className,
-                Instruction: highlight.tags.className
+                Instruction: highlight.tags.comment
             })
         ]
     }),

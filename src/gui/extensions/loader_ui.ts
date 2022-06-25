@@ -1,5 +1,5 @@
 import { EditorView } from "codemirror";
-import { Decoration, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
+import { Decoration, DecorationSet, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
 
 function loadFileThroughDialog(e: Event) {
     const F = (e.target as HTMLInputElement).files[0];
@@ -69,7 +69,7 @@ function loadDOMWidgetInterface(view: EditorView) {
 }
 
 const LoadDocumentPlugin = ViewPlugin.fromClass(class {
-    public decorations;
+    public decorations: DecorationSet;
 
     constructor (view: EditorView) {
         this.decorations = loadDOMWidgetInterface(view);

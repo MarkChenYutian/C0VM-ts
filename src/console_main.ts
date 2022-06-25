@@ -65,7 +65,7 @@ const state: VM_State = {
 let cont = true;
 try {
     while (cont) {
-        cont = step(state, heap, globalThis.MSG_EMITTER);
+        cont = step(state, heap);
         if (global.DEBUG_DUMP_STEP) {
             console.log("==========\nDEBUG - Heap Memory Dump:");
             console.log(heap.debug_getMemPool());

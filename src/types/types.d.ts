@@ -31,16 +31,17 @@ type C0Function = {
 // Information extracted from comment during parsing phase
 // Facilitate type inference etc.
 type CodeComment = {
-    dataType?: string,
-    lineNumber: number
+    dataType?: string,  // If command = new/new_array/bipush, the type name of variable will be placed here
+    lineNumber: number  // The corresponding line number in .bc0 file
 }
 
 
 type C0Native = {
+    // Number of arguments the function will receive
     numArgs: number;
-    // functionIndex: number;
+    // The enumeration type - C0 Native Functions' name
     readonly functionType: C0NativeFuncType;
-    // name: number;
+    // The native function implementation - receive several C0 value and return a C0Value accordingly
     readonly f: (mem: C0HeapAllocator, ...args: C0Value<C0TypeClass>[]) => 
         C0Value<C0TypeClass>;
 };
@@ -71,17 +72,6 @@ type C0ByteCode = {
 type C0Pointer = DataView;
 
 
-// C0Value type with some stronger constraints
-/**
- * If 
- * vm_type = value, then 
- *      type must be "int", "char" or "boolean"
- * Else if
- * vm_type = ptr, then
- *      type must be "<unknown>", ..., "<unknown>[]", ...
- * Else if
- * never happens (in future, tagged ptr / func ptr)
- */
 type C0Value<T extends C0TypeClass> = {
     type: C0Type<T>,
     value: DataView,
@@ -265,18 +255,22 @@ type VM_StackFrame = {
 };
 
 type VM_State = {
+    // Bytecode file to be executed
     P: C0ByteCode,
-    C: VM_Constants, // Constants the VM will use
+    // Constants the VM will use
+    C: VM_Constants,
+    // The callstack of the virtual machine
     CallStack: VM_StackFrame[],
+    // The function frame that is currently executed
     CurrFrame: VM_StackFrame,
+    // The line number of .bc0 file that is currently executing
     CurrLineNumber: number,
+    // The type pool (struct type information) hashmap
     TypeRecord: Map<string, Map<number, C0Type<C0TypeClass>>>
 };
 
 
 declare abstract class C0VM_RT {
-    public emitter: MessageEmitter;
-    
     abstract step_forward(): boolean;
     abstract restart(): void;
     abstract debug(): any;

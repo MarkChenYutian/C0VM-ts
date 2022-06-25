@@ -1,3 +1,5 @@
+import { new_editor_state } from "../gui/code_editor_setup";
+import { updateCtrBtns } from "../gui/extensions/on_view_update";
 import init_runtime from "./web_runtime_init";
 
 /**
@@ -22,7 +24,13 @@ export function compile(s: string): void {
         (res) => res.json()
     ).then(
         (res) => {
+            if (res.c0_output !== "") {
+                document.getElementById(globalThis.UI_PRINTOUT_ID).innerText = res.c0_output;
+                throw Error("See printout window for detailed information.");
+            }
             init_runtime(res.bytecode);
+            globalThis.EDITOR_VIEW.setState(new_editor_state(res.bytecode));
+            updateCtrBtns();
         }
     ).catch(
         (e) => {

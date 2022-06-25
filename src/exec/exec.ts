@@ -1,12 +1,12 @@
 import { CloneType, getType, maybeStringType, maybeValueType, String2Type } from "../types/c0type_utility";
-import * as arithmetic from "../utility/arithmetic";
+import * as Arithmetic from "../utility/arithmetic";
 import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value, build_c0_stringValue } from "../utility/c0_value";
 import { c0_memory_error, c0_user_error, vm_error } from "../utility/errors";
 import { read_ptr, shift_ptr } from "../utility/pointer_ops";
 import { loadString } from "../utility/string_utility";
 import { safe_pop_stack } from "./helpers";
 
-export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: MessageEmitter): boolean {
+export function step(state: VM_State, allocator: C0HeapAllocator): boolean {
     const F = state.CurrFrame.P; // the function that is currently running on
     if (globalThis.DEBUG_DUMP_STEP) {
         console.log(`Executing OpCode: ${F.code[state.CurrFrame.PC]}@${state.CurrFrame.PC}. Mapped from ${F.comment.get(state.CurrFrame.PC).lineNumber}`);
@@ -55,7 +55,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             state.CurrFrame.S.push(
                 build_c0_value(
-                    arithmetic.c_add(x.value, y.value),
+                    Arithmetic.c_add(x.value, y.value),
                     "int"
                 )
             );
@@ -70,7 +70,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             state.CurrFrame.S.push(
                 build_c0_value(
-                    arithmetic.c_and(x.value, y.value),
+                    Arithmetic.c_and(x.value, y.value),
                     "int"
                 )
             );
@@ -85,7 +85,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             state.CurrFrame.S.push(
                 build_c0_value(
-                    arithmetic.c_div(x.value, y.value), 
+                    Arithmetic.c_div(x.value, y.value), 
                     "int"
                 )
             );
@@ -100,7 +100,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             state.CurrFrame.S.push(
                 build_c0_value(
-                    arithmetic.c_mul(x.value, y.value, msg_handle), 
+                    Arithmetic.c_mul(x.value, y.value, globalThis.MSG_EMITTER), 
                     "int"
                 )
             );
@@ -115,7 +115,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             state.CurrFrame.S.push(
                 build_c0_value(
-                    arithmetic.c_or(x.value, y.value),
+                    Arithmetic.c_or(x.value, y.value),
                     "int"
                 )
             );
@@ -130,7 +130,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             state.CurrFrame.S.push(
                 build_c0_value(
-                    arithmetic.c_rem(x.value, y.value),
+                    Arithmetic.c_rem(x.value, y.value),
                     "int"
                 )
             );
@@ -145,7 +145,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             state.CurrFrame.S.push(
                 build_c0_value(
-                    arithmetic.c_lsh(x.value, y.value),
+                    Arithmetic.c_lsh(x.value, y.value),
                     "int"
                 )
             );
@@ -160,7 +160,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             state.CurrFrame.S.push(
                 build_c0_value(
-                    arithmetic.c_rsh(x.value, y.value),
+                    Arithmetic.c_rsh(x.value, y.value),
                     "int"
                 )
             );
@@ -175,7 +175,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             state.CurrFrame.S.push(
                 build_c0_value(
-                    arithmetic.c_sub(x.value, y.value),
+                    Arithmetic.c_sub(x.value, y.value),
                     "int"
                 )
             );
@@ -190,7 +190,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, msg_handle: Me
             const x = safe_pop_stack(state.CurrFrame.S);
             state.CurrFrame.S.push(
                 build_c0_value(
-                    arithmetic.c_xor(x.value, y.value),
+                    Arithmetic.c_xor(x.value, y.value),
                     "int"
                 )
             );
