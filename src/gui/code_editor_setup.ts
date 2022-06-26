@@ -13,6 +13,11 @@ import LoadDocumentPlugin from "./extensions/loader_ui";
 import { onViewUpdate } from "./extensions/on_view_update";
 import { EditorState } from "@codemirror/state";
 
+/**
+ * Initialize an editor state with given content
+ * @param s The string the editor will show in content area
+ * @returns Editor State
+ */
 export function new_editor_state(s: string): EditorState {
     return EditorState.create({
         extensions: [
@@ -35,6 +40,9 @@ export function new_editor_state(s: string): EditorState {
 
 // Auto-detect language
 // https://codemirror.net/examples/config/
+/**
+ * Initialize the editor
+ */
 export function editor_init() {
     globalThis.EDITOR_VIEW = new EditorView({
         parent: document.getElementById(globalThis.UI_INPUT_ID),
@@ -42,4 +50,3 @@ export function editor_init() {
     });
     console.log(`[C0VM.ts] C0 Editor Initialized.`);
 }
-

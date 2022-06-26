@@ -1,0 +1,14 @@
+#use <conio>
+
+int main() {
+    int* I = alloc(int);
+    *I = 1024;
+    bool* B = alloc(bool);
+    *B = false;
+    char* C = alloc(char);
+    *C = 'm';
+    string Bs;
+    if (*B) Bs = "true"; else Bs = "false";
+    printf("*I=%d, *B=%s, *C=%c", *I, Bs, *C);
+    return 0;
+}

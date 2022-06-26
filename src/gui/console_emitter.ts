@@ -1,5 +1,6 @@
 /**
  * A message emitter that emits message to console. Used for test & debug.
+ * Or used in "node" ENVIRN_MODE
  */
 export default class ConsoleEmitter implements MessageEmitter {
     err(msg: string, detail?: string): void {

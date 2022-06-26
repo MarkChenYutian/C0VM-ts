@@ -34,6 +34,11 @@ export function nativeFuncLoader(
     return native;
 }
 
+/**
+ * Load native functions dynamically
+ * @param index The index of Native function
+ * @returns A C0Native object that contains the entry-point of native function
+ */
 function nativeFuncMapping(index: number): C0Native | undefined {
     switch (index) {
         /* Command Line Arguments parsing */

@@ -1,21 +1,16 @@
 type C0Function = {
     // function name, inferenced from comments in .bc0 file
     name: string;
-
     // Number of local vairables in function
     numVars: number;
     // Number of arguments the function receives        
     numArgs: number;
-
     // name of local variables, inferenced from comments in .bc0 file
     varName: string[];
-
-
     // the length of code of the function
     size: number;
     // bytecodes of the function
     code: Uint8Array;
-
     /**
      * the mapping between the bytecode index and the comment
      * Note: only the opcode's bytecode will have mapping. For instance

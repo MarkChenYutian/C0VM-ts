@@ -23,8 +23,8 @@ var htmlConfig = Object.assign({}, config, {
     main: "./src/web_main.ts",
   },
   optimization: {
-    concatenateModules: true,
-    minimize: true
+    // concatenateModules: true,
+    // minimize: true
   },
   output: {
     path: path.resolve(__dirname, './public'),

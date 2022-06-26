@@ -1,0 +1,10 @@
+#use <conio>
+#use <util>
+
+int main() {
+    int** I = alloc(int*);
+    *I = alloc(int);
+    **I = int_max();
+    printf("**I = %d", **I);
+    return 0;
+}

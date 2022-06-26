@@ -1,4 +1,4 @@
-import { vm_error } from "./errors";
+import { internal_error, vm_error } from "./errors";
 
 /**
  * Converting JavaScript primitive into C0Value
@@ -86,19 +86,6 @@ export function build_c0_ptrValue(value: C0Pointer, kind: "arr" | "ptr", dest_ty
 }
 
 
-export function build_c0_structPtrValue(value: C0Pointer, name: string, offset: number): C0Value<C0TypeClass.ptr> {
-    return {
-        value: value,
-        type: {
-            type: C0TypeClass.ptr,
-            kind: "struct",
-            value: name,
-            offset: offset
-        }
-    };
-}
-
-
 export function build_c0_stringValue(value: C0Pointer): C0Value<C0TypeClass.string> {
     return {
         value: value,
@@ -119,4 +106,3 @@ export function is_same_value(x: DataView, y: DataView): boolean {
     }
     return true;
 }
-

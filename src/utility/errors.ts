@@ -53,3 +53,10 @@ export class bc0_format_error extends Error {
         super("Invalid BC0 File Input.");
     }
 }
+
+export class internal_error extends Error {
+    public readonly name: "Internal Exception" = "Internal Exception";
+    constructor(msg: string) {
+        super(msg);
+    }
+}

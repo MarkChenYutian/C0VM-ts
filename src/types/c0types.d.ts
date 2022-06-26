@@ -16,8 +16,8 @@ type C0Type<T extends C0TypeClass> =
     } : 
     T extends C0TypeClass.ptr ? {
         type: T,
-        kind: "arr"| "ptr",
-        value: C0Type<C0TypeClass>,
+        kind: "arr"| "ptr",         // "arr" -> "C[]", "ptr" -> "C*"
+        value: C0Type<C0TypeClass>, // the type "C" in comment above
     } | {
         type: T,
         kind: "struct",
@@ -29,5 +29,5 @@ type C0Type<T extends C0TypeClass> =
         value: "string"
     } : 
     T extends C0TypeClass.unknown ? {
-        type: T
+        type: T         // No more type information for unknown
     } : never;

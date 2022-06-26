@@ -8,9 +8,14 @@
 
 import { c0_arith_error, vm_error } from "./errors";
 
+/**
+ * Read the values in x with length check to explicitly detect state corruption
+ * @param x The dataview to 
+ * @returns the i32 represented by the first 4 bytes of x
+ */
 export function read_i32_with_check(x: DataView): number {
     if (x.byteLength < 4) {
-        throw new vm_error("Bad Addition: arguments passed in are less than 4 bytes long");
+        throw new vm_error("Bad Read: The DataView passed in to arithmetic module is less than 4 bytes long (not i32 (w) type)");
     }
     return x.getInt32(0);
 }

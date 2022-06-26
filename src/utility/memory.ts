@@ -41,6 +41,11 @@ export class VM_Memory implements C0HeapAllocator {
         this.heap_top_address = 0x01;
     }
 
+    /**
+     * Allocate a memory block in the heap memory
+     * @param size The size (in byte) to be allocated
+     * @returns A C0Pointer that points to the allocated memory block
+     */
     malloc(size: number): C0Pointer {
         if (size < 0 || this.heap_top_address + size > this.memory_size) {
             throw new c0_memory_error(`Unable to allocate ${size} bytes of memory.`);
@@ -75,8 +80,12 @@ export class VM_Memory implements C0HeapAllocator {
         new Uint8Array(this.memory_pool, addr).fill(0, 0, size);
     }
 
+    /**
+     * Clean up the allocator, re-initialize the allocator
+     */
     clear(): void {
         this.memory_pool = new ArrayBuffer(this.memory_size);
+        this.heap_top_address = 0x01;
     }
 
     debug_getMemPool(): ArrayBuffer {
