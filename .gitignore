@@ -1,5 +1,6 @@
 node_modules/
 build/
+.vscode/
 console_test.js
 *.bc0
 *.out

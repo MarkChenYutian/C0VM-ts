@@ -110,7 +110,7 @@ footer > ul {
 
 /* Editor Style */
 
-.cm-content, .cm-gutter, .cm-gutters, .cm-scroller, .cm-editor {
+.cm-gutter, .cm-gutters, .cm-scroller, .cm-editor {
     height: calc(100vh - 19rem);
     min-height: 10rem;
 }
