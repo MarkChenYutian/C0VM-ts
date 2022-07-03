@@ -1,4 +1,6 @@
 import React from "react";
+import { Switch } from "antd";
+import "antd/lib/switch/style/index.css";
 
 
 
@@ -27,7 +29,6 @@ export default class CompilerOption extends React.Component
                     </button>
                 </h3>
                 {this.state.show ? <CompilerOptionBtnGroup
-                    flag_state={this.props.flag_state}
                     flip_d_flag={this.props.flip_d_flag}
                 /> : null}
             </>
@@ -38,12 +39,7 @@ export default class CompilerOption extends React.Component
 function CompilerOptionBtnGroup(props: CompilerOptionPropInterface){
     return (
         <div>
-            <button
-                className={"base-btn main-btn" + (props.flag_state["d"] ? " flag-selected" : "")}
-                onClick={props.flip_d_flag}
-            >
-                Check Contract
-            </button>
+            <Switch onChange={props.flip_d_flag} defaultChecked={false}/><label> Check Contract</label>
         </div>
     );
 }

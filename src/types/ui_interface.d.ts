@@ -2,7 +2,6 @@ interface C0VMApplicationState {
     EditorContent: string,
     PrintoutValue: string,
     C0Runtime: C0VM_RuntimeState | undefined,
-    ShowCompilerOption: boolean,
     CompilerFlags: Record<string, boolean>
 };
 
@@ -17,7 +16,6 @@ interface MainControlProps {
 };
 
 interface CompilerOptionPropInterface {
-    flag_state: Record<string, boolean>,
     flip_d_flag: () => void
 };
 

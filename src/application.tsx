@@ -17,7 +17,6 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
             EditorContent : "",
             PrintoutValue : "",
             C0Runtime: undefined,
-            ShowCompilerOption: true,
             CompilerFlags: {"d": false}
         }
     }
@@ -50,7 +49,6 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
                     <div className="io-area">
                         <CompilerOption
                             flip_d_flag={() => this.setState((state, props) => {return {CompilerFlags: {...state.CompilerFlags, "d": !state.CompilerFlags["d"]}}})}
-                            flag_state={this.state.CompilerFlags}
                         />
                         <C0Output
                             printContent={this.state.PrintoutValue}
