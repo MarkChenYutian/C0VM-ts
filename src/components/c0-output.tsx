@@ -1,5 +1,8 @@
 import React from "react";
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleDown, faAngleUp, faPrint } from '@fortawesome/free-solid-svg-icons';
+
 export default class C0Output extends React.Component
 <
     C0OutputPropInterface,
@@ -14,15 +17,14 @@ export default class C0Output extends React.Component
     render() {
         return (
             <>
-                <h3><i className="fa-solid fa-print"></i> Standard Output
-                    <button
-                            className="implicit-btn"
-                            onClick={() => this.setState((state, props) => {
+                <h3
+                    onClick={() => this.setState((state, props) => {
                                 return {show: !state.show}
                             })}
-                        >
-                        {this.state.show ? "➖" : "➕"}
-                    </button>
+                >
+                    <FontAwesomeIcon icon={faPrint}/>
+                    {" Standard Output "}
+                    {this.state.show ? <FontAwesomeIcon icon={faAngleDown}/> : <FontAwesomeIcon icon={faAngleUp} />}
                 </h3>
                 {this.state.show ? <C0OutputMonitor printContent={this.props.printContent}/> : null}
             </>

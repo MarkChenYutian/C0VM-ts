@@ -1,4 +1,8 @@
 import React from "react";
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleDown, faAngleUp, faToggleOff } from '@fortawesome/free-solid-svg-icons';
+
 import { Switch } from "antd";
 import "antd/lib/switch/style/index.css";
 
@@ -18,15 +22,15 @@ export default class CompilerOption extends React.Component
     render() {
         return (
             <>
-                <h3 style={{marginTop: 0}}><i className="fa-solid fa-toggle-off"></i> Compiler Options
-                    <button
-                        className="implicit-btn"
-                        onClick={() => this.setState((state, props) => {
-                            return {show: !state.show}
-                        })}
-                    >
-                        {this.state.show ? "➖" : "➕"}
-                    </button>
+                <h3
+                    style={{marginTop: 0}}
+                    onClick={() => this.setState((state, props) => {
+                        return {show: !state.show}
+                    })}
+                >
+                        <FontAwesomeIcon icon={faToggleOff}/>
+                        {" Compiler Options "}
+                        {this.state.show ? <FontAwesomeIcon icon={faAngleDown}/> : <FontAwesomeIcon icon={faAngleUp} />}
                 </h3>
                 {this.state.show ? <CompilerOptionBtnGroup
                     flip_d_flag={this.props.flip_d_flag}

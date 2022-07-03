@@ -1,3 +1,5 @@
+import { faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import tsLogo from "../assets/ts-logo-128.svg";
 import * as VM from "../vm_core/vm_interface";
@@ -43,28 +45,28 @@ export default class MainControlBar extends React.Component<MainControlProps, {}
                         className={"base-btn main-btn unselectable " + (this.props.isbc0 ? "disable-btn" : "")}
                         id="ctr-btn-compile"
                     >
-                        <i className="fa-solid fa-screwdriver-wrench hide-in-mobile "></i> Compile
+                        <FontAwesomeIcon icon={faScrewdriverWrench} className="hide-in-mobile"/> {" Compile "}
                     </button>
                     <button
                         className={"base-btn success-btn unselectable " + (this.props.isbc0 ? "" : "disable-btn")}
                         id="ctr-btn-step"
                         onClick={step_c0runtime}
                     >
-                        <i className="fas fa-step-forward hide-in-mobile"></i> Step
+                        <FontAwesomeIcon icon={faStepForward} className="hide-in-mobile"/>{" Step "}
                     </button>
                     <button
                         className={"base-btn success-btn unselectable " + (this.props.isbc0 ? "" : "disable-btn")}
                         id="ctr-btn-run"
                         onClick={run_c0runtime}
                     >
-                        <i className="fas fa-fast-forward hide-in-mobile"></i> Run
+                        <FontAwesomeIcon icon={faPlay} className="hide-in-mobile"/>{" Run "}
                     </button>
                     <button
                         className="base-btn danger-btn unselectable"
                         id="ctr-btn-restart"
                         onClick={restart_c0runtime}
                     >
-                        <i className="fas fa-undo hide-in-mobile"> </i> Restart
+                        <FontAwesomeIcon icon={faUndo} className="hide-in-mobile"/>{" Restart "}
                     </button>
                 </div>
             </div>
