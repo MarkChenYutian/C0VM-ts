@@ -30,6 +30,10 @@ type CodeComment = {
     lineNumber: number  // The corresponding line number in .bc0 file
 }
 
+type ReactUIHook = {
+    print_update: (s: string) => void
+}
+
 
 type C0Native = {
     // Number of arguments the function will receive
@@ -37,7 +41,7 @@ type C0Native = {
     // The enumeration type - C0 Native Functions' name
     readonly functionType: C0NativeFuncType;
     // The native function implementation - receive several C0 value and return a C0Value accordingly
-    readonly f: (mem: C0HeapAllocator, ...args: C0Value<C0TypeClass>[]) => 
+    readonly f: (hooks: ReactUIHook, mem: C0HeapAllocator, ...args: C0Value<C0TypeClass>[]) => 
         C0Value<C0TypeClass>;
 };
 
@@ -54,7 +58,7 @@ type C0ByteCode = {
     functionPool: C0Function[];
     /* Native Functions */
     nativeCount: number;
-    nativePool: C0Native[];
+    nativePool: (C0Native|undefined)[];
 };
 
 
@@ -72,56 +76,10 @@ type C0Value<T extends C0TypeClass> = {
     value: DataView,
 }
 
-// Enum Types for C0VM Instructions
-declare const enum OpCode {
-    IADD = 0x60,
-    IAND = 0x7e,
-    IDIV = 0x6c,
-    IMUL = 0x68,
-    IOR = 0x80,
-    IREM = 0x70,
-    ISHL = 0x78,
-    ISHR = 0x7a,
-    ISUB = 0x64,
-    IXOR = 0x82,
-    DUP = 0x59,
-    POP = 0x57,
-    SWAP = 0x5f,
-    NEWARRAY = 0xbc,
-    ARRAYLENGTH = 0xbe,
-    NEW = 0xbb,
-    AADDF = 0x62,
-    AADDS = 0x63,
-    IMLOAD = 0x2e,
-    AMLOAD = 0x2f,
-    IMSTORE = 0x4e,
-    AMSTORE = 0x4f,
-    CMLOAD = 0x34,
-    CMSTORE = 0x55,
-    VLOAD = 0x15,
-    VSTORE = 0x36,
-    ACONST = 0x01,
-    BIPUSH = 0x10,
-    ILDC = 0x13,
-    ALDC = 0x14,
-    NOP = 0x00,
-    IF_CMPEQ = 0x9f,
-    IF_CMPNE = 0xa0,
-    IF_ICMPLT = 0xa1,
-    IF_ICMPGE = 0xa2,
-    IF_ICMPGT = 0xa3,
-    IF_ICMPLE = 0xa4,
-    GOTO = 0xa7,
-    ATHROW = 0xbf,
-    ASSERT = 0xcf,
-    INVOKESTATIC = 0xb8,
-    INVOKENATIVE = 0xb7,
-    RETURN = 0xb0,
-}
-
 // use_official name instead of internal name.
 type C0NativeFuncType =
-    "NATIVE_ARGS_FLAG"
+    "NATIVE_NOT_IMPLEMENTED"
+    | "NATIVE_ARGS_FLAG"
     | "NATIVE_ARGS_INT"
     | "NATIVE_ARGS_PARSE"
     | "NATIVE_ARGS_STRING"
@@ -266,7 +224,7 @@ type VM_State = {
 
 
 declare abstract class C0VM_RT {
-    abstract step_forward(): boolean;
+    abstract step_forward(UIHooks: ReactUIHook): boolean;
     abstract restart(): void;
     abstract debug(): any;
 }
