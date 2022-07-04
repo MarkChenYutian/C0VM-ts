@@ -22,7 +22,9 @@ export default class C0Editor extends React.Component<
                     <ReactCodeMirror
                     theme="light"
                     basicSetup={false}
-                    onUpdate={(v) => {if (v.docChanged) this.props.updateContent(v.state.doc.toString())}}
+                    onUpdate={(v) => 
+                        {if (v.docChanged) this.props.updateContent(v.state.doc.toString())}
+                    }
                     extensions={[
                         breakpointGutter,
                         LoadDocumentPlugin,

@@ -166,119 +166,119 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 },
             };
         /** Double Type calculation */
-        case 54: {
-            return {
-                functionType: "NATIVE_DADD",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 55: {
-            return {
-                functionType: "NATIVE_DDIV",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 56: {
-            return {
-                functionType: "NATIVE_DLESS",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 57: {
-            return {
-                functionType: "NATIVE_DMUL",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 59: {
-            return {
-                functionType: "NATIVE_DSUB",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 60: {
-            return {
-                functionType: "NATIVE_DTOI",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 61: {
-            return {
-                functionType: "NATIVE_ITOD",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 62: {
-            return {
-                functionType: "NATIVE_PRINT_DUB",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
+        // case 54: {
+        //     return {
+        //         functionType: "NATIVE_DADD",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 55: {
+        //     return {
+        //         functionType: "NATIVE_DDIV",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 56: {
+        //     return {
+        //         functionType: "NATIVE_DLESS",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 57: {
+        //     return {
+        //         functionType: "NATIVE_DMUL",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 59: {
+        //     return {
+        //         functionType: "NATIVE_DSUB",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 60: {
+        //     return {
+        //         functionType: "NATIVE_DTOI",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 61: {
+        //     return {
+        //         functionType: "NATIVE_ITOD",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 62: {
+        //     return {
+        //         functionType: "NATIVE_PRINT_DUB",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
         /** Floating Point Operations */
-        case 67: {
-            return {
-                functionType: "NATIVE_FADD",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 68: {
-            return {
-                functionType: "NATIVE_FDIV",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 69: {
-            return {
-                functionType: "NATIVE_FLESS",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 70: {
-            return {
-                functionType: "NATIVE_FMUL",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 71: {
-            return {
-                functionType: "NATIVE_FSUB",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 72: {
-            return {
-                functionType: "NATIVE_FTOI",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 73: {
-            return {
-                functionType: "NATIVE_ITOF",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
-        case 74: {
-            return {
-                functionType: "NATIVE_PRINT_FPT",
-                numArgs: 0,
-                f: nativeNotImplemented,
-            };
-        }
+        // case 67: {
+        //     return {
+        //         functionType: "NATIVE_FADD",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 68: {
+        //     return {
+        //         functionType: "NATIVE_FDIV",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 69: {
+        //     return {
+        //         functionType: "NATIVE_FLESS",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 70: {
+        //     return {
+        //         functionType: "NATIVE_FMUL",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 71: {
+        //     return {
+        //         functionType: "NATIVE_FSUB",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 72: {
+        //     return {
+        //         functionType: "NATIVE_FTOI",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 73: {
+        //     return {
+        //         functionType: "NATIVE_ITOF",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
+        // case 74: {
+        //     return {
+        //         functionType: "NATIVE_PRINT_FPT",
+        //         numArgs: 0,
+        //         f: nativeNotImplemented,
+        //     };
+        // }
         case 75: {
             return {
                 functionType: "NATIVE_PRINT_HEX",

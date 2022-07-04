@@ -2,7 +2,7 @@ import { step } from "./exec";
 import { createHeap, VM_Memory } from "../utility/memory";
 import parse from "../parser/parse";
 import { loadStringPool } from "../utility/string_utility";
-import { vm_error } from "../../utility/errors";
+import { internal_error, vm_error } from "../../utility/errors";
 
 /**
  * The C0 Virtual Machine Runtime with interface of operation
@@ -57,26 +57,8 @@ export default class C0VM_RuntimeState implements C0VM_RT{
      * The parsed bytecode is stored in the .code property of runtime and is 
      * loaded again when this function is called.
      */
-    public restart(): void {
-        this.allocator.clear();
-        const str_ptr = loadStringPool(this.code.stringPool, this.allocator);
-        const start_line_num = this.code.functionPool[0].comment.get(0);
-        if (start_line_num === undefined) throw new vm_error("Failed to map executable bytes to the bc0 source code line number");
-        this.state = {
-            P: this.code,
-            C: {
-                stringPoolPtr: str_ptr
-            },
-            CallStack: [],
-            CurrFrame: {
-                PC: 0,
-                S: [],
-                V: new Array(this.code.functionPool[0].numVars).fill(undefined),
-                P: this.code.functionPool[0]
-            },
-            CurrLineNumber: start_line_num.lineNumber,
-            TypeRecord: new Map<string, Map<number, C0Type<C0TypeClass>>>()
-        };
+    public restart(): never {
+        throw new internal_error("Calling deprecated method restart()");
     }
 
     public clone(): C0VM_RuntimeState {
