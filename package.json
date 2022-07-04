@@ -1,6 +1,7 @@
 {
-  "name": "c0vm-ts-react",
+  "name": "c0vm-ts",
   "version": "0.1.0",
+  "homepage": "https://markchenyutian.github.io/C0VM-ts/",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",
@@ -18,7 +19,6 @@
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
     "@uiw/react-codemirror": "^4.9.4",
-    "nth-check": "^2.1.0",
     "antd": "^4.21.3",
     "babel-jest": "^27.4.2",
     "babel-loader": "^8.2.3",
@@ -38,12 +38,14 @@
     "eslint-webpack-plugin": "^3.1.1",
     "file-loader": "^6.2.0",
     "fs-extra": "^10.0.0",
+    "gh-pages": "^4.0.0",
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.4.3",
     "jest-resolve": "^27.4.2",
     "jest-watch-typeahead": "^1.0.0",
     "mini-css-extract-plugin": "^2.4.5",
+    "nth-check": "^2.1.0",
     "postcss": "^8.4.4",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^6.2.1",
@@ -73,7 +75,9 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
