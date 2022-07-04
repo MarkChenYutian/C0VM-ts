@@ -1,0 +1,6 @@
+int main() {
+    int** I = alloc(int*);
+    *I = alloc(int);
+    **I = 1024;
+    return 0;
+}

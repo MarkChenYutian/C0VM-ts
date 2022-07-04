@@ -32,6 +32,10 @@ body {
     gap: 1rem;
     flex-wrap: wrap;
     border-bottom: solid 1px #CCC;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: white;
 }
 
 .control-btn-group {
@@ -266,16 +270,32 @@ pre#c0-output {
     user-select: none !important;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 /* Debug */
 .debug-console {
     display: grid;
-    grid-template-columns: 4fr 7fr;
-    align-items: center;
+    grid-template-columns: 3fr 7fr;
+    align-items: start;
     column-gap: 1rem;
 }
 
 .debug-console p {
     margin: 0.3rem 0 0.3rem 0;
+}
+
+.debug-console li {
+    margin: 0.3rem 0;
+    padding: 0;
+    list-style: none;
+}
+
+.debug-console ul {
+    padding-left: 1rem;
+    list-style: none;
+    margin: 0;
 }
 
 code {
@@ -286,3 +306,23 @@ code {
     color: #ce1c1c;
 }
 
+.dbg-func-name {
+    color: #006cae;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    cursor: pointer;
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+.dbg-collapse-value {
+    color: #006ace;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.dbg-expand-value {
+    color: #006ace;
+    cursor: pointer;
+    text-decoration: underline;
+}

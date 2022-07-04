@@ -7,7 +7,7 @@ export default class AntdEmitter implements MessageEmitter {
             message: msg,
             description: detail,
             placement: "bottomRight",
-            duration: globalThis.UI_OK_DISPLAY_TIME_SEC
+            duration: globalThis.UI_ERR_DISPLAY_TIME_SEC
         });
     }
 
@@ -26,7 +26,7 @@ export default class AntdEmitter implements MessageEmitter {
             message: msg,
             description: detail,
             placement: "bottomRight",
-            duration: globalThis.UI_ERR_DISPLAY_TIME_SEC
+            duration: globalThis.UI_OK_DISPLAY_TIME_SEC
         })
     }
 }

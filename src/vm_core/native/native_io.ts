@@ -46,7 +46,7 @@ export function c0_println(
     c0_print(hook, mem, arg1);
     return internal_print(
         hook,
-        globalThis.C0_ENVIR_MODE === "nodejs" ? "\n" : "<br>"
+        "\n"
     );
 }
 

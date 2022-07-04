@@ -1,7 +1,7 @@
 import React from "react";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleUp, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleRight, faPrint } from '@fortawesome/free-solid-svg-icons';
 
 export default class C0Output extends React.Component
 <
@@ -24,7 +24,7 @@ export default class C0Output extends React.Component
                 >
                     <FontAwesomeIcon icon={faPrint}/>
                     {" Standard Output "}
-                    {this.state.show ? <FontAwesomeIcon icon={faAngleDown}/> : <FontAwesomeIcon icon={faAngleUp} />}
+                    {this.state.show ? <FontAwesomeIcon icon={faAngleDown}/> : <FontAwesomeIcon icon={faAngleRight} />}
                 </h3>
                 {this.state.show ? <C0OutputMonitor printContent={this.props.printContent}/> : null}
             </>

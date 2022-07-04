@@ -14,19 +14,31 @@ export function initialize(s: string, clear_printout: () => void): C0VM_RuntimeS
 
 export function step(s: C0VM_RuntimeState, printout_handler: (s: string) => void): [C0VM_RuntimeState, boolean] {
     const new_state = s.clone();
-    const can_continue = new_state.step_forward({
-        print_update: printout_handler
-    });
-    return [new_state, can_continue];
+    try {
+        const can_continue = new_state.step_forward({
+            print_update: printout_handler
+        });
+        return [new_state, can_continue];
+    } catch(e) {
+        globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);   
+        if(globalThis.DEBUG) console.error(e);
+        return [s, false];
+    }
 }
 
 export function run(s: C0VM_RuntimeState, printout_handler: (s: string) => void): [C0VM_RuntimeState, boolean] {
     const new_state = s.clone();
     let can_continue = true;
     while (can_continue) {
-        can_continue = new_state.step_forward({
-            print_update: printout_handler
-        });
+        try {
+            can_continue = new_state.step_forward({
+                print_update: printout_handler
+            });
+        } catch(e) {
+            globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);
+            if(globalThis.DEBUG) console.error(e);
+            return [s, false];
+        }
         if (globalThis.EDITOR_BREAKPOINTS.has(new_state.state.CurrLineNumber)) break;
     }
     return [new_state, can_continue];

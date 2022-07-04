@@ -22,3 +22,31 @@ interface CompilerOptionPropInterface {
 interface C0OutputPropInterface {
     printContent: string
 };
+
+interface DebugConsoleProps {
+    state: C0VM_RuntimeState | undefined,
+}
+
+
+interface DebugConsoleState {
+    show: boolean,
+    mode: "tablular" | "graphical"
+}
+
+interface TabularDebugEvaluationProps {
+    state: VM_State
+    mem: C0HeapAllocator
+}
+
+interface TabularStackFrameProps {
+    frame: VM_StackFrame,
+    mem: C0HeapAllocator,
+    typeRecord: Map<string, Map<number, C0Type<C0TypeClass>>>
+}
+
+
+interface C0ValueTabularDisplayProps {
+    mem: C0HeapAllocator,
+    value: C0Value<C0TypeClass>,
+    typeRecord: Map<string, Map<number, C0Type<C0TypeClass>>>
+}

@@ -7,6 +7,7 @@ import C0Editor from "./components/c0-editor";
 import CompilerOption from "./components/compiler-option";
 import C0Output from "./components/c0-output";
 import C0VM_RuntimeState from "./vm_core/exec/state";
+import DebugConsole from "./components/debug_console/debug_console";
 
 
 
@@ -52,6 +53,9 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
                         />
                         <C0Output
                             printContent={this.state.PrintoutValue}
+                        />
+                        <DebugConsole
+                            state={this.state.C0Runtime}
                         />
                     </div>
                 </div>

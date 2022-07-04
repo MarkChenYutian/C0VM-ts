@@ -26,11 +26,11 @@ export default class C0Editor extends React.Component<
                     extensions={[
                         breakpointGutter,
                         LoadDocumentPlugin,
-                        execLineHighlighter,
                         basicSetup(),
                         keymap.of([indentWithTab]),
                         indentUnit.of("    "),
-                        language.of(BC0Language)
+                        language.of(BC0Language),
+                        execLineHighlighter,
                     ]}/>
                 </div>;
     }

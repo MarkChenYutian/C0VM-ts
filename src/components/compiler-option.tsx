@@ -1,7 +1,7 @@
 import React from "react";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleUp, faToggleOff } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleRight, faToggleOff } from '@fortawesome/free-solid-svg-icons';
 
 import { Switch } from "antd";
 import "antd/lib/switch/style/index.css";
@@ -16,7 +16,7 @@ export default class CompilerOption extends React.Component
 {
     constructor(props: CompilerOptionPropInterface) {
         super(props);
-        this.state = {show: true}
+        this.state = {show: false}
     }
 
     render() {
@@ -30,7 +30,7 @@ export default class CompilerOption extends React.Component
                 >
                         <FontAwesomeIcon icon={faToggleOff}/>
                         {" Compiler Options "}
-                        {this.state.show ? <FontAwesomeIcon icon={faAngleDown}/> : <FontAwesomeIcon icon={faAngleUp} />}
+                        {this.state.show ? <FontAwesomeIcon icon={faAngleDown}/> : <FontAwesomeIcon icon={faAngleRight} />}
                 </h3>
                 {this.state.show ? <CompilerOptionBtnGroup
                     flip_d_flag={this.props.flip_d_flag}
@@ -43,7 +43,7 @@ export default class CompilerOption extends React.Component
 function CompilerOptionBtnGroup(props: CompilerOptionPropInterface){
     return (
         <div>
-            <Switch onChange={props.flip_d_flag} defaultChecked={false}/><label> Check Contract</label>
+            <Switch onChange={props.flip_d_flag} defaultChecked={false} size="small"/><label> Check Contract</label>
         </div>
     );
 }

@@ -28,9 +28,9 @@ globalThis.UI_PRINTOUT_ID = "c0-output";
 globalThis.UI_MSG_ID = "message-terminal";
 globalThis.UI_DEBUG_OUTPUT_ID = "debug-output";
 
-globalThis.UI_ERR_DISPLAY_TIME_SEC = 10;
-globalThis.UI_WARN_DISPLAY_TIME_SEC = 5;
-globalThis.UI_OK_DISPLAY_TIME_SEC = 3;
+globalThis.UI_ERR_DISPLAY_TIME_SEC = 4;
+globalThis.UI_WARN_DISPLAY_TIME_SEC = 4;
+globalThis.UI_OK_DISPLAY_TIME_SEC = 1;
 
 globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8081/compile";
 
