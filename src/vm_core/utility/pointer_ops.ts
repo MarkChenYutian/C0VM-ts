@@ -73,6 +73,6 @@ export function build_ptr(addr: number, offset: number, size: number) {
     const p = new DataView(p_buf);
     p.setUint32(0, addr);
     p.setUint16(4, offset);
-    p.setUint16(4, size);
+    p.setUint16(6, size);
     return p;
 }

@@ -5,6 +5,9 @@ export function initialize(s: string, clear_printout: () => void): C0VM_RuntimeS
     try {
         const ns = new C0VM_RuntimeState(s);
         globalThis.MSG_EMITTER.ok("Load Successfully", "C0VM has load your code successfully. Press Step or Run to see result.");
+        if (globalThis.DEBUG_DUMP_MEM) {
+            console.log(ns.allocator.debug_getMemPool());
+        }
         return ns;
     } catch (e) {
         globalThis.MSG_EMITTER.err("Load Failed (" + (e as Error).name + ")", (e as Error).message);

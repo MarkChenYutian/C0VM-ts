@@ -1,9 +1,10 @@
+import React from "react";
+
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
-import { Type2String } from "../../vm_core/types/c0type_utility";
+
 import { c0_cvt2_js_value } from "../../vm_core/utility/c0_value";
-import { isNullPtr, read_ptr } from "../../vm_core/utility/pointer_ops";
+import { isNullPtr, read_ptr, shift_ptr } from "../../vm_core/utility/pointer_ops";
 import { loadString } from "../../vm_core/utility/string_utility";
 
 export default class C0ValueTabularDisplay extends React.Component<
@@ -63,6 +64,40 @@ export default class C0ValueTabularDisplay extends React.Component<
                 </p>
             );
         }
+
+        if (this.props.value.type.type === "<unknown>") {
+            return (<div>
+                <span onClick={() => this.setState({expand: false})} className="clickable">
+                    <button className="implicit-btn">
+                    <FontAwesomeIcon icon={faCaretDown}/>
+                    </button>
+                    Pointer (
+                </span>
+                    <p>Can't expend &lt;unknown&gt; type</p>
+                )
+            </div>);
+        }
+
+        if (this.props.value.type.type === "ptr") {
+            const subType = this.props.value.type.value as C0Type<C0TypeClass>;
+            if (subType.type === "ptr" && subType.kind === "struct") {
+                return (
+                    <div>
+                        <span onClick={() => this.setState({expand: false})} className="clickable">
+                            <button className="implicit-btn">
+                            <FontAwesomeIcon icon={faCaretDown}/>
+                            </button>
+                            Pointer (
+                        </span>
+                            <ul>
+                                <li><C0ValueTabularDisplay mem={this.props.mem} value={{type: subType, value: this.props.value.value}} typeRecord={this.props.typeRecord}/></li>
+                            </ul>
+                        )
+                    </div>
+                );
+            }
+        }
+
         const deref_value = derefValue(this.props.mem, this.props.value as C0Value<"ptr">);
 
         return (
@@ -82,21 +117,39 @@ export default class C0ValueTabularDisplay extends React.Component<
     }
 
     render_struct() {
+        if (isNullPtr(this.props.value.value)) {
+            return <p>NULL</p>;
+        }
+
         const ValueType = this.props.value.type as C0Type<"ptr">;
+        const ValueValue = this.props.value.value;
         if (ValueType.kind === "struct") {
             const StructInformation = this.props.typeRecord.get(ValueType.value);
             if (StructInformation === undefined) return <p>No Struct Information</p>
+
+            // The memory that struct lives on
+
             const StructFields: JSX.Element[] = [];
+
             StructInformation.forEach(
                 (value, key) => {
-                    StructFields.push(<li key={key}>Offset {key} : {Type2String(value)}</li>)
+                    const ptr_to_field: C0Value<"ptr"> = {
+                        value: shift_ptr(ValueValue, key),
+                        type: {type: "ptr", kind: "ptr", value: value}
+                    };
+                    StructFields.push(
+                        <li key={key}>
+                            Offset {key} : <C0ValueTabularDisplay value={derefValue(this.props.mem, ptr_to_field)} mem={this.props.mem} typeRecord={this.props.typeRecord}/>
+                        </li>
+                    );
                 }
             );
+
             return <ul>
                 {StructFields}
             </ul>
         }
-        return <p>No Sutrct Information</p>
+        return <p>Failed to render value. (Internal Err)</p>
     }
 
     render(): React.ReactNode {
