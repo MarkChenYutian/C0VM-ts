@@ -566,6 +566,19 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 throw new vm_error("Type unmatch, IMSTORE expected to have {ptr, value}");
             }
             allocator.imstore( a.value, x.value );
+
+            /**
+             * Type Inference Type(a<unknown>) => Type(a<int>)
+             */
+            if (a.type.type !== "<unknown>") {
+                const a_concrete = a.type.value;
+                if (typeof a_concrete !== "string" && a_concrete.type === "ptr" && a_concrete.kind === "struct") {
+                    const struct_field_record = state.TypeRecord.get(a_concrete.value);
+                    if (struct_field_record === undefined) state.TypeRecord.set(a_concrete.value, new Map());
+                    (state.TypeRecord.get(a_concrete.value) as Map<number, C0Type<C0TypeClass>>).set(a_concrete.offset, x.type);
+                }
+            }
+
             break;
         }
 
@@ -608,6 +621,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 throw new vm_error("Type unmatch, AMSTORE expected to have {ptr|string, ptr|string}");
             }
             allocator.amstore( a.value, x.value );
+
+            /**
+             * Type Inference Type(x) => Type(a)
+             */
             if (a.type.type !== "<unknown>") {
                 const a_concrete = a.type.value as C0Type<"ptr">;
                 if (a_concrete.kind === "struct") {
@@ -652,6 +669,19 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 throw new vm_error("Type unmatch, CMSTORE expected to have {ptr, value}");
             }
             allocator.cmstore( a.value, x.value );
+
+            /**
+             * Type Inference Type(a<unknown>), Type(x) => Type(a) = Type(x)
+             */
+             if (a.type.type !== "<unknown>") {
+                const a_concrete = a.type.value;
+                if (typeof a_concrete !== "string" && a_concrete.type === "ptr" && a_concrete.kind === "struct") {
+                    const struct_field_record = state.TypeRecord.get(a_concrete.value);
+                    if (struct_field_record === undefined) state.TypeRecord.set(a_concrete.value, new Map());
+                    (state.TypeRecord.get(a_concrete.value) as Map<number, C0Type<C0TypeClass>>).set(a_concrete.offset, x.type);
+                }
+            }
+
             break;
         }
 

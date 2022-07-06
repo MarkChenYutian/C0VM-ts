@@ -5,8 +5,8 @@ const int_comment_regex = /(\d+)|(dummy return value)/;
 const bool_comment_regex = /(true)|(false)/;
 const char_comment_regex = /'.*'/;
 
-const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-*[\]]+),.+\)/;
-const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-*[\]]+)\)/;
+const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-*[\]\s]+),.+\)/;
+const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-*[\]\s]+)\)/;
 
 /**
  * Parse the bc0 text into byte arrays, load Native Functions from Native Pool
@@ -144,7 +144,7 @@ export default function parse(raw_file: string): C0ByteCode {
                 if (int_comment_regex.test(comment)) {
                     type = "int";
                 } else if (bool_comment_regex.test(comment)) {
-                    type = "boolean";
+                    type = "bool";
                 } else if (char_comment_regex.test(comment)) {
                     type = "char";
                 } else {

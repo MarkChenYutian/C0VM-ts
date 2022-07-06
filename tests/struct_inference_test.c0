@@ -1,0 +1,22 @@
+struct T {
+    bool boolean;
+    char character;
+    int count;
+    struct T* next;
+};
+
+// typedef struct T T;
+
+int main() {
+    struct T* test = alloc(struct T);
+    struct T* test2 = alloc(struct T);
+    test->next = test2;
+    test->boolean = true;
+    test2->boolean = false;
+    test->character='m';
+    test2->character='c';
+    test->count=10;
+    test2->count = 12;
+    test2->next = test;
+    return 0;
+}

@@ -54,6 +54,7 @@ void print_segment(list* start, list* end)
 
 typedef struct stack_header stack;
 struct stack_header {
+  int length;
   list* top;
   list* floor;
 };
@@ -90,6 +91,7 @@ stack* stack_new()
   list* l = alloc(list);
   S->top = l;
   S->floor = l;
+  S->length = 0;
   return S;
 }
 
@@ -102,6 +104,7 @@ void push(stack* S, string x)
   l->data = x;
   l->next = S->top;
   S->top = l;
+  S->length ++;
 }
 
 string pop(stack* S)
@@ -111,6 +114,7 @@ string pop(stack* S)
 {
   string e = S->top->data;
   S->top = S->top->next;
+  S->length --;
   return e;
 }
 

@@ -1,0 +1,20 @@
+typedef struct list_node list;
+struct list_node {
+  string data;
+  list* next;
+};
+
+int main() {
+    list*[] S = alloc_array(list*, 3);
+    list* L1 = alloc(list);
+    L1 -> data = "test_node1";
+    S[0] = L1;
+    S[1] = alloc(list);
+    S[2] = alloc(list);
+    L1 -> next = S[2];
+    S[1] -> data = "test_node3";
+    S[2] -> data = "test_node2";
+    S[2] -> next = S[1];
+    S[1] -> next = S[0];
+    return 0;
+}
