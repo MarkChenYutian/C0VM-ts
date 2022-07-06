@@ -331,13 +331,21 @@ code {
 }
 
 .dbg-evaluate-tabular-btn {
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
     vertical-align: top;
     display: inline-block;
 }
 
 .dbg-evaluate-tabular-content {
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
     vertical-align: top;
     display: inline-block !important;
+}
+
+p.dbg-evaluate-field-name {
+    color: #006cae;
 }
 
 p.dbg-error-information {

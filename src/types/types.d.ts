@@ -27,6 +27,7 @@ type C0Function = {
 // Facilitate type inference etc.
 type CodeComment = {
     dataType?: string,  // If command = new/new_array/bipush, the type name of variable will be placed here
+    fieldName?: string, // If command = aaddf, the field name will be placed here
     lineNumber: number  // The corresponding line number in .bc0 file
 }
 
@@ -207,6 +208,11 @@ type VM_StackFrame = {
     P: C0Function
 };
 
+type Struct_Type_Record = {
+    name ?: string,
+    type ?: C0Type<C0TypeClass>
+};
+
 type VM_State = {
     // Bytecode file to be executed
     P: C0ByteCode,
@@ -219,7 +225,7 @@ type VM_State = {
     // The line number of .bc0 file that is currently executing
     CurrLineNumber: number,
     // The type pool (struct type information) hashmap
-    TypeRecord: Map<string, Map<number, C0Type<C0TypeClass>>>
+    TypeRecord: Map<string, Map<number, Struct_Type_Record>>
 };
 
 

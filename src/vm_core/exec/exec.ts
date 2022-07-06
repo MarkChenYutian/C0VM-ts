@@ -13,13 +13,20 @@ import OpCode from "./opcode";
  * @returns The top of C0VM Stack
  * @throws `vm_error` if the stack S is empty
  */
-function safe_pop_stack(typeRecord: Map<string, Map<number, C0Type<C0TypeClass>>>, S: VM_OperandStack): C0Value<C0TypeClass> {
+function safe_pop_stack(typeRecord: Map<string, Map<number, Struct_Type_Record>>, S: VM_OperandStack): C0Value<C0TypeClass> {
     const V = S.pop();
     if (V === undefined) throw new vm_error("Unable to pop value out of an empty stack!");
+    
+    /**
+     * Since in C0, there can't have struct on stack, a value with type of struct without ptr MUST be a poitner
+     * to some field of the struct.
+     * 
+     * The code below will "auto-deboxing" the type information from type record pool.
+     */
     if (V.type.type === "ptr" && V.type.kind === "struct") {
         const fields = typeRecord.get(V.type.value);
         if (fields !== undefined) {
-            const deref_type = fields.get(V.type.offset);
+            const deref_type = fields.get(V.type.offset)?.type;
             if (deref_type !== undefined) {
                 return {
                     value: V.value,
@@ -575,7 +582,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 if (typeof a_concrete !== "string" && a_concrete.type === "ptr" && a_concrete.kind === "struct") {
                     const struct_field_record = state.TypeRecord.get(a_concrete.value);
                     if (struct_field_record === undefined) state.TypeRecord.set(a_concrete.value, new Map());
-                    (state.TypeRecord.get(a_concrete.value) as Map<number, C0Type<C0TypeClass>>).set(a_concrete.offset, x.type);
+
+                    let struct_field_entry = (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).get(a_concrete.offset);
+                    struct_field_entry = Object.assign(struct_field_entry === undefined ? {} : struct_field_entry, {type: x.type});
+                    (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).set(a_concrete.offset, struct_field_entry);
+
                 }
             }
 
@@ -630,7 +641,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 if (a_concrete.kind === "struct") {
                     const struct_field_record = state.TypeRecord.get(a_concrete.value);
                     if (struct_field_record === undefined) state.TypeRecord.set(a_concrete.value, new Map());
-                    (state.TypeRecord.get(a_concrete.value) as Map<number, C0Type<C0TypeClass>>).set(a_concrete.offset, x.type);
+
+                    let struct_field_entry = (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).get(a_concrete.offset);
+                    struct_field_entry = Object.assign(struct_field_entry === undefined ? {} : struct_field_entry, {type: x.type});
+                    (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).set(a_concrete.offset, struct_field_entry);
                 }
             }
             break;
@@ -678,7 +692,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 if (typeof a_concrete !== "string" && a_concrete.type === "ptr" && a_concrete.kind === "struct") {
                     const struct_field_record = state.TypeRecord.get(a_concrete.value);
                     if (struct_field_record === undefined) state.TypeRecord.set(a_concrete.value, new Map());
-                    (state.TypeRecord.get(a_concrete.value) as Map<number, C0Type<C0TypeClass>>).set(a_concrete.offset, x.type);
+                    
+                    let struct_field_entry = (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).get(a_concrete.offset);
+                    struct_field_entry = Object.assign(struct_field_entry === undefined ? {} : struct_field_entry, {type: x.type});
+                    (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).set(a_concrete.offset, struct_field_entry);
                 }
             }
 
@@ -702,6 +719,22 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                     throw new vm_error("AADDF should only be applied on a struct pointer");
                 }
                 child_type.offset += f;
+
+                // Register the field name on type record.
+                
+                if (state.TypeRecord.get(child_type.value) === undefined) {
+                    state.TypeRecord.set(child_type.value, new Map<number, Struct_Type_Record>());
+                }
+                const struct_type_fields = state.TypeRecord.get(child_type.value) as Map<number, Struct_Type_Record>;
+                let struct_field_entry = struct_type_fields.get(child_type.offset);
+                
+                struct_field_entry = Object.assign(struct_field_entry === undefined ? {} : struct_field_entry, {name: 
+                    F.comment.get(state.CurrFrame.PC - 2)?.fieldName
+                });
+
+                (state.TypeRecord.get(child_type.value) as Map<number, Struct_Type_Record>).set(child_type.offset, struct_field_entry);
+
+
                 state.CurrFrame.S.push(
                     {
                         value: off_ptr,

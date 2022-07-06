@@ -8,6 +8,8 @@ const char_comment_regex = /'.*'/;
 const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-*[\]\s]+),.+\)/;
 const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-*[\]\s]+)\)/;
 
+const aaddf_comment_regex = /^&.*->([a-zA-z_0-9]+)$/;
+
 /**
  * Parse the bc0 text into byte arrays, load Native Functions from Native Pool
  * @param raw_file A .bc0 string compiled by cc0 with -b flag
@@ -139,7 +141,10 @@ export default function parse(raw_file: string): C0ByteCode {
             const [lineBytes, opcodeName, comment] = funcLines[lineNum].split("#")
                 .map((elem) => elem.trim());
             if (lineBytes === "") continue;
+
             let type: string | undefined = undefined;
+            let fieldName: string | undefined = undefined;
+
             if (opcodeName.startsWith("bipush")) {
                 if (int_comment_regex.test(comment)) {
                     type = "int";
@@ -156,21 +161,42 @@ export default function parse(raw_file: string): C0ByteCode {
             } else if (opcodeName.startsWith("newarray")) {
                 const parsed_comment = arr_comment_regex.exec(comment);
                 if (parsed_comment === null || parsed_comment[1] === undefined) {
-                    if (globalThis.DEBUG) console.log(funcLines[lineNum]);
+                    if (globalThis.DEBUG) console.warn(funcLines[lineNum]);
+                    globalThis.MSG_EMITTER.warn(
+                        "Incomplete Type Inference Parse", 
+                        "Failed to parse certain type annotation in .bc0 file. The debug console evaluation may fail on certain variables."
+                    );
                 } else {
                     type = parsed_comment[1];
                 }
             } else if (opcodeName.startsWith("new")) {
                 const parsed_comment = new_comment_regex.exec(comment);
                 if (parsed_comment === null || parsed_comment[1] === undefined) {
-                    if (globalThis.DEBUG) console.log(funcLines[lineNum]);
+                    if (globalThis.DEBUG) console.warn(funcLines[lineNum]);
+                    globalThis.MSG_EMITTER.warn(
+                        "Incomplete Type Inference Parse", 
+                        "Failed to parse certain type annotation in .bc0 file. The debug console evaluation may fail on certain variables."
+                    );
                 } else {
                     type = parsed_comment[1];
                 }
+            } else if (opcodeName.startsWith("aaddf")) {
+                const parsed_comment = aaddf_comment_regex.exec(comment);
+                if (parsed_comment === null || parsed_comment[1] === undefined) {
+                    if (globalThis.DEBUG) console.warn(funcLines[lineNum]);
+                    globalThis.MSG_EMITTER.warn(
+                        "Incomplete Type Inference Parse", 
+                        "Failed to parse certain type annotation in .bc0 file. The debug console evaluation may fail on certain variables."
+                    );
+                } else {
+                    fieldName = parsed_comment[1];
+                }
             }
+
             comment_mapping.set(code_byte_counter, 
                 {
                     dataType: type,
+                    fieldName: fieldName,
                     lineNumber: global_line_offset + lineNum + 1
                 }
             );

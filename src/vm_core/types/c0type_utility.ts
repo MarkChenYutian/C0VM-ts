@@ -54,13 +54,13 @@ export function String2Type(S: string): C0Type<C0TypeClass> {
     else return { type: "ptr", kind: "struct", value: S, offset: 0 };
 }
 
-export function getType(T: C0Type<C0TypeClass>, TypeRecord: Map<string, Map<number, C0Type<C0TypeClass>>>): C0Type<C0TypeClass> {
+export function getType(T: C0Type<C0TypeClass>, TypeRecord: Map<string, Map<number, Struct_Type_Record>>): C0Type<C0TypeClass> {
     if (T.type === "ptr" && T.kind === "struct") {
         const struct_fields = TypeRecord.get(T.value);
 
         if (struct_fields === undefined) return { type: "<unknown>" }
 
-        const type_cache = struct_fields.get(T.offset);
+        const type_cache = struct_fields.get(T.offset)?.type;
         return type_cache === undefined ? {type: "<unknown>"} : type_cache;
         
     } else return T;

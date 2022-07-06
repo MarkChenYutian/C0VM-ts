@@ -32,7 +32,7 @@ export default class C0ValueTabularDisplay extends React.Component<
         const content = [];
         for (let i = 0; i < vals.length; i ++) {
             content.push(
-                <li key={i + "-exp-value"}><C0ValueTabularDisplay mem={this.props.mem} value={vals[i]} typeRecord={this.props.typeRecord}/> ,</li>
+                <li key={i + "-exp-value"}><C0ValueTabularDisplay mem={this.props.mem} value={vals[i]} typeRecord={this.props.typeRecord}/></li>
             );
         }
         return (
@@ -81,7 +81,7 @@ export default class C0ValueTabularDisplay extends React.Component<
         }
         // Special cases above! Here's the actual rendering:
 
-        const [addr, offset, size] = read_ptr(this.props.value.value);
+        const [addr, offset, ] = read_ptr(this.props.value.value);
 
         // Well... struct is really special here.
         /**
@@ -152,20 +152,32 @@ export default class C0ValueTabularDisplay extends React.Component<
                      * Then we passed in the dereferenced value into <C0ValueTabularDisplay ... /> 
                      * component to evaluate it recursively.
                      */
-                    const ptr_to_field: C0Value<"ptr"> = {
+                    let ptr_to_field: C0Value<Maybe<"ptr">> = {
                         value: shift_ptr(ValueValue, key),
-                        type: {type: "ptr", kind: "ptr", value: value}
+                        type: value.type === undefined ? {type: "<unknown>"} : {type: "ptr", kind: "ptr", value: value.type}
                     };
-                    StructFields.push(
-                        <li key={key}>
-                            <p className="dbg-evaluate-tabular-btn">
-                                Offset @ {key} :&nbsp;
-                            </p>
-                            <div className="dbg-evalute-tabular-content">
-                                <C0ValueTabularDisplay value={derefValue(this.props.mem, ptr_to_field)} mem={this.props.mem} typeRecord={this.props.typeRecord}/>
-                            </div>
-                        </li>
-                    );
+
+                    const field_name = value.name === undefined ?
+                        <p className="dbg-evaluate-field-name"> Offset @ {key} :&nbsp;</p> : 
+                        <p className="dbg-evaluate-field-name"> {value.name} :&nbsp;</p>;
+
+                    if (ptr_to_field.type.type === "ptr") {
+                        StructFields.push(
+                            <li key={key}>
+                                {field_name}
+                                <div className="dbg-evalute-tabular-content">
+                                    <C0ValueTabularDisplay value={derefValue(this.props.mem, ptr_to_field as C0Value<"ptr">)} mem={this.props.mem} typeRecord={this.props.typeRecord}/>
+                                </div>
+                            </li>
+                        );   
+                    } else {
+                        StructFields.push(
+                            <li key={key}>
+                                <p className="dbg-evaluate-tabular-btn"> {value.name} :&nbsp;</p>
+                                <p className="dbg-evaluate-tabular-content dbg-error-information">No Type Information</p>
+                            </li>
+                        )
+                    }
                 }
             );
 

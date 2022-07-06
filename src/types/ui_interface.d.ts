@@ -41,12 +41,12 @@ interface TabularDebugEvaluationProps {
 interface TabularStackFrameProps {
     frame: VM_StackFrame,
     mem: C0HeapAllocator,
-    typeRecord: Map<string, Map<number, C0Type<C0TypeClass>>>
+    typeRecord: Map<string, Map<number, Struct_Type_Record>>
 }
 
 
 interface C0ValueTabularDisplayProps {
     mem: C0HeapAllocator,
     value: C0Value<C0TypeClass>,
-    typeRecord: Map<string, Map<number, C0Type<C0TypeClass>>>
+    typeRecord: Map<string, Map<number, Struct_Type_Record>>
 }
