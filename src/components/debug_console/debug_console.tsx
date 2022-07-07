@@ -1,5 +1,7 @@
 import React from "react";
 
+import ReactFlow, { Controls, Background } from "react-flow-renderer";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalculator, faAngleDown, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 
@@ -92,11 +94,19 @@ class GraphicalDebugEvaluation extends React.Component<
     TabularDebugEvaluationProps,
     {}
 > {
+    componentDidMount() {
+        globalThis.MSG_EMITTER.warn(
+            "Not Implemented Yet",
+            "The graphical heap memory visualizer will be implemented in the near future."
+        );
+    }
+    
     render(): React.ReactNode {
-        return (<Result
-            status="error"
-            subTitle="Graphical Visualizer Not Implemented Yet"
-            className="debug-console-info"
-        />);
+        return (
+            <ReactFlow className="debug-console">
+                <Controls/>
+                <Background/>
+            </ReactFlow>
+        )
     }
 }

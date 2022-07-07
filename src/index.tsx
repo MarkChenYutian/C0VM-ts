@@ -6,8 +6,8 @@ import AntdEmitter from './utility/antd_emitter';
 
 // Global Variables
 globalThis.DEBUG = true;
-globalThis.DEBUG_DUMP_MEM = true;
-globalThis.DEBUG_DUMP_STEP = true;
+globalThis.DEBUG_DUMP_MEM = false;
+globalThis.DEBUG_DUMP_STEP = false;
 
 globalThis.MEM_POOL_SIZE = 1024 * 50;
 globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;

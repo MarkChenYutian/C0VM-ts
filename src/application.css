@@ -104,14 +104,14 @@ footer > ul {
 /* Editor Style */
 
 .cm-gutter, .cm-gutters, .cm-scroller, .cm-editor {
-    height: calc(100vh - 12rem);
+    height: calc(100vh - 11.7rem);
 }
 .cm-editor {
     overflow-x: auto;
 }
 .cm-gutters { margin: 1px; }
 .cm-scroller { overflow: auto; }
-.cm-editor { border: 1px solid silver; }
+.cm-editor { border: 1px solid silver; border-radius: 0.3rem; }
 .cm-execLine { background-color: #FDFF32;  }
 .cm-lineNumbers > .cm-gutterElement { padding: 0 !important; }
 .cm-foldPlaceholder { padding: 0 0.5rem; color: black; background: #EEEEEE; border: none; }
@@ -218,6 +218,8 @@ pre#c0-output {
     font-size: small;
     flex-grow: 1;
     flex-basis: 5rem;
+
+    width: inherit !important;
 
     overflow: auto;
     padding: 1rem;
