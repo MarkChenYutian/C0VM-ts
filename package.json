@@ -1,7 +1,7 @@
 {
   "name": "c0vm-ts",
   "version": "0.1.0",
-  "homepage": "https://markchenyutian.github.io/C0VM-ts",
+  "homepage": "https://markchenyutian.github.io/C0VM-ts/build/",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",
