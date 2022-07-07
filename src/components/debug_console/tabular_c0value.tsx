@@ -13,12 +13,19 @@ export default class C0ValueTabularDisplay extends React.Component<
 > {
     constructor(props: C0ValueTabularDisplayProps) {
         super(props);
-        this.state = {expand: false}
+        this.state = {expand: props.default_expand}
     }
 
+    /**
+     * Render a C0Value by expanding the values in array in heap memory space and 
+     * return a list of <C0ValueTabularDisplay/> components.
+     * 
+     * @returns The rendering of array value in C0 Value
+     */
     render_array() {
         if (isNullPtr(this.props.value.value)) {
-            return <p>NULL</p>
+            // In C0 language, the uninitialized array is recognized as an empty array.
+            return <p>[]</p>
         }
         if (!this.state.expand) {
             return <p onClick={() => this.setState({expand: true})} className="clickable" >
@@ -30,9 +37,24 @@ export default class C0ValueTabularDisplay extends React.Component<
         }
         const vals = expandArrayValue(this.props.mem, this.props.value as C0Value<"ptr">);
         const content = [];
+
+        if (vals.length > 100) {
+            globalThis.MSG_EMITTER.warn(
+                "Potential Performance Degredation",
+                "You are evaluating a large array in the debug console. Performance of website might be degraded."
+            );
+        }
+
         for (let i = 0; i < vals.length; i ++) {
             content.push(
-                <li key={i + "-exp-value"}><C0ValueTabularDisplay mem={this.props.mem} value={vals[i]} typeRecord={this.props.typeRecord}/></li>
+                <li key={i + "-exp-value"}>
+                    <C0ValueTabularDisplay
+                        mem={this.props.mem}
+                        value={vals[i]}
+                        typeRecord={this.props.typeRecord}
+                        default_expand={false}
+                    />
+                </li>
             );
         }
         return (
@@ -51,10 +73,18 @@ export default class C0ValueTabularDisplay extends React.Component<
         );
     }
 
+    /**
+     * Evaluate and render a pointer value by tracing into the heap memory
+     * space and return a <C0ValueTabularDisplay/>.
+     * 
+     * @returns The rendered GUI of the Pointer value
+     */
     render_pointer() {
         if (isNullPtr(this.props.value.value)) {
             return <p className="dbg-evaluate-tabular-content">NULL</p>
         }
+
+        // When the component is not expended, show Pointer(...)
         if (!this.state.expand) {
             return (
                 <p onClick={() => this.setState({expand: true})} className="clickable" >
@@ -66,6 +96,8 @@ export default class C0ValueTabularDisplay extends React.Component<
             );
         }
 
+
+        // When the component is "<unknown>" type, show proper error message.
         if (this.props.value.type.type === "<unknown>") {
             return (
             <div>
@@ -103,13 +135,23 @@ export default class C0ValueTabularDisplay extends React.Component<
                         </button>
                         <div className="dbg-evaluate-tabular-content">
                             Pointer ( <span className="dbg-extra-information">0x{(addr + offset).toString(16).padStart(8, "0").toUpperCase()}</span>
-                                <C0ValueTabularDisplay mem={this.props.mem} value={{type: subType, value: this.props.value.value}} typeRecord={this.props.typeRecord}/>
+                                <C0ValueTabularDisplay
+                                    mem={this.props.mem}
+                                    value={{type: subType, value: this.props.value.value}}
+                                    typeRecord={this.props.typeRecord}
+                                    default_expand={false}
+                                />
                             )
                         </div>
                     </div>
                 );
             }
         }
+
+        /** 
+         * Otherwise, we only dereference the value and send it into a child <C0ValueTabularDisplay/>
+         * so that values are rendered recursively.
+         */
         const deref_value = derefValue(this.props.mem, this.props.value as C0Value<"ptr">);
         return (
             <div>
@@ -120,7 +162,12 @@ export default class C0ValueTabularDisplay extends React.Component<
                     Pointer ( <span className="dbg-extra-information">0x{(addr + offset).toString(16).padStart(8, "0").toUpperCase()}</span>
                         <ul>
                             <li>
-                                <C0ValueTabularDisplay mem={this.props.mem} value={deref_value} typeRecord={this.props.typeRecord}/>
+                                <C0ValueTabularDisplay
+                                    mem={this.props.mem}
+                                    value={deref_value}
+                                    typeRecord={this.props.typeRecord}
+                                    default_expand={false}
+                                />
                             </li>
                         </ul>
                     )
@@ -129,6 +176,12 @@ export default class C0ValueTabularDisplay extends React.Component<
         );
     }
 
+    /**
+     * Render the struct value by reading global TypeRecord in state and go to
+     * the heap memory to evaluate each field.
+     * 
+     * @returns A rendered struct C0Value Component
+     */
     render_struct() {
         if (isNullPtr(this.props.value.value)) {
             return <p>NULL</p>;
@@ -165,15 +218,20 @@ export default class C0ValueTabularDisplay extends React.Component<
                         StructFields.push(
                             <li key={key}>
                                 {field_name}
-                                <div className="dbg-evalute-tabular-content">
-                                    <C0ValueTabularDisplay value={derefValue(this.props.mem, ptr_to_field as C0Value<"ptr">)} mem={this.props.mem} typeRecord={this.props.typeRecord}/>
+                                <div className="dbg-evaluate-tabular-content">
+                                    <C0ValueTabularDisplay
+                                        value={derefValue(this.props.mem, ptr_to_field as C0Value<"ptr">)}
+                                        mem={this.props.mem}
+                                        typeRecord={this.props.typeRecord}
+                                        default_expand={false}
+                                    />
                                 </div>
                             </li>
                         );   
                     } else {
                         StructFields.push(
                             <li key={key}>
-                                <p className="dbg-evaluate-tabular-btn"> {value.name} :&nbsp;</p>
+                                <p className="dbg-evaluate-field-name"> {value.name} :&nbsp;</p>
                                 <p className="dbg-evaluate-tabular-content dbg-error-information">No Type Information</p>
                             </li>
                         )
@@ -223,6 +281,13 @@ export default class C0ValueTabularDisplay extends React.Component<
 }
 
 
+/**
+ * Expend an array pointer in C0Value into a list of C0Value.
+ * 
+ * @param mem The heap memory allocator that contains the array
+ * @param V The pointer points to the start of array
+ * @returns A list of values in the array V points to
+ */
 function expandArrayValue(
     mem: C0HeapAllocator,
     V: C0Value<"ptr">
@@ -270,6 +335,12 @@ function expandArrayValue(
     return result;
 }
 
+/**
+ * Dereference a C0Value Pointer and return the C0Value accordingly.
+ * @param mem The heap memory allocator
+ * @param V The C0Value Pointer you want to dereference
+ * @returns The C0Value after dereference
+ */
 function derefValue(mem: C0HeapAllocator, V: C0Value<"ptr">): C0Value<C0TypeClass> 
 {
     const block = mem.deref(V.value);

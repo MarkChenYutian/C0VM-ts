@@ -1,3 +1,5 @@
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { Type2String } from "../../vm_core/types/c0type_utility";
 import C0ValueTabularDisplay from "./tabular_c0value";
@@ -13,11 +15,12 @@ export default class TabularStackFrame extends React.Component<
     render(): React.ReactNode {
         if (!this.state.expand) {
             return(
-                <>
-                <p className="dbg-func-name" onClick={() => this.setState({expand: true})}>
-                    f: {this.props.frame.P.name}(...)
-                </p>
-                </>
+                <div className="dbg-func-name" onClick={() => this.setState({expand: true})}>
+                    <button className="implicit-btn">
+                        <FontAwesomeIcon icon={faCaretRight}/>
+                    </button>
+                    {this.props.frame.P.name}(...)
+                </div>
             )
         }
 
@@ -30,15 +33,24 @@ export default class TabularStackFrame extends React.Component<
                 <p key={i + "-name"}><code>{Type2String(to_be_rendered.type)} {this.props.frame.P.varName[i]}</code></p>
             )
             var_info.push(
-                <C0ValueTabularDisplay key={i + "-value"} value={to_be_rendered} mem={this.props.mem} typeRecord={this.props.typeRecord}/>
+                <C0ValueTabularDisplay
+                    key={i + "-value"}
+                    value={to_be_rendered}
+                    mem={this.props.mem}
+                    typeRecord={this.props.typeRecord}
+                    default_expand={true}
+                />
             )
         }
 
         return(
             <>
-            <p className="dbg-func-name" onClick={() => this.setState({expand: false})}>
-                f: {this.props.frame.P.name} {var_info.length === 0 ? "(No variable to evaluate)" : ""}
-            </p>
+            <div className="dbg-func-name" onClick={() => this.setState({expand: false})}>
+                <button className="implicit-btn">
+                    <FontAwesomeIcon icon={faCaretDown} />
+                </button>
+                {this.props.frame.P.name} {var_info.length === 0 ? "(No variable to evaluate)" : ""}
+            </div>
             {var_info}
             </>
         )

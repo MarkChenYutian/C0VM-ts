@@ -36,6 +36,10 @@ export default class MainControlBar extends React.Component<MainControlProps, {}
             this.props.update_state(VM.initialize(this.props.curr_content, this.props.clear_print));
         };
 
+        const remote_compile = () => {
+            globalThis.MSG_EMITTER.warn("Not Implemented Yet", "We haven't implement this feature yet.");
+        };
+
 
         return (
             <div className="main-control">
@@ -44,6 +48,7 @@ export default class MainControlBar extends React.Component<MainControlProps, {}
                     <button
                         className={"base-btn main-btn unselectable " + (this.props.isbc0 ? "disable-btn" : "")}
                         id="ctr-btn-compile"
+                        onClick={remote_compile}
                     >
                         <FontAwesomeIcon icon={faScrewdriverWrench} className="hide-in-mobile"/> {" Compile "}
                     </button>

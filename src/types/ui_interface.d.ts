@@ -48,5 +48,6 @@ interface TabularStackFrameProps {
 interface C0ValueTabularDisplayProps {
     mem: C0HeapAllocator,
     value: C0Value<C0TypeClass>,
-    typeRecord: Map<string, Map<number, Struct_Type_Record>>
+    typeRecord: Map<string, Map<number, Struct_Type_Record>>,
+    default_expand: boolean
 }
