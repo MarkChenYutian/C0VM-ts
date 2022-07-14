@@ -1,20 +1,22 @@
 interface C0VMApplicationState {
     EditorContent: string,
+    // EditorBreakpoint: Set<number>,
     PrintoutValue: string,
     C0Runtime: C0VM_RuntimeState | undefined,
     CompilerFlags: Record<string, boolean>
 };
 
+// The props that main control bar component will accept
 interface MainControlProps {
     isbc0: boolean,
     curr_content: string,
     curr_state: C0VM_RuntimeState | undfined,
-    // update_state: (ns: Pick<C0VMApplicationState, keyof C0VMApplicationState>) => void
     update_state: (ns: C0RuntimeState | undefined) => void
     update_print: (ns: string) => void
     clear_print: () => void
 };
 
+// The props that CompilerOption component will accept
 interface CompilerOptionPropInterface {
     flip_d_flag: () => void
 };

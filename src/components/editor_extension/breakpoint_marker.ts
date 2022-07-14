@@ -12,19 +12,28 @@ const breakpointEffect = StateEffect.define<{ pos: number; on: boolean }>({
 
 const breakpointState = StateField.define<RangeSet<GutterMarker>>({
   create() {
+    // Enforce synchronous between breakpointState and global var
+    globalThis.EDITOR_BREAKPOINTS = new Set<number>();
     return RangeSet.empty;
   },
+
   update(set, transaction) {
     set = set.map(transaction.changes);
     for (let e of transaction.effects) {
       if (e.is(breakpointEffect)) {
         if (e.value.on) {
+          // Add the breakpoint effect on specific line gutter
           set = set.update({ add: [breakpointMarker.range(e.value.pos)] });
         } else {
+          // Remove the breakpoint effect on specific line gutter
           set = set.update({ filter: (from) => from !== e.value.pos });
         }
       }
     }
+    set.update({ filter: (from) => from <= transaction.state.doc.lines });
+    globalThis.EDITOR_BREAKPOINTS = new Set(Array.from(globalThis.EDITOR_BREAKPOINTS.values()).filter(
+      (v) => v <= transaction.state.doc.lines
+    ));
     return set;
   },
 });
@@ -66,11 +75,10 @@ const breakpointGutter = [
   }),
   EditorView.baseTheme({
     ".cm-breakpoint-gutter .cm-gutterElement": {
-      color: "red",
       paddingLeft: "1px",
       paddingTop: "1.5px",
       cursor: "pointer",
-      "font-size": "0.6rem",
+      fontSize: "0.6rem",
     },
   }),
 ];

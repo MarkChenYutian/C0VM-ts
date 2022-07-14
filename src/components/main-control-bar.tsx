@@ -10,23 +10,27 @@ export default class MainControlBar extends React.Component<MainControlProps, {}
     render() {
 
         const step_c0runtime = () => {
-            const [new_runtime, can_continue] = VM.step(
-                (this.props.curr_state === undefined ?
-                VM.initialize(this.props.curr_content, this.props.clear_print) : this.props.curr_state),
-                this.props.update_print
-            );
-    
+            let new_runtime, can_continue = undefined;
+            if (this.props.curr_state === undefined) {
+                const init_state = VM.initialize(this.props.curr_content, this.props.clear_print);
+                if (init_state === undefined) return;
+                [new_runtime, can_continue] = VM.step(init_state, this.props.update_print);
+            } else {
+                [new_runtime, can_continue] = VM.step(this.props.curr_state, this.props.update_print);
+            }
             if (!can_continue) this.props.update_state(undefined);
             else this.props.update_state(new_runtime);
         }
 
         const run_c0runtime = () => {
-            const [new_runtime, can_continue] = VM.run(
-                (this.props.curr_state === undefined ? 
-                VM.initialize(this.props.curr_content, this.props.clear_print) : this.props.curr_state),
-                this.props.update_print
-            );
-    
+            let new_runtime, can_continue = undefined;
+            if (this.props.curr_state === undefined) {
+                const init_state = VM.initialize(this.props.curr_content, this.props.clear_print);
+                if (init_state === undefined) return;
+                [new_runtime, can_continue] = VM.run(init_state, this.props.update_print);
+            } else {
+                [new_runtime, can_continue] = VM.run(this.props.curr_state, this.props.update_print);
+            }
             if (!can_continue) this.props.update_state(undefined);
             else this.props.update_state(new_runtime);
         }
@@ -39,7 +43,6 @@ export default class MainControlBar extends React.Component<MainControlProps, {}
         const remote_compile = () => {
             globalThis.MSG_EMITTER.warn("Not Implemented Yet", "We haven't implement this feature yet.");
         };
-
 
         return (
             <div className="main-control">

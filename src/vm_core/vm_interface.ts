@@ -1,6 +1,7 @@
 import C0VM_RuntimeState from "./exec/state";
 
 export function initialize(s: string, clear_printout: () => void): C0VM_RuntimeState | undefined {
+    // Clean up environment before initialize.
     clear_printout();
     try {
         const ns = new C0VM_RuntimeState(s);

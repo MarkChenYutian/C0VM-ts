@@ -15,10 +15,10 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
     constructor(props: {}) {
         super(props);
         this.state = {
-            EditorContent : "",
-            PrintoutValue : "",
-            C0Runtime: undefined,
-            CompilerFlags: {"d": false}
+            EditorContent   : "",
+            PrintoutValue   : "",
+            C0Runtime       : undefined,
+            CompilerFlags   : {"d": false}
         }
     }
 
@@ -33,20 +33,18 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
                         this.setState({C0Runtime: s})
                     }}
                     update_print={
-                        (s) => this.setState((state, props) => {return {PrintoutValue: state.PrintoutValue + s}})
+                        (s) => this.setState((state) => {return {PrintoutValue: state.PrintoutValue + s}})
                     }
                     clear_print ={
-                        ()  => this.setState((state, props) => {return {PrintoutValue: ""}})
+                        ()  => this.setState(() => {return {PrintoutValue: ""}})
                     }
-                    curr_content={
-                        this.state.EditorContent
-                    }
-                    curr_state  ={
-                        this.state.C0Runtime
-                    }
+                    curr_content={ this.state.EditorContent }
+                    curr_state  ={ this.state.C0Runtime }
                 />
                 <div className="main-ui-framework">
-                    <C0Editor updateContent={(s) => {this.setState({EditorContent: s})}}/>
+                    <C0Editor
+                        updateContent={(s) => {this.setState({EditorContent: s})}}
+                    />
                     <div className="io-area">
                         <CompilerOption
                             flip_d_flag={() => this.setState((state, props) => {return {CompilerFlags: {...state.CompilerFlags, "d": !state.CompilerFlags["d"]}}})}

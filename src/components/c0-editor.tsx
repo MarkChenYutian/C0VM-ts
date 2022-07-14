@@ -13,7 +13,7 @@ import { indentUnit, language } from "@codemirror/language";
 
 export default class C0Editor extends React.Component<
     {
-        updateContent: (s: string) => void,
+        updateContent: (s: string) => void
     }
 >
 {
