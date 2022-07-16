@@ -1,3 +1,8 @@
+/**
+ * @author Yutian Chen <yutianch@andrew.cmu.edu>
+ * @description The Root component of the Debug Console, provides switching between tabular
+ * debug console and graphical debug console.
+ */
 import React from "react";
 
 import ReactFlow, { Controls, Background } from "react-flow-renderer";
@@ -6,7 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalculator, faAngleDown, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 
 import { Result, Switch } from "antd";
-import "antd/lib/result/style/index.css";
+
 import TabularStackFrame from "./tabular_stackframe";
 import C0VM_RuntimeState from "../../vm_core/exec/state";
 
@@ -51,16 +56,20 @@ export default class DebugConsole extends React.Component
                         {" Debug Console "}
                         {this.state.show ? <FontAwesomeIcon icon={faAngleDown}/> : <FontAwesomeIcon icon={faAngleRight} />}
                     </h3>
-                    <Switch
-                        unCheckedChildren="Table"
-                        checkedChildren="Graph"
-                        style={{marginBottom: "0.4rem"}}
-                        onChange={() => {
-                            this.setState((state) => {
-                                return {mode: state.mode === "graphical" ? "tablular" : "graphical"};
-                            })
-                        }}
-                    />
+                    {
+                    this.state.show ? 
+                        <Switch
+                            unCheckedChildren="Table"
+                            checkedChildren="Graph"
+                            style={{marginBottom: "0.4rem"}}
+                            onChange={() => {
+                                this.setState((state) => {
+                                    return {mode: state.mode === "graphical" ? "tablular" : "graphical"};
+                                })
+                            }}
+                        />
+                        : null
+                    }
                 </div>
                 {this.resolve_render_view()}
             </>

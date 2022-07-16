@@ -4,8 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleRight, faToggleOff } from '@fortawesome/free-solid-svg-icons';
 
 import { Switch } from "antd";
-import "antd/lib/switch/style/index.css";
-
 
 
 export default class CompilerOption extends React.Component

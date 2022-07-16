@@ -1,3 +1,13 @@
+/**
+ * @author Yutian Chen <yutianch@andrew.cmu.edu>
+ * @description Warning! This is a very very lengthy and verbose file that is written in several 
+ * days so it will be hard to get it in a simple glimpse. (And there are also some edge cases 
+ * we must handle specifically, making it even more lengthy)
+ * 
+ * @abstract The file implements a React component called C0ValueTabularDisplay which **recursively** 
+ * renders the C0Value passed in in the props as "value" using lazy-evaluation.
+ */
+
 import React from "react";
 
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";

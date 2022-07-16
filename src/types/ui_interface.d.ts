@@ -1,7 +1,8 @@
 interface C0VMApplicationState {
     EditorContent: string,
-    // EditorBreakpoint: Set<number>,
     PrintoutValue: string,
+    C0SourceCodes: string[],
+    ActiveEditor : number,
     C0Runtime: C0VM_RuntimeState | undefined,
     CompilerFlags: Record<string, boolean>
 };
@@ -11,10 +12,54 @@ interface MainControlProps {
     isbc0: boolean,
     curr_content: string,
     curr_state: C0VM_RuntimeState | undfined,
-    update_state: (ns: C0RuntimeState | undefined) => void
-    update_print: (ns: string) => void
-    clear_print: () => void
+    flags: Record<string, boolean>,
+
+    update_value: (ns: string) => void,
+    update_state: (ns: C0RuntimeState | undefined) => void,
+    update_print: (ns: string) => void,
+    clear_print: () => void,
 };
+
+interface CodeEditorProps {
+    C0_Contents: string[],
+    C0_ActiveTab: number,
+    BC0_Content: string,
+    set_app_state<K extends keyof C0VMApplicationState>(ns: Pick<C0VMApplicationState, K>): void;
+}
+
+interface CodeEditorState {
+    mode: "c0" | "bc0";
+
+    C0_tabTitle: EditorTabTitle[],
+    C0_nextKey: number
+}
+
+interface C0EditorGroupProps {
+    activeTab   : number,
+
+    currTabs    : EditorTabTitle[],
+    currContents: string[],
+
+    updateContent: (s: string, key: number) => void,
+    setActiveTab : (i: number) => void,
+    setTabName   : (key: number, name: string) => void,
+
+    newPanel     : () => void,
+    removePanel  : (key: string) => void,
+}
+
+type EditorTabTitle = {name: string, key: number};
+
+interface C0EditorProps {
+    updateContent : (s: string) => void,
+    editorValue   : string,
+    updateName   ?: (s: string) => void,
+    revUpdate    ?: boolean
+}
+
+interface C0EditorState {
+    shouldRevUpdate  : boolean
+}
 
 // The props that CompilerOption component will accept
 interface CompilerOptionPropInterface {

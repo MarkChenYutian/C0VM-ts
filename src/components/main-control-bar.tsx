@@ -1,12 +1,15 @@
+import React from "react";
+
 import { faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
-import tsLogo from "../assets/ts-logo-128.svg";
+
 import * as VM from "../vm_core/vm_interface";
+import remote_compile from "../network/remote_compile";
+
+import tsLogo from "../assets/ts-logo-128.svg";
 
 
-
-export default class MainControlBar extends React.Component<MainControlProps, {}>{
+export default class MainControlBar extends React.Component<MainControlProps>{
     render() {
 
         const step_c0runtime = () => {
@@ -40,8 +43,10 @@ export default class MainControlBar extends React.Component<MainControlProps, {}
             this.props.update_state(VM.initialize(this.props.curr_content, this.props.clear_print));
         };
 
-        const remote_compile = () => {
-            globalThis.MSG_EMITTER.warn("Not Implemented Yet", "We haven't implement this feature yet.");
+        const compile_c0source = () => {
+            // globalThis.MSG_EMITTER.warn("Not Implemented Yet", "We haven't implement this feature yet.");
+            this.props.clear_print();
+            remote_compile(this.props.curr_content, this.props.update_value, this.props.clear_print, this.props.update_print,this.props.flags);
         };
 
         return (
@@ -51,7 +56,7 @@ export default class MainControlBar extends React.Component<MainControlProps, {}
                     <button
                         className={"base-btn main-btn unselectable " + (this.props.isbc0 ? "disable-btn" : "")}
                         id="ctr-btn-compile"
-                        onClick={remote_compile}
+                        onClick={compile_c0source}
                     >
                         <FontAwesomeIcon icon={faScrewdriverWrench} className="hide-in-mobile"/> {" Compile "}
                     </button>

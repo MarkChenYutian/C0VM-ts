@@ -1,4 +1,3 @@
-import "antd/lib/notification/style/index.css";
 import { notification } from "antd";
 
 export default class AntdEmitter implements MessageEmitter {

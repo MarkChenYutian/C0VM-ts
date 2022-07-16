@@ -72,6 +72,10 @@ body {
     height: 100%;
 }
 
+.ant-tabs-nav {
+    margin-bottom: 0 !important;
+}
+
 .io-area {
     flex-grow: 1;
     max-width: calc(100vw - 2rem);
@@ -104,14 +108,19 @@ footer > ul {
 /* Editor Style */
 
 .cm-gutter, .cm-gutters, .cm-scroller, .cm-editor {
-    height: calc(100vh - 11.7rem);
+    height: calc(100vh - 16rem);
+    min-height: 20rem;
 }
 .cm-editor {
     overflow-x: auto;
 }
+.cm-content {
+    cursor: text;
+}
 .cm-gutters { margin: 1px; }
 .cm-scroller { overflow: auto; }
-.cm-editor { border: 1px solid silver; border-radius: 0.3rem; }
+.cm-editor { border: 1px solid silver; border-radius: 0 0 0.3rem 0.3rem; }
+.ͼ1.cm-editor.cm-focused { border: 1px solid #52a3f970; outline: none; }
 .cm-execLine { background-color: #FDFF32;  }
 .cm-lineNumbers > .cm-gutterElement { padding: 0 !important; }
 .cm-foldPlaceholder { padding: 0 0.5rem; color: black; background: #EEEEEE; border: none; }
@@ -162,10 +171,6 @@ pre#c0-output {
 
 .main-btn:hover {
     background: #52a3f910;
-}
-
-.flag-selected {
-    background: #52a3f920;
 }
 
 .success-btn {
