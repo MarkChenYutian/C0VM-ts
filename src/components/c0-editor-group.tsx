@@ -5,7 +5,7 @@ import { Tabs } from "antd";
 import C0Editor from "./c0-editor";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
 
 const { TabPane } = Tabs;
 
@@ -34,6 +34,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
             size="small"
             onEdit={on_edit}
             onChange={(new_key) => {this.on_change_key(new_key)}}
+            addIcon={<FontAwesomeIcon icon={faAdd}/>}
         >
             {
                 this.props.currTabs.map(

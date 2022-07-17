@@ -5,6 +5,7 @@ import C0EditorGroup from "./c0-editor-group";
 import { Switch } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
+import { faSquareCaretLeft, faSquareCaretRight, faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>
@@ -17,6 +18,63 @@ export default class CodeEditor extends React.Component
             C0_tabTitle: [{name: "Untitled_0.c0", key: 0}],
             C0_nextKey : 1
         }
+    }
+
+    move_current_to_left() {
+        let curr_idx = 0;
+        for (let i = 0; i < this.state.C0_tabTitle.length; i ++) {
+            if (this.state.C0_tabTitle[i].key === this.props.C0_ActiveTab) {
+                curr_idx = i;
+                break;
+            }
+        }
+
+        const new_tabs = [...this.state.C0_tabTitle];
+        const new_contents = [...this.props.C0_Contents];
+        [new_tabs[curr_idx], new_tabs[curr_idx - 1]] = [new_tabs[curr_idx - 1], new_tabs[curr_idx]];
+        [new_contents[curr_idx], new_contents[curr_idx - 1]] = [new_contents[curr_idx - 1], new_contents[curr_idx]];
+
+        this.setState({C0_tabTitle: new_tabs});
+        this.props.set_app_state({C0SourceCodes: new_contents});
+    }
+
+    move_current_to_right() {
+        let curr_idx = 0;
+        for (let i = 0; i < this.state.C0_tabTitle.length; i ++) {
+            if (this.state.C0_tabTitle[i].key === this.props.C0_ActiveTab) {
+                curr_idx = i;
+                break;
+            }
+        }
+
+        const new_tabs = [...this.state.C0_tabTitle];
+        const new_contents = [...this.props.C0_Contents];
+        [new_tabs[curr_idx], new_tabs[curr_idx + 1]] = [new_tabs[curr_idx + 1], new_tabs[curr_idx]];
+        [new_contents[curr_idx], new_contents[curr_idx + 1]] = [new_contents[curr_idx + 1], new_contents[curr_idx]];
+
+        this.setState({C0_tabTitle: new_tabs});
+        this.props.set_app_state({C0SourceCodes: new_contents});
+    }
+
+    rename_current_tab() {
+        const new_title = prompt("New title for tab:");
+        if (new_title === null) return;
+        if (new_title === "") {
+            globalThis.MSG_EMITTER.warn(
+                "Invalid Name for Editor Tab",
+                "Can't give an editor tab a empty title, no change is applied."
+            );
+            return;
+        }
+
+        this.setState((state) => {return {
+            C0_tabTitle: state.C0_tabTitle.map(
+                (value) => {
+                    if (value.key === this.props.C0_ActiveTab) return {key: value.key, name: new_title};
+                    return value;
+                }
+            )
+        };})
     }
 
     render() {
@@ -84,22 +142,51 @@ export default class CodeEditor extends React.Component
                 editorValue  ={this.props.BC0_Content}
             />;
         }
+
+        let btn_groups = null;
+        if (this.state.mode === "c0") {
+            btn_groups = 
+            <>
+                    <button
+                        className="implicit-btn editor-tab-btn"
+                        onClick={() => this.rename_current_tab()}
+                    >
+                        <FontAwesomeIcon icon={faPenToSquare}/>
+                    </button>
+                    <button
+                        className={"implicit-btn " + (this.props.C0_ActiveTab === this.state.C0_tabTitle[0].key ? "editor-tab-btn-disable" :"editor-tab-btn")}
+                        onClick={() => this.move_current_to_left()}
+                    >
+                        <FontAwesomeIcon icon={faSquareCaretLeft}/>
+                    </button>
+                    <button
+                        className={"implicit-btn " + (this.props.C0_ActiveTab === this.state.C0_tabTitle[this.state.C0_tabTitle.length - 1].key ? "editor-tab-btn-disable" :"editor-tab-btn")}
+                        onClick={() => this.move_current_to_right()}
+                    >
+                        <FontAwesomeIcon icon={faSquareCaretRight}/>
+                    </button>
+            </>;
+        }
+
         return (
         <div className="code-editor">
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline"}}>
                 <h3 style={{marginTop: 0, marginBottom: this.state.mode === "c0" ? 0 : "2.8rem"}}>
                     <FontAwesomeIcon icon={faCode}/> Code Editor
                 </h3>
-                <Switch
-                    unCheckedChildren="C0"
-                    checkedChildren="BC0"
-                    style={{marginBottom: "0.4rem"}}
-                    onChange={() => {
-                        this.setState((state) => {
-                            return {mode: state.mode === "c0" ? "bc0" : "c0"};
-                        })
-                    }}
-                />
+                <div>
+                    {btn_groups}
+                    <Switch
+                        unCheckedChildren="C0"
+                        checkedChildren="BC0"
+                        style={{marginBottom: "0.4rem"}}
+                        onChange={() => {
+                            this.setState((state) => {
+                                return {mode: state.mode === "c0" ? "bc0" : "c0"};
+                            })
+                        }}
+                    />
+                </div>
             </div>
             {content}
         </div>);

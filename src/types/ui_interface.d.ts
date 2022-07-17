@@ -10,7 +10,10 @@ interface C0VMApplicationState {
 // The props that main control bar component will accept
 interface MainControlProps {
     isbc0: boolean,
-    curr_content: string,
+    
+    curr_bc0_content: string,
+    curr_c0_contents: string[],
+
     curr_state: C0VM_RuntimeState | undfined,
     flags: Record<string, boolean>,
 

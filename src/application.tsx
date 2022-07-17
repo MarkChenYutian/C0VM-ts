@@ -29,10 +29,11 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
             <div className="page-framework">
                 <MainControlBar
                     isbc0        = { this.is_bc0_content(this.state.EditorContent)}
-                    curr_content = { this.state.EditorContent }
+                    curr_bc0_content = { this.state.EditorContent }
+                    curr_c0_contents = { this.state.C0SourceCodes }
                     curr_state   = { this.state.C0Runtime }
                     flags        = { this.state.CompilerFlags }
-                    update_value = { (s: string) => {} }
+                    update_value = { (s: string) => {this.setState({EditorContent: s})} }
                     update_state = { (s: C0VM_RuntimeState | undefined) => {
                             if (s === undefined) globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
                             else globalThis.EDITOR_HIGHLIGHT_LINENUM = s.state.CurrLineNumber;
@@ -44,9 +45,6 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
                         )}
                 />
                 <div className="main-ui-framework">
-                    {/* <C0Editor
-                        updateContent = { (s) => {this.setState({EditorContent: s})} }
-                    /> */}
                     <CodeEditor
                         C0_Contents  = {this.state.C0SourceCodes}
                         C0_ActiveTab = {this.state.ActiveEditor}

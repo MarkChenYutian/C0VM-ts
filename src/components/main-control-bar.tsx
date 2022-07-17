@@ -15,7 +15,7 @@ export default class MainControlBar extends React.Component<MainControlProps>{
         const step_c0runtime = () => {
             let new_runtime, can_continue = undefined;
             if (this.props.curr_state === undefined) {
-                const init_state = VM.initialize(this.props.curr_content, this.props.clear_print);
+                const init_state = VM.initialize(this.props.curr_bc0_content, this.props.clear_print);
                 if (init_state === undefined) return;
                 [new_runtime, can_continue] = VM.step(init_state, this.props.update_print);
             } else {
@@ -28,7 +28,7 @@ export default class MainControlBar extends React.Component<MainControlProps>{
         const run_c0runtime = () => {
             let new_runtime, can_continue = undefined;
             if (this.props.curr_state === undefined) {
-                const init_state = VM.initialize(this.props.curr_content, this.props.clear_print);
+                const init_state = VM.initialize(this.props.curr_bc0_content, this.props.clear_print);
                 if (init_state === undefined) return;
                 [new_runtime, can_continue] = VM.run(init_state, this.props.update_print);
             } else {
@@ -40,13 +40,18 @@ export default class MainControlBar extends React.Component<MainControlProps>{
 
         const restart_c0runtime = () => {
             this.props.clear_print();
-            this.props.update_state(VM.initialize(this.props.curr_content, this.props.clear_print));
+            this.props.update_state(VM.initialize(this.props.curr_bc0_content, this.props.clear_print));
         };
 
         const compile_c0source = () => {
-            // globalThis.MSG_EMITTER.warn("Not Implemented Yet", "We haven't implement this feature yet.");
             this.props.clear_print();
-            remote_compile(this.props.curr_content, this.props.update_value, this.props.clear_print, this.props.update_print,this.props.flags);
+            remote_compile(
+                this.props.curr_c0_contents,
+                this.props.update_value,
+                this.props.clear_print,
+                this.props.update_print,
+                this.props.flags
+            );
         };
 
         return (
@@ -54,7 +59,7 @@ export default class MainControlBar extends React.Component<MainControlProps>{
                 <h3 className="unselectable">C0VM.<img src={tsLogo} style={{display: "inline-block", height: "1.2rem", marginBottom: "-0.1rem"}} alt="ts"/></h3>
                 <div className="control-btn-group">
                     <button
-                        className={"base-btn main-btn unselectable " + (this.props.isbc0 ? "disable-btn" : "")}
+                        className={"base-btn main-btn unselectable " + (this.props.curr_c0_contents[0] === "" ? "disable-btn" : "")}
                         id="ctr-btn-compile"
                         onClick={compile_c0source}
                     >

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactCodeMirror, { basicSetup } from "@uiw/react-codemirror";
 
-import breakpointGutter from "./editor_extension/breakpoint_marker";
+// import breakpointGutter from "./editor_extension/breakpoint_marker";
 import LoadDocumentPlugin from "./editor_extension/blank_load";
 import execLineHighlighter from "./editor_extension/exec_position";
 
@@ -24,7 +24,7 @@ export default class C0Editor extends React.Component<C0EditorProps>
                         }
                         value = {this.props.editorValue}
                         extensions={[
-                            breakpointGutter,
+                            // breakpointGutter,
                             LoadDocumentPlugin(".c0", this.props.updateName),
                             basicSetup(),
                             keymap.of([indentWithTab]),

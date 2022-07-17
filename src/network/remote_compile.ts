@@ -3,7 +3,7 @@ import * as VM from "../vm_core/vm_interface";
 
 
 export default function remote_compile(
-    s: string,
+    s: string[],
     update_content: (s: string) => void,
     clean_printout: () => void,
     update_printout: (s: string) => void,

@@ -107,6 +107,24 @@ footer > ul {
 
 /* Editor Style */
 
+.editor-tab-btn {
+    margin-right: .5rem;
+    font-size: 1.3rem;
+    color: #52a3f9;
+    border-radius: .3rem;
+}
+
+.editor-tab-btn:hover {
+    background-color: #EEE;
+}
+
+.editor-tab-btn-disable {
+    margin-right: .5rem;
+    font-size: 1.3rem;
+    color: #CCC;
+    pointer-events: none;
+}
+
 .cm-gutter, .cm-gutters, .cm-scroller, .cm-editor {
     height: calc(100vh - 16rem);
     min-height: 20rem;

@@ -38,7 +38,7 @@ globalThis.UI_ERR_DISPLAY_TIME_SEC = 4;
 globalThis.UI_WARN_DISPLAY_TIME_SEC = 4;
 globalThis.UI_OK_DISPLAY_TIME_SEC = 1;
 
-globalThis.COMPILER_BACKEND_URL = "http://172.18.83.241:8081/compile";
+globalThis.COMPILER_BACKEND_URL = "http://172.18.90.173:8081/compile";
 
 globalThis.C0_ENVIR_MODE = "web";
 globalThis.C0_MAX_RECURSION = 999;
