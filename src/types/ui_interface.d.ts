@@ -1,4 +1,5 @@
 interface C0VMApplicationState {
+    crashed      : boolean,
     EditorContent: string,
     PrintoutValue: string,
     C0SourceCodes: string[],
@@ -100,4 +101,14 @@ interface C0ValueTabularDisplayProps {
     value: C0Value<C0TypeClass>,
     typeRecord: Map<string, Map<number, Struct_Type_Record>>,
     default_expand: boolean
+}
+
+interface C0StackFrameNodeData {
+    frame: VM_StackFrame,
+    mem: C0HeapAllocator
+}
+
+interface C0StructNodeData {
+    ptr: C0Value<"ptr">,
+    mem: C0HeapAllocator
 }

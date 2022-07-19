@@ -8,6 +8,7 @@ import C0Output from "./components/c0-output";
 import C0VM_RuntimeState from "./vm_core/exec/state";
 import DebugConsole from "./components/debug_console/debug_console";
 import CodeEditor from "./components/code-editor";
+import { Result } from "antd";
 
 
 
@@ -15,16 +16,20 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
     constructor(props: {}) {
         super(props);
         this.state = {
+            crashed         : false,
             EditorContent   : "",
             PrintoutValue   : "",
             C0SourceCodes   : [""],
             ActiveEditor    : 0,
             C0Runtime       : undefined,
             CompilerFlags   : {"d": false}
-        }
+        };
     }
 
     render() {
+        if (this.state.crashed) {
+            return <Result status="error" title="Application Crashed" subTitle="Reload the page to restart the application."/>
+        }
         return (
             <div className="page-framework">
                 <MainControlBar
@@ -84,5 +89,6 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
             "Internal User Interface Error",
             (error === null) ? undefined : error.message
         );
+        this.setState({crashed: true});
     }
 }

@@ -14,6 +14,11 @@ import { Result, Switch } from "antd";
 
 import TabularStackFrame from "./tabular_stackframe";
 import C0VM_RuntimeState from "../../vm_core/exec/state";
+import C0StackFrameNode from "./reactflow/stack_node";
+import { build_nodes } from "./graph_builder";
+import C0StructNode from "./reactflow/struct_node";
+
+const node_types = {stackNode: C0StackFrameNode, structNode: C0StructNode};
 
 export default class DebugConsole extends React.Component
 <
@@ -99,23 +104,46 @@ class TabularDebugEvaluation extends React.Component<
 }
 
 
-class GraphicalDebugEvaluation extends React.Component<
-    TabularDebugEvaluationProps,
-    {}
-> {
-    componentDidMount() {
-        globalThis.MSG_EMITTER.warn(
-            "Not Implemented Yet",
-            "The graphical heap memory visualizer will be implemented in the near future."
-        );
+class GraphicalDebugEvaluation extends React.Component<TabularDebugEvaluationProps, {err: boolean}> { 
+    constructor(props: TabularDebugEvaluationProps) {
+        super(props);
+        this.state = {err: false};
     }
-    
+
     render(): React.ReactNode {
+        if (this.state.err) {
+            return <Result 
+                className="debug-console-info"
+                status="error"
+                title="Graphical Visualizer Crashed!"
+                extra={
+                    <button className="base-btn main-btn" onClick={() => this.setState({err: false})}>
+                        Reload Graph
+                    </button>
+                }
+            />;
+        }
+
+        const nodes = build_nodes(this.props.state, this.props.mem);
+
+        // React Flow Setup //////////////////
+        
         return (
-            <ReactFlow className="debug-console">
+            <ReactFlow className="debug-console"
+                nodeTypes={node_types}
+                nodes={nodes}
+            >
                 <Controls/>
                 <Background/>
             </ReactFlow>
         )
+    }
+
+    componentDidCatch(e: Error) {
+        globalThis.MSG_EMITTER.warn(
+            "Debugger Interface Exception",
+            e.name + ": " + e.message
+        );
+        this.setState({err: true});
     }
 }
