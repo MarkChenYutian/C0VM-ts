@@ -365,3 +365,8 @@ li > .dbg-evaluate-tabular-content {
     max-width: 7rem;
     word-wrap: break-word;
 }
+
+.dbg-entire-row {
+    grid-column-start: 1;
+    grid-column-end: 3;
+}

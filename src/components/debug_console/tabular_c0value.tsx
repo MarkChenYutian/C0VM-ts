@@ -14,10 +14,10 @@ import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { c0_cvt2_js_value } from "../../vm_core/utility/c0_value";
-import { isNullPtr, read_ptr, shift_ptr } from "../../vm_core/utility/pointer_ops";
+import { isNullPtr, read_ptr } from "../../vm_core/utility/pointer_ops";
 import { loadString } from "../../vm_core/utility/string_utility";
 
-import { derefValue, expandArrayValue } from "../../utility/debug_utility";
+import { derefValue, expandArrayValue, expandStructValue } from "../../utility/debug_utility";
 
 export default class C0ValueTabularDisplay extends React.Component<
     C0ValueTabularDisplayProps,
@@ -198,71 +198,59 @@ export default class C0ValueTabularDisplay extends React.Component<
         if (isNullPtr(this.props.value.value)) {
             return <p>NULL</p>;
         }
+        
+        const fields = expandStructValue(
+            this.props.mem,
+            this.props.typeRecord,
+            {
+                value: this.props.value.value,
+                type: {type: "ptr", kind: "ptr", value: this.props.value.type}
+            } as C0Value<"ptr">
+        );
 
-        const ValueType = this.props.value.type as C0Type<"ptr">;
-        const ValueValue = this.props.value.value;
-        if (ValueType.kind === "struct") {
-            const StructInformation = this.props.typeRecord.get(ValueType.value);
-            if (StructInformation === undefined) {
-                return <p className="dbg-error-information">No Struct Information</p>;
-            }
-
-            const StructFields: JSX.Element[] = [];
-
-            StructInformation.forEach(
-                (value, key) => {
-                    /**
-                     * We shift the pointer to the field of struct we want to evaluate
-                     * 
-                     * Then we passed in the dereferenced value into <C0ValueTabularDisplay ... /> 
-                     * component to evaluate it recursively.
-                     */
-                    let ptr_to_field: C0Value<Maybe<"ptr">> = {
-                        value: shift_ptr(ValueValue, key),
-                        type: value.type === undefined ? {type: "<unknown>"} : {type: "ptr", kind: "ptr", value: value.type}
-                    };
-
-                    const field_name = value.name === undefined ?
-                        <p className="dbg-evaluate-field-name"> Offset @ {key} :&nbsp;</p> : 
-                        <p className="dbg-evaluate-field-name"> {value.name} :&nbsp;</p>;
-
-                    if (ptr_to_field.type.type === "ptr") {
-                        StructFields.push(
-                            <li key={key}>
-                                {field_name}
-                                <div className="dbg-evaluate-tabular-content">
-                                    <C0ValueTabularDisplay
-                                        value={derefValue(this.props.mem, ptr_to_field as C0Value<"ptr">)}
-                                        mem={this.props.mem}
-                                        typeRecord={this.props.typeRecord}
-                                        default_expand={false}
-                                    />
-                                </div>
-                            </li>
-                        );   
-                    } else {
-                        StructFields.push(
-                            <li key={key}>
-                                <p className="dbg-evaluate-field-name"> {value.name} :&nbsp;</p>
-                                <p className="dbg-evaluate-tabular-content dbg-error-information">No Type Information</p>
-                            </li>
-                        )
-                    }
-                }
-            );
-
-            return (
-                <div style={{marginTop: "0.3rem"}}>
-                    <>
-                    <code>{(this.props.value.type as C0Type<"ptr">).value as string}</code>
-                    <ul>
-                        {StructFields}
-                    </ul>
-                    </>
-                </div>
-            );
+        if (fields.length === 0) {
+            return <p className="dbg-error-information">No Struct Information</p>;
         }
-        return <p className="dbg-error-information">Failed to render value. (Internal Err)</p>
+
+        const StructFields: JSX.Element[] = [];
+
+        for (let i = 0; i < fields.length; i ++) {
+            const entry = fields[i];
+            const field_name = <p className="dbg-evaluate-field-name"> {entry.name ?? `Offset @ ${entry.offset}`}:&nbsp;</p>;
+            if (entry.value === undefined) {
+                StructFields.push(
+                    <li key={entry.offset}>
+                        {field_name}
+                        <p className="dbg-evaluate-tabular-content dbg-error-information">No Type Information</p>
+                    </li>
+                )
+            } else {
+                StructFields.push(
+                    <li key={entry.offset}>
+                        {field_name}
+                        <div className="dbg-evaluate-tabular-content">
+                            <C0ValueTabularDisplay
+                                value={entry.value}
+                                mem={this.props.mem}
+                                typeRecord={this.props.typeRecord}
+                                default_expand={false}
+                            />
+                        </div>
+                    </li>
+                );
+            }
+        }
+
+        return (
+            <div style={{marginTop: "0.3rem"}}>
+                <>
+                <code>{(this.props.value.type as C0Type<"ptr">).value as string}</code>
+                <ul>
+                    {StructFields}
+                </ul>
+                </>
+            </div>
+        );
     }
 
     render(): React.ReactNode {

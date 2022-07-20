@@ -240,3 +240,8 @@ declare abstract class C0VM_RT {
     abstract debug(): any;
 }
 
+type C0StructJSEntry = {
+    value: C0Value<C0TypeClass> | undefined,
+    offset: number,
+    name: string | undefined;
+};

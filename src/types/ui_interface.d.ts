@@ -110,5 +110,6 @@ interface C0StackFrameNodeData {
 
 interface C0StructNodeData {
     ptr: C0Value<"ptr">,
-    mem: C0HeapAllocator
+    mem: C0HeapAllocator,
+    typeRecord: Map<string, Map<number, Struct_Type_Record>>
 }

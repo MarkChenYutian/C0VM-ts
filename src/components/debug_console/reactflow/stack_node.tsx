@@ -2,18 +2,11 @@ import React from "react";
 import { NodeProps, Handle, Position } from "react-flow-renderer";
 import { calculate_entry_height } from "../../../utility/graphical_utility";
 import { Type2String } from "../../../vm_core/types/c0type_utility";
-import { c0_cvt2_js_value } from "../../../vm_core/utility/c0_value";
+import { render_c0_value } from "../../../utility/debug_utility";
 import { loadString } from "../../../vm_core/utility/string_utility";
+import { isNullPtr } from "../../../vm_core/utility/pointer_ops";
 
-function render_c0_value(v: C0Value<"value">): string {
-    switch (v.type.value) {
-        case "bool":
-        case "int":
-            return "" + c0_cvt2_js_value(v);
-        case "char":
-            return "'" + c0_cvt2_js_value(v) + "'";
-    }
-}
+
 
 export default class C0StackFrameNode extends React.Component<NodeProps<C0StackFrameNodeData>> {
     render(): JSX.Element {
@@ -36,13 +29,19 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
                 } else if (to_be_rendered.type.type === "string") {
                     render_content = `"${loadString(to_be_rendered as C0Value<"string">, data.mem)}"`;
                 } else if (to_be_rendered.type.type === "ptr") {
-                    render_content = "Pointer";
-                    handles.push(<Handle type="source" id={"s-val-ptr-" + i} position={Position.Right} style={{ top: calculate_entry_height(valid_cnt), right: "1rem" }}/>);
+                    render_content = isNullPtr(to_be_rendered.value) ? "NULL" : "Pointer";
                 } else {
                     render_content = "Unknown value";
                 }
                 contents.push(
-                    <p key={"s-val-value-" + i} className="dbg-frame-content">{render_content}</p>
+                    <div>
+                        <p key={"s-val-value-" + i} className="dbg-frame-content">{render_content}</p>
+                        {
+                            to_be_rendered.type.type === "ptr" && !isNullPtr(to_be_rendered.value)?
+                            <Handle type="source" key={"s-val-ptr-" + i} id={"s-val-ptr-" + i} position={Position.Right} style={{ top: calculate_entry_height(valid_cnt, "frame"), right: "1.2rem" }}/>
+                            : null
+                        }
+                    </div>
                 )
                 valid_cnt ++;
             }
