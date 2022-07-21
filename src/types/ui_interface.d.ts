@@ -81,7 +81,8 @@ interface DebugConsoleProps {
 
 interface DebugConsoleState {
     show: boolean,
-    mode: "tablular" | "graphical"
+    mode: "tablular" | "graphical",
+    err: boolean
 }
 
 interface TabularDebugEvaluationProps {
@@ -112,4 +113,19 @@ interface C0StructNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
     typeRecord: Map<string, Map<number, Struct_Type_Record>>
+}
+
+interface C0ArrayNodeData {
+    ptr: C0Value<"ptr">,
+    mem: C0HeapAllocator
+}
+
+interface C0PointerNodeData {
+    ptr: C0Value<"ptr">,
+    mem: C0HeapAllocator
+}
+
+interface C0ValueNodeData {
+    val: C0Value<"ptr">,
+    mem: C0HeapAllocator
 }

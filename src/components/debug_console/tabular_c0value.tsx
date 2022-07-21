@@ -17,7 +17,7 @@ import { c0_cvt2_js_value } from "../../vm_core/utility/c0_value";
 import { isNullPtr, read_ptr } from "../../vm_core/utility/pointer_ops";
 import { loadString } from "../../vm_core/utility/string_utility";
 
-import { derefValue, expandArrayValue, expandStructValue } from "../../utility/debug_utility";
+import { derefValue, expandArrayValue, expandStructValue } from "./debug_utility";
 
 export default class C0ValueTabularDisplay extends React.Component<
     C0ValueTabularDisplayProps,
@@ -221,7 +221,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                 StructFields.push(
                     <li key={entry.offset}>
                         {field_name}
-                        <p className="dbg-evaluate-tabular-content dbg-error-information">No Type Information</p>
+                        <p className="dbg-evaluate-tabular-content dbg-error-information">No Type Info</p>
                     </li>
                 )
             } else {

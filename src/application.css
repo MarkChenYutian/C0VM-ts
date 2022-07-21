@@ -323,8 +323,11 @@ p.dbg-error-information {
     color: #bbbbbb;
 }
 
-li > p.dbg-evaluate-field-name {
+p.dbg-evaluate-field-name {
     color: #006cae;
+}
+
+li > p.dbg-evaluate-field-name {
     display: inline-block;
     margin: 0;
 }
@@ -345,7 +348,7 @@ li > .dbg-evaluate-tabular-content {
     border: 1px solid silver;
     min-width: 5rem;
     min-height: 2rem;
-    padding: .3rem 1.5rem .3rem 1rem;
+    padding: .3rem 2rem .3rem 1rem;
     border-radius: .3rem;
     background-color: #FEFEFE;
 

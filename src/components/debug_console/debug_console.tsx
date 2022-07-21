@@ -17,8 +17,17 @@ import C0VM_RuntimeState from "../../vm_core/exec/state";
 import C0StackFrameNode from "./reactflow/stack_node";
 import { build_nodes } from "./graph_builder";
 import C0StructNode from "./reactflow/struct_node";
+import C0ArrayNode from "./reactflow/array_node";
+import C0PointerNode from "./reactflow/pointer_node";
+import C0ValueNode from "./reactflow/value_node";
 
-const node_types = {stackNode: C0StackFrameNode, structNode: C0StructNode};
+const node_types = {
+    stackNode: C0StackFrameNode,
+    structNode: C0StructNode,
+    arrayNode: C0ArrayNode,
+    pointerNode: C0PointerNode,
+    valueNode: C0ValueNode
+};
 
 export default class DebugConsole extends React.Component
 <
@@ -27,7 +36,7 @@ export default class DebugConsole extends React.Component
 > {
     constructor(props: DebugConsoleProps) {
         super(props);
-        this.state = { show: true, mode: "tablular" };
+        this.state = { show: true, mode: "tablular", err: false };
     }
 
     render_no_valid_state() {
@@ -51,6 +60,29 @@ export default class DebugConsole extends React.Component
     }
 
     render() {
+        if (this.state.err) {
+            return (
+            <>
+                <h3 onClick={() => this.setState((state) => {return {show: !state.show}})}>
+                    <FontAwesomeIcon icon={faCalculator}/>
+                    {" Debug Console "}
+                    {this.state.show ? <FontAwesomeIcon icon={faAngleDown}/> : <FontAwesomeIcon icon={faAngleRight} />}
+                </h3>
+                {this.state.show ? 
+                    <Result 
+                    className="debug-console-info"
+                    status="error"
+                    title="Debugger Crashed!"
+                    extra={
+                        <button className="base-btn main-btn" onClick={() => this.setState({err: false, mode: "tablular"})}>
+                            Reload Debugger
+                        </button>
+                    }
+                    /> : null
+                }
+            </>);
+        }
+
         return (
             <>
                 <div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline"}}>
@@ -80,6 +112,14 @@ export default class DebugConsole extends React.Component
             </>
         )
     }
+
+    componentDidCatch(e: Error) {
+        globalThis.MSG_EMITTER.err(
+            "Debugger Interface Exception",
+            e.name + ": " + e.message
+        );
+        this.setState({err: true});
+    }
 }
 
 
@@ -104,27 +144,9 @@ class TabularDebugEvaluation extends React.Component<
 }
 
 
-class GraphicalDebugEvaluation extends React.Component<TabularDebugEvaluationProps, {err: boolean}> { 
-    constructor(props: TabularDebugEvaluationProps) {
-        super(props);
-        this.state = {err: false};
-    }
-
+class GraphicalDebugEvaluation extends React.Component<TabularDebugEvaluationProps> { 
     render(): React.ReactNode {
-        if (this.state.err) {
-            return <Result 
-                className="debug-console-info"
-                status="error"
-                title="Graphical Visualizer Crashed!"
-                extra={
-                    <button className="base-btn main-btn" onClick={() => this.setState({err: false})}>
-                        Reload Graph
-                    </button>
-                }
-            />;
-        }
-
-        const nodes = build_nodes(this.props.state, this.props.mem);
+        const [nodes, edges] = build_nodes(this.props.state, this.props.mem);
 
         // React Flow Setup //////////////////
         
@@ -132,18 +154,11 @@ class GraphicalDebugEvaluation extends React.Component<TabularDebugEvaluationPro
             <ReactFlow className="debug-console"
                 nodeTypes={node_types}
                 nodes={nodes}
+                edges={edges}
             >
                 <Controls/>
                 <Background/>
             </ReactFlow>
         )
-    }
-
-    componentDidCatch(e: Error) {
-        globalThis.MSG_EMITTER.warn(
-            "Debugger Interface Exception",
-            e.name + ": " + e.message
-        );
-        this.setState({err: true});
     }
 }

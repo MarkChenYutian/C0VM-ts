@@ -1,10 +1,11 @@
 import React from "react";
 import { Handle, NodeProps, Position } from "react-flow-renderer";
-import { expandStructValue, render_c0_value } from "../../../utility/debug_utility";
+import { expandStructValue, render_c0_value } from "../debug_utility";
 import { internal_error } from "../../../utility/errors";
-import { calculate_entry_height } from "../../../utility/graphical_utility";
+import { calculate_entry_height } from "../graphical_utility";
 import { isNullPtr } from "../../../vm_core/utility/pointer_ops";
 import { loadString } from "../../../vm_core/utility/string_utility";
+import { heapNodeTargetHandleID } from "../graph_builder";
 
 export default class C0StructNode extends React.Component<NodeProps<C0StructNodeData>> {
     render_content(mem: C0HeapAllocator, type: C0Type<"ptr">, value: C0Pointer, typeRecord: Map<string, Map<number, Struct_Type_Record>>) {
@@ -26,11 +27,14 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
         for (let i = 0; i < fields.length; i ++) {
             const entry = fields[i];
             StructFields.push(
-                <p className="dbg-evaluate-field-name">{entry.name ?? ("Offset @ " + entry.offset)}</p>
+                <p className="dbg-evaluate-field-name">
+                    {/* {entry.value === undefined ? null : <><code>{Type2String(entry.value.type)}</code> &nbsp;</>} */}
+                    {entry.name ?? ("Offset @ " + entry.offset)}
+                </p>
             );
             if (entry.value === undefined) {
                 StructFields.push(
-                    <p className="dbg-error-information">No Type Information</p>
+                    <p className="dbg-error-information">No Type Info</p>
                 );
             } else {
                 let render_content = null;
@@ -64,7 +68,7 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
         const ValueValue = data.ptr.value;
 
         return <div className="dbg-frame-node">
-            <Handle position={Position.Left} type="target" style={{top: "1rem"}} />
+            <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem"}} />
             {this.render_content(data.mem, ValueType, ValueValue, data.typeRecord)}
         </div>;
     }

@@ -1,6 +1,6 @@
-import { c0_cvt2_js_value } from "../vm_core/utility/c0_value";
-import { read_ptr, shift_ptr } from "../vm_core/utility/pointer_ops";
-import { internal_error } from "./errors";
+import { c0_cvt2_js_value } from "../../vm_core/utility/c0_value";
+import { read_ptr, shift_ptr } from "../../vm_core/utility/pointer_ops";
+import { internal_error } from "../../utility/errors";
 
 /**
  * Expend an array pointer in C0Value into a list of C0Value.

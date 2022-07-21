@@ -1,10 +1,11 @@
 import React from "react";
 import { NodeProps, Handle, Position } from "react-flow-renderer";
-import { calculate_entry_height } from "../../../utility/graphical_utility";
+import { calculate_entry_height } from "../graphical_utility";
 import { Type2String } from "../../../vm_core/types/c0type_utility";
-import { render_c0_value } from "../../../utility/debug_utility";
+import { render_c0_value } from "../debug_utility";
 import { loadString } from "../../../vm_core/utility/string_utility";
 import { isNullPtr } from "../../../vm_core/utility/pointer_ops";
+import { stackSrcHandleID } from "../graph_builder";
 
 
 
@@ -38,7 +39,7 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
                         <p key={"s-val-value-" + i} className="dbg-frame-content">{render_content}</p>
                         {
                             to_be_rendered.type.type === "ptr" && !isNullPtr(to_be_rendered.value)?
-                            <Handle type="source" key={"s-val-ptr-" + i} id={"s-val-ptr-" + i} position={Position.Right} style={{ top: calculate_entry_height(valid_cnt, "frame"), right: "1.2rem" }}/>
+                            <Handle type="source" key={"s-val-ptr-" + i} id={stackSrcHandleID(i)} position={Position.Right} style={{ top: calculate_entry_height(valid_cnt, "frame"), right: "1.2rem" }}/>
                             : null
                         }
                     </div>

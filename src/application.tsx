@@ -28,7 +28,22 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
 
     render() {
         if (this.state.crashed) {
-            return <Result status="error" title="Application Crashed" subTitle="Reload the page to restart the application."/>
+            return <Result
+                status="error"
+                title="Application Crashed"
+                subTitle="Reload the page to restart the application."
+                extra={
+                    <button
+                        className="base-btn main-btn"
+                        onClick={() => {
+                            globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
+                            this.setState({crashed: false, C0Runtime: undefined, PrintoutValue: ""});
+                        }}
+                    >
+                        Restore Editor Content
+                    </button>
+                }
+            />
         }
         return (
             <div className="page-framework">
