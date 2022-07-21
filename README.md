@@ -15,4 +15,4 @@ See the demo of this project here: https://markchenyutian.github.io/C0VM-ts/buil
 
 # Project Documentation
 
-Documentations are moved to the Git Repo Wiki part. See [here](https://github.com/MarkChenYutian/C0VM-ts/wiki/Main).
+Documentations are in GitBook here: https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/
