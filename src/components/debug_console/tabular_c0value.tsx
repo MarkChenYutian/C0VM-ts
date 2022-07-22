@@ -13,11 +13,10 @@ import React from "react";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { c0_cvt2_js_value } from "../../vm_core/utility/c0_value";
 import { isNullPtr, read_ptr } from "../../vm_core/utility/pointer_ops";
 import { loadString } from "../../vm_core/utility/string_utility";
 
-import { derefValue, expandArrayValue, expandStructValue } from "./debug_utility";
+import { derefValue, expandArrayValue, expandStructValue, render_c0_value } from "./debug_utility";
 
 export default class C0ValueTabularDisplay extends React.Component<
     C0ValueTabularDisplayProps,
@@ -255,13 +254,7 @@ export default class C0ValueTabularDisplay extends React.Component<
 
     render(): React.ReactNode {
         if (this.props.value.type.type === "value") {
-            switch (this.props.value.type.value) {
-                case "bool":
-                case "int":
-                    return <p>{"" + c0_cvt2_js_value(this.props.value as C0Value<"value">)}</p>
-                case "char":
-                    return <p>'{c0_cvt2_js_value(this.props.value as C0Value<"value">)}'</p>
-            }
+            return <p>{render_c0_value(this.props.value as C0Value<"value">)}</p>
         }
         if (this.props.value.type.type === "string") {
             return <p>"{loadString(this.props.value as C0Value<"string">, this.props.mem)}"</p>

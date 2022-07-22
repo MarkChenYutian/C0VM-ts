@@ -1,0 +1,42 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2022                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+/*
+ * Testing the text buffer implementation.
+ *
+ * Note that this is just for testing! This code allows the user's
+ * input to attempt to do invalid things like deleting from an empty
+ * buffer and moving left or right off the end of an array. These
+ * should lead to a @requires violation.
+ *
+ * cc0 -d -w -x tbuf.c0 editor.c0 editor-test.c0 test-main.c0
+ *
+ * 15-122 Principles of Imperative Computation */
+
+
+/********************* Implementation *********************/
+
+tbuf* extract_tbuf(tbuf* B) { return B; }
+int row(tbuf* B) { return tbuf_row(B); }
+int col(tbuf* B) { return tbuf_col(B); }
+tbuf* new() { return tbuf_new(); }
+void forward(tbuf* B) { tbuf_forward(B); }
+void backward(tbuf* B) { tbuf_backward(B); }
+void insert(tbuf* B, char c) { tbuf_insert(B, c); }
+void delete(tbuf* B) { tbuf_delete(B); }
+
+// Client type
+typedef tbuf* buffer_t;
+
+
+/********************* Interface *********************/
+
+tbuf* extract_tbuf(buffer_t B);
+int row(buffer_t B);
+int col(buffer_t B);
+buffer_t new();
+void forward(buffer_t B);
+void backward(buffer_t B);
+void insert(buffer_t B, char c);
+void delete(buffer_t B);

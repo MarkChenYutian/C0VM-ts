@@ -105,3 +105,7 @@ export function c0_readline(mem: C0HeapAllocator): C0Pointer {
     const userInput = prompt("C0VM.ts Input:");
     return allocate_js_string(mem, userInput === null ? "" : userInput);
 }
+
+export function c0_flush(): boolean {
+    return true;
+}

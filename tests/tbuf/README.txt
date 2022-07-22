@@ -1,0 +1,13 @@
+# WARNING
+
+IF YOU ARE CURRENTLY ENROLLED IN 15-122, DO NOT OPEN ANY FILE 
+IN THIS DIRECTORY. DOING SO WILL LEAD TO ACADEMIC INTEGRITY 
+VIOLATION.
+
+THIS FILE IS HERE ONLY FOR TESTING PURPOSE.
+
+# YOU HAVE BEEN WARNED
+
+Compiling and running the tbuf tests:
+   % cc0 -W -w -b -o tbuf-test.bc0 tbuf.c0 tbuf-test.c0 test-main.c0
+   % ./tbuf-test

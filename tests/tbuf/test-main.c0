@@ -1,0 +1,98 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2022                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+/*
+ * Testing the text buffer implementation.
+ *
+ * Note that this is just for testing! This code allows the user's
+ * input to attempt to do invalid things like deleting from an empty
+ * buffer and moving left or right off the end of an array. These
+ * should lead to a @requires violation.
+ *
+ * cc0 -d -w -x tbuf.c0 tbuf-test.c0
+ *
+ * 15-122 Principles of Imperative Computation */
+
+#use <string>
+#use <conio>
+
+void visualize_tbuf(tbuf* B)
+{
+  printf("START");
+  for (dll* L = B->start->next; L != B->end; L = L->next) {
+    printf(" <--> ");
+    if (L == B->cursor) printf("_");
+    printf("'");
+    if (L->data == '\n') printf("\\n");
+    else printf("%c", L->data);
+    printf("'");
+    if (L == B->cursor) printf("_");
+  }
+
+  if (B->cursor == B->end) printf(" <--> _END_\n");
+  else printf(" <--> END\n");
+}
+
+void process_char(buffer_t BUF, char c)  {
+  if (c == '<') {
+    printf("<=   : ");
+    backward(BUF);
+  } else if (c == '>') {
+    printf("=>   : ");
+    forward(BUF);
+  } else if (c == '^') {
+    printf("del  : ");
+    delete(BUF);
+  } else if (c == '@') {
+    printf("enter: ");
+    insert(BUF,'\n');
+  } else {
+    printf("'%c'  : ", c);
+    insert(BUF,c);
+  }
+}
+
+void visualize_position(buffer_t BUF) {
+  printf("       Position: (%d,%d)\n", row(BUF), col(BUF));
+}
+
+void process_string(buffer_t BUF, string s) {
+  int limit = string_length(s);
+  for(int i = 0; i < limit; i++) {
+    process_char(BUF, string_charat(s, i));
+    visualize_tbuf(extract_tbuf(BUF));
+    visualize_position(BUF);
+  }
+}
+
+void test()
+{
+  buffer_t BUF = new();
+  printf("Visualizing an initially-empty text buffer.\n");
+  printf("The '<' character mimics going backwards (left arrow key)\n");
+  printf("The '>' character mimics going forwards (right arrow key)\n");
+  printf("The '^' character mimics deletion (delete key)\n");
+  printf("The '@' character mimics a newline (enter key)\n");
+  printf("All other characters just insert that character\n\n");
+  printf("Give initial input (empty line quits): ");
+  flush();
+
+  string s = readline();
+
+  while(!string_equal("", s)) {
+    printf("       ");
+    visualize_tbuf(extract_tbuf(BUF));
+    visualize_position(BUF);
+    process_string(BUF, s);
+    printf("Done. More input? (empty line quits): ");
+    flush();
+    s = readline();
+  }
+}
+
+int main() {
+  test();
+  printf("Goodbye.\n");
+  return 0;
+}

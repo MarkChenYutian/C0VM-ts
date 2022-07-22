@@ -143,7 +143,13 @@ export function render_c0_value(v: C0Value<"value">): string {
         case "int":
             return "" + c0_cvt2_js_value(v);
         case "char":
-            return "'" + c0_cvt2_js_value(v) + "'";
+            const string = c0_cvt2_js_value(v);
+            if (string === "\n") {
+                return "'\\n'";
+            } else if (string === "\0") {
+                return "'\\0'";
+            }
+            return "'" + string + "'";
     }
 }
 

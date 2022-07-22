@@ -78,7 +78,9 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_FLUSH",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (UIHook: ReactUIHook, mem: C0HeapAllocator) => {
+                    return js_cvt2_c0_value(IONative.c0_flush());
+                }
             };
         /**
          * TODO:
@@ -341,21 +343,58 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_CHAR_CHR",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>) => {
+                        if (TypeUtil.maybeValueType(arg1)) {
+                            return js_cvt2_c0_value(
+                                StringNative.c0_char_chr(arg1)
+                            );
+                        }
+                        throw new vm_error("NATIVE_CHAR_CHR only accepts (value) as input");
+                    },
             };
         }
         case 92: {
             return {
                 functionType: "NATIVE_CHAR_ORD",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>) => {
+                        if (TypeUtil.maybeValueType(arg1)) {
+                            return js_cvt2_c0_value(
+                                StringNative.c0_char_ord(arg1)
+                            );
+                        }
+                        throw new vm_error("NATIVE_CHAR_ORD only accepts (value) as input");
+                    },
             };
         }
         case 93: {
             return {
                 functionType: "NATIVE_STRING_CHARAT",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>,
+                    arg2: C0Value<C0TypeClass>
+                ) => {
+                    if (
+                        TypeUtil.maybeStringType(arg1) &&
+                        TypeUtil.maybeValueType(arg2)
+                    ) {
+                        return js_cvt2_c0_value(
+                            StringNative.c0_string_charat(mem, arg1, arg2)
+                        );
+                    }
+                    throw new vm_error(
+                        "NATIVE_STRING_CHARAT only accepts (string, value) as input"
+                    );
+                },
             };
         }
         case 94: {
@@ -512,14 +551,50 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_STRING_SUB",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHook: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>,
+                    arg2: C0Value<C0TypeClass>,
+                    arg3: C0Value<C0TypeClass>,
+                ) => {
+                    if (
+                        TypeUtil.maybeStringType(arg1) &&
+                        TypeUtil.maybeValueType(arg2) &&
+                        TypeUtil.maybeValueType(arg3)
+                    ) {
+                        return build_c0_stringValue(
+                            StringNative.c0_string_sub(mem, arg1, arg2, arg3)
+                        );
+                    }
+                    throw new vm_error(
+                        "NATIVE_STRING_SUB only accepts (string, value, value) as input"
+                    );
+                },
             };
         }
         case 103: {
             return {
                 functionType: "NATIVE_STRING_TERMINATED",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHook: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>,
+                    arg2: C0Value<C0TypeClass>
+                ) => {
+                    if (
+                        TypeUtil.maybePointerType(arg1) &&
+                        TypeUtil.maybeValueType(arg2)
+                    ) {
+                        return js_cvt2_c0_value(
+                            StringNative.c0_string_terminated(mem, arg1, arg2)
+                        );
+                    }
+                    throw new vm_error(
+                        "NATIVE_STRING_TERMINATED only accepts (ptr, value) as input"
+                    );
+                },
             };
         }
         case 104: {
@@ -535,7 +610,7 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                         );
                     }
                     throw new vm_error(
-                        "NATIVE_STRING_TO_CHARARRAY only accepts pointer as input"
+                        "NATIVE_STRING_TO_CHARARRAY only accepts (string) as input"
                     );
                 },
             };
@@ -544,7 +619,16 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_STRING_TOLOWER",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (UIHook: ReactUIHook, mem: C0HeapAllocator, arg1: C0Value<C0TypeClass>) => {
+                    if (TypeUtil.maybeStringType(arg1)) {
+                        return build_c0_stringValue(
+                            StringNative.c0_string_tolower(mem, arg1)
+                        );
+                    }
+                    throw new vm_error(
+                        "NATIVE_STRING_TOLOWER only accepts (string) as input"
+                    );
+                },
             };
         }
         default:

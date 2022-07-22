@@ -1,12 +1,18 @@
 /**
  * @author Yutian Chen <yutianch@andrew.cmu.edu>
  * @Description TypeScript implementation of string native functions in C0VM.
+ * 
+ * Source:
+ * cc0/bare/cstr.c
+ * cc0/libs/string/string.c
  */
 
 import { c0_cvt2_js_value } from "../utility/c0_value";
-import { vm_error } from "../../utility/errors";
+import { c0_value_error, vm_error } from "../../utility/errors";
 import { read_ptr } from "../utility/pointer_ops";
 import { loadString, allocate_js_string } from "../utility/string_utility";
+import { expandArrayValue } from "../../components/debug_console/debug_utility";
+import { String2Type } from "../types/c0type_utility";
 
 /**
  * Compare two "string" objects
@@ -164,4 +170,77 @@ export function c0_string_from_chararray(
         str = str + String.fromCharCode(mem_block.getUint8(4 + i));
     }
     return allocate_js_string(mem, str);
+}
+
+export function c0_string_charat(
+    mem: C0HeapAllocator,
+    arg1: C0Value<Maybe<"string">>,
+    arg2: C0Value<Maybe<"value">>
+): string {
+    const str = loadString(arg1, mem);
+    // Force cast
+    arg2.type = {type: "value", value: "int"};
+
+    const idx = c0_cvt2_js_value(arg2) as number;
+    if (idx < 0 || idx >= str.length) throw new c0_value_error("c0_string_charat: index out of bound");
+    return str[idx];
+}
+
+export function c0_string_sub(
+    mem: C0HeapAllocator,
+    arg1: C0Value<Maybe<"string">>,
+    arg2: C0Value<Maybe<"value">>,
+    arg3: C0Value<Maybe<"value">>
+): C0Pointer {
+    const str = loadString(arg1, mem);
+    // Force cast
+    arg2.type = {type: "value", value: "int"};
+    arg3.type = {type: "value", value: "int"};
+
+    const lidx = c0_cvt2_js_value(arg2) as number;
+    const ridx = c0_cvt2_js_value(arg3) as number;
+    if (lidx < 0) throw new c0_value_error("c0_string_sub: start_idx < 0");
+    if (ridx > str.length) throw new c0_value_error("c0_string_sub: end_idx > string length");
+    if (lidx > ridx) throw new c0_value_error("c0_string_sub: start_idx > end_idx");
+    if (lidx === ridx) return allocate_js_string(mem, "");
+    return allocate_js_string(mem, str.slice(lidx, ridx));
+}
+
+
+export function c0_string_terminated(
+    mem: C0HeapAllocator,
+    arg1: C0Value<Maybe<"ptr">>,
+    arg2: C0Value<Maybe<"value">>
+): boolean {
+    // Force cast
+    arg1.type = String2Type("char[]") as C0Type<"ptr">;
+    arg2.type = String2Type("int") as C0Type<"value">;
+
+    const str = expandArrayValue(mem, arg1 as C0Value<"ptr">);
+
+    const n = c0_cvt2_js_value(arg2);
+    for (let i = 0; i < str.length && i < n; i ++) {
+        if (c0_cvt2_js_value(str[i] as C0Value<"value">) === '\0') {
+            return true;
+        }
+    }
+    return false;
+}
+
+export function c0_char_ord(arg1: C0Value<Maybe<"value">>): number {
+    return c0_cvt2_js_value(arg1).toString().charCodeAt(0);
+}
+
+export function c0_char_chr(arg1: C0Value<Maybe<"value">>): string {
+    // Force cast
+    arg1.type = String2Type("int") as C0Type<"value">;
+
+    const n = c0_cvt2_js_value(arg1) as number;
+    if (n < 0 || n > 127) throw new c0_value_error("c0_char_chr: only ASCII code [0, 127] is supported.");
+    return String.fromCharCode(n);
+}
+
+export function c0_string_tolower(mem: C0HeapAllocator, arg1: C0Value<Maybe<"string">>): C0Pointer {
+    const s = loadString(arg1, mem);
+    return allocate_js_string(mem, s.toLowerCase());
 }

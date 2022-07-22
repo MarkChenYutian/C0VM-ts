@@ -1,9 +1,6 @@
 @media screen and (min-width: 810px) {
     div.code-editor {
-        max-width: calc(50vw - 1.5rem);
-    }
-    div.io-area {
-        max-width: calc(50vw - 1.5rem);
+        max-width: min(calc(50vw - 1.5rem), 50rem);
     }
 }
 

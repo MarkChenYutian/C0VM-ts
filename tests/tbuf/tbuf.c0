@@ -1,0 +1,176 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2022                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+/*
+ * Text buffers as doubly linked lists.
+ *
+ * 15-122 Principles of Imperative Computation */
+
+/*** Interface ***/
+
+typedef struct dll_node dll;
+struct dll_node {
+  dll* next;
+  char data;
+  dll* prev;
+};
+
+typedef struct tbuf_header tbuf;
+struct tbuf_header {
+  dll* start;  /* the fist node of the list (on the left)  */
+  dll* cursor; /* the position where the cursor is displayed */
+  dll* end;    /* the last node of the list (on the right) */
+};
+
+bool is_tbuf(tbuf* B);
+
+bool tbuf_at_left(tbuf* B);            /* Returns true if the cursor       */
+                                       /* is in leftmost position          */
+bool tbuf_at_right(tbuf* B);           /* Returns true if the cursor       */
+                                       /* is in rightmost position         */
+
+tbuf* tbuf_new();                      /* Creates a new, empty text buffer */
+void tbuf_forward(tbuf* B);            /* Moves the cursor forward (right) */
+void tbuf_backward(tbuf* B);           /* Moves the cursor backward (left) */
+void tbuf_insert(tbuf* B, char c);     /* Insert a character before cursor */
+char tbuf_delete(tbuf* B);             /* Remove character before cursor   */
+                                       /* (and returns the deleted char)   */
+
+int tbuf_row(tbuf* B);                 /* Returns the row of the cursor    */
+int tbuf_col(tbuf* B);                 /* Returns the column of the cursor */
+
+/*** Implementation ***/
+
+
+bool is_tbuf(tbuf* B){
+    // Null Pointer Check
+    if (B == NULL || B ->start == NULL ||
+        B -> end == NULL || B -> cursor == NULL){
+        return false;
+    }
+    // LinkList Property Check
+    dll* check_ptr = B -> start -> next;
+    if (check_ptr == NULL) return false;
+    bool cursor_in_chain = false;
+
+    // Test for middle double link list
+    while (check_ptr != B -> end)
+    //@loop_invariant check_ptr != NULL;
+    {
+        if (check_ptr -> prev == NULL) return false;
+        if (check_ptr -> next == NULL) return false;
+        if (check_ptr -> prev -> next != check_ptr) return false;
+        if (check_ptr -> next -> prev != check_ptr) return false;
+        if (check_ptr == B -> cursor) cursor_in_chain = true;
+        check_ptr = check_ptr -> next;
+    }
+
+    // Test for tbuf -> end
+    if (check_ptr != B -> end) return false;
+    if (check_ptr -> prev == NULL) return false;
+    if (check_ptr -> prev -> next != check_ptr) return false;
+    if (check_ptr == B -> cursor) cursor_in_chain = true;
+
+    // Test for tbuf -> start
+    if (B -> start == NULL) return false;
+    if (B -> start -> next == NULL) return false;
+    if (B -> start -> next -> prev != B -> start) return false;
+
+    // Cursor in Linklist
+    if (!cursor_in_chain) return false;
+
+    return true;
+}
+
+bool tbuf_at_left(tbuf* B)
+//@requires is_tbuf(B);
+{
+    return B -> cursor == B -> start -> next;
+}
+
+bool tbuf_at_right(tbuf* B)
+//@requires is_tbuf(B);
+{
+    return B -> cursor == B -> end;
+}
+
+tbuf* tbuf_new()
+//@ensures is_tbuf(\result);
+//@ensures tbuf_at_left(\result) && tbuf_at_right(\result);
+{
+    tbuf* text_buffer = alloc(tbuf);
+    text_buffer -> start = alloc(dll);
+    text_buffer -> end = alloc(dll);
+    text_buffer -> start -> next = text_buffer -> end;
+    text_buffer -> end -> prev = text_buffer -> start;
+    text_buffer -> cursor = text_buffer -> end;
+    return text_buffer;
+}
+
+void tbuf_forward(tbuf* B)
+//@requires is_tbuf(B);
+//@requires !tbuf_at_right(B);
+{
+    B -> cursor = B -> cursor -> next;
+}
+
+void tbuf_backward(tbuf* B)
+//@requires is_tbuf(B);
+//@requires !tbuf_at_left(B);
+{
+    B -> cursor = B -> cursor -> prev;
+}
+
+void tbuf_insert(tbuf* B, char c)
+//@requires is_tbuf(B);
+{
+    dll* new_node = alloc(dll);
+
+    new_node -> data = c;
+    new_node -> next = B -> cursor;
+    new_node -> prev = B -> cursor -> prev;
+
+    B -> cursor -> prev = new_node;
+    new_node -> prev -> next = new_node;
+}
+
+char tbuf_delete(tbuf* B)
+//@requires is_tbuf(B);
+//@requires !tbuf_at_left(B);
+{
+    char result = B -> cursor -> prev -> data;
+    B -> cursor -> prev -> prev -> next = B -> cursor;
+    B -> cursor -> prev = B -> cursor -> prev -> prev;
+    return result;
+}
+
+int tbuf_row(tbuf* B)
+//@requires is_tbuf(B);
+//@ensures 1 <= \result;
+{
+    dll* ptr = B -> cursor -> prev;
+    int row_cnt = 0;
+    while (ptr != B -> start)
+    //@loop_invariant ptr != NULL;
+    {
+        if (ptr -> data == '\n') row_cnt ++;
+        ptr = ptr -> prev;
+    }
+    return row_cnt + 1;
+}
+
+int tbuf_col(tbuf* B)
+//@requires is_tbuf(B);
+//@ensures 0 <= \result;
+{
+    dll* ptr = B -> cursor -> prev;
+    int col_cnt = 0;
+    while (ptr != B -> start && ptr -> data != '\n')
+    //@loop_invariant ptr != NULL;
+    {
+        col_cnt ++;
+        ptr = ptr -> prev;
+    }
+    return col_cnt;
+}

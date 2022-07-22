@@ -5,7 +5,7 @@ import { internal_error } from "../../../utility/errors";
 import { calculate_entry_height } from "../graphical_utility";
 import { isNullPtr } from "../../../vm_core/utility/pointer_ops";
 import { loadString } from "../../../vm_core/utility/string_utility";
-import { heapNodeTargetHandleID } from "../graph_builder";
+import { heapNodeTargetHandleID, structSrcHandleID } from "../graph_builder";
 
 export default class C0StructNode extends React.Component<NodeProps<C0StructNodeData>> {
     render_content(mem: C0HeapAllocator, type: C0Type<"ptr">, value: C0Pointer, typeRecord: Map<string, Map<number, Struct_Type_Record>>) {
@@ -51,7 +51,12 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
                         <p key={"s-val-value-" + entry.offset} className="dbg-frame-content">{render_content}</p>
                         {
                             entry.value.type.type === "ptr" && !isNullPtr(entry.value.value)?
-                            <Handle type="source" key={"s-val-ptr-" + entry.offset} id={"s-val-ptr-" + entry.offset} position={Position.Right} style={{ top: calculate_entry_height(i, "struct"), right: "1.2rem" }}/>
+                            <Handle type="source"
+                                key={structSrcHandleID(entry.offset)}
+                                id={structSrcHandleID(entry.offset)}
+                                position={Position.Right}
+                                style={{ top: calculate_entry_height(i, "struct"), right: "1.2rem" }}
+                            />
                             : null
                         }
                     </>
