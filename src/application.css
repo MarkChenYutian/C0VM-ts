@@ -1,6 +1,9 @@
 @media screen and (min-width: 810px) {
     div.code-editor {
-        max-width: min(calc(50vw - 1.5rem), 50rem);
+        max-width: min(calc(50vw - 1.5rem), 45rem);
+    }
+    div.io-area {
+        max-width: max(calc(50vw - 1.5rem), calc(100vw - 48rem));
     }
 }
 
@@ -236,7 +239,7 @@ pre#c0-output {
     column-gap: 1rem;
 
     font-size: small;
-    flex-grow: 1;
+    flex-grow: 3;
     flex-basis: 5rem;
 
     width: inherit !important;
@@ -248,7 +251,7 @@ pre#c0-output {
 }
 
 .debug-console-info {
-    flex-grow: 1;
+    flex-grow: 3;
     flex-basis: 5rem;
     border: 1px solid silver;
     border-radius: 0.3rem;
@@ -341,6 +344,25 @@ li > .dbg-evaluate-tabular-content {
 
 
 /* Graphical Debug Console */
+div.dbg-stack-node {
+    width: 15rem;
+    border-right: 2px solid #202030;
+    cursor: default;
+    border-radius: .3rem 0 0 .3rem;
+    background-color: #FAFAFE;
+}
+div.dbg-stack-node::before {
+    background: none;
+    border-right: 2px dashed #202030;
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 6px;
+    pointer-events: none;
+}
+
 .dbg-frame-node {
     border: 1px solid silver;
     min-width: 5rem;
@@ -359,6 +381,8 @@ li > .dbg-evaluate-tabular-content {
         6.7px 6.7px 5.3px rgba(0, 0, 0, 0.007),
         22.3px 22.3px 17.9px rgba(0, 0, 0, 0.011),
         100px 100px 80px rgba(0, 0, 0, 0.02);
+    
+    cursor: move;
 }
 
 .dbg-frame-content {
@@ -369,4 +393,8 @@ li > .dbg-evaluate-tabular-content {
 .dbg-entire-row {
     grid-column-start: 1;
     grid-column-end: 3;
+}
+
+path.react-flow__edge-path {
+    stroke-width: 1.5;
 }

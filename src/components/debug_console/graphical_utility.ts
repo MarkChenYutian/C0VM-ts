@@ -20,7 +20,7 @@ const TOP_HEIGHT  = 50;
 export function calculate_node_height(lines: number, type: NodeTypes) {
     switch (type) {
         case "frame":
-            return Math.max(TOP_HEIGHT + LINE_HEIGHT, TOP_HEIGHT + LINE_HEIGHT * lines);
+            return Math.max(STRUCT_TOP_HEIGHT + LINE_HEIGHT, TOP_HEIGHT + LINE_HEIGHT * lines);
         case "struct":
             return Math.max(TOP_HEIGHT + LINE_HEIGHT, TOP_HEIGHT + LINE_HEIGHT * lines);
         case "array":

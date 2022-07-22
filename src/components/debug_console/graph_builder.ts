@@ -1,11 +1,9 @@
-import { Node, Edge } from "react-flow-renderer";
+import { Node, Edge, MarkerType } from "react-flow-renderer";
 import { derefValue, expandArrayValue, expandStructValue, is_struct_pointer } from "./debug_utility";
 import { internal_error } from "../../utility/errors";
 import { calculate_node_height, valid_variable_count } from "./graphical_utility";
 import { isNullPtr, read_ptr } from "../../vm_core/utility/pointer_ops";
 import { Type2String } from "../../vm_core/types/c0type_utility";
-
-type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData;
 
 // ID Generate function that is shared between component and edge linker
 
@@ -56,7 +54,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator):
         nodes.push({
             id: stackNodeID(i),
             position: {x, y},
-            data: {frame: state.CallStack[i], mem: mem},
+            data: {frame: state.CallStack[i], mem: mem, dragged: false},
             type: "stackNode",
             draggable: false
         });
@@ -65,7 +63,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator):
     nodes.push({
         id: `stack-${state.CallStack.length}`,
         position: {x, y},
-        data: {frame: state.CurrFrame, mem: mem},
+        data: {frame: state.CurrFrame, mem: mem, dragged: false},
         type: "stackNode",
         draggable: false
     });
@@ -77,6 +75,11 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator):
     return [nodes, edges];
 }
 
+/**
+ * @param state The VM_STATE
+ * @param mem The heap memory allocator
+ * @returns A set of nodes and edges that represents the situation of heap memory space
+ */
 function BFS_heap_scan(state: VM_State, mem: C0HeapAllocator): [Node<VisData>[], Edge<undefined>[]]
 {
     // Initialize the "fringe (to-be-explored)" in BFS
@@ -90,7 +93,7 @@ function BFS_heap_scan(state: VM_State, mem: C0HeapAllocator): [Node<VisData>[],
     const drawn_ids: Set<string> = new Set();
 
     let curr_lv = 1;
-    let [x, y] = [350, 50];
+    let [x, y] = [450, 50];
 
     while (job_list.length > 0) {
         const curr_job = job_list.shift();
@@ -101,7 +104,7 @@ function BFS_heap_scan(state: VM_State, mem: C0HeapAllocator): [Node<VisData>[],
         else { drawn_ids.add(heapNodeID(val)); }
 
         if (lv !== curr_lv) {
-            [x, y] = [300 * lv, 80 * lv];  // Start position for next level of nodes
+            [x, y] = [150 + 300 * lv, 80 * lv];  // Start position for next level of nodes
             curr_lv = lv;
         }
 
@@ -121,6 +124,12 @@ function BFS_heap_scan(state: VM_State, mem: C0HeapAllocator): [Node<VisData>[],
     return [output, edges];
 }
 
+/**
+ * Given a C0Value, automatically expand it based on type information
+ * and trace down the pointers in its field if there exists non-NULL pointers.
+ * 
+ * Return a series of BFS nodes that are "successors" of current node V.
+ */
 function get_successors(V: C0Value<"ptr">, M: C0HeapAllocator, S: VM_State, lv: number): {val: C0Value<"ptr">, lv: number}[]
 {
     const output: {val: C0Value<"ptr">, lv: number}[] = [];
@@ -158,6 +167,23 @@ function get_successors(V: C0Value<"ptr">, M: C0HeapAllocator, S: VM_State, lv: 
     // return [];
 }
 
+/**
+ * Note: V here must be a C0Value<"ptr"> since if we have a 
+ * pointer T*, this function will always render the value "T"
+ * instead of T* itself.
+ * 
+ * V = String2Type("T*");
+ *           ------------
+ *   -----> |  T Typed  |
+ *          ------------
+ * 
+ * @param v The value to be rendered
+ * @param state The VM state to be rendered
+ * @param mem The heap memory of current VM
+ * @param x x-coordinate to place this node
+ * @param y y-coordinate to place this node
+ * @returns [Node itself, Edges sourced from this node, delta_y]
+ */
 function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAllocator, x: number, y: number): [Node<VisData>, Edge<undefined>[], number] {
     let result_data = undefined;
     let result_edge: Edge<undefined>[] = [];
@@ -167,7 +193,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
         result_data = {
             id: heapNodeID(v),
             position: {x, y},
-            data: {ptr: v, mem: mem, typeRecord: state.TypeRecord},
+            data: {ptr: v, mem: mem, typeRecord: state.TypeRecord, dragged: false},
             type: "structNode"
         };
 
@@ -191,7 +217,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
         result_data = {
             id: heapNodeID(v),
             position: {x, y},
-            data: {ptr: v, mem: mem},
+            data: {ptr: v, mem: mem, dragged: false},
             type: "arrayNode"
         }
 
@@ -216,7 +242,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
                 result_data = {
                     id: heapNodeID(v),
                     position: {x, y},
-                    data: {ptr: v, mem: mem},
+                    data: {ptr: v, mem: mem, dragged: false},
                     type: "unknownNode"
                 };
                 break;
@@ -224,7 +250,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
                 result_data = {
                     id: heapNodeID(v),
                     position: {x, y},
-                    data: {ptr: v, mem: mem},
+                    data: {ptr: v, mem: mem, dragged: false},
                     type: "pointerNode"
                 };
                 break;
@@ -233,7 +259,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
                 result_data = {
                     id: heapNodeID(v),
                     position: {x, y},
-                    data: {val: v, mem: mem},
+                    data: {val: v, mem: mem, dragged: false},
                     type: "valueNode"
                 };
                 break;
@@ -258,6 +284,13 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
     return [result_data, result_edge, delta_y];
 }
 
+/**
+ * Create an initial job queue for BFS by scanning through stack frames.
+ * 
+ * @param state The VM_state
+ * @returns A set of vertex in BFS as the initial level (thouse directly pointed by some
+ * local variables in stack frames)
+ */
 function scan_stack_get_ptrs(state: VM_State): {val: C0Value<"ptr">, lv: number}[] {
     let result = [];
 
@@ -279,6 +312,11 @@ function scan_stack_get_ptrs(state: VM_State): {val: C0Value<"ptr">, lv: number}
     return result;
 }
 
+/**
+ * @param state The VM_state
+ * @returns A set of edges where originated from stack frame and 
+ * pointing to somewhere in the heap memory.
+ */
 function scan_stack_build_edges(state: VM_State): Edge<undefined>[] {
     const result: Edge<undefined>[] = [];
     for (let i = 0; i < state.CallStack.length; i ++) {
@@ -307,19 +345,46 @@ function scan_stack_build_edges(state: VM_State): Edge<undefined>[] {
     return result;
 }
 
+/**
+ * 
+ * An abstracted method to build edge so that we can easily apply some global 
+ * styles (e.g. high zIndex, markerEnd, etc.) without being verbose.
+ * 
+ */
 function edge_factory(source: string, target: string, sourceHandle: string): Edge<undefined> {
     return {
         source, target, id: `${sourceHandle}@${source} > ${target}`, sourceHandle,
         zIndex: 999,
-        markerEnd: "arrowclosed"
+        markerEnd: {type: MarkerType.Arrow},
+        
     };
 }
 
-// function get_struct_name_from_ptr(ptr: C0Value<"ptr">): string {
-//     if (!is_struct_pointer(ptr)){
-//         if (DEBUG) console.log(ptr);
-//         throw new internal_error("get_struct_name_from_ptr() receives non-struct-ptr.");
-//     }
-//     const subtype = ptr.type.value as C0Type<"ptr">;
-//     return subtype.value as string;
-// }
+/**
+ * @param original_state The original position of nodes (possibly changed by user)
+ * @param new_state The new positions of nodes generated by BFS
+ * @return Whenever possible, use the position that user alters.
+ */
+export function merge_nodes(original_state: Node<VisData>[], new_state: Node<VisData>[]): Node<VisData>[] {
+    const original_map = original_state.reduce(
+        (prev, curr) => {
+            return prev.set(curr.id, curr);
+        },
+        new Map<string, Node<VisData>>()
+    );
+    
+    const merged_state = new_state.map(
+        (node) => {
+            const original_node = original_map.get(node.id);
+            if (original_node !== undefined && original_node.data.dragged) {
+                node.position = original_node.position;
+                node.data.dragged = true;
+                return node;
+            }
+            return node;
+        }
+    );
+
+    return merged_state;
+}
+
