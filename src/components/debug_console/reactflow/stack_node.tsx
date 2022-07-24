@@ -1,10 +1,10 @@
 import React from "react";
 import { NodeProps, Handle, Position } from "react-flow-renderer";
 import { calculate_entry_height } from "../graphical_utility";
-import { Type2String } from "../../../vm_core/types/c0type_utility";
-import { render_c0_value } from "../debug_utility";
-import { loadString } from "../../../vm_core/utility/string_utility";
-import { isNullPtr } from "../../../vm_core/utility/pointer_ops";
+import { Type2String } from "../../../utility/c0_type_utility";
+import { c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
+import { loadString } from "../../../utility/string_utility";
+import { isNullPtr } from "../../../utility/pointer_utility";
 import { stackSrcHandleID } from "../graph_builder";
 
 
@@ -26,7 +26,7 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
                 contents.push(<p key={"s-val-name-" + i}><code>{Type2String(to_be_rendered.type)} {data.frame.P.varName[i]}</code></p>);
                 let render_content = undefined;
                 if (to_be_rendered.type.type === "value") {
-                    render_content = render_c0_value(to_be_rendered as C0Value<"value">);
+                    render_content = c0_value_cvt2_js_string(to_be_rendered as C0Value<"value">);
                 } else if (to_be_rendered.type.type === "string") {
                     render_content = `"${loadString(to_be_rendered as C0Value<"string">, data.mem)}"`;
                 } else if (to_be_rendered.type.type === "ptr") {

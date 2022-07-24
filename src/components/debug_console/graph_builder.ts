@@ -1,9 +1,10 @@
 import { Node, Edge, MarkerType } from "react-flow-renderer";
-import { derefValue, expandArrayValue, expandStructValue, is_struct_pointer } from "./debug_utility";
+import { is_struct_pointer } from "../../utility/c0_type_utility";
+import { deref_C0Value, expand_C0Array, expand_C0Struct } from "../../utility/c0_value_utility";
 import { internal_error } from "../../utility/errors";
 import { calculate_node_height, valid_variable_count } from "./graphical_utility";
-import { isNullPtr, read_ptr } from "../../vm_core/utility/pointer_ops";
-import { Type2String } from "../../vm_core/types/c0type_utility";
+import { isNullPtr, read_ptr } from "../../utility/pointer_utility";
+import { Type2String } from "../../utility/c0_type_utility";
 
 // ID Generate function that is shared between component and edge linker
 
@@ -136,7 +137,7 @@ function get_successors(V: C0Value<"ptr">, M: C0HeapAllocator, S: VM_State, lv: 
     // Populate joblist, if necessary:
     switch (V.type.kind) {
         case "arr":
-            const js_arr = expandArrayValue(M, V);
+            const js_arr = expand_C0Array(M, V);
             for (let i = 0; i < js_arr.length; i ++) {
                 if (js_arr[i].type.type === "ptr" && !isNullPtr(js_arr[i].value)) {
                     output.push({val: js_arr[i] as C0Value<"ptr">, lv: lv + 1});
@@ -145,7 +146,7 @@ function get_successors(V: C0Value<"ptr">, M: C0HeapAllocator, S: VM_State, lv: 
             break;
         case "ptr":
             if (is_struct_pointer(V) && !isNullPtr(V.value)) {
-                const js_struct = expandStructValue(M, S.TypeRecord, V);
+                const js_struct = expand_C0Struct(M, S.TypeRecord, V);
                 js_struct.forEach(
                     ({value, offset, name}) => {
                         if (value !== undefined && value.type.type === "ptr" && !isNullPtr(value.value)) {
@@ -154,7 +155,7 @@ function get_successors(V: C0Value<"ptr">, M: C0HeapAllocator, S: VM_State, lv: 
                     }
                 )
             } else if (!isNullPtr(V.value)) {
-                const js_deref = derefValue(M, V);
+                const js_deref = deref_C0Value(M, V);
                 if (js_deref.type.type === "ptr" && !isNullPtr(js_deref.value)) {
                     output.push({val: js_deref as C0Value<"ptr">, lv: lv + 1});
                 }
@@ -197,7 +198,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
             type: "structNode"
         };
 
-        const fields = expandStructValue(mem, state.TypeRecord, v);
+        const fields = expand_C0Struct(mem, state.TypeRecord, v);
         delta_y = calculate_node_height(fields.length, "struct");
         ///////// Get Edges /////////
         for (let i = 0; i < fields.length; i ++) {
@@ -221,7 +222,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
             type: "arrayNode"
         }
 
-        const elems = expandArrayValue(mem, v);
+        const elems = expand_C0Array(mem, v);
         delta_y = calculate_node_height(elems.length, "array");
         ///////// Get Edges /////////
         for (let i = 0; i < elems.length; i ++) {
@@ -266,7 +267,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
         }
         delta_y = calculate_node_height(1, "struct");
         ///////// Get Edges /////////
-        const val = derefValue(mem, v);
+        const val = deref_C0Value(mem, v);
         if (val.type.type === "ptr" && !isNullPtr(val.value)) {
             result_edge.push(edge_factory(
                 heapNodeID(v),

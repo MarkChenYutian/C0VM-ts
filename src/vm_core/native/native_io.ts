@@ -2,7 +2,7 @@
  * @author Yutian Chen <yutianch@andrew.cmu.edu>
  * @Description TypeScript implementation of native I/O functions in C0VM.
  */
-import { allocate_js_string, loadString } from "../utility/string_utility";
+import { allocate_js_string, loadString } from "../../utility/string_utility";
 
 /**
  * Print string to terminal/HTML GUI according to the C0_ENVIR_MODE setting
@@ -44,10 +44,7 @@ export function c0_println(
     arg1: C0Value<Maybe<"string">>
 ): boolean {
     c0_print(hook, mem, arg1);
-    return internal_print(
-        hook,
-        "\n"
-    );
+    return internal_print(hook,"\n");
 }
 
 /**
@@ -96,8 +93,7 @@ export function c0_print_char(
 /**
  * Obtain user input synchronously
  * 
- * TODO: In the future, a more elegant way is to convert this into some 
- * kind of `async` function call. 
+ * @todo In the future convert this into some kind of `async` function call.
  * @param mem The heap memory to store the user input string
  * @returns A pointer points to the string user input
  */
@@ -106,6 +102,11 @@ export function c0_readline(mem: C0HeapAllocator): C0Pointer {
     return allocate_js_string(mem, userInput === null ? "" : userInput);
 }
 
+/**
+ * This is a dummy function to satisfy the compiled bc0 instructs
+ * 
+ * @returns always true, since there is no "flush" in React framework...
+ */
 export function c0_flush(): boolean {
     return true;
 }

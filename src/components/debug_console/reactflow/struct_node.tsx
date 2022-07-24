@@ -1,17 +1,17 @@
 import React from "react";
 import { Handle, NodeProps, Position } from "react-flow-renderer";
-import { expandStructValue, render_c0_value } from "../debug_utility";
+import { expand_C0Struct, c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
 import { internal_error } from "../../../utility/errors";
 import { calculate_entry_height } from "../graphical_utility";
-import { isNullPtr } from "../../../vm_core/utility/pointer_ops";
-import { loadString } from "../../../vm_core/utility/string_utility";
+import { isNullPtr } from "../../../utility/pointer_utility";
+import { loadString } from "../../../utility/string_utility";
 import { heapNodeTargetHandleID, structSrcHandleID } from "../graph_builder";
 
 export default class C0StructNode extends React.Component<NodeProps<C0StructNodeData>> {
     render_content(mem: C0HeapAllocator, type: C0Type<"ptr">, value: C0Pointer, typeRecord: Map<string, Map<number, Struct_Type_Record>>) {
         if (isNullPtr(value)) throw new internal_error("<C0StructNode/> Receives a NULL pointer");
 
-        const fields = expandStructValue(mem, typeRecord, {value: value, type: type});
+        const fields = expand_C0Struct(mem, typeRecord, {value: value, type: type});
         
         const struct_type = type.value;
         if (typeof struct_type === "string" || struct_type.type !== "ptr" || struct_type.kind !== "struct") {
@@ -39,7 +39,7 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
             } else {
                 let render_content = null;
                 if (entry.value.type.type === "value") {
-                    render_content = render_c0_value(entry.value as C0Value<"value">);
+                    render_content = c0_value_cvt2_js_string(entry.value as C0Value<"value">);
                 } else if (entry.value.type.type === "string") {
                     render_content = `"${loadString(entry.value as C0Value<"string">, mem)}"`;
                 } else if (entry.value.type.type === "ptr") {

@@ -1,14 +1,14 @@
 import React from "react";
 import { Handle, NodeProps, Position } from "react-flow-renderer";
-import { isNullPtr } from "../../../vm_core/utility/pointer_ops";
-import { loadString } from "../../../vm_core/utility/string_utility";
-import { expandArrayValue, render_c0_value } from "../debug_utility";
+import { isNullPtr } from "../../../utility/pointer_utility";
+import { loadString } from "../../../utility/string_utility";
+import { expand_C0Array, c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
 import { calculate_entry_height } from "../graphical_utility";
 import { arrSrcHandleID, heapNodeTargetHandleID } from "../graph_builder";
 
 export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeData>> {
     render_content() {
-        const js_array = expandArrayValue(this.props.data.mem, this.props.data.ptr);
+        const js_array = expand_C0Array(this.props.data.mem, this.props.data.ptr);
         if (js_array.length === 0) {
             return <p>Empty Array</p>
         }
@@ -26,7 +26,7 @@ export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeDa
                     break;
                 case "value":
                     result.push(<p key={"val-" + i}>
-                        {render_c0_value(to_be_rendered as C0Value<"value">)}
+                        {c0_value_cvt2_js_string(to_be_rendered as C0Value<"value">)}
                     </p>);
                     break;
                 case "<unknown>":

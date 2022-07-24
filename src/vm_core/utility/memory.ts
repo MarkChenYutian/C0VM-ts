@@ -8,7 +8,7 @@
  */
 
 import { c0_memory_error, vm_error } from "../../utility/errors";
-import { isNullPtr, read_ptr } from "./pointer_ops";
+import { isNullPtr, read_ptr } from "../../utility/pointer_utility";
 
 /**
  * Naive Heap Memory Allocator that mimic the memory manegement in C.

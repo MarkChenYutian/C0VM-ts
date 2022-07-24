@@ -13,10 +13,10 @@ import React from "react";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { isNullPtr, read_ptr } from "../../vm_core/utility/pointer_ops";
-import { loadString } from "../../vm_core/utility/string_utility";
+import { isNullPtr, read_ptr } from "../../utility/pointer_utility";
+import { loadString } from "../../utility/string_utility";
 
-import { derefValue, expandArrayValue, expandStructValue, render_c0_value } from "./debug_utility";
+import { deref_C0Value, expand_C0Array, expand_C0Struct, c0_value_cvt2_js_string } from "../../utility/c0_value_utility";
 
 export default class C0ValueTabularDisplay extends React.Component<
     C0ValueTabularDisplayProps,
@@ -46,7 +46,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                 Array [...]
             </p>
         }
-        const vals = expandArrayValue(this.props.mem, this.props.value as C0Value<"ptr">);
+        const vals = expand_C0Array(this.props.mem, this.props.value as C0Value<"ptr">);
         const content = [];
 
         if (vals.length > 100) {
@@ -163,7 +163,7 @@ export default class C0ValueTabularDisplay extends React.Component<
          * Otherwise, we only dereference the value and send it into a child <C0ValueTabularDisplay/>
          * so that values are rendered recursively.
          */
-        const deref_value = derefValue(this.props.mem, this.props.value as C0Value<"ptr">);
+        const deref_value = deref_C0Value(this.props.mem, this.props.value as C0Value<"ptr">);
         return (
             <div>
                 <button className="implicit-btn dbg-evaluate-tabular-btn" onClick={() => this.setState({expand: false})}>
@@ -198,7 +198,7 @@ export default class C0ValueTabularDisplay extends React.Component<
             return <p>NULL</p>;
         }
         
-        const fields = expandStructValue(
+        const fields = expand_C0Struct(
             this.props.mem,
             this.props.typeRecord,
             {
@@ -254,7 +254,7 @@ export default class C0ValueTabularDisplay extends React.Component<
 
     render(): React.ReactNode {
         if (this.props.value.type.type === "value") {
-            return <p>{render_c0_value(this.props.value as C0Value<"value">)}</p>
+            return <p>{c0_value_cvt2_js_string(this.props.value as C0Value<"value">)}</p>
         }
         if (this.props.value.type.type === "string") {
             return <p>"{loadString(this.props.value as C0Value<"string">, this.props.mem)}"</p>

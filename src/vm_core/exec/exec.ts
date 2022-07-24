@@ -1,10 +1,10 @@
 import * as Arithmetic from "../utility/arithmetic";
-import * as TypeUtil from "../types/c0type_utility";
+import * as TypeUtil from "../../utility/c0_type_utility";
 
-import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value, build_c0_stringValue } from "../utility/c0_value";
+import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value, build_c0_stringValue } from "../../utility/c0_value_utility";
 import { c0_memory_error, c0_user_error, vm_error, vm_instruct_error } from "../../utility/errors";
-import { read_ptr, shift_ptr } from "../utility/pointer_ops";
-import { loadString } from "../utility/string_utility";
+import { read_ptr, shift_ptr } from "../../utility/pointer_utility";
+import { loadString } from "../../utility/string_utility";
 import OpCode from "./opcode";
 
 /**

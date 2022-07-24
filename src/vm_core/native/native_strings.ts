@@ -7,12 +7,12 @@
  * cc0/libs/string/string.c
  */
 
-import { c0_cvt2_js_value } from "../utility/c0_value";
+import { c0_cvt2_js_value } from "../../utility/c0_value_utility";
 import { c0_value_error, vm_error } from "../../utility/errors";
-import { read_ptr } from "../utility/pointer_ops";
-import { loadString, allocate_js_string } from "../utility/string_utility";
-import { expandArrayValue } from "../../components/debug_console/debug_utility";
-import { String2Type } from "../types/c0type_utility";
+import { read_ptr } from "../../utility/pointer_utility";
+import { loadString, allocate_js_string } from "../../utility/string_utility";
+import { expand_C0Array } from "../../utility/c0_value_utility";
+import { String2Type } from "../../utility/c0_type_utility";
 
 /**
  * Compare two "string" objects
@@ -216,7 +216,7 @@ export function c0_string_terminated(
     arg1.type = String2Type("char[]") as C0Type<"ptr">;
     arg2.type = String2Type("int") as C0Type<"value">;
 
-    const str = expandArrayValue(mem, arg1 as C0Value<"ptr">);
+    const str = expand_C0Array(mem, arg1 as C0Value<"ptr">);
 
     const n = c0_cvt2_js_value(arg2);
     for (let i = 0; i < str.length && i < n; i ++) {

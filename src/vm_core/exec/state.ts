@@ -1,7 +1,7 @@
 import { step } from "./exec";
 import { createHeap, VM_Memory } from "../utility/memory";
 import parse from "../parser/parse";
-import { loadStringPool } from "../utility/string_utility";
+import { loadStringPool } from "../../utility/string_utility";
 import { internal_error } from "../../utility/errors";
 
 /**

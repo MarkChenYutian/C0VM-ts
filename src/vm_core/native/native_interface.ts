@@ -13,11 +13,11 @@ import {
     build_c0_ptrValue,
     build_c0_stringValue,
     js_cvt2_c0_value,
-} from "../utility/c0_value";
+} from "../../utility/c0_value_utility";
 import { vm_error, vm_instruct_error } from "../../utility/errors";
 import * as StringNative from "./native_strings";
 import * as IONative from "./native_io";
-import * as TypeUtil from "../types/c0type_utility";
+import * as TypeUtil from "../../utility/c0_type_utility";
 /**
  * Load the C0Native Functions from bytecode to C0VM.
  * @param index Load the native function with specific index

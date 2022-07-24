@@ -1,3 +1,11 @@
+/**
+ * @author Yutian Chen <yutianch@andrew.cmu.edu>
+ * @description A message emitter module that uses Ant-design notification component
+ * framework. notification calls are wrapped with functional methods for convenience.
+ * 
+ * Ant Design Notification Component: https://ant.design/components/notification/
+ */
+
 import { notification } from "antd";
 
 export default class AntdEmitter implements MessageEmitter {
@@ -16,7 +24,7 @@ export default class AntdEmitter implements MessageEmitter {
             description: detail,
             placement: "bottomRight",
             duration: globalThis.UI_WARN_DISPLAY_TIME_SEC
-        })
+        });
         
     }
 
@@ -26,6 +34,6 @@ export default class AntdEmitter implements MessageEmitter {
             description: detail,
             placement: "bottomRight",
             duration: globalThis.UI_OK_DISPLAY_TIME_SEC
-        })
+        });
     }
 }

@@ -1,7 +1,7 @@
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { Type2String } from "../../vm_core/types/c0type_utility";
+import { Type2String } from "../../utility/c0_type_utility";
 import C0ValueTabularDisplay from "./tabular_c0value";
 
 export default class TabularStackFrame extends React.Component<
