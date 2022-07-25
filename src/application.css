@@ -385,6 +385,24 @@ div.dbg-stack-node::before {
     cursor: move;
 }
 
+.dbg-array-node {
+    border: 1px solid silver;
+    min-width: 5rem;
+    min-height: 2rem;
+    padding: .3rem 1rem .3rem 1rem;
+    border-radius: .3rem;
+    background-color: #FEFEFE;
+
+    display: flex;
+
+    box-shadow: /* Generated at https://shadows.brumm.af/ */
+    6.7px 6.7px 5.3px rgba(0, 0, 0, 0.007),
+    22.3px 22.3px 17.9px rgba(0, 0, 0, 0.011),
+    100px 100px 80px rgba(0, 0, 0, 0.02);
+
+    cursor: move;
+}
+
 .dbg-frame-content {
     max-width: 7rem;
     word-wrap: break-word;
@@ -393,6 +411,13 @@ div.dbg-stack-node::before {
 .dbg-entire-row {
     grid-column-start: 1;
     grid-column-end: 3;
+}
+
+.dbg-elem-box {
+    min-width: 5rem;
+    max-width: 8rem;
+    border: 1px solid silver;
+    padding-left: .3rem;
 }
 
 path.react-flow__edge-path {

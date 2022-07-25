@@ -1,0 +1,83 @@
+import React from "react";
+
+import * as TypeUtil from "../../../utility/c0_type_utility";
+
+import { Handle, NodeProps, Position } from "react-flow-renderer";
+import { expand_C0Struct, c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
+import { internal_error } from "../../../utility/errors";
+import { calculate_entry_height } from "./graphical_utility";
+import { isNullPtr } from "../../../utility/pointer_utility";
+import { loadString } from "../../../utility/string_utility";
+import { heapNodeTargetHandleID, structSrcHandleID } from "./graph_builder";
+
+export default class C0StructNode extends React.Component<NodeProps<C0StructNodeData>> {
+    render_content(mem: C0HeapAllocator, type: C0Type<"ptr">, value: C0Pointer, typeRecord: Map<string, Map<number, Struct_Type_Record>>) {
+        if (isNullPtr(value)) throw new internal_error("<C0StructNode/> Receives a NULL pointer");
+
+        const c0_val = {value: value, type: type};
+        const fields = expand_C0Struct(mem, typeRecord, c0_val);
+        if (!TypeUtil.is_struct_pointer(c0_val)) {
+            throw new internal_error("<C0StructNode/> Receives a non-struct pointer");
+        }
+
+        const struct_type = c0_val.type.value;
+        if (fields.length === 0) {
+            return <p className="dbg-error-information dbg-entire-row">No Struct Information</p>;
+        }
+
+        const StructFields: JSX.Element[] = [<p className="dbg-entire-row"><code>{struct_type.value}</code></p>];
+        for (let i = 0; i < fields.length; i ++) {
+            const entry = fields[i];
+            const to_be_rendered = entry.value;
+            StructFields.push(
+                <p className="dbg-evaluate-field-name">
+                    {entry.name ?? ("Offset @ " + entry.offset)}
+                </p>
+            );
+            
+            if (to_be_rendered === undefined) {
+                StructFields.push(
+                    <p className="dbg-error-information">No Type Info</p>
+                );
+            } else {
+                let render_content = null;
+                if (TypeUtil.isValueType(to_be_rendered)) {
+                    render_content = c0_value_cvt2_js_string(to_be_rendered);
+                } else if (TypeUtil.isStringType(to_be_rendered)) {
+                    render_content = `"${loadString(to_be_rendered, mem)}"`;
+                } else if (TypeUtil.isPointerType(to_be_rendered)) {
+                    render_content = isNullPtr(to_be_rendered.value) ? "NULL" : "Pointer";
+                }
+
+                StructFields.push(
+                    <>
+                        <p key={"s-val-value-" + entry.offset} className="dbg-frame-content">{render_content}</p>
+                        {
+                            TypeUtil.isPointerType(to_be_rendered) && !isNullPtr(to_be_rendered.value)?
+                            <Handle type="source"
+                                key={structSrcHandleID(entry.offset)}
+                                id={structSrcHandleID(entry.offset)}
+                                position={Position.Right}
+                                style={{ top: calculate_entry_height(i, "struct"), right: "1.2rem" }}
+                            />
+                            : null
+                        }
+                    </>
+                );
+            }
+        }
+
+        return StructFields;
+    }
+
+    render() {
+        const data = this.props.data;
+        const ValueType = data.ptr.type as C0Type<"ptr">;
+        const ValueValue = data.ptr.value;
+
+        return <div className="dbg-frame-node">
+            <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem"}} />
+            {this.render_content(data.mem, ValueType, ValueValue, data.typeRecord)}
+        </div>;
+    }
+}
