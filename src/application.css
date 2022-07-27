@@ -11,6 +11,9 @@
     .hide-in-mobile {
         display: none !important;
     }
+    div.control-btn-group {
+        gap: .3rem;
+    }
 }
 
 body {
@@ -84,6 +87,10 @@ body {
     flex-direction: column;
 }
 
+.io-area > h3:first-child {
+    margin-top: 0;
+}
+
 footer {
     padding: 0 3vw 1rem 3vw;
     background-color: #3577C1;
@@ -125,10 +132,22 @@ footer > ul {
     pointer-events: none;
 }
 
-.cm-gutter, .cm-gutters, .cm-scroller, .cm-editor {
-    height: calc(100vh - 16rem);
+div[data-lang="c0"] .cm-gutter,
+div[data-lang="c0"] .cm-gutters,
+div[data-lang="c0"] .cm-scroller,
+div[data-lang="c0"] .cm-editor {
+    height: calc(100vh - 17rem);
     min-height: 20rem;
 }
+
+div[data-lang="bc0"] .cm-gutter,
+div[data-lang="bc0"] .cm-gutters,
+div[data-lang="bc0"] .cm-scroller,
+div[data-lang="bc0"] .cm-editor {
+    height: calc(100vh - 14.5rem);
+    min-height: 20rem;
+}
+
 .cm-editor {
     overflow-x: auto;
 }

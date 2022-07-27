@@ -9,6 +9,7 @@ import "antd/lib/switch/style/index.css";
 
 import C0VMApplication from './application';
 import AntdEmitter from './utility/antd_emitter';
+import AppCrashFallbackPage from './components/app_crash_fallback';
 
 // Global Variables
 globalThis.DEBUG = true;
@@ -46,13 +47,27 @@ globalThis.C0_MAX_RECURSION = 999;
 globalThis.MSG_EMITTER = new AntdEmitter();
 //
 
+const htmlRoots = document.querySelectorAll('#c0vm-root') as NodeListOf<HTMLElement>;
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+htmlRoots.forEach(
+  (htmlRoot) => {
+    const root = ReactDOM.createRoot(htmlRoot);
+    
+    const displayModeContext: React.Context<ApplicationContextInterface> = React.createContext<ApplicationContextInterface>({
+      mode: htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable",
+      compiler_option: htmlRoot.dataset["compileoption"] === "on",
+      std_out: htmlRoot.dataset["stdoutput"] === "on",
+      debug_console: htmlRoot.dataset["debugconsole"] === "on"
+    });
+    
+    C0VMApplication.contextType = displayModeContext;
+    AppCrashFallbackPage.contextType = displayModeContext;
+    
+    root.render(
+      <React.StrictMode>
+        <C0VMApplication/>
+      </React.StrictMode>
+    );
+  }
 );
 
-root.render(
-  <React.StrictMode>
-    <C0VMApplication/>
-  </React.StrictMode>
-);

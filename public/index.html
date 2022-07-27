@@ -24,11 +24,17 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>C0VM.ts Alpha Version</title>
+    <title>C0VM.ts (Alpha Version)</title>
   </head>
   <body>
     <noscript>Run and Visualize C0 on modern browser</noscript>
-    <div id="root"></div>
+    <div
+      id="c0vm-root"
+      data-mode="full-page"
+      data-compileOption="on"
+      data-stdOutput="on"
+      data-debugConsole="on"
+    ></div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

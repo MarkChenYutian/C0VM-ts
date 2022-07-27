@@ -21,7 +21,6 @@ export default class CompilerOption extends React.Component
         return (
             <>
                 <h3
-                    style={{marginTop: 0}}
                     onClick={() => this.setState((state, props) => {
                         return {show: !state.show}
                     })}

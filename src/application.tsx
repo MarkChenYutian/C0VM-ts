@@ -1,5 +1,6 @@
 import React from "react";
 import "./application.css";
+import "./embeddable.css";
 
 import MainControlBar from "./components/main-control-bar";
 import C0VMApplicationFooter from "./components/main-footer";
@@ -8,7 +9,8 @@ import C0Output from "./components/c0-output";
 import C0VM_RuntimeState from "./vm_core/exec/state";
 import DebugConsole from "./components/debug_console/debug_console";
 import CodeEditor from "./components/code-editor";
-import { Result } from "antd";
+import AppCrashFallbackPage from "./components/app_crash_fallback";
+
 
 
 
@@ -27,75 +29,12 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
     }
 
     render() {
-        if (this.state.crashed && !globalThis.DEBUG) {
-            return <Result
-                status="error"
-                title="Application Crashed"
-                subTitle="Reload the page to restart the application."
-                extra={
-                    <button
-                        className="base-btn main-btn"
-                        onClick={() => {
-                            globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
-                            this.setState({crashed: false, C0Runtime: undefined, PrintoutValue: ""});
-                        }}
-                    >
-                        Restore Editor Content
-                    </button>
-                }
-            />
-        } else if (this.state.crashed && globalThis.DEBUG) {
-            return <Result
-                status="error"
-                title="Application Crashed (Debug Mode)"
-                subTitle={<p>Please report this problem to our GitHub Repo!</p>}
-                extra={
-                    <>
-                        <button
-                            className="base-btn main-btn"
-                            onClick={() => {
-                                globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
-                                this.setState({crashed: false, C0Runtime: undefined, PrintoutValue: ""});
-                            }}
-                        >
-                            Restore Editor Content
-                        </button>
-                        <div style={{textAlign: "left"}}>
-                        <h3>How to report?</h3>
-                        <h4>Step 1</h4>
-                        <p>Copy the application status dump below: </p>
-                        <pre id={globalThis.UI_PRINTOUT_ID}>{
-                            JSON.stringify(
-                                {
-                                    ReactState: this.state,
-                                    GlobalState: {
-                                        exec_line: globalThis.EDITOR_HIGHLIGHT_LINENUM,
-                                        breakpoints: Array.from(globalThis.EDITOR_BREAKPOINTS),
-                                        configuration: {
-                                            DEBUG: globalThis.DEBUG,
-                                            DEBUG_DUMP_MEM: globalThis.DEBUG_DUMP_MEM,
-                                            DEBUG_DUMP_STEP: globalThis.DEBUG_DUMP_STEP,
-                                            MEM_POOL_SIZE: globalThis.MEM_POOL_SIZE,
-                                        }
-                                    }
-                                }, undefined, 4
-                            )
-                        }</pre>
-
-                        <h4>Step 2</h4>
-                        <p>
-                            Open a new issue and paste the state dump above into issue description.
-                        </p>
-                        <a href="https://github.com/MarkChenYutian/C0VM-ts/issues" target="_blank" rel="noreferrer">
-                            <button className="base-btn main-btn">
-                                Open a New Issue
-                            </button>
-                        </a>
-                        </div>
-                    </>
-                }
-            />
+        if (this.state.crashed) {
+            return <AppCrashFallbackPage state={this.state} setState={(ns) => this.setState(ns)}/>
         }
+
+        const context: ApplicationContextInterface = this.context as ApplicationContextInterface;
+
         return (
             <div className="page-framework">
                 <MainControlBar
@@ -123,7 +62,7 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
                         set_app_state= {(ns: any) => this.setState(ns)}
                     />
                     <div className="io-area">
-                        <CompilerOption
+                        { context.compiler_option ? <CompilerOption
                             flip_d_flag={ 
                                 () => this.setState(
                                     (state, props) => {
@@ -131,13 +70,13 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
                                     }
                                 )
                             }
-                        />
-                        <C0Output
+                        /> : null }
+                        { context.std_out ? <C0Output
                             printContent={this.state.PrintoutValue}
-                        />
-                        <DebugConsole
+                        /> : null}
+                        { context.debug_console ? <DebugConsole
                             state={this.state.C0Runtime}
-                        />
+                        /> : null }
                     </div>
                 </div>
                 <C0VMApplicationFooter/>

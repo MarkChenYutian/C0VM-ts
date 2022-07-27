@@ -136,3 +136,15 @@ interface C0ValueNodeData {
 }
 
 type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData;
+
+interface ApplicationCrashPageProps {
+    state: C0VMApplicationState;
+    setState<K extends keyof C0VMApplicationState>(ns: Pick<C0VMApplicationState, K>): void;
+}
+
+interface ApplicationContextInterface {
+    mode: "full-page" | "embeddable",
+    compiler_option: boolean,
+    std_out: boolean,
+    debug_console: boolean
+}

@@ -56,7 +56,9 @@ export default class MainControlBar extends React.Component<MainControlProps>{
 
         return (
             <div className="main-control">
-                <h3 className="unselectable">C0VM.<img src={tsLogo} style={{display: "inline-block", height: "1.2rem", marginBottom: "-0.1rem"}} alt="ts"/></h3>
+                <a href="https://github.com/MarkChenYutian/C0VM-ts" style={{cursor: "pointer", color: "black", textDecoration: "none"}}>
+                    <h3 className="unselectable">C0VM.<img src={tsLogo} style={{display: "inline-block", height: "1.2rem", marginBottom: "-0.1rem"}} alt="ts"/></h3>
+                </a>
                 <div className="control-btn-group">
                     <button
                         className={"base-btn main-btn unselectable " + (this.props.curr_c0_contents[0] === "" ? "disable-btn" : "")}

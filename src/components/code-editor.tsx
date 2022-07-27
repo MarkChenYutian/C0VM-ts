@@ -169,9 +169,9 @@ export default class CodeEditor extends React.Component
         }
 
         return (
-        <div className="code-editor">
+        <div className="code-editor" data-lang={this.state.mode} >
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline"}}>
-                <h3 style={{marginTop: 0, marginBottom: this.state.mode === "c0" ? 0 : "2.8rem"}}>
+                <h3 style={{marginTop: 0}}>
                     <FontAwesomeIcon icon={faCode}/> Code Editor
                 </h3>
                 <div>
