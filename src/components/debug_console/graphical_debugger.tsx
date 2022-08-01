@@ -77,10 +77,10 @@ export default function GraphicalDebugEvaluation(props: TabularDebugEvaluationPr
         (e: React.MouseEvent, node: Node<any>) => {
             setEdges(edges.map(
                 (edge) => {
-                    if (edge.id.startsWith(node.id)) {
+                    if (edge.source === node.id) {
                         edge.style={stroke: "#CE1C1C"}
                         edge.animated = true;
-                    } else if (edge.id.endsWith(node.id)) {
+                    } else if (edge.target === node.id) {
                         edge.style={stroke: "#3577C1"}
                         edge.animated = true;
                     }

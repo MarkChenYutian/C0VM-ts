@@ -7,7 +7,7 @@
  * state function described in this file.
  */
 
-import { Node, Edge, MarkerType } from "react-flow-renderer";
+import { Node, Edge, MarkerType, CoordinateExtent } from "react-flow-renderer";
 import { isPointerType, is_struct_pointer } from "../../../utility/c0_type_utility";
 import { deref_C0Value, expand_C0Array, expand_C0Struct } from "../../../utility/c0_value_utility";
 import { internal_error } from "../../../utility/errors";
@@ -60,7 +60,17 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator):
     let [x, y] = [10, 10];
     let nodes:Node<VisData>[] = [];
 
-    for (let i = 0; i < state.CallStack.length; i ++) {
+
+    nodes.push({
+        id: `stack-${state.CallStack.length}`,
+        position: {x, y},
+        data: {frame: state.CurrFrame, mem: mem, dragged: false},
+        type: "stackNode",
+        draggable: false
+    });
+    y += calculate_node_height(valid_variable_count(state.CurrFrame), "frame");
+
+    for (let i = state.CallStack.length - 1; i >= 0; i --) {
         nodes.push({
             id: stackNodeID(i),
             position: {x, y},
@@ -70,13 +80,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator):
         });
         y += calculate_node_height(valid_variable_count(state.CallStack[i]), "frame");
     }
-    nodes.push({
-        id: `stack-${state.CallStack.length}`,
-        position: {x, y},
-        data: {frame: state.CurrFrame, mem: mem, dragged: false},
-        type: "stackNode",
-        draggable: false
-    });
+    
 
     // Step 2. Build heap memory nodes
     let [heap_nodes, edges] = BFS_heap_scan(state, mem);
@@ -196,6 +200,7 @@ function get_successors(V: C0Value<"ptr">, M: C0HeapAllocator, S: VM_State, lv: 
  * @returns [Node itself, Edges sourced from this node, delta_y]
  */
 function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAllocator, x: number, y: number): [Node<VisData>, Edge<undefined>[], number] {
+    const heap_node_extent: CoordinateExtent = [[310, 0], [10000, 10000]];
     let result_data = undefined;
     let result_edge: Edge<undefined>[] = [];
     let delta_y = 0;
@@ -205,7 +210,8 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
             id: heapNodeID(v),
             position: {x, y},
             data: {ptr: v, mem: mem, typeRecord: state.TypeRecord, dragged: false},
-            type: "structNode"
+            type: "structNode",
+            extent: heap_node_extent
         };
 
         const fields = expand_C0Struct(mem, state.TypeRecord, v);
@@ -229,7 +235,8 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
             id: heapNodeID(v),
             position: {x, y},
             data: {ptr: v, mem: mem, dragged: false},
-            type: "arrayNode"
+            type: "arrayNode",
+            extent: heap_node_extent
         }
 
         const elems = expand_C0Array(mem, v);
@@ -254,7 +261,8 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
                     id: heapNodeID(v),
                     position: {x, y},
                     data: {ptr: v, mem: mem, dragged: false},
-                    type: "unknownNode"
+                    type: "unknownNode",
+                    extent: heap_node_extent
                 };
                 break;
             case "ptr":
@@ -262,7 +270,8 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
                     id: heapNodeID(v),
                     position: {x, y},
                     data: {ptr: v, mem: mem, dragged: false},
-                    type: "pointerNode"
+                    type: "pointerNode",
+                    extent: heap_node_extent
                 };
                 break;
             case "string":
@@ -271,7 +280,8 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
                     id: heapNodeID(v),
                     position: {x, y},
                     data: {val: v, mem: mem, dragged: false},
-                    type: "valueNode"
+                    type: "valueNode",
+                    extent: heap_node_extent
                 };
                 break;
         }

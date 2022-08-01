@@ -23,7 +23,7 @@ export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeDa
             if (TypeUtil.isStringType(to_be_rendered)) {
                 result.push(
                     <div className="dbg-elem-box">
-                        <p key={"idx-" + i} className="dbg-evaluate-field-name">{i}</p>
+                        <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i}</p>
                         <p key={"val-" + i}>"{loadString(to_be_rendered, data.mem)}"</p>
                     </div>
                 );
@@ -31,15 +31,15 @@ export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeDa
             else if (TypeUtil.isValueType(to_be_rendered)) {
                 result.push(
                     <div className="dbg-elem-box">
-                        <p key={"idx-" + i} className="dbg-evaluate-field-name">{i}</p>
-                        <p key={"val-" + i}>{c0_value_cvt2_js_string(to_be_rendered)}</p>
+                        <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i}</p>
+                        <p key={"val-" + i} className="dbg-evaluate-arr-val">{c0_value_cvt2_js_string(to_be_rendered)}</p>
                     </div>);
             }
             else if (TypeUtil.isUnknownType(to_be_rendered)) {
                 result.push(
                     <div className="dbg-elem-box">
-                        <p key={"idx-" + i} className="dbg-evaluate-field-name">{i}</p>
-                        <p key={"val-" + i} className="dbg-error-information">Unknown Value</p>
+                        <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i}</p>
+                        <p key={"val-" + i} className="dbg-error-information dbg-evaluate-arr-val">Unknown Value</p>
                     </div>
                 );
             }
@@ -47,15 +47,15 @@ export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeDa
                 if (isNullPtr(to_be_rendered.value)) {
                     result.push(
                         <div className="dbg-elem-box">
-                            <p key={"idx-" + i} className="dbg-evaluate-field-name">{i}</p>
-                            <p key={"val-" + i}>NULL</p>
+                            <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i}</p>
+                            <p key={"val-" + i} className="dbg-evaluate-arr-val">NULL</p>
                         </div>
                     );
                 } else {
                     result.push(
                         <div className="dbg-elem-box">
-                            <p key={"idx-" + i} className="dbg-evaluate-field-name">{i}</p>
-                            <p key={"val-" + i}>Pointer</p>
+                            <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i}</p>
+                            <p key={"val-" + i} className="dbg-evaluate-arr-val">&nbsp;</p>
                         </div>
                     );
                     result.push(<Handle
@@ -63,7 +63,7 @@ export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeDa
                         id={arrSrcHandleID(i)}
                         position={Position.Bottom}
                         type="source"
-                        style={{ left: calculate_entry_height(i, "array"), top: "3rem" }}
+                        style={{ left: calculate_entry_height(i, "array"), top: "2.5rem" }}
                     />);
                 }
             }
@@ -72,8 +72,8 @@ export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeDa
     }
 
     render(): React.ReactNode {
-        return <div className="dbg-array-node">
-            <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem"}} />
+        return <div className="dbg-array-node dbg-node-base">
+            <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "2rem", visibility: "hidden"}} />
             <>{this.render_content()}</>
         </div>;
     }

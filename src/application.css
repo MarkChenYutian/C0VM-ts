@@ -132,20 +132,23 @@ footer > ul {
     pointer-events: none;
 }
 
+.cm-gutter, .cm-gutters, .cm-scroller, .cm-editor {
+    min-height: 20rem;
+}
+
 div[data-lang="c0"] .cm-gutter,
 div[data-lang="c0"] .cm-gutters,
 div[data-lang="c0"] .cm-scroller,
 div[data-lang="c0"] .cm-editor {
     height: calc(100vh - 17rem);
-    min-height: 20rem;
 }
 
 div[data-lang="bc0"] .cm-gutter,
 div[data-lang="bc0"] .cm-gutters,
 div[data-lang="bc0"] .cm-scroller,
 div[data-lang="bc0"] .cm-editor {
-    height: calc(100vh - 14.5rem);
-    min-height: 20rem;
+    height: calc(100vh - 14.3rem) !important;
+    border-radius: .3rem !important;
 }
 
 .cm-editor {
@@ -363,14 +366,44 @@ li > .dbg-evaluate-tabular-content {
 
 
 /* Graphical Debug Console */
-div.dbg-stack-node {
+div.dbg-node-base {
+    padding: .3rem 1rem .3rem 1rem;
+    border-radius: .3rem;
+    background-color: #FEFEFE;
+
+    /* Generated at https://shadows.brumm.af/ */
+    box-shadow:
+        1.4px 2.3px 3.6px rgba(0, 0, 0, 0.008),
+        3.8px 6.3px 10px rgba(0, 0, 0, 0.017),
+        9px 15.1px 24.1px rgba(0, 0, 0, 0.028),
+        30px 50px 80px rgba(0, 0, 0, 0.05)
+    ;
+    transition: .3s;
+}
+
+div.dbg-node-base:hover {
+    box-shadow:
+  1.4px 2.3px 4.5px rgba(0, 0, 0, 0.017),
+  3.8px 6.3px 12.5px rgba(0, 0, 0, 0.029),
+  9px 15.1px 30.1px rgba(0, 0, 0, 0.042),
+  30px 50px 100px rgba(0, 0, 0, 0.07)
+;
+}
+
+.dbg-stack-node {
     width: 15rem;
     border-right: 2px solid #202030;
     cursor: default;
     border-radius: .3rem 0 0 .3rem;
-    background-color: #FAFAFE;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    align-content: flex-start;
+    column-gap: 1rem;
 }
-div.dbg-stack-node::before {
+
+.dbg-stack-node::before {
     background: none;
     border-right: 2px dashed #202030;
     content: "";
@@ -382,13 +415,11 @@ div.dbg-stack-node::before {
     pointer-events: none;
 }
 
-.dbg-frame-node {
+
+.dbg-struct-node {
     border: 1px solid silver;
     min-width: 5rem;
     min-height: 2rem;
-    padding: .3rem 2rem .3rem 1rem;
-    border-radius: .3rem;
-    background-color: #FEFEFE;
 
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -396,35 +427,7 @@ div.dbg-stack-node::before {
     align-content: flex-start;
     column-gap: 1rem;
     
-    box-shadow: /* Generated at https://shadows.brumm.af/ */
-        6.7px 6.7px 5.3px rgba(0, 0, 0, 0.007),
-        22.3px 22.3px 17.9px rgba(0, 0, 0, 0.011),
-        100px 100px 80px rgba(0, 0, 0, 0.02);
-    
     cursor: move;
-}
-
-.dbg-array-node {
-    border: 1px solid silver;
-    min-width: 5rem;
-    min-height: 2rem;
-    padding: .3rem 1rem .3rem 1rem;
-    border-radius: .3rem;
-    background-color: #FEFEFE;
-
-    display: flex;
-
-    box-shadow: /* Generated at https://shadows.brumm.af/ */
-    6.7px 6.7px 5.3px rgba(0, 0, 0, 0.007),
-    22.3px 22.3px 17.9px rgba(0, 0, 0, 0.011),
-    100px 100px 80px rgba(0, 0, 0, 0.02);
-
-    cursor: move;
-}
-
-.dbg-frame-content {
-    max-width: 7rem;
-    word-wrap: break-word;
 }
 
 .dbg-entire-row {
@@ -432,11 +435,49 @@ div.dbg-stack-node::before {
     grid-column-end: 3;
 }
 
+.dbg-array-node {
+    min-width: 5rem;
+    min-height: 2rem;
+    display: flex;
+    cursor: move;
+}
+
+.dbg-array-node:hover {
+    border: 1px solid silver;
+}
+
+.dbg-frame-content {
+    max-width: 7rem;
+    word-wrap: break-word;
+}
+
+.dbg-pointer-node {
+    border: 1px solid silver;
+    min-width: 2rem;
+    min-height: 2rem;
+    cursor: move;
+}
+
+.dbg-value-node {
+    border: 1px solid silver;
+    min-width: 7rem;
+    min-height: 2rem;
+    word-break: break-all;
+}
+
 .dbg-elem-box {
     min-width: 5rem;
     max-width: 8rem;
-    border: 1px solid silver;
+}
+
+.dbg-evaluate-arr-idx {
+    color: #006cae;
     padding-left: .3rem;
+}
+
+.dbg-evaluate-arr-val {
+    border: 1px solid silver;
+    padding: .3rem;
 }
 
 path.react-flow__edge-path {

@@ -57,7 +57,7 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
 
         return (
         <>
-            <div className="dbg-frame-node dbg-stack-node">
+            <div className="dbg-node-base dbg-stack-node">
                 {contents}
                 {handles}
             </div>

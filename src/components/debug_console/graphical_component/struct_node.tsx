@@ -46,7 +46,7 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
                 } else if (TypeUtil.isStringType(to_be_rendered)) {
                     render_content = `"${loadString(to_be_rendered, mem)}"`;
                 } else if (TypeUtil.isPointerType(to_be_rendered)) {
-                    render_content = isNullPtr(to_be_rendered.value) ? "NULL" : "Pointer";
+                    render_content = isNullPtr(to_be_rendered.value) ? "NULL" : " ";
                 }
 
                 StructFields.push(
@@ -58,7 +58,7 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
                                 key={structSrcHandleID(entry.offset)}
                                 id={structSrcHandleID(entry.offset)}
                                 position={Position.Right}
-                                style={{ top: calculate_entry_height(i, "struct"), right: "1.2rem" }}
+                                style={{ top: calculate_entry_height(i, "struct"), right: "2rem" }}
                             />
                             : null
                         }
@@ -75,8 +75,8 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
         const ValueType = data.ptr.type as C0Type<"ptr">;
         const ValueValue = data.ptr.value;
 
-        return <div className="dbg-frame-node">
-            <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem"}} />
+        return <div className="dbg-struct-node dbg-node-base">
+            <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem", visibility: "hidden"}} />
             {this.render_content(data.mem, ValueType, ValueValue, data.typeRecord)}
         </div>;
     }

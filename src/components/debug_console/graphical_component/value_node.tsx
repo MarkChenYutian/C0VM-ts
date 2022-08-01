@@ -22,8 +22,8 @@ export default class C0ValueNode extends React.Component<NodeProps<C0ValueNodeDa
             throw new internal_error("<C0ValueNode/> Receives unexpected value that is not 'value'|'string' typed.");
         }
         
-        return <div className="dbg-frame-node">
-            <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem"}} />
+        return <div className="dbg-node-base dbg-value-node">
+            <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem", visibility: "hidden"}} />
             <p className="dbg-entire-row">{content}</p>
         </div>;
     }
