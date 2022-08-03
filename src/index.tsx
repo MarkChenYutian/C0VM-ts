@@ -23,7 +23,6 @@ globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
 
 globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
 
-globalThis.EDITOR_BREAKPOINTS = new Set<number>();
 globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
 
 globalThis.UI_INPUT_ID = "c0-code-input";

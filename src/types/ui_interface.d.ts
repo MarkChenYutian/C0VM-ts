@@ -1,22 +1,21 @@
 interface C0VMApplicationState {
-    crashed      : boolean,
-    EditorContent: string,
-    PrintoutValue: string,
-    C0SourceCodes: string[],
-    ActiveEditor : number,
-    C0Runtime: C0VM_RuntimeState | undefined,
-    CompilerFlags: Record<string, boolean>
+    crashed      : boolean,     /* C0VM Application top-level error boundary */
+
+    BC0SourceCode: string,      /* The content of BC0 code editor */
+    BC0BreakPoints: Set<number>,/* Breakpoints activated in BC0 code editor */
+
+    C0SourceCodes: string[],    /* Content (in differnet tabs) of C0 code editors */
+    ActiveEditor : number,      /* Currently activated tab index of C0Editor */
+
+    PrintoutValue: string,      /* The string to show in the stdout console */
+
+    C0Runtime: C0VM_RuntimeState | undefined,   /* Runtime of C0VM */
+    CompilerFlags: Record<string, boolean>      /* Compiler Flags (-d) */
 };
 
 // The props that main control bar component will accept
 interface MainControlProps {
-    isbc0: boolean,
-    
-    curr_bc0_content: string,
-    curr_c0_contents: string[],
-
-    curr_state: C0VM_RuntimeState | undfined,
-    flags: Record<string, boolean>,
+    application_state: C0VMApplicationState,
 
     update_value: (ns: string) => void,
     update_state: (ns: C0RuntimeState | undefined) => void,
@@ -28,6 +27,7 @@ interface CodeEditorProps {
     C0_Contents: string[],
     C0_ActiveTab: number,
     BC0_Content: string,
+    BC0_Breakpoint: Set<number>,
     set_app_state<K extends keyof C0VMApplicationState>(ns: Pick<C0VMApplicationState, K>): void;
 }
 
@@ -58,11 +58,13 @@ interface C0EditorProps {
     updateContent : (s: string) => void,
     editorValue   : string,
     updateName   ?: (s: string) => void,
-    revUpdate    ?: boolean
 }
 
-interface C0EditorState {
-    shouldRevUpdate  : boolean
+interface BC0EditorProps {
+    updateContent : (s: string) => void,
+    editorValue   : string,
+    breakpointVal : Set<number>,
+    updateBrkPts  : (ns: Set<number>) => void,
 }
 
 // The props that CompilerOption component will accept

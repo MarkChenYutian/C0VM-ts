@@ -1,4 +1,4 @@
-import ReactFlow, { Controls, Background, useNodesState, useEdgesState, NodeChange, Node } from "react-flow-renderer";
+import ReactFlow, { Controls, Background, useNodesState, useEdgesState, NodeChange, Node, MarkerType } from "react-flow-renderer";
 import React, { useEffect, useCallback } from "react";
 import { build_nodes, merge_nodes } from "./graphical_component/graph_builder";
 
@@ -79,10 +79,14 @@ export default function GraphicalDebugEvaluation(props: TabularDebugEvaluationPr
                 (edge) => {
                     if (edge.source === node.id) {
                         edge.style={stroke: "#CE1C1C"}
+                        edge.markerEnd={type: MarkerType.Arrow, color: "#CE1C1C"}
                         edge.animated = true;
+                        edge.zIndex = 1000;
                     } else if (edge.target === node.id) {
                         edge.style={stroke: "#3577C1"}
+                        edge.markerEnd={type: MarkerType.Arrow, color: "#3577C1"}
                         edge.animated = true;
+                        edge.zIndex = 1000;
                     }
                     return edge;
                 }
@@ -100,8 +104,10 @@ export default function GraphicalDebugEvaluation(props: TabularDebugEvaluationPr
             setEdges(edges.map(
                 (edge) => {
                     if (edge.id.startsWith(node.id) || edge.id.endsWith(node.id)) {
+                        edge.markerEnd = {type: MarkerType.Arrow};
                         edge.style = undefined;
                         edge.animated = false;
+                        edge.zIndex = 999;
                     }
                     return edge;
                 }

@@ -31,7 +31,6 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                                     ReactContext: this.context,
                                     GlobalState: {
                                         exec_line: globalThis.EDITOR_HIGHLIGHT_LINENUM,
-                                        breakpoints: Array.from(globalThis.EDITOR_BREAKPOINTS),
                                         configuration: {
                                             DEBUG: globalThis.DEBUG,
                                             DEBUG_DUMP_MEM: globalThis.DEBUG_DUMP_MEM,

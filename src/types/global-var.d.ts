@@ -11,8 +11,6 @@ declare global {
     var MEM_POOL_DEFAULT_SIZE: number;
 
     var COMPILER_BACKEND_URL: string;
-
-    var EDITOR_BREAKPOINTS: Set<number>;
     var EDITOR_HIGHLIGHT_LINENUM: number;
     
     var UI_INPUT_ID: string;

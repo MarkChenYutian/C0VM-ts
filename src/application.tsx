@@ -12,17 +12,16 @@ import CodeEditor from "./components/code-editor";
 import AppCrashFallbackPage from "./components/app_crash_fallback";
 
 
-
-
 export default class C0VMApplication extends React.Component<{}, C0VMApplicationState> {
     constructor(props: {}) {
         super(props);
         this.state = {
             crashed         : false,
-            EditorContent   : "",
-            PrintoutValue   : "",
+            BC0SourceCode   : "",
+            BC0BreakPoints  : new Set<number>(),
             C0SourceCodes   : [""],
             ActiveEditor    : 0,
+            PrintoutValue   : "",
             C0Runtime       : undefined,
             CompilerFlags   : {"d": false}
         };
@@ -38,45 +37,50 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
         return (
             <div className="page-framework">
                 <MainControlBar
-                    isbc0        = { this.is_bc0_content(this.state.EditorContent)}
-                    curr_bc0_content = { this.state.EditorContent }
-                    curr_c0_contents = { this.state.C0SourceCodes }
-                    curr_state   = { this.state.C0Runtime }
-                    flags        = { this.state.CompilerFlags }
-                    update_value = { (s: string) => {this.setState({EditorContent: s})} }
-                    update_state = { (s: C0VM_RuntimeState | undefined) => {
-                            if (s === undefined) globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
-                            else globalThis.EDITOR_HIGHLIGHT_LINENUM = s.state.CurrLineNumber;
-                            this.setState({C0Runtime: s})
+                    application_state = { this.state }
+                    update_value = { (s: string) => {
+                            this.setState({BC0SourceCode: s})
                         }}
-                    update_print = { (s) => this.setState((state) => {return {PrintoutValue: state.PrintoutValue + s}}
-                        )}
-                    clear_print  = { ()  => this.setState(() => {return {PrintoutValue: ""}}
-                        )}
+                    update_state = { (s: C0VM_RuntimeState | undefined) => {
+                            if (s === undefined) {
+                                globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
+                                this.setState({C0Runtime: s, BC0BreakPoints: new Set()})
+                            } else {
+                                globalThis.EDITOR_HIGHLIGHT_LINENUM = s.state.CurrLineNumber;
+                                this.setState({C0Runtime: s});
+                            }
+                        }}
+                    update_print = { (s) => this.setState((state) => {
+                            return {PrintoutValue: state.PrintoutValue + s}
+                        })}
+                    clear_print  = { ()  => this.setState({PrintoutValue: ""})}
                 />
                 <div className="main-ui-framework">
                     <CodeEditor
-                        C0_Contents  = {this.state.C0SourceCodes}
-                        C0_ActiveTab = {this.state.ActiveEditor}
-                        BC0_Content  = {this.state.EditorContent}
-                        set_app_state= {(ns: any) => this.setState(ns)}
+                        C0_Contents     = {this.state.C0SourceCodes}
+                        C0_ActiveTab    = {this.state.ActiveEditor}
+                        BC0_Content     = {this.state.BC0SourceCode}
+                        BC0_Breakpoint  = {this.state.BC0BreakPoints}
+                        set_app_state   = {(ns: any) => this.setState(ns)}
                     />
                     <div className="io-area">
                         { context.compiler_option ? <CompilerOption
                             flip_d_flag={ 
                                 () => this.setState(
-                                    (state, props) => {
+                                    (state) => {
                                         return {CompilerFlags: {...state.CompilerFlags, "d": !state.CompilerFlags["d"]}};
                                     }
                                 )
                             }
                         /> : null }
-                        { context.std_out ? <C0Output
-                            printContent={this.state.PrintoutValue}
-                        /> : null}
-                        { context.debug_console ? <DebugConsole
-                            state={this.state.C0Runtime}
-                        /> : null }
+                        { context.std_out ? 
+                            <C0Output printContent={this.state.PrintoutValue}/>
+                            : null
+                        }
+                        { context.debug_console ?
+                            <DebugConsole state={this.state.C0Runtime}/>
+                            : null 
+                        }
                     </div>
                 </div>
                 <C0VMApplicationFooter/>

@@ -22,7 +22,7 @@ export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeDa
             const to_be_rendered = js_array[i];
             if (TypeUtil.isStringType(to_be_rendered)) {
                 result.push(
-                    <div className="dbg-elem-box">
+                    <div key={"elem-" + i} className="dbg-elem-box">
                         <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i}</p>
                         <p key={"val-" + i}>"{loadString(to_be_rendered, data.mem)}"</p>
                     </div>
@@ -30,14 +30,14 @@ export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeDa
             }
             else if (TypeUtil.isValueType(to_be_rendered)) {
                 result.push(
-                    <div className="dbg-elem-box">
+                    <div key={"elem-" + i} className="dbg-elem-box">
                         <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i}</p>
                         <p key={"val-" + i} className="dbg-evaluate-arr-val">{c0_value_cvt2_js_string(to_be_rendered)}</p>
                     </div>);
             }
             else if (TypeUtil.isUnknownType(to_be_rendered)) {
                 result.push(
-                    <div className="dbg-elem-box">
+                    <div key={"elem-" + i} className="dbg-elem-box">
                         <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i}</p>
                         <p key={"val-" + i} className="dbg-error-information dbg-evaluate-arr-val">Unknown Value</p>
                     </div>
@@ -46,14 +46,14 @@ export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeDa
             else if (TypeUtil.isPointerType(to_be_rendered)) {
                 if (isNullPtr(to_be_rendered.value)) {
                     result.push(
-                        <div className="dbg-elem-box">
+                        <div key={"elem-" + i} className="dbg-elem-box">
                             <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i}</p>
                             <p key={"val-" + i} className="dbg-evaluate-arr-val">NULL</p>
                         </div>
                     );
                 } else {
                     result.push(
-                        <div className="dbg-elem-box">
+                        <div key={"elem-" + i} className="dbg-elem-box">
                             <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i}</p>
                             <p key={"val-" + i} className="dbg-evaluate-arr-val">&nbsp;</p>
                         </div>

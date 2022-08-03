@@ -30,7 +30,7 @@ export function step(s: C0VM_RuntimeState, printout_handler: (s: string) => void
     }
 }
 
-export function run(s: C0VM_RuntimeState, printout_handler: (s: string) => void): [C0VM_RuntimeState, boolean] {
+export function run(s: C0VM_RuntimeState, bp: Set<number>, printout_handler: (s: string) => void): [C0VM_RuntimeState, boolean] {
     const new_state = s.clone();
     let can_continue = true;
     while (can_continue) {
@@ -43,7 +43,7 @@ export function run(s: C0VM_RuntimeState, printout_handler: (s: string) => void)
             if(globalThis.DEBUG) console.error(e);
             return [s, false];
         }
-        if (globalThis.EDITOR_BREAKPOINTS.has(new_state.state.CurrLineNumber)) break;
+        if (bp.has(new_state.state.CurrLineNumber)) break;
     }
     return [new_state, can_continue];
 }

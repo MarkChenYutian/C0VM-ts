@@ -148,6 +148,9 @@ div[data-lang="bc0"] .cm-gutters,
 div[data-lang="bc0"] .cm-scroller,
 div[data-lang="bc0"] .cm-editor {
     height: calc(100vh - 14.3rem) !important;
+}
+
+div[data-lang="bc0"] .cm-editor {
     border-radius: .3rem !important;
 }
 
@@ -164,6 +167,12 @@ div[data-lang="bc0"] .cm-editor {
 .cm-execLine { background-color: #FDFF32;  }
 .cm-lineNumbers > .cm-gutterElement { padding: 0 !important; }
 .cm-foldPlaceholder { padding: 0 0.5rem; color: black; background: #EEEEEE; border: none; }
+.cm-breakpoint-gutter {
+    cursor: pointer;
+}
+.cm-breakpoint-gutter:hover {
+    background-color: #EFEFEF;
+}
 
 .active-href {
     color: #009dff;
@@ -397,7 +406,7 @@ div.dbg-node-base:hover {
     border-radius: .3rem 0 0 .3rem;
 
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* grid-template-columns: 1fr 1fr; */
     align-items: start;
     align-content: flex-start;
     column-gap: 1rem;

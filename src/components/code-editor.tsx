@@ -138,8 +138,10 @@ export default class CodeEditor extends React.Component
             />;
         } else {
             content = <BC0Editor
-                updateContent={(s: string) => this.props.set_app_state({EditorContent: s})}
+                updateContent={(s: string) => this.props.set_app_state({BC0SourceCode: s})}
                 editorValue  ={this.props.BC0_Content}
+                breakpointVal={this.props.BC0_Breakpoint}
+                updateBrkPts ={(ns: Set<number>) => {this.props.set_app_state({BC0BreakPoints: ns})}}
             />;
         }
 

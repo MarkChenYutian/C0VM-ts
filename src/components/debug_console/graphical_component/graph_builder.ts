@@ -376,8 +376,7 @@ function edge_factory(source: string, target: string, sourceHandle: string): Edg
     return {
         source, target, id: `${source}@${sourceHandle} > ${target}`, sourceHandle,
         zIndex: 999,
-        markerEnd: {type: MarkerType.Arrow},
-        
+        markerEnd: {type: MarkerType.Arrow}
     };
 }
 

@@ -83,6 +83,18 @@ function loadDOMWidgetInterface(view: EditorView, accept_format: string,update_t
     ]);
 }
 
+/**
+ * Entry point of LoadDocumentPlugin
+ * 
+ * @param accepted_format File formats supported by this loader, seperated by comma
+ * example: ".bc0,.c0" or ".bc0"
+ * 
+ * @param update_name React call back function to update some internal states in 
+ * react component. When the file is loaded, this function will be called with 
+ * argument (s: string) where s is the file name of loaded file. [Optional]
+ * 
+ * @returns ViewPlugin that can be installed on code mirror editor
+ */
 function LoadDocumentPlugin(accepted_format: string, update_name ?: (s: string) => void) {
     return ViewPlugin.fromClass(class {
         public decorations   : DecorationSet;

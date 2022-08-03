@@ -21,7 +21,7 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
 
         let valid_cnt = 0;
 
-        contents.push(<p className="dbg-func-name">{data.frame.P.name}</p>)
+        contents.push(<p className="dbg-func-name" key="func-name">{data.frame.P.name}</p>)
         
         for (let i = 0; i < data.frame.V.length; i ++) {
             const to_be_rendered = data.frame.V[i];
@@ -33,7 +33,7 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
                 } else if (TypeUtil.isStringType(to_be_rendered)) {
                     render_content = `"${loadString(to_be_rendered, data.mem)}"`;
                 } else if (TypeUtil.isPointerType(to_be_rendered)) {
-                    render_content = isNullPtr(to_be_rendered.value) ? "NULL" : "Pointer";
+                    render_content = isNullPtr(to_be_rendered.value) ? "NULL" : " ";
                 } else {
                     render_content = "Unknown value";
                 }
