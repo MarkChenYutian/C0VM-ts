@@ -3,21 +3,22 @@ import * as VM from "../vm_core/vm_interface";
 
 
 export default function remote_compile(
-    s: string[],
+    content: string[],
+    names: string[],
     update_content: (s: string) => void,
     clean_printout: () => void,
     update_printout: (s: string) => void,
     compiler_flags: Record<string, boolean>
 ): void {
-    fetch(globalThis.COMPILER_BACKEND_URL, {
+    fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${compiler_flags["-d"] ? "true" : "false"}`, {
         method: "POST",
         cache: "no-cache",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            code: s,
-            flag: compiler_flags
+            codes: content,
+            filenames: names,
         })
     })
     .then(
@@ -25,8 +26,8 @@ export default function remote_compile(
     )
     .then(
         (result: any) => {
-            if (result.c0_output !== ""){
-                update_printout(result.c0_output as string);
+            if (result.error !== ""){
+                update_printout(result.error as string);
                 throw new vm_error("Compile Failed for c0 source code. See standard output for more information.");
             }
             VM.initialize(result.bytecode, clean_printout);

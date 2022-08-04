@@ -49,6 +49,7 @@ export default class MainControlBar extends React.Component<MainControlProps>{
             this.props.clear_print();
             remote_compile(
                 appState.C0SourceCodes,
+                appState.C0TabTitles.map((v) => v.name),
                 this.props.update_value,
                 this.props.clear_print,
                 this.props.update_print,

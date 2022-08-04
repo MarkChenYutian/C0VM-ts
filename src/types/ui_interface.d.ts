@@ -1,13 +1,14 @@
 interface C0VMApplicationState {
-    crashed      : boolean,     /* C0VM Application top-level error boundary */
+    crashed      : boolean,         /* C0VM Application top-level error boundary */
 
-    BC0SourceCode: string,      /* The content of BC0 code editor */
-    BC0BreakPoints: Set<number>,/* Breakpoints activated in BC0 code editor */
+    BC0SourceCode: string,          /* The content of BC0 code editor */
+    BC0BreakPoints: Set<number>,    /* Breakpoints activated in BC0 code editor */
 
-    C0SourceCodes: string[],    /* Content (in differnet tabs) of C0 code editors */
-    ActiveEditor : number,      /* Currently activated tab index of C0Editor */
+    C0TabTitles: EditorTabTitle[],  /* Code editor tab titles */
+    C0SourceCodes: string[],        /* Content (in differnet tabs) of C0 code editors */
+    ActiveEditor : number,          /* Currently activated tab index of C0Editor */
 
-    PrintoutValue: string,      /* The string to show in the stdout console */
+    PrintoutValue: string,          /* The string to show in the stdout console */
 
     C0Runtime: C0VM_RuntimeState | undefined,   /* Runtime of C0VM */
     CompilerFlags: Record<string, boolean>      /* Compiler Flags (-d) */
@@ -24,17 +25,21 @@ interface MainControlProps {
 };
 
 interface CodeEditorProps {
+    C0_TabTitles: EditorTabTitle[],
     C0_Contents: string[],
     C0_ActiveTab: number,
     BC0_Content: string,
     BC0_Breakpoint: Set<number>,
-    set_app_state<K extends keyof C0VMApplicationState>(ns: Pick<C0VMApplicationState, K>): void;
+    set_app_state<K extends keyof C0VMApplicationState>(
+        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) => (
+            Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) | (Pick<C0VMApplicationState, K> | C0VMApplicationState | null),
+        callback?: () => void
+    ): void;
 }
 
 interface CodeEditorState {
     mode: "c0" | "bc0";
 
-    C0_tabTitle: EditorTabTitle[],
     C0_nextKey: number
 }
 

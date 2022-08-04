@@ -14,45 +14,43 @@ export default class CodeEditor extends React.Component
         super(props);
         this.state = {
             mode: "c0",
-
-            C0_tabTitle: [{name: "Untitled_0.c0", key: 0}],
             C0_nextKey : 1
         }
     }
 
     move_current_to_left() {
         let curr_idx = 0;
-        for (let i = 0; i < this.state.C0_tabTitle.length; i ++) {
-            if (this.state.C0_tabTitle[i].key === this.props.C0_ActiveTab) {
+        for (let i = 0; i < this.props.C0_TabTitles.length; i ++) {
+            if (this.props.C0_TabTitles[i].key === this.props.C0_ActiveTab) {
                 curr_idx = i;
                 break;
             }
         }
 
-        const new_tabs = [...this.state.C0_tabTitle];
+        const new_tabs = [...this.props.C0_TabTitles];
         const new_contents = [...this.props.C0_Contents];
         [new_tabs[curr_idx], new_tabs[curr_idx - 1]] = [new_tabs[curr_idx - 1], new_tabs[curr_idx]];
         [new_contents[curr_idx], new_contents[curr_idx - 1]] = [new_contents[curr_idx - 1], new_contents[curr_idx]];
 
-        this.setState({C0_tabTitle: new_tabs});
+        this.props.set_app_state({C0TabTitles: new_tabs});
         this.props.set_app_state({C0SourceCodes: new_contents});
     }
 
     move_current_to_right() {
         let curr_idx = 0;
-        for (let i = 0; i < this.state.C0_tabTitle.length; i ++) {
-            if (this.state.C0_tabTitle[i].key === this.props.C0_ActiveTab) {
+        for (let i = 0; i < this.props.C0_TabTitles.length; i ++) {
+            if (this.props.C0_TabTitles[i].key === this.props.C0_ActiveTab) {
                 curr_idx = i;
                 break;
             }
         }
 
-        const new_tabs = [...this.state.C0_tabTitle];
+        const new_tabs = [...this.props.C0_TabTitles];
         const new_contents = [...this.props.C0_Contents];
         [new_tabs[curr_idx], new_tabs[curr_idx + 1]] = [new_tabs[curr_idx + 1], new_tabs[curr_idx]];
         [new_contents[curr_idx], new_contents[curr_idx + 1]] = [new_contents[curr_idx + 1], new_contents[curr_idx]];
 
-        this.setState({C0_tabTitle: new_tabs});
+        this.props.set_app_state({C0TabTitles: new_tabs});
         this.props.set_app_state({C0SourceCodes: new_contents});
     }
 
@@ -67,14 +65,15 @@ export default class CodeEditor extends React.Component
             return;
         }
 
-        this.setState((state) => {return {
-            C0_tabTitle: state.C0_tabTitle.map(
-                (value) => {
-                    if (value.key === this.props.C0_ActiveTab) return {key: value.key, name: new_title};
-                    return value;
-                }
-            )
-        };})
+        this.props.set_app_state((S) => {return {
+            C0TabTitles: S.C0TabTitles.map(
+                    (value) => {
+                        if (value.key === this.props.C0_ActiveTab) return {key: value.key, name: new_title};
+                        return value;
+                    }
+                )
+            };
+        })
     }
 
     render() {
@@ -83,7 +82,7 @@ export default class CodeEditor extends React.Component
             content = <C0EditorGroup
                 activeTab   ={this.props.C0_ActiveTab}
                 
-                currTabs    ={this.state.C0_tabTitle}
+                currTabs    ={this.props.C0_TabTitles}
                 currContents={this.props.C0_Contents}
 
                 updateContent={(s: string, key: number) => {
@@ -95,8 +94,8 @@ export default class CodeEditor extends React.Component
                     this.props.set_app_state({ActiveEditor: i})
                 }}
                 setTabName   = {(key: number, name: string) => {
-                    this.setState(
-                        (state) => {return {C0_tabTitle: state.C0_tabTitle.map(
+                    this.props.set_app_state(
+                        (S) => {return {C0TabTitles: S.C0TabTitles.map(
                             (tab) => {
                                 if (tab.key === key) return {key: tab.key, name: name};
                                 return tab;
@@ -109,21 +108,26 @@ export default class CodeEditor extends React.Component
                     const new_content = structuredClone(this.props.C0_Contents);
                     new_content.push("");
 
-                    const new_title: EditorTabTitle[] = structuredClone(this.state.C0_tabTitle);
+                    const new_title: EditorTabTitle[] = structuredClone(this.props.C0_TabTitles);
                     new_title.push({name: `Untitled_${this.state.C0_nextKey}.c0`, key: this.state.C0_nextKey });
 
-                    this.props.set_app_state({C0SourceCodes: new_content, ActiveEditor: this.state.C0_nextKey});
-                    this.setState((state) => {return {C0_tabTitle: new_title, C0_nextKey: state.C0_nextKey + 1}})
+                    this.props.set_app_state({
+                        C0TabTitles: new_title,
+                        C0SourceCodes: new_content,
+                        ActiveEditor: this.state.C0_nextKey,
+                    });
+                    this.setState((state) => {return {C0_nextKey: state.C0_nextKey + 1}})
                 }}
+
                 removePanel = {(key: string) => {
                     const key_tbr = parseInt(key);
                     
                     const new_tabs = [];
                     const new_content = [];
                     
-                    for (let i = 0; i < this.state.C0_tabTitle.length; i ++) {
-                        if (this.state.C0_tabTitle[i].key !== key_tbr) {
-                            new_tabs.push(this.state.C0_tabTitle[i]);
+                    for (let i = 0; i < this.props.C0_TabTitles.length; i ++) {
+                        if (this.props.C0_TabTitles[i].key !== key_tbr) {
+                            new_tabs.push(this.props.C0_TabTitles[i]);
                             new_content.push(this.props.C0_Contents[i]);
                         }
                     }
@@ -132,8 +136,7 @@ export default class CodeEditor extends React.Component
                         this.props.set_app_state({ActiveEditor: new_tabs[0].key});
                     }
 
-                    this.setState({C0_tabTitle: new_tabs});
-                    this.props.set_app_state({C0SourceCodes: new_content});
+                    this.props.set_app_state({C0SourceCodes: new_content, C0TabTitles: new_tabs});
                 }}
             />;
         } else {
@@ -156,13 +159,13 @@ export default class CodeEditor extends React.Component
                         <FontAwesomeIcon icon={faPenToSquare}/>
                     </button>
                     <button
-                        className={"implicit-btn " + (this.props.C0_ActiveTab === this.state.C0_tabTitle[0].key ? "editor-tab-btn-disable" :"editor-tab-btn")}
+                        className={"implicit-btn " + (this.props.C0_ActiveTab === this.props.C0_TabTitles[0].key ? "editor-tab-btn-disable" :"editor-tab-btn")}
                         onClick={() => this.move_current_to_left()}
                     >
                         <FontAwesomeIcon icon={faSquareCaretLeft}/>
                     </button>
                     <button
-                        className={"implicit-btn " + (this.props.C0_ActiveTab === this.state.C0_tabTitle[this.state.C0_tabTitle.length - 1].key ? "editor-tab-btn-disable" :"editor-tab-btn")}
+                        className={"implicit-btn " + (this.props.C0_ActiveTab === this.props.C0_TabTitles[this.props.C0_TabTitles.length - 1].key ? "editor-tab-btn-disable" :"editor-tab-btn")}
                         onClick={() => this.move_current_to_right()}
                     >
                         <FontAwesomeIcon icon={faSquareCaretRight}/>

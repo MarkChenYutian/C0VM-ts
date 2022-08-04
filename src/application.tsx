@@ -19,6 +19,7 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
             crashed         : false,
             BC0SourceCode   : "",
             BC0BreakPoints  : new Set<number>(),
+            C0TabTitles     : [{name: "Untitled_0.c0", key: 0}],
             C0SourceCodes   : [""],
             ActiveEditor    : 0,
             PrintoutValue   : "",
@@ -57,6 +58,7 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
                 />
                 <div className="main-ui-framework">
                     <CodeEditor
+                        C0_TabTitles    = {this.state.C0TabTitles}
                         C0_Contents     = {this.state.C0SourceCodes}
                         C0_ActiveTab    = {this.state.ActiveEditor}
                         BC0_Content     = {this.state.BC0SourceCode}
