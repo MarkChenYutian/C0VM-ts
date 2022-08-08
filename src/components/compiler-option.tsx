@@ -39,8 +39,14 @@ export default class CompilerOption extends React.Component
 
 function CompilerOptionBtnGroup(props: CompilerOptionPropInterface){
     return (
-        <div>
-            <Switch onChange={props.flip_d_flag} defaultChecked={false} size="small"/><label> Check Contract</label>
+        // display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: space-between;align-items: flex-start;
+        <div style={{display: "flex",
+                     flexDirection: "row",
+                     flexWrap: "nowrap",
+                     justifyContent: "space-between",
+                     alignItems: "flex-start",
+                     margin: "0 5%"}}>
+            <p style={{margin: "0"}}>Check Contract (<code>-d</code> flag)</p> <Switch onChange={props.flip_d_flag} defaultChecked={false} size="default"/> 
         </div>
     );
 }

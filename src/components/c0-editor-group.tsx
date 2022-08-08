@@ -35,6 +35,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
             onEdit={on_edit}
             onChange={(new_key) => {this.on_change_key(new_key)}}
             addIcon={<FontAwesomeIcon icon={faAdd}/>}
+            onDoubleClick={() => console.log("dbl clicked")}
         >
             {
                 this.props.currTabs.map(

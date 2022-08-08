@@ -6,9 +6,9 @@
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalculator, faAngleDown, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import { faCalculator, faAngleDown, faAngleRight, faTableCells, faList } from "@fortawesome/free-solid-svg-icons";
 
-import { Result, Switch } from "antd";
+import { Result, Segmented } from "antd";
 
 import C0VM_RuntimeState from "../../vm_core/exec/state";
 
@@ -22,7 +22,7 @@ export default class DebugConsole extends React.Component
 > {
     constructor(props: DebugConsoleProps) {
         super(props);
-        this.state = { show: true, mode: "tablular", err: false };
+        this.state = { show: true, mode: "Table", err: false };
     }
 
     render_no_valid_state() {
@@ -40,8 +40,8 @@ export default class DebugConsole extends React.Component
         const S = this.props.state as C0VM_RuntimeState;
         if (S === undefined) return this.render_no_valid_state();
         switch (this.state.mode) {
-            case "tablular": return <TabularDebugEvaluation state={S.state} mem={S.allocator}/>
-            case "graphical": return <GraphicalDebugEvaluation state={S.state} mem={S.allocator}/>;
+            case "Table": return <TabularDebugEvaluation state={S.state} mem={S.allocator}/>
+            case "Graph": return <GraphicalDebugEvaluation state={S.state} mem={S.allocator}/>;
         }
     }
 
@@ -60,7 +60,7 @@ export default class DebugConsole extends React.Component
                     status="error"
                     title="Debugger Crashed!"
                     extra={
-                        <button className="base-btn main-btn" onClick={() => this.setState({err: false, mode: "tablular"})}>
+                        <button className="base-btn main-btn" onClick={() => this.setState({err: false, mode: "Table"})}>
                             Reload Debugger
                         </button>
                     }
@@ -81,15 +81,18 @@ export default class DebugConsole extends React.Component
                     </h3>
                     {
                     this.state.show ? 
-                        <Switch
-                            unCheckedChildren="Table"
-                            checkedChildren="Graph"
-                            style={{marginBottom: "0.4rem"}}
-                            onChange={() => {
-                                this.setState((state) => {
-                                    return {mode: state.mode === "graphical" ? "tablular" : "graphical"};
-                                })
-                            }}
+                        <Segmented
+                            options={[{
+                                label: "Table",
+                                value: "Table",
+                                icon: <FontAwesomeIcon icon={faList}/>
+                            }, {
+                                label: "Graph",
+                                value: "Graph",
+                                icon: <FontAwesomeIcon icon={faTableCells}/>
+                            }]}
+                            defaultValue={"Table"}
+                            onChange={(value) => { this.setState({mode: value as "Table"|"Graph" }) } }
                         />
                         : null
                     }

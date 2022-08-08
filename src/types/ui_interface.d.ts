@@ -88,7 +88,7 @@ interface DebugConsoleProps {
 
 interface DebugConsoleState {
     show: boolean,
-    mode: "tablular" | "graphical",
+    mode: "Table" | "Graph",
     err: boolean
 }
 

@@ -6,6 +6,7 @@ import "antd/lib/result/style/index.css";
 import "antd/lib/tabs/style/index.css";
 import "antd/lib/notification/style/index.css";
 import "antd/lib/switch/style/index.css";
+import "antd/lib/segmented/style/index.css";
 
 import C0VMApplication from './application';
 import AntdEmitter from './utility/antd_emitter';

@@ -147,7 +147,7 @@ div[data-lang="bc0"] .cm-gutter,
 div[data-lang="bc0"] .cm-gutters,
 div[data-lang="bc0"] .cm-scroller,
 div[data-lang="bc0"] .cm-editor {
-    height: calc(100vh - 14.3rem) !important;
+    height: calc(100vh - 14.5rem) !important;
 }
 
 div[data-lang="bc0"] .cm-editor {
@@ -171,7 +171,7 @@ div[data-lang="bc0"] .cm-editor {
     cursor: pointer;
 }
 .cm-breakpoint-gutter:hover {
-    background-color: #EFEFEF;
+    background-color: #E7E7E7;
 }
 
 .active-href {
@@ -271,7 +271,7 @@ pre#c0-output {
 
     font-size: small;
     flex-grow: 3;
-    flex-basis: 5rem;
+    flex-basis: 10rem;
 
     width: inherit !important;
 
@@ -283,7 +283,7 @@ pre#c0-output {
 
 .debug-console-info {
     flex-grow: 3;
-    flex-basis: 5rem;
+    flex-basis: 10rem;
     border: 1px solid silver;
     border-radius: 0.3rem;
 }
@@ -491,4 +491,14 @@ div.dbg-node-base:hover {
 
 path.react-flow__edge-path {
     stroke-width: 1.5;
+}
+
+/* Ant Design Components */
+
+.ant-segmented {
+    margin-bottom: 10px;
+}
+
+.ant-segmented-item-selected .ant-segmented-item-label {
+    color: #009dff;
 }

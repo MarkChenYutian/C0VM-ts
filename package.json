@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",
+    "@codemirror/autocomplete": "^6.1.0",
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
     "@fortawesome/free-brands-svg-icons": "^6.1.1",
     "@fortawesome/free-regular-svg-icons": "^6.1.1",

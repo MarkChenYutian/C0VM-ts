@@ -38,7 +38,7 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
                     render_content = "Unknown value";
                 }
                 contents.push(
-                    <div>
+                    <div key={"s-val-wrap-" + i}>
                         <p key={"s-val-value-" + i} className="dbg-frame-content">{render_content}</p>
                         {
                             TypeUtil.isPointerType(to_be_rendered) && !isNullPtr(to_be_rendered.value)?

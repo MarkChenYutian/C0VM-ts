@@ -2,7 +2,7 @@ import React from "react";
 import BC0Editor from "./bc0-editor";
 import C0EditorGroup from "./c0-editor-group";
 
-import { Switch } from "antd";
+import { Segmented } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
 import { faSquareCaretLeft, faSquareCaretRight, faPenToSquare } from "@fortawesome/free-regular-svg-icons";
@@ -181,15 +181,13 @@ export default class CodeEditor extends React.Component
                 </h3>
                 <div>
                     {btn_groups}
-                    <Switch
-                        unCheckedChildren="C0"
-                        checkedChildren="BC0"
-                        style={{marginBottom: "0.4rem"}}
-                        onChange={() => {
-                            this.setState((state) => {
-                                return {mode: state.mode === "c0" ? "bc0" : "c0"};
-                            })
-                        }}
+                    <Segmented
+                        options={[
+                            { label: "C0", value: "c0" } , 
+                            { label: "BC0",value: "bc0"}
+                        ]}
+                        defaultValue="c0"
+                        onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
                     />
                 </div>
             </div>
