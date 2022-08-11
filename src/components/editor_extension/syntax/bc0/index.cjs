@@ -31,7 +31,7 @@ const BC0Language = language.LRLanguage.define({
                 Function: language.foldInside,
             }),
             highlight.styleTags({
-                Byte: highlight.tags.integer,
+                Byte: highlight.tags.content,
                 Comment: highlight.tags.className,
                 FuncHeader: highlight.tags.definitionKeyword,
                 Identifier: highlight.tags.definitionKeyword,

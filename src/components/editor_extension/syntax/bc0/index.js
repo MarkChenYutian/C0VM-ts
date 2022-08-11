@@ -27,7 +27,7 @@ const BC0Language = LRLanguage.define({
                 Function: foldInside,
             }),
             styleTags({
-                Byte: tags.integer,
+                Byte: tags.content,
                 Comment: tags.className,
                 FuncHeader: tags.definitionKeyword,
                 Identifier: tags.definitionKeyword,
