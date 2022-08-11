@@ -8,7 +8,6 @@ import { C0, C0Language } from "./editor_extension/syntax/c0";
 // import { indentWithTab } from "@codemirror/commands";
 import { indentUnit } from "@codemirror/language";
 import { snippetCompletion } from "@codemirror/autocomplete";
-import { C0ContractAutoComplete } from "./editor_extension/c0_auto_complete";
 
 
 export default class C0Editor extends React.Component<C0EditorProps>
@@ -16,7 +15,7 @@ export default class C0Editor extends React.Component<C0EditorProps>
     render() {
         return <div className="code-editor">
                     <ReactCodeMirror
-                        theme="light"
+                        theme="dark"
                         basicSetup={false}
                         onUpdate={(v) => 
                             {
@@ -33,10 +32,6 @@ export default class C0Editor extends React.Component<C0EditorProps>
                                 autocomplete: [
                                     snippetCompletion('for(#{int i = 0}; #{condition}; #{i++})\n{\n}', {label: "for loop", type: "text", info: "Snippet: for(init; cond; incr){...}"}),
                                     snippetCompletion('while(#{cond})\n{\n}', {label: "while loop", type: "text", info: "Snippet: while(cond){...}"}),
-                                    snippetCompletion('/*@requires #{condition}; @*/', {label: "requires", type: "interface", info: "Contract: Describe the precondition of a function"}),
-                                    snippetCompletion('/*@ensures #{condition}; @*/', {label: "ensures", type: "interface", info: "Contract: Describe the postcondition of a function"}),
-                                    snippetCompletion('/*@assert #{condition}; @*/', {label: "assert", type: "interface", info: "Contract: assert some condition to be true during runtime"}),
-                                    snippetCompletion('/*@loop_invariant #{condition}; @*/', {label: "loop_invariant", type: "interface", info: "Contract: Describe a loop invariant"}),
                                 ]
                             }),
                         ]}

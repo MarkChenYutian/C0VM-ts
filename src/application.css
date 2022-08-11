@@ -502,3 +502,10 @@ path.react-flow__edge-path {
 .ant-segmented-item-selected .ant-segmented-item-label {
     color: #009dff;
 }
+
+.ant-tabs-tab, .ant-tabs-nav-add {
+    border-left: 1px solid silver !important;
+    border-right: 1px solid silver !important;
+    border-top: 1px solid silver !important;
+}
+
