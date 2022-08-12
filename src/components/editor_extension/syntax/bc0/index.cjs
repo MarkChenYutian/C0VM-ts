@@ -37,7 +37,7 @@ const BC0Language = language.LRLanguage.define({
                 Identifier: highlight.tags.definitionKeyword,
                 BlockHeader: highlight.tags.definitionKeyword,
                 Commands: highlight.tags.className,
-                Instruction: highlight.tags.comment
+                Instruction: highlight.tags.literal
             })
         ]
     }),

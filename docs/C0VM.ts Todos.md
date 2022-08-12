@@ -1,6 +1,7 @@
 ### C0VM.ts Main Functionality
 
 - [x] **Function**: `NativeIO::Readline`
+- [ ] **Function**: Change `NativeIO::Readline` to `async` function
 - [x] **Function**: Type Inference System during runtime
 - [x] **Function**: Show local variable’s value during runtime
 - [ ] <s>**Function**: Heap allocator garbage collection based on ref count</s>
@@ -47,6 +48,7 @@
 - [ ] <del>**Editor**: Auto language-detection & switch</del>
 - [x] **Editor**: Refresh & Render problem when scrolling
 - [x] **Editor**: Syntax Highlighting (BC0)
+- [ ] **Editor**: Middle comment in BC0 in another color
 - [x] **Editor**: Syntax Highlighting (C0)
 - [ ] **Editor**: Autocomplete for C0 Language
 - [x] **Editor**: Multiple File Editors (Tabs?)

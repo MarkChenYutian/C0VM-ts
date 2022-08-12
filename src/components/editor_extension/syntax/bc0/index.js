@@ -33,7 +33,7 @@ const BC0Language = LRLanguage.define({
                 Identifier: tags.definitionKeyword,
                 BlockHeader: tags.definitionKeyword,
                 Commands: tags.className,
-                Instruction: tags.comment
+                Instruction: tags.string
             })
         ]
     }),

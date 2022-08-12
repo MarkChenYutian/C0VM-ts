@@ -91,7 +91,7 @@ export default class DebugConsole extends React.Component
                                 value: "Graph",
                                 icon: <FontAwesomeIcon icon={faTableCells}/>
                             }]}
-                            defaultValue={"Table"}
+                            defaultValue={this.state.mode}
                             onChange={(value) => { this.setState({mode: value as "Table"|"Graph" }) } }
                         />
                         : null
