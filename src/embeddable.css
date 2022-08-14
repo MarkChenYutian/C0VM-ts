@@ -13,20 +13,20 @@
 #c0vm-root[data-mode="embeddable"] div[data-lang="c0"] .cm-gutters,
 #c0vm-root[data-mode="embeddable"] div[data-lang="c0"] .cm-scroller,
 #c0vm-root[data-mode="embeddable"] div[data-lang="c0"] .cm-editor {
-    height: 25rem;
-    max-height: 25rem;
+    height: 26rem;
+    max-height: 26rem;
 }
 
 #c0vm-root[data-mode="embeddable"] div[data-lang="bc0"] .cm-gutter, 
 #c0vm-root[data-mode="embeddable"] div[data-lang="bc0"] .cm-gutters,
 #c0vm-root[data-mode="embeddable"] div[data-lang="bc0"] .cm-scroller,
 #c0vm-root[data-mode="embeddable"] div[data-lang="bc0"] .cm-editor {
-    height: 27rem;
-    max-height: 27rem;
+    height: 28rem;
+    max-height: 28rem;
 }
 
 #c0vm-root[data-mode="embeddable"] h3 {
-    font-size: medium;
+    font-size: 1rem;
 }
 
 #c0vm-root[data-mode="embeddable"] .main-control {

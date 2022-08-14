@@ -67,13 +67,14 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                 f: nativeNotImplemented,
             };
         /* Native Standard I/O Functions */
-        // case 4:
-        //     Not implemented since it's dealing with file I/Os
-        //     return {
-        //         functionType: "NATIVE_EOF",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented
-        //     }
+        case 4:
+            return {
+                functionType: "NATIVE_EOF",
+                numArgs: 0,
+                f: (UIHook: ReactUIHook, mem: C0HeapAllocator) => {
+                    return js_cvt2_c0_value(IONative.c0_eof());
+                }
+            }
         case 5:
             return {
                 functionType: "NATIVE_FLUSH",
@@ -82,10 +83,6 @@ function nativeFuncMapping(index: number): C0Native | undefined {
                     return js_cvt2_c0_value(IONative.c0_flush());
                 }
             };
-        /**
-         * TODO:
-         * Force to print the current content from buffer to the screen
-         */
         case 6:
             return {
                 functionType: "NATIVE_PRINT",

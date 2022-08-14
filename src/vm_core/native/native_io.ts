@@ -1,6 +1,10 @@
 /**
  * @author Yutian Chen <yutianch@andrew.cmu.edu>
  * @Description TypeScript implementation of native I/O functions in C0VM.
+ * 
+ * Sources:
+ * cc0/libs/conio/conio.c
+ * 
  */
 import { allocate_js_string, loadString } from "../../utility/string_utility";
 
@@ -108,5 +112,15 @@ export function c0_readline(mem: C0HeapAllocator): C0Pointer {
  * @returns always true, since there is no "flush" in React framework...
  */
 export function c0_flush(): boolean {
+    return true;
+}
+
+/**
+ * This is a dummy function to satisfy the compiled bc0 instructs
+ * 
+ * @returns always true, since we don't read file in C0VM.ts, every input should
+ * be loaded into memory completely during readline().
+ */
+export function c0_eof(): boolean {
     return true;
 }

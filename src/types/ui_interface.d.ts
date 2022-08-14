@@ -3,6 +3,7 @@ interface C0VMApplicationState {
 
     BC0SourceCode: string,          /* The content of BC0 code editor */
     BC0BreakPoints: Set<number>,    /* Breakpoints activated in BC0 code editor */
+    TypedefRecord: Map<string, TypeDefInfo>, /* Record the typedef names for string substitution */
 
     C0TabTitles: EditorTabTitle[],  /* Code editor tab titles */
     C0SourceCodes: string[],        /* Content (in differnet tabs) of C0 code editors */
@@ -13,6 +14,10 @@ interface C0VMApplicationState {
     C0Runtime: C0VM_RuntimeState | undefined,   /* Runtime of C0VM */
     CompilerFlags: Record<string, boolean>      /* Compiler Flags (-d) */
 };
+
+/* to: the string of typedef source */
+/* key: the key of editor where this typedef info entry comes from */
+type TypeDefInfo = {source: string, key: number}
 
 // The props that main control bar component will accept
 interface MainControlProps {
@@ -35,6 +40,7 @@ interface CodeEditorProps {
             Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) | (Pick<C0VMApplicationState, K> | C0VMApplicationState | null),
         callback?: () => void
     ): void;
+    set_typedef: (key: number, newMap: Map<string, string>) => void;
 }
 
 interface CodeEditorState {
@@ -44,23 +50,26 @@ interface CodeEditorState {
 }
 
 interface C0EditorGroupProps {
-    activeTab   : number,
+    activeTab    : number,
 
-    currTabs    : EditorTabTitle[],
-    currContents: string[],
+    currTabs     : EditorTabTitle[],
+    currContents : string[],
 
-    updateContent: (s: string, key: number) => void,
     setActiveTab : (i: number) => void,
     setTabName   : (key: number, name: string) => void,
-
+    
     newPanel     : () => void,
     removePanel  : (key: string) => void,
+
+    updateContent: (s: string, key: number) => void,
+    updateTypedef: (key: number, newTypeDef: Map<string, string>) => void;
 }
 
 type EditorTabTitle = {name: string, key: number};
 
 interface C0EditorProps {
     updateContent : (s: string) => void,
+    updateTypedef : (newTypeDef: Map<string, string>) => void,
     editorValue   : string,
     updateName   ?: (s: string) => void,
 }

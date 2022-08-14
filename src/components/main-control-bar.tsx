@@ -41,6 +41,8 @@ export default class MainControlBar extends React.Component<MainControlProps>{
         }
 
         const restart_c0runtime = () => {
+            // TODO: If the bytecode (bc0 string) is unchanged, we can preserve the type information
+            // collected in previous execution...
             this.props.clear_print();
             this.props.update_state(VM.initialize(appState.BC0SourceCode, this.props.clear_print));
         };
@@ -50,6 +52,7 @@ export default class MainControlBar extends React.Component<MainControlProps>{
             remote_compile(
                 appState.C0SourceCodes,
                 appState.C0TabTitles.map((v) => v.name),
+                appState.TypedefRecord,
                 this.props.update_value,
                 this.props.clear_print,
                 this.props.update_print,

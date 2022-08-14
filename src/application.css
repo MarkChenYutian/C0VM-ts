@@ -115,9 +115,8 @@ footer > ul {
 /* Editor Style */
 
 .editor-tab-btn {
-    margin-right: .5rem;
-    font-size: 1.3rem;
-    color: #52a3f9;
+    font-size: 1.2rem;
+    color: #3577C1;
     border-radius: .3rem;
 }
 
@@ -126,40 +125,33 @@ footer > ul {
 }
 
 .editor-tab-btn-disable {
-    margin-right: .5rem;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     color: #CCC;
     pointer-events: none;
 }
 
 .cm-gutter, .cm-gutters, .cm-scroller, .cm-editor {
-    min-height: 20rem;
+    min-height: 25rem;
 }
 
 div[data-lang="c0"] .cm-gutter,
 div[data-lang="c0"] .cm-gutters,
 div[data-lang="c0"] .cm-scroller,
 div[data-lang="c0"] .cm-editor {
-    height: calc(100vh - 17rem);
+    height: calc(100vh - 16rem);
 }
 
 div[data-lang="bc0"] .cm-gutter,
 div[data-lang="bc0"] .cm-gutters,
 div[data-lang="bc0"] .cm-scroller,
 div[data-lang="bc0"] .cm-editor {
-    height: calc(100vh - 14.5rem) !important;
+    height: calc(100vh - 13.7rem) !important;
 }
 
 div[data-lang="bc0"] .cm-editor {
     border-radius: .3rem !important;
 }
 
-.cm-editor {
-    overflow-x: auto;
-}
-.cm-content {
-    cursor: text;
-}
 .cm-gutters { margin: 1px; }
 .cm-scroller { overflow: auto; }
 .cm-editor { border: 1px solid silver; border-radius: 0 0 0.3rem 0.3rem; }
@@ -502,10 +494,6 @@ path.react-flow__edge-path {
 }
 
 /* Ant Design Components */
-
-.ant-segmented {
-    margin-bottom: 10px;
-}
 
 .ant-segmented-item-selected .ant-segmented-item-label {
     color: #009dff;

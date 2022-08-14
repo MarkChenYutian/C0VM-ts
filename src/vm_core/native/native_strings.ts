@@ -160,13 +160,17 @@ export function c0_string_from_chararray(
 ): C0Pointer {
     const mem_block = mem.deref(arg1.value);
 
-    if (mem_block.getUint8(0) !== 1)
-        throw new vm_error("String from Chararray doesn't receive a char[]");
+    if (mem_block.getUint32(0) !== 1){
+        throw new vm_error("String from Chararray doesn't receive a char[].");
+    }
 
     const [, offset, size] = read_ptr(arg1.value);
-    const length = size - offset;
+    // minus 4 since the first 4 bytes are the size of each element.
+    const length = size - offset  - 4;
     let str = "";
+    console.log(size, offset, length);
     for (let i = 0; i < length; i++) {
+        console.log(i, String.fromCharCode(mem_block.getUint8(4 + i)));
         str = str + String.fromCharCode(mem_block.getUint8(4 + i));
     }
     return allocate_js_string(mem, str);

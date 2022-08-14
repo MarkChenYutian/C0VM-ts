@@ -50,12 +50,16 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
     const F = state.CurrFrame.P; // the function that is currently running on
     const comment = F.comment.get(state.CurrFrame.PC);
     if (comment === undefined) {
+        if (DEBUG) {
+            console.warn(`Expect comment field on function ${F.name} at PC=${state.CurrFrame.PC}.\nHint: Last line number executed = ${state.CurrLineNumber}.`);
+        }
         throw new vm_error("Failed to load mapping between executable bytecode and .bc0 linue number");
     }
     if (globalThis.DEBUG_DUMP_STEP) {
         console.log(`Executing OpCode: ${F.code[state.CurrFrame.PC]}@${state.CurrFrame.PC}. Mapped from ${comment.lineNumber}`);
         console.log(state.CurrFrame);
     }
+    // Update line number
     state.CurrLineNumber = comment.lineNumber;
     switch (F.code[state.CurrFrame.PC]) {
         // dup
@@ -478,8 +482,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
         case OpCode.GOTO: {
             const view = new DataView(F.code.buffer);
             const o1 = view.getInt8(state.CurrFrame.PC + 1);
-            const o2 = view.getInt8(state.CurrFrame.PC + 2);
+            const o2 = view.getUint8(state.CurrFrame.PC + 2);
             const offset = (o1 << 8) | o2;
+            console.log("GOTO: PC + ",offset, "o1 =", o1, "o2 =", o2);
             state.CurrFrame.PC += offset;
             break;
         }
@@ -801,25 +806,16 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const s = allocator.deref(a.value).getUint32(0);
             if (a.type.kind === "arr") {
-                // if (a.type.value.type === "value" || a.type.value.type === "string") {
-                    state.CurrFrame.S.push(
-                        {
-                            value: shift_ptr(a.value, 4 + s * i.value.getUint32(0)), 
-                            type: {
-                                type: "ptr",
-                                kind: "ptr",
-                                value: (a.type.value as C0Type<C0TypeClass>)
-                            }
+                state.CurrFrame.S.push(
+                    {
+                        value: shift_ptr(a.value, 4 + s * i.value.getUint32(0)), 
+                        type: {
+                            type: "ptr",
+                            kind: "ptr",
+                            value: (a.type.value as C0Type<C0TypeClass>)
                         }
-                    )
-                // } else {
-                //     state.CurrFrame.S.push(
-                //         {
-                //             value: shift_ptr(a.value, 4 + s * i.value.getUint32(0)), 
-                //             type: (a.type.value as C0Type<"ptr">)
-                //         }
-                //     );
-                // }
+                    }
+                )
             } else {
                 throw new vm_error("AADDS is only expected to apply on ptr<arr> type.")
             }

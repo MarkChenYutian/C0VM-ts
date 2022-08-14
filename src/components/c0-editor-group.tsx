@@ -1,9 +1,6 @@
 import React from "react";
-
 import { Tabs } from "antd";
-
 import C0Editor from "./c0-editor";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
 
@@ -49,6 +46,9 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                         <C0Editor
                             updateContent = {(s: string) => {
                                 this.props.updateContent(s, index);
+                            }}
+                            updateTypedef = {(nt: Map<string, string>) => {
+                                this.props.updateTypedef(title.key, nt)
                             }}
                             updateName    = {(s: string) => {
                                 this.props.setTabName(title.key, s);

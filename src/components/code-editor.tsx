@@ -18,6 +18,9 @@ export default class CodeEditor extends React.Component
         }
     }
 
+    /**
+     * Move the tab currently selected to its left
+     */
     move_current_to_left() {
         let curr_idx = 0;
         for (let i = 0; i < this.props.C0_TabTitles.length; i ++) {
@@ -36,6 +39,9 @@ export default class CodeEditor extends React.Component
         this.props.set_app_state({C0SourceCodes: new_contents});
     }
 
+    /**
+     * Move the tab currently selected to its right
+     */
     move_current_to_right() {
         let curr_idx = 0;
         for (let i = 0; i < this.props.C0_TabTitles.length; i ++) {
@@ -54,6 +60,9 @@ export default class CodeEditor extends React.Component
         this.props.set_app_state({C0SourceCodes: new_contents});
     }
 
+    /**
+     * Set a new name for the tab currently selected
+     */
     rename_current_tab() {
         const new_title = prompt("New title for tab:");
         if (new_title === null) return;
@@ -81,18 +90,13 @@ export default class CodeEditor extends React.Component
         if (this.state.mode === "c0") {
             content = <C0EditorGroup
                 activeTab   ={this.props.C0_ActiveTab}
-                
                 currTabs    ={this.props.C0_TabTitles}
                 currContents={this.props.C0_Contents}
 
-                updateContent={(s: string, key: number) => {
-                    const ns = structuredClone(this.props.C0_Contents);
-                    ns[key] = s;
-                    this.props.set_app_state({C0SourceCodes: ns});
-                }}
                 setActiveTab = {(i: number) => {
                     this.props.set_app_state({ActiveEditor: i})
                 }}
+
                 setTabName   = {(key: number, name: string) => {
                     this.props.set_app_state(
                         (S) => {return {C0TabTitles: S.C0TabTitles.map(
@@ -138,6 +142,14 @@ export default class CodeEditor extends React.Component
 
                     this.props.set_app_state({C0SourceCodes: new_content, C0TabTitles: new_tabs});
                 }}
+
+                updateContent={(s: string, key: number) => {
+                    const ns = structuredClone(this.props.C0_Contents);
+                    ns[key] = s;
+                    this.props.set_app_state({C0SourceCodes: ns});
+                }}
+
+                updateTypedef={this.props.set_typedef}
             />;
         } else {
             content = <BC0Editor
@@ -176,10 +188,10 @@ export default class CodeEditor extends React.Component
         return (
         <div className="code-editor" data-lang={this.state.mode} >
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline"}}>
-                <h3 style={{marginTop: 0}}>
+                <h3 style={{marginTop: 0, marginBottom: 0}}>
                     <FontAwesomeIcon icon={faCode}/> Code Editor
                 </h3>
-                <div>
+                <div style={{display: "flex", gap: ".3rem"}}>
                     {btn_groups}
                     <Segmented
                         options={[

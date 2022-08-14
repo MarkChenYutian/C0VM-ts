@@ -1,0 +1,7 @@
+{
+    "rules": {
+        // The Lezer Parser Generator will generate template-curly in 
+        // its serialized result unintentionally.
+        "no-template-curly-in-string": "off"
+    }
+}

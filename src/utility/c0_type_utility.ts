@@ -55,7 +55,7 @@ export function Type2String(T: C0Type<C0TypeClass>): string {
 }
 
 /**
- * "Deserialize" the C0 Type Name string
+ * Parse the C0 Type Name string
  * @param S The string to be parsed into the C0Type Object
  * @returns A C0Type object based parsed from S
  */

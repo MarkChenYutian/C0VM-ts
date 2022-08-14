@@ -29,7 +29,7 @@ export default class DebugConsole extends React.Component
         return (
             <Result
                 status="info"
-                subTitle="There is no currently executing C0/C0 Bytecode"
+                subTitle="There is no currently executing program"
                 className="debug-console-info"
             />
         )
