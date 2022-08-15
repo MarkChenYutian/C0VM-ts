@@ -1,29 +1,29 @@
 declare global {
-    var DEBUG: boolean;
-    var DEBUG_DUMP_MEM: boolean;
-    var DEBUG_DUMP_STEP: boolean;
+    var DEBUG: boolean;                     // Log debug information
+    var DEBUG_DUMP_MEM: boolean;            // Dump the heap memory (arraybuffer) to console when init vm
+    var DEBUG_DUMP_STEP: boolean;           // Log vital information (PC, V, S) of each step to console
 
-    var MEM_BLOCK_MAX_SIZE: number;
+    var MEM_BLOCK_MAX_SIZE: number;         // Maximum allowed size of one memory block
 
-    var MEM_POOL_SIZE: number;
-    var MEM_POOL_MIN_SIZE: number;
-    var MEM_POOL_MAX_SIZE: number;
-    var MEM_POOL_DEFAULT_SIZE: number;
+    var MEM_POOL_SIZE: number;              // Memory pool size (by default, bytes)
+    var MEM_POOL_MIN_SIZE: number;          // Memory pool minimum size (bytes)
+    var MEM_POOL_MAX_SIZE: number;          // Memory pool maximum size (bytes)
+    var MEM_POOL_DEFAULT_SIZE: number;      // Default size of memory pool
 
-    var COMPILER_BACKEND_URL: string;
+    var COMPILER_BACKEND_URL: string;       // The URL for compile API
     var EDITOR_HIGHLIGHT_LINENUM: number;
     
-    var UI_INPUT_ID: string;
-    var UI_PRINTOUT_ID: string;
-    var UI_MSG_ID: string;
-    var UI_DEBUG_OUTPUT_ID: string;
+    var UI_EDITOR_THEME: "dark" | "light";  // Theme of code editors
+    var UI_ERR_DISPLAY_TIME_SEC: number;    // How many time (sec) an err message will display
+    var UI_WARN_DISPLAY_TIME_SEC: number;   // How many time (sec) a warn message will display
+    var UI_OK_DISPLAY_TIME_SEC: number;     // How many time (sec) an OK mssage will display
 
-    var UI_ERR_DISPLAY_TIME_SEC: number;
-    var UI_WARN_DISPLAY_TIME_SEC: number;
-    var UI_OK_DISPLAY_TIME_SEC: number;
+    var C0_MAX_RECURSION: number;           // Maximum allowed recursion level for C0 runtime
 
-    var C0_ENVIR_MODE: "web" | "nodejs";
-    var C0_MAX_RECURSION: number;
+    // Experimental features
+    
+    // Preserve state.TypeRecord when bytecode does not change on restart
+    var EXP_PRESERVE_TYPE: boolean;
 
     var MSG_EMITTER: MessageEmitter;
 }

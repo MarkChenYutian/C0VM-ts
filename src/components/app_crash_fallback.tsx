@@ -24,7 +24,7 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                         <h3>How to report?</h3>
                         <h4>Step 1</h4>
                         <p>Copy the application status dump below: </p>
-                        <pre id={globalThis.UI_PRINTOUT_ID}>{
+                        <pre id="c0-output">{
                             JSON.stringify(
                                 {
                                     ReactState: this.props.state,

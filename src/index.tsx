@@ -26,23 +26,18 @@ globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
 
 globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
 
-globalThis.UI_INPUT_ID = "c0-code-input";
-
 // For style specification only, writing to printout should be done
 // by calling react hooks
-globalThis.UI_PRINTOUT_ID = "c0-output";
-
-globalThis.UI_MSG_ID = "message-terminal";
-globalThis.UI_DEBUG_OUTPUT_ID = "debug-output";
-
+globalThis.UI_EDITOR_THEME = "light";
 globalThis.UI_ERR_DISPLAY_TIME_SEC = 4;
 globalThis.UI_WARN_DISPLAY_TIME_SEC = 4;
 globalThis.UI_OK_DISPLAY_TIME_SEC = 1;
 
 globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8000/compile";
 
-globalThis.C0_ENVIR_MODE = "web";
 globalThis.C0_MAX_RECURSION = 999;
+
+globalThis.EXP_PRESERVE_TYPE = true;
 
 globalThis.MSG_EMITTER = new AntdEmitter();
 //

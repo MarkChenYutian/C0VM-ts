@@ -167,18 +167,21 @@ export default class CodeEditor extends React.Component
                     <button
                         className="implicit-btn editor-tab-btn"
                         onClick={() => this.rename_current_tab()}
+                        type="button"
                     >
                         <FontAwesomeIcon icon={faPenToSquare}/>
                     </button>
                     <button
                         className={"implicit-btn " + (this.props.C0_ActiveTab === this.props.C0_TabTitles[0].key ? "editor-tab-btn-disable" :"editor-tab-btn")}
                         onClick={() => this.move_current_to_left()}
+                        type="button"
                     >
                         <FontAwesomeIcon icon={faSquareCaretLeft}/>
                     </button>
                     <button
                         className={"implicit-btn " + (this.props.C0_ActiveTab === this.props.C0_TabTitles[this.props.C0_TabTitles.length - 1].key ? "editor-tab-btn-disable" :"editor-tab-btn")}
                         onClick={() => this.move_current_to_right()}
+                        type="button"
                     >
                         <FontAwesomeIcon icon={faSquareCaretRight}/>
                     </button>

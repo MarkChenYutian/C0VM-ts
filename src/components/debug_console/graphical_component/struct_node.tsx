@@ -25,19 +25,19 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
             return <p className="dbg-error-information dbg-entire-row">No Struct Information</p>;
         }
 
-        const StructFields: JSX.Element[] = [<p className="dbg-entire-row"><code>{struct_type.value}</code></p>];
+        const StructFields: JSX.Element[] = [<p className="dbg-entire-row" key="struct-name"><code>{struct_type.value}</code></p>];
         for (let i = 0; i < fields.length; i ++) {
             const entry = fields[i];
             const to_be_rendered = entry.value;
             StructFields.push(
-                <p className="dbg-evaluate-field-name">
+                <p className="dbg-evaluate-field-name" key={"s-val-name-" + entry.offset}>
                     {entry.name ?? ("Offset @ " + entry.offset)}
                 </p>
             );
             
             if (to_be_rendered === undefined) {
                 StructFields.push(
-                    <p className="dbg-error-information">No Type Info</p>
+                    <p className="dbg-error-information" key={"s-val-value-" + entry.offset}>No Type Info</p>
                 );
             } else {
                 let render_content = null;

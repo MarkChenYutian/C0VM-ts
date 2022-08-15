@@ -21,10 +21,6 @@ const aaddf_comment_regex = /^&.*->([a-zA-z_0-9]+)$/;
  * CRLF input. It can only parse files with LF line change character.
  */
 export default function parse(raw_file: string): C0ByteCode {
-    if (globalThis.C0_ENVIR_MODE === "nodejs") {
-        raw_file = raw_file.replace(/\r\n/g, "\n");
-    }
-
     const blocks = raw_file.trim().split("\n\n");
     if (blocks.length < 6) { throw new bc0_format_error(); }
 

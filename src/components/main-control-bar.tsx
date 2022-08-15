@@ -7,6 +7,7 @@ import * as VM from "../vm_core/vm_interface";
 import remote_compile from "../network/remote_compile";
 
 import tsLogo from "../assets/ts-logo-128.svg";
+import C0VM_RuntimeState from "../vm_core/exec/state";
 
 
 export default class MainControlBar extends React.Component<MainControlProps>{
@@ -44,7 +45,15 @@ export default class MainControlBar extends React.Component<MainControlProps>{
             // TODO: If the bytecode (bc0 string) is unchanged, we can preserve the type information
             // collected in previous execution...
             this.props.clear_print();
-            this.props.update_state(VM.initialize(appState.BC0SourceCode, this.props.clear_print));
+            const old_state = appState.C0Runtime as (undefined | C0VM_RuntimeState);
+            const new_state = VM.initialize(appState.BC0SourceCode, this.props.clear_print);
+            if (EXP_PRESERVE_TYPE                                   // configuration flag opened
+                && old_state !== undefined                          // old_state exists
+                && old_state.raw_code === appState.BC0SourceCode    // Have same bytecode source
+                && new_state !== undefined) {                       // new_state exists
+                new_state.state.TypeRecord = old_state.state.TypeRecord;
+            }
+            this.props.update_state(new_state);
         };
 
         const compile_c0source = () => {

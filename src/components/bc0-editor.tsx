@@ -34,7 +34,7 @@ export default class BC0Editor extends React.Component<BC0EditorProps>
     render() {
         const breakpoint_extension = breakpointGutter((n: number) => this.auto_update(n));
         return  <ReactCodeMirror
-                    theme="dark"
+                    theme={globalThis.UI_EDITOR_THEME}
                     basicSetup={false}
                     onUpdate={(v) => 
                         {

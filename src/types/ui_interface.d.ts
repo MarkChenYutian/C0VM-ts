@@ -83,6 +83,7 @@ interface BC0EditorProps {
 
 // The props that CompilerOption component will accept
 interface CompilerOptionPropInterface {
+    d_flag_stat: boolean;
     flip_d_flag: () => void
 };
 

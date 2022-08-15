@@ -36,10 +36,11 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
 
         const context: ApplicationContextInterface = this.context as ApplicationContextInterface;
 
-        const CompilerOptionComponent = context.compiler_option ? <CompilerOption flip_d_flag={ 
-            () => this.setState((state) => {
+        const CompilerOptionComponent = context.compiler_option ? <CompilerOption 
+            flip_d_flag={() => this.setState((state) => {
                                 return {CompilerFlags: {...state.CompilerFlags, "d": !state.CompilerFlags["d"]}};
-                                })}
+                        })}
+            d_flag_stat={this.state.CompilerFlags["d"]}
             /> : null;
         
         const StandardOutputComponent = context.std_out ? <C0Output printContent={this.state.PrintoutValue}/> : null;

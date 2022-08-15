@@ -9,17 +9,13 @@
 import { allocate_js_string, loadString } from "../../utility/string_utility";
 
 /**
- * Print string to terminal/HTML GUI according to the C0_ENVIR_MODE setting
+ * Print string to HTML GUI
  * @param s The string to be printed
  * @returns Whether the print is success or not
  */
 function internal_print(UIHook: ReactUIHook, s: string): boolean {
-    if (globalThis.C0_ENVIR_MODE === "nodejs") {
-        return process.stdout.write(s);
-    } else {
-        UIHook.print_update(s);
-        return true;
-    }
+    UIHook.print_update(s);
+    return true;
 }
 
 /**

@@ -484,7 +484,6 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             const o1 = view.getInt8(state.CurrFrame.PC + 1);
             const o2 = view.getUint8(state.CurrFrame.PC + 2);
             const offset = (o1 << 8) | o2;
-            console.log("GOTO: PC + ",offset, "o1 =", o1, "o2 =", o2);
             state.CurrFrame.PC += offset;
             break;
         }

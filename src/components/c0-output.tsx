@@ -35,7 +35,7 @@ export default class C0Output extends React.Component
 
 function C0OutputMonitor(props: C0OutputPropInterface) {
     return (
-        <pre id={globalThis.UI_PRINTOUT_ID}>
+        <pre id="c0-output">
             {props.printContent}
         </pre>
     );

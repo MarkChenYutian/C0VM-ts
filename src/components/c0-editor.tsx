@@ -30,7 +30,7 @@ export default class C0Editor extends React.Component<C0EditorProps>
     render() {
         return <div className="code-editor">
                     <ReactCodeMirror
-                        theme="dark"
+                        theme={globalThis.UI_EDITOR_THEME}
                         basicSetup={false}
                         onUpdate={(v) => 
                             {

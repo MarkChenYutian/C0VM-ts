@@ -31,6 +31,7 @@ export default class CompilerOption extends React.Component
                 </h3>
                 {this.state.show ? <CompilerOptionBtnGroup
                     flip_d_flag={this.props.flip_d_flag}
+                    d_flag_stat={this.props.d_flag_stat}
                 /> : null}
             </>
         );
@@ -46,7 +47,7 @@ function CompilerOptionBtnGroup(props: CompilerOptionPropInterface){
                      justifyContent: "space-between",
                      alignItems: "flex-start",
                      margin: "0 5%"}}>
-            <p style={{margin: "0"}}>Check Contract (<code>-d</code> flag)</p> <Switch onChange={props.flip_d_flag} defaultChecked={false} size="default"/> 
+            <p style={{margin: "0"}}>Check Contract (<code>-d</code> flag)</p> <Switch onChange={props.flip_d_flag} defaultChecked={props.d_flag_stat} size="default"/> 
         </div>
     );
 }
