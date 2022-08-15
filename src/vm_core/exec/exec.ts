@@ -357,7 +357,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             if (!TypeUtil.maybeStringType(str_ptr)) {
                 throw new vm_error(`Type unmatch: expected a pointer in C0Value, received a ${str_ptr.type.type}`);
             }
-            throw new c0_user_error(loadString(str_ptr, allocator));
+            UIHooks.print_update("C0 Abort: error(...) called by program\n");
+            const err_prompt = loadString(str_ptr, allocator);
+            UIHooks.print_update(err_prompt + "\n");
+            throw new c0_user_error(err_prompt);
         }
 
         // assert
@@ -373,7 +376,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 throw new vm_error(`Type unmatch: expected a value in C0Value, received a ${str_ptr.type.type}`);
             }
             if (val.value.getUint32(0) === 0) {
-                throw new c0_user_error(loadString(str_ptr, allocator));
+                UIHooks.print_update("C0 Abort: Assertion Error\n");
+                const err_prompt = loadString(str_ptr, allocator);
+                UIHooks.print_update(err_prompt + "\n");
+                throw new c0_user_error(err_prompt);
             }
             break;
         }
@@ -526,7 +532,8 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             // Switch Context
             state.CallStack.push(state.CurrFrame);
             if (state.CallStack.length > globalThis.C0_MAX_RECURSION) {
-                throw new c0_memory_error("Maximum Recursion Depth Exceeded (current maximum: " + globalThis.C0_MAX_RECURSION + " )");
+                UIHooks.print_update("C0 Abort: Maximum Recursion Depth Exceeded\n");
+                throw new c0_memory_error("Maximum Recursion Depth Exceeded (current max depth: " + globalThis.C0_MAX_RECURSION + " )");
             }
             state.CurrFrame = {
                 PC: 0,
@@ -542,8 +549,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             state.CurrFrame.PC += 2;
 
             const ptr = allocator.malloc(s);
-            //@ts-ignore
-            const T = TypeUtil.String2Type(comment.dataType);
+            const T = TypeUtil.String2Type(comment.dataType as string);
             state.CurrFrame.S.push(
                 build_c0_ptrValue(
                     ptr, "ptr", T

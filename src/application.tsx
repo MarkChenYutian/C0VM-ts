@@ -87,7 +87,7 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
                         { DebugConsoleComponent }
                     </div>
                 </div>
-                <C0VMApplicationFooter/>
+                <C0VMApplicationFooter state={this.state}/>
             </div>
         );
     }

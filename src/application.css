@@ -158,7 +158,7 @@ div[data-lang="bc0"] .cm-editor {
 .cm-scroller { overflow: auto; }
 .cm-editor { border: 1px solid silver; border-radius: 0 0 0.3rem 0.3rem; }
 .ͼ1.cm-editor.cm-focused { border: 1px solid #52a3f970; outline: none; }
-.cm-execLine { background-color: #e0e000;  }
+.cm-execLine { background-color: #ffff00;  }
 .cm-lineNumbers > .cm-gutterElement { padding: 0 !important; }
 .cm-foldPlaceholder { padding: 0 0.5rem; color: black; background: #EEEEEE; border: none; }
 .cm-breakpoint-gutter {

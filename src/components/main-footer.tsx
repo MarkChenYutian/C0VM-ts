@@ -1,10 +1,38 @@
-export default function C0VMApplicationFooter() {
-    return (
-        <footer>
-            <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"}}>
-                <p>C0VM.ts, The C0 Runtime on browser</p>
-                <p>V{globalThis.C0VM_VERSION} {globalThis.DEBUG ? "(Debug)" : ""}</p>
-            </div>
-        </footer>
-    );
+import { faCircleCheck, faCircleXmark } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
+import C0VM_RuntimeState from "../vm_core/exec/state";
+
+export default class C0VMApplicationFooter extends React.PureComponent<{state: C0VMApplicationState}> {
+    render() {
+        const s = this.props.state.C0Runtime as (C0VM_RuntimeState | undefined);
+        if (s === undefined) {
+            return (
+                <footer>
+                    <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"}}>
+                        <p>V{globalThis.C0VM_VERSION} {globalThis.DEBUG ? "(Debug)" : ""}</p>
+                        <p><FontAwesomeIcon icon={faCircleXmark}/> Not Loaded</p>
+                    </div>
+                </footer>
+            );
+        } else if (s.state.CurrLineNumber === 0) {
+            return (
+                <footer>
+                    <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"}}>
+                        <p>V{globalThis.C0VM_VERSION} {globalThis.DEBUG ? "(Debug)" : ""}</p>
+                        <p><FontAwesomeIcon icon={faCircleCheck}/> Loaded</p>
+                    </div>
+                </footer>
+            );
+        } else {
+            return (
+                <footer>
+                    <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"}}>
+                        <p>V{globalThis.C0VM_VERSION} {globalThis.DEBUG ? "(Debug)" : ""}</p>
+                        <p><FontAwesomeIcon icon={faCircleCheck}/> Running: Line{s.state.CurrLineNumber} </p>
+                    </div>
+                </footer>
+            );
+        }
+    }
 }
