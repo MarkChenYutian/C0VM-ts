@@ -58,7 +58,7 @@ export default class BC0Editor extends React.Component<BC0EditorProps>
                         keymap.of([indentWithTab]),
                         indentUnit.of("    "),
                         language.of(BC0Language),
-                        execLineHighlighter,
+                        execLineHighlighter(this.props.execLine),
                     ]}
                 />
     }

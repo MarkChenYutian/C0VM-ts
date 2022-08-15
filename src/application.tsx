@@ -11,6 +11,7 @@ import CodeEditor from "./components/code-editor";
 import AppCrashFallbackPage from "./components/app_crash_fallback";
 
 import { merge_typedef } from "./utility/ui_helper";
+import C0VM_RuntimeState from "./vm_core/exec/state";
 
 export default class C0VMApplication extends React.Component<{}, C0VMApplicationState> {
     constructor(props: {}) {
@@ -36,6 +37,10 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
 
         const context: ApplicationContextInterface = this.context as ApplicationContextInterface;
 
+        const state = this.state.C0Runtime as (C0VM_RuntimeState | undefined);
+        let lineNum = 0;
+        if (state !== undefined) { lineNum = state.state.CurrLineNumber }
+
         const CompilerOptionComponent = context.compiler_option ? <CompilerOption 
             flip_d_flag={() => this.setState((state) => {
                                 return {CompilerFlags: {...state.CompilerFlags, "d": !state.CompilerFlags["d"]}};
@@ -53,14 +58,9 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
                     application_state = { this.state }
                     update_value = { (s) => {this.setState({BC0SourceCode: s})}}
                     update_state = { (s) => {
-                            if (s === undefined) {
-                                globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
-                                this.setState({C0Runtime: s})
-                            } else {
-                                globalThis.EDITOR_HIGHLIGHT_LINENUM = s.state.CurrLineNumber;
-                                this.setState({C0Runtime: s});
-                            }
-                        }}
+                                        if (s === undefined) {this.setState({C0Runtime: s})}
+                                        else {this.setState({C0Runtime: s});}
+                                   }}
                     update_print = { (s) => this.setState((state) => { return {PrintoutValue: state.PrintoutValue + s} })}
                     clear_print  = { ()  => this.setState({PrintoutValue: ""})}
                 />
@@ -71,6 +71,7 @@ export default class C0VMApplication extends React.Component<{}, C0VMApplication
                         C0_ActiveTab    = {this.state.ActiveEditor}
                         BC0_Content     = {this.state.BC0SourceCode}
                         BC0_Breakpoint  = {this.state.BC0BreakPoints}
+                        BC0_Execline    = {lineNum}
                         set_app_state   = {(ns: any) => this.setState(ns)}
                         set_typedef     = {(key, newMap) => {
                             this.setState(

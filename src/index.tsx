@@ -13,6 +13,8 @@ import AntdEmitter from './utility/antd_emitter';
 import AppCrashFallbackPage from './components/app_crash_fallback';
 
 // Global Variables
+global.C0VM_VERSION = "0.2.5-alpha";
+
 globalThis.DEBUG = true;
 globalThis.DEBUG_DUMP_MEM = false;
 globalThis.DEBUG_DUMP_STEP = false;
@@ -23,8 +25,6 @@ globalThis.MEM_POOL_MAX_SIZE = 0xFFFF_FFFE;
 globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
 
 globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
-
-globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
 
 // For style specification only, writing to printout should be done
 // by calling react hooks

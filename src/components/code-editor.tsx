@@ -155,6 +155,7 @@ export default class CodeEditor extends React.Component
             content = <BC0Editor
                 updateContent={(s: string) => this.props.set_app_state({BC0SourceCode: s})}
                 editorValue  ={this.props.BC0_Content}
+                execLine     ={this.props.BC0_Execline}
                 breakpointVal={this.props.BC0_Breakpoint}
                 updateBrkPts ={(ns: Set<number>) => {this.props.set_app_state({BC0BreakPoints: ns})}}
             />;
@@ -190,7 +191,7 @@ export default class CodeEditor extends React.Component
 
         return (
         <div className="code-editor" data-lang={this.state.mode} >
-            <div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline"}}>
+            <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
                 <h3 style={{marginTop: 0, marginBottom: 0}}>
                     <FontAwesomeIcon icon={faCode}/> Code Editor
                 </h3>

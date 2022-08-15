@@ -1,4 +1,5 @@
 declare global {
+    var C0VM_VERSION: string;               // Version number of C0VM Build
     var DEBUG: boolean;                     // Log debug information
     var DEBUG_DUMP_MEM: boolean;            // Dump the heap memory (arraybuffer) to console when init vm
     var DEBUG_DUMP_STEP: boolean;           // Log vital information (PC, V, S) of each step to console
@@ -11,7 +12,6 @@ declare global {
     var MEM_POOL_DEFAULT_SIZE: number;      // Default size of memory pool
 
     var COMPILER_BACKEND_URL: string;       // The URL for compile API
-    var EDITOR_HIGHLIGHT_LINENUM: number;
     
     var UI_EDITOR_THEME: "dark" | "light";  // Theme of code editors
     var UI_ERR_DISPLAY_TIME_SEC: number;    // How many time (sec) an err message will display

@@ -14,7 +14,6 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                         <button
                             className="base-btn main-btn"
                             onClick={() => {
-                                globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
                                 this.props.setState({crashed: false, C0Runtime: undefined, PrintoutValue: ""});
                             }}
                         >
@@ -27,10 +26,10 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                         <pre id="c0-output">{
                             JSON.stringify(
                                 {
+                                    Version: globalThis.C0VM_VERSION,
                                     ReactState: this.props.state,
                                     ReactContext: this.context,
                                     GlobalState: {
-                                        exec_line: globalThis.EDITOR_HIGHLIGHT_LINENUM,
                                         configuration: {
                                             DEBUG: globalThis.DEBUG,
                                             DEBUG_DUMP_MEM: globalThis.DEBUG_DUMP_MEM,
@@ -64,7 +63,6 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                     <button
                         className="base-btn main-btn"
                         onClick={() => {
-                            globalThis.EDITOR_HIGHLIGHT_LINENUM = 0;
                             this.props.setState({crashed: false, C0Runtime: undefined, PrintoutValue: ""});
                         }}
                     >

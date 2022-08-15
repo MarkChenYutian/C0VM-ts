@@ -41,6 +41,11 @@ body {
     background: white;
 }
 
+.main-control h3 {
+    margin-top: .65rem;
+    margin-bottom: .65rem;
+}
+
 .control-btn-group {
     display: flex;
     flex-direction: row;
@@ -92,24 +97,21 @@ body {
 }
 
 footer {
-    padding: 0 3vw 1rem 3vw;
+    padding: 0 2vw 0 2vw;
     background-color: #3577C1;
+}
+
+footer * {
     color: #EEEEEE;
 }
 
-footer a {
-    cursor: pointer;
-    color: #fffba8;
-    text-decoration: underline;
+footer p {
+    margin: .3rem;
 }
 
 ul > li {
     list-style: none;
     padding-bottom: 0.3rem;
-}
-
-footer > ul {
-    margin: 1rem 0 0 0;
 }
 
 /* Editor Style */
@@ -138,14 +140,14 @@ div[data-lang="c0"] .cm-gutter,
 div[data-lang="c0"] .cm-gutters,
 div[data-lang="c0"] .cm-scroller,
 div[data-lang="c0"] .cm-editor {
-    height: calc(100vh - 16rem);
+    height: calc(100vh - 10.8rem);
 }
 
 div[data-lang="bc0"] .cm-gutter,
 div[data-lang="bc0"] .cm-gutters,
 div[data-lang="bc0"] .cm-scroller,
 div[data-lang="bc0"] .cm-editor {
-    height: calc(100vh - 13.7rem) !important;
+    height: calc(100vh - 8.6rem) !important;
 }
 
 div[data-lang="bc0"] .cm-editor {
@@ -156,14 +158,14 @@ div[data-lang="bc0"] .cm-editor {
 .cm-scroller { overflow: auto; }
 .cm-editor { border: 1px solid silver; border-radius: 0 0 0.3rem 0.3rem; }
 .ͼ1.cm-editor.cm-focused { border: 1px solid #52a3f970; outline: none; }
-.cm-execLine { background-color: #55560f;  }
+.cm-execLine { background-color: #e0e000;  }
 .cm-lineNumbers > .cm-gutterElement { padding: 0 !important; }
 .cm-foldPlaceholder { padding: 0 0.5rem; color: black; background: #EEEEEE; border: none; }
 .cm-breakpoint-gutter {
     cursor: pointer;
 }
 .cm-breakpoint-gutter:hover {
-    background-color: #4b4b4b;
+    background-color: #E7E7E7;
 }
 
 .active-href {

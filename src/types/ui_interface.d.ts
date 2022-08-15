@@ -35,6 +35,7 @@ interface CodeEditorProps {
     C0_ActiveTab: number,
     BC0_Content: string,
     BC0_Breakpoint: Set<number>,
+    BC0_Execline: number,
     set_app_state<K extends keyof C0VMApplicationState>(
         state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) => (
             Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) | (Pick<C0VMApplicationState, K> | C0VMApplicationState | null),
@@ -77,6 +78,7 @@ interface C0EditorProps {
 interface BC0EditorProps {
     updateContent : (s: string) => void,
     editorValue   : string,
+    execLine      : number,
     breakpointVal : Set<number>,
     updateBrkPts  : (ns: Set<number>) => void,
 }
