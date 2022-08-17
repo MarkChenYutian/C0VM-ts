@@ -374,7 +374,7 @@ function scan_stack_build_edges(state: VM_State): Edge<undefined>[] {
  */
 function edge_factory(source: string, target: string, sourceHandle: string): Edge<undefined> {
     return {
-        source, target, id: `${source}@${sourceHandle} > ${target}`, sourceHandle,
+        source, target, id: `${source}@${sourceHandle}>${target}`, sourceHandle,
         zIndex: 999,
         markerEnd: {type: MarkerType.Arrow}
     };

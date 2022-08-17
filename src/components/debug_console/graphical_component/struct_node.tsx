@@ -30,7 +30,7 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
             const entry = fields[i];
             const to_be_rendered = entry.value;
             StructFields.push(
-                <p className="dbg-evaluate-field-name" key={"s-val-name-" + entry.offset}>
+                <p className="dbg-evaluate-field-name right-aligned" key={"s-val-name-" + entry.offset}>
                     {entry.name ?? ("Offset @ " + entry.offset)}
                 </p>
             );

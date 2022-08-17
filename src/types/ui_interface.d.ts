@@ -101,7 +101,8 @@ interface DebugConsoleProps {
 interface DebugConsoleState {
     show: boolean,
     mode: "Table" | "Graph",
-    err: boolean
+    err: boolean,
+    fullscreen: boolean,
 }
 
 interface TabularDebugEvaluationProps {

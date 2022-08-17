@@ -26,7 +26,7 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
         for (let i = 0; i < data.frame.V.length; i ++) {
             const to_be_rendered = data.frame.V[i];
             if (to_be_rendered !== undefined && data.frame.P.varName[i] !== undefined) {
-                contents.push(<p key={"s-val-name-" + i}><code>{Type2String(to_be_rendered.type)} {data.frame.P.varName[i]}</code></p>);
+                contents.push(<p key={"s-val-name-" + i} className="right-aligned"><code>{Type2String(to_be_rendered.type)} {data.frame.P.varName[i]}</code></p>);
                 let render_content = undefined;
                 if (TypeUtil.isValueType(to_be_rendered)) {
                     render_content = c0_value_cvt2_js_string(to_be_rendered);
@@ -42,7 +42,7 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
                         <p key={"s-val-value-" + i} className="dbg-frame-content">{render_content}</p>
                         {
                             TypeUtil.isPointerType(to_be_rendered) && !isNullPtr(to_be_rendered.value)?
-                            <Handle type="source" key={"s-val-ptr-" + i} id={stackSrcHandleID(i)} position={Position.Right} style={{ top: calculate_entry_height(valid_cnt, "frame"), right: "1.2rem" }}/>
+                            <Handle type="source" key={"s-val-ptr-" + i} id={stackSrcHandleID(i)} position={Position.Right} style={{ top: calculate_entry_height(valid_cnt, "frame"), right: "2rem" }}/>
                             : null
                         }
                     </div>
