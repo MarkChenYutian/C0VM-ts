@@ -39,7 +39,9 @@ globalThis.C0_MAX_RECURSION = 999;
 
 globalThis.EXP_PRESERVE_TYPE = true;
 
-globalThis.MSG_EMITTER = new AntdEmitter();
+if (globalThis.MSG_EMITTER === undefined) {
+  globalThis.MSG_EMITTER = new AntdEmitter();
+}
 //
 
 const htmlRoots = document.querySelectorAll('#c0vm-root') as NodeListOf<HTMLElement>;

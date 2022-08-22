@@ -5,9 +5,9 @@
     border: solid 1px silver;
 }
 
-#c0vm-root[data-mode="embeddable"] footer {
+/* #c0vm-root[data-mode="embeddable"] footer {
     display: none;
-}
+} */
 
 #c0vm-root[data-mode="embeddable"] div[data-lang="c0"] .cm-gutter, 
 #c0vm-root[data-mode="embeddable"] div[data-lang="c0"] .cm-gutters,
@@ -15,6 +15,10 @@
 #c0vm-root[data-mode="embeddable"] div[data-lang="c0"] .cm-editor {
     height: 26rem;
     max-height: 26rem;
+}
+
+#c0vm-root[data-mode="embeddable"] .io-area h3 {
+    margin-top: .3rem;
 }
 
 #c0vm-root[data-mode="embeddable"] div[data-lang="bc0"] .cm-gutter, 

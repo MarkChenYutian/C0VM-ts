@@ -103,6 +103,7 @@ interface DebugConsoleState {
     mode: "Table" | "Graph",
     err: boolean,
     fullscreen: boolean,
+    internalID: string
 }
 
 interface TabularDebugEvaluationProps {

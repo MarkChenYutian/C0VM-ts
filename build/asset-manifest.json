@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/C0VM-ts/build/static/css/main.41b1a53d.css",
-    "main.js": "/C0VM-ts/build/static/js/main.5bb95686.js",
+    "main.css": "/C0VM-ts/build/static/css/main.015dbe35.css",
+    "main.js": "/C0VM-ts/build/static/js/main.ea832e13.js",
     "static/media/ts-logo-128.svg": "/C0VM-ts/build/static/media/ts-logo-128.c76204988f8496c480cbab87d1604986.svg",
     "index.html": "/C0VM-ts/build/index.html",
-    "main.41b1a53d.css.map": "/C0VM-ts/build/static/css/main.41b1a53d.css.map",
-    "main.5bb95686.js.map": "/C0VM-ts/build/static/js/main.5bb95686.js.map"
+    "main.015dbe35.css.map": "/C0VM-ts/build/static/css/main.015dbe35.css.map",
+    "main.ea832e13.js.map": "/C0VM-ts/build/static/js/main.ea832e13.js.map"
   },
   "entrypoints": [
-    "static/css/main.41b1a53d.css",
-    "static/js/main.5bb95686.js"
+    "static/css/main.015dbe35.css",
+    "static/js/main.ea832e13.js"
   ]
 }

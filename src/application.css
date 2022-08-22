@@ -1,13 +1,13 @@
-@media screen and (min-width: 810px) {
+@media screen and (min-width: 950px) {
     div.code-editor {
-        max-width: min(calc(50vw - .5rem), 45rem);
+        max-width: min(calc(50vw - 1rem), 45rem);
     }
     div.io-area {
-        max-width: max(calc(50vw - .5rem), calc(100vw - 48rem));
+        max-width: max(calc(50vw - 1rem), calc(100vw - 45rem));
     }
 }
 
-@media screen and (max-width: 670px) {
+@media screen and (max-width: 600px) {
     .hide-in-mobile {
         display: none !important;
     }

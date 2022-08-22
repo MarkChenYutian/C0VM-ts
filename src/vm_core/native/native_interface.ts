@@ -15,8 +15,11 @@ import {
     js_cvt2_c0_value,
 } from "../../utility/c0_value_utility";
 import { vm_error, vm_instruct_error } from "../../utility/errors";
+
 import * as StringNative from "./native_strings";
 import * as IONative from "./native_io";
+import * as ParseNative from "./native_parse";
+
 import * as TypeUtil from "../../utility/c0_type_utility";
 /**
  * Load the C0Native Functions from bytecode to C0VM.
@@ -304,21 +307,60 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_NUM_TOKENS",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>
+                ) => {
+                    if (TypeUtil.maybeStringType(arg1)) {
+                        return js_cvt2_c0_value(
+                            ParseNative.c0_num_tokens(mem, arg1)
+                        );
+                    }
+                    throw new vm_error("NATIVE_NUM_TOKENS only accepts (string) as input");
+                },
             };
         }
         case 87: {
             return {
                 functionType: "NATIVE_PARSE_BOOL",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator, 
+                    arg1: C0Value<C0TypeClass>
+                ) => {
+                    if (TypeUtil.maybeStringType(arg1)) {
+                        return build_c0_ptrValue(
+                            ParseNative.c0_parse_bool(mem, arg1),
+                            "ptr",
+                            {type: "value", value: "bool"}
+                        );
+                    }
+                    throw new vm_error("NATIVE_PARSE_BOOL only accepts (string) as input");
+                },
             };
         }
         case 88: {
             return {
                 functionType: "NATIVE_PARSE_INT",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>,
+                    arg2: C0Value<C0TypeClass>
+                ) => {
+                    if (TypeUtil.maybeStringType(arg1) 
+                        && TypeUtil.maybeValueType(arg2)) {
+                        return build_c0_ptrValue(
+                            ParseNative.c0_parse_int(mem, arg1, arg2),
+                            "ptr",
+                            {type: "value", value: "int"}
+                        );
+                    }
+                    throw new vm_error("NATIVE_PARSE_INT only accepts (string, value) as input");
+                },
             };
         }
         case 89: {

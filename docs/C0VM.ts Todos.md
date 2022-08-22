@@ -34,6 +34,7 @@
 - [x] **Debugger**: Just show the function name on debug console (not `f main` as it currently shows)
 - [ ] **Debugger**: Show ptr address on hover on struct component
 - [x] **Debugger**: Darken breakpoint column on hover
+- [ ] Shortcut key for Run and Step
 - [ ] <s>**Debugger**: flexible grid proportion</s>
 
 ### Feature Enhancements
@@ -60,6 +61,4 @@
 - [x] **Server**: Change the synchronous system-calls to `async`.
 - [x] **Server**: Support the -d flag option
 - [x] **Server**: Documentation of Compile-code API
-
-
 

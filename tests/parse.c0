@@ -1,0 +1,8 @@
+#use <conio>
+#use <parse>
+
+int main() {
+    bool* B = parse_bool("true");
+    printf("%s", *B ? "true" : "false");
+    return 0;
+}

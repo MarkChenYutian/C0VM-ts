@@ -14,6 +14,7 @@ import C0VM_RuntimeState from "../../vm_core/exec/state";
 
 import TabularDebugEvaluation from "./tabular_debugger";
 import GraphicalDebugEvaluation from "./graphical_debugger";
+import { generateUUID } from "../../utility/ui_helper";
 
 export default class DebugConsole extends React.Component
     <
@@ -23,10 +24,12 @@ export default class DebugConsole extends React.Component
     constructor(props: DebugConsoleProps) {
         super(props);
         this.state = {
+            err: false,
             show: true,
             mode: "Table",
-            err: false,
+
             fullscreen: false,
+            internalID: generateUUID()
         };
     }
 
@@ -53,7 +56,7 @@ export default class DebugConsole extends React.Component
     render() {
         if (this.state.err) {
             return (
-                <div id="c0vm-debug-console" className="debug-console-box">
+                <div id={"c0vm-debug-console_" + this.state.internalID} className="debug-console-box">
                     <h3 onClick={() => this.setState((state) => { return { show: !state.show } })}>
                         <FontAwesomeIcon icon={faCalculator} />
                         {" Debug Console "}
@@ -77,12 +80,12 @@ export default class DebugConsole extends React.Component
         const toggle_full_screen = document.fullscreenEnabled ? <button
             className="base-btn success-btn"
             onClick={() => {
-                document.querySelector("#c0vm-debug-console")?.requestFullscreen();
+                document.querySelector("#c0vm-debug-console_" + this.state.internalID)?.requestFullscreen();
                 this.setState({fullscreen: true});
             }}
             style={{marginRight: "1rem"}}
         >
-            Full Sccreen
+            Full Screen
         </button> : null;
 
         const exit_full_screen = <button
@@ -100,7 +103,7 @@ export default class DebugConsole extends React.Component
 
         return (
             <div
-                id="c0vm-debug-console"
+                id={"c0vm-debug-console_" + this.state.internalID}
                 className={ this.state.show ? "debug-console-box" : "" }
                 style={
                     this.state.fullscreen ? {padding: "1rem", width: "100vw"} : {}
@@ -142,7 +145,7 @@ export default class DebugConsole extends React.Component
 
     componentDidCatch(e: Error) {
         globalThis.MSG_EMITTER.err(
-            "Debugger Interface Exception",
+            "Debugger Crashed!",
             e.name + ": " + e.message
         );
         this.setState({ err: true });
