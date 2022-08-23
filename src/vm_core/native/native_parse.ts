@@ -9,7 +9,7 @@
 import { castToType } from "../../utility/c0_type_utility";
 import { c0_cvt2_js_value, js_cvt2_c0_value } from "../../utility/c0_value_utility";
 import { c0_memory_error, c0_value_error } from "../../utility/errors";
-import { isNullPtr } from "../../utility/pointer_utility";
+import { build_null_ptr, isNullPtr } from "../../utility/pointer_utility";
 import { loadString } from "../../utility/string_utility";
 
 export function c0_parse_bool(
@@ -29,7 +29,7 @@ export function c0_parse_bool(
         mem.cmstore(res, js_cvt2_c0_value(false).value);
         return res;
     } else {
-        return new DataView(new ArrayBuffer(8));    // return NULL
+        return build_null_ptr()    // return NULL
     }
 }
 
@@ -49,7 +49,7 @@ export function c0_parse_int(
 
     const res_value = parseInt(str, base);
     if (isNaN(res_value)) {
-        return new DataView(new ArrayBuffer(8));    // return NULL
+        return build_null_ptr()    // return NULL
     } else {
         const res_ptr = mem.malloc(4);
         mem.imstore(res_ptr, js_cvt2_c0_value(res_value).value);

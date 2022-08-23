@@ -3,7 +3,7 @@ import * as TypeUtil from "../../utility/c0_type_utility";
 
 import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value, build_c0_stringValue } from "../../utility/c0_value_utility";
 import { c0_memory_error, c0_user_error, vm_error, vm_instruct_error } from "../../utility/errors";
-import { read_ptr, shift_ptr } from "../../utility/pointer_utility";
+import { build_null_ptr, read_ptr, shift_ptr } from "../../utility/pointer_utility";
 import { loadString } from "../../utility/string_utility";
 import OpCode from "./opcode";
 
@@ -296,10 +296,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
         case OpCode.ACONST: {
             state.CurrFrame.PC += 1;
 
-            const null_ptr = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]);
             state.CurrFrame.S.push(
                 {
-                    value: new DataView(null_ptr.buffer),
+                    value: build_null_ptr(),
                     type: {type: "<unknown>"}
                 }
             );

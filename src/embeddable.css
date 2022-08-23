@@ -5,9 +5,9 @@
     border: solid 1px silver;
 }
 
-/* #c0vm-root[data-mode="embeddable"] footer {
-    display: none;
-} */
+#c0vm-root[data-mode="embeddable"] footer {
+    border-radius: 0 0 .3rem .3rem;
+}
 
 #c0vm-root[data-mode="embeddable"] div[data-lang="c0"] .cm-gutter, 
 #c0vm-root[data-mode="embeddable"] div[data-lang="c0"] .cm-gutters,

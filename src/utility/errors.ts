@@ -38,6 +38,9 @@ export class c0_memory_error extends Error {
     public readonly name = "C0MemoryError";
     constructor(msg: string) {
         super("C0 Memory Error: " + msg);
+        if (DEBUG) {
+            console.error(this);
+        }
     }
 }
 

@@ -63,7 +63,15 @@ export function shift_ptr(ptr: C0Pointer, offset: number): C0Pointer {
  * @returns `true` if the given pointer is NULL
  */
 export function isNullPtr(ptr: C0Pointer): boolean {
-    return ptr.getBigUint64(0) === BigInt(0);
+    try {
+        return ptr.getBigUint64(0) === BigInt(0);
+    } catch (e) {
+        if (DEBUG) {
+            console.error(e);
+            console.log(ptr);
+        }
+        throw e;
+    }
 }
 
 
@@ -81,4 +89,9 @@ export function build_ptr(addr: number, offset: number, size: number) {
     p.setUint16(4, offset);
     p.setUint16(6, size);
     return p;
+}
+
+
+export function build_null_ptr() {
+    return build_ptr(0, 0, 0);
 }
