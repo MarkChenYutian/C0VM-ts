@@ -175,8 +175,13 @@ export class VM_Memory implements C0HeapAllocator {
                 `Tried to write 8 bytes @${address + offset}, but segment is only allocated as [${address}, ${address + size})`
             )
         }
-        new DataView(this.memory_pool).setBigUint64(
-            address + offset, stored_ptr.getBigUint64(0)
+        const temp_view =new DataView(this.memory_pool);
+        // Refer to issue #3, getBigUint64 is undefined in Safari
+        temp_view.setUint32(
+            address + offset, stored_ptr.getUint32(0)
+        );
+        temp_view.setUint32(
+            address + offset + 4, stored_ptr.getUint32(4)
         );
     }
 
@@ -191,7 +196,9 @@ export class VM_Memory implements C0HeapAllocator {
             )
         }
         const result = new DataView(new Uint8Array(8).buffer);
-        result.setBigUint64(0, new DataView(this.memory_pool).getBigUint64(address + offset));
+        const temp_view = new DataView(this.memory_pool);
+        result.setUint32(0, temp_view.getUint32(address + offset));
+        result.setUint32(4, temp_view.getUint32(address + offset + 4));
         return result;
     }
 

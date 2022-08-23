@@ -63,15 +63,8 @@ export function shift_ptr(ptr: C0Pointer, offset: number): C0Pointer {
  * @returns `true` if the given pointer is NULL
  */
 export function isNullPtr(ptr: C0Pointer): boolean {
-    try {
-        return ptr.getBigUint64(0) === BigInt(0);
-    } catch (e) {
-        if (DEBUG) {
-            console.error(e);
-            console.log(ptr);
-        }
-        throw e;
-    }
+    // Refer to issue #3, bigUint64 is not defined in some Safari browser
+    return ptr.getUint32(0) === 0 && ptr.getUint32(4) === 0;
 }
 
 
