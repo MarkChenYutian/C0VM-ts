@@ -2,7 +2,6 @@ import { step } from "./exec";
 import { createHeap, VM_Memory } from "../utility/memory";
 import parse from "../parser/parse";
 import { loadStringPool } from "../../utility/string_utility";
-import { internal_error } from "../../utility/errors";
 
 /**
  * The C0 Virtual Machine Runtime with interface of operation
@@ -49,16 +48,6 @@ export default class C0VM_RuntimeState implements C0VM_RT{
      */
     public step_forward(UIHooks: ReactUIHook): boolean {
         return step(this.state, this.allocator, UIHooks);
-    }
-
-    /**
-     * @deprecated
-     * Re-initialize the state **without passing in bytecode file**
-     * The parsed bytecode is stored in the .code property of runtime and is 
-     * loaded again when this function is called.
-     */
-    public restart(): never {
-        throw new internal_error("Calling deprecated method restart()");
     }
 
     public clone(): C0VM_RuntimeState {

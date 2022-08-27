@@ -12,6 +12,7 @@ export function initialize(s: string, clear_printout: () => void): C0VM_RuntimeS
         return ns;
     } catch (e) {
         globalThis.MSG_EMITTER.err("Load Failed (" + (e as Error).name + ")", (e as Error).message);
+        if(globalThis.DEBUG) console.error(e);
         return undefined;
     }
 }

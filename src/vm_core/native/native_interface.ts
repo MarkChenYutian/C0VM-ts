@@ -19,6 +19,7 @@ import { vm_error, vm_instruct_error } from "../../utility/errors";
 import * as StringNative from "./native_strings";
 import * as IONative from "./native_io";
 import * as ParseNative from "./native_parse";
+import * as FloatNative from "./native_float";
 
 import * as TypeUtil from "../../utility/c0_type_utility";
 /**
@@ -285,14 +286,36 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_PRINT_HEX",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>
+                ) => {
+                    if (TypeUtil.maybeValueType(arg1)){
+                        return js_cvt2_c0_value(
+                            FloatNative.c0_print_hex_fp(UIHooks, arg1)
+                        );
+                    }
+                    throw new vm_error("NATIVE_PRINT_HEX only accepts (value) as input");
+                },
             };
         }
         case 76: {
             return {
                 functionType: "NATIVE_PRINT_INT",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>
+                ) => {
+                    if (TypeUtil.maybeValueType(arg1)) {
+                        return js_cvt2_c0_value(
+                            FloatNative.c0_print_int_fp(UIHooks, arg1)
+                        );
+                    }
+                    throw new vm_error("NATIVE_PRINT_INT only supports (value) as input");
+                },
             };
         }
         /** String Parsing Functions */
@@ -300,7 +323,22 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_INT_TOKENS",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>,
+                    arg2: C0Value<C0TypeClass>
+                ) => {
+                    if (TypeUtil.maybeStringType(arg1)
+                        && TypeUtil.maybeValueType(arg2)){
+                        return build_c0_ptrValue(
+                            ParseNative.c0_parse_ints(mem, arg1, arg2),
+                            "arr",
+                            {type: "value", value: "int"}
+                        );
+                    }
+                    throw new vm_error("NATIVE_INT_TOKENS only accepts (string, value) as input");
+                },
             };
         }
         case 86: {
@@ -367,14 +405,42 @@ function nativeFuncMapping(index: number): C0Native | undefined {
             return {
                 functionType: "NATIVE_PARSE_INTS",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>,
+                    arg2: C0Value<C0TypeClass>
+                ) => {
+                    if (TypeUtil.maybeStringType(arg1)
+                        && TypeUtil.maybeValueType(arg2)) {
+                        return build_c0_ptrValue(
+                            ParseNative.c0_parse_ints(mem, arg1, arg2),
+                            "arr",
+                            {type: "value", value: "int"}
+                        );
+                    }
+                    throw new vm_error("NATIVE_PARSE_INTS only accepts (string, value) as input");
+                },
             };
         }
         case 90: {
             return {
                 functionType: "NATIVE_PARSE_TOKENS",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: (
+                    UIHooks: ReactUIHook,
+                    mem: C0HeapAllocator,
+                    arg1: C0Value<C0TypeClass>
+                ) => {
+                    if (TypeUtil.maybeStringType(arg1)) {
+                        return build_c0_ptrValue(
+                            ParseNative.c0_parse_tokens(mem, arg1),
+                            "ptr",
+                            {type: "string", value: "string"}
+                        );
+                    }
+                    throw new vm_error("NATIVE_PARSE_TOKENS only accepts (string) as input");
+                },
             };
         }
         /** String and Char Operations */

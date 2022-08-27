@@ -231,12 +231,6 @@ type VM_State = {
 
 declare abstract class C0VM_RT {
     abstract step_forward(UIHooks: ReactUIHook): boolean;
-    /**
-     * @deprecated This method "restart" is a legacy from the original
-     * vanilla HTML frontend. It should not be used anymore in the React
-     * frontend.
-     */
-    abstract restart(): void;
     abstract debug(): any;
 }
 
