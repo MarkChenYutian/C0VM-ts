@@ -1,5 +1,6 @@
 interface C0VMApplicationState {
     crashed      : boolean,         /* C0VM Application top-level error boundary */
+    dbgFullScreen: boolean,         /* If it is in full screen mode currently */
 
     BC0SourceCode: string,          /* The content of BC0 code editor */
     BC0BreakPoints: Set<number>,    /* Breakpoints activated in BC0 code editor */
@@ -95,15 +96,15 @@ interface C0OutputPropInterface {
 
 interface DebugConsoleProps {
     state: C0VM_RuntimeState | undefined,
+    isFullScreen: boolean,
+    setFullScreen: (s: boolean) => void
 }
 
 
 interface DebugConsoleState {
     show: boolean,
     mode: "Table" | "Graph",
-    err: boolean,
-    fullscreen: boolean,
-    internalID: string
+    err: boolean
 }
 
 interface TabularDebugEvaluationProps {

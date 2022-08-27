@@ -6,7 +6,7 @@
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalculator, faAngleDown, faAngleRight, faTableCells, faList } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDown, faAngleRight, faList, faCodeMerge, faBug } from "@fortawesome/free-solid-svg-icons";
 
 import { Result, Segmented } from "antd";
 
@@ -14,7 +14,6 @@ import C0VM_RuntimeState from "../../vm_core/exec/state";
 
 import TabularDebugEvaluation from "./tabular_debugger";
 import GraphicalDebugEvaluation from "./graphical_debugger";
-import { generateUUID } from "../../utility/ui_helper";
 
 export default class DebugConsole extends React.Component
     <
@@ -26,10 +25,7 @@ export default class DebugConsole extends React.Component
         this.state = {
             err: false,
             show: true,
-            mode: "Table",
-
-            fullscreen: false,
-            internalID: generateUUID()
+            mode: "Table"
         };
     }
 
@@ -56,9 +52,9 @@ export default class DebugConsole extends React.Component
     render() {
         if (this.state.err) {
             return (
-                <div id={"c0vm-debug-console_" + this.state.internalID} className="debug-console-box">
+                <div id="c0vm-debug-console" className="debug-console-box">
                     <h3 onClick={() => this.setState((state) => { return { show: !state.show } })}>
-                        <FontAwesomeIcon icon={faCalculator} />
+                        <FontAwesomeIcon icon={faBug} />
                         {" Debug Console "}
                         {this.state.show ? <FontAwesomeIcon icon={faAngleDown} /> : <FontAwesomeIcon icon={faAngleRight} />}
                     </h3>
@@ -77,43 +73,30 @@ export default class DebugConsole extends React.Component
                 </div>);
         }
 
-        const toggle_full_screen = document.fullscreenEnabled ? <button
+        const toggle_full_screen = <button
             className="base-btn success-btn"
-            onClick={() => {
-                document.querySelector("#c0vm-debug-console_" + this.state.internalID)?.requestFullscreen();
-                this.setState({fullscreen: true});
-            }}
+            onClick={() => {this.props.setFullScreen(true);}}
             style={{marginRight: "1rem"}}
-        >
-            Full Screen
-        </button> : null;
+        >Full Screen</button>;
 
         const exit_full_screen = <button
             className="base-btn danger-btn"
-            onClick={() => {
-                document.exitFullscreen();
-                this.setState({fullscreen: false});
-            }}
+            onClick={() => {this.props.setFullScreen(false);}}
             style={{marginRight: "1rem"}}
-        >
-            Exit Full Screen
-        </button>
+        >Exit Full Screen</button>
 
-        const full_screen_btn = (this.state.fullscreen) ? exit_full_screen : toggle_full_screen;
+        const full_screen_btn = (this.props.isFullScreen) ? exit_full_screen : toggle_full_screen;
 
         return (
             <div
-                id={"c0vm-debug-console_" + this.state.internalID}
+                id="c0vm-debug-console"
                 className={ this.state.show ? "debug-console-box" : "" }
-                style={
-                    this.state.fullscreen ? {padding: "1rem", width: "100vw"} : {}
-                }
             >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                     <h3
                         onClick={() => this.setState((state) => { return { show: !state.show } })}
                     >
-                        <FontAwesomeIcon icon={faCalculator} />
+                        <FontAwesomeIcon icon={faBug} />
                         {" Debug Console "}
                         {this.state.show ? <FontAwesomeIcon icon={faAngleDown} /> : <FontAwesomeIcon icon={faAngleRight} />}
                     </h3>
@@ -129,7 +112,7 @@ export default class DebugConsole extends React.Component
                                     }, {
                                         label: "Graph",
                                         value: "Graph",
-                                        icon: <FontAwesomeIcon icon={faTableCells} />
+                                        icon: <FontAwesomeIcon icon={faCodeMerge} />
                                     }]}
                                     defaultValue={this.state.mode}
                                     onChange={(value) => { this.setState({ mode: value as "Table" | "Graph" }) }}

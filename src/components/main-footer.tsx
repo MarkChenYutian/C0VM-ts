@@ -1,4 +1,4 @@
-import { faCircleCheck, faCircleXmark } from "@fortawesome/free-regular-svg-icons";
+import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import C0VM_RuntimeState from "../vm_core/exec/state";
@@ -11,7 +11,7 @@ export default class C0VMApplicationFooter extends React.PureComponent<{state: C
                 <footer>
                     <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"}}>
                         <p>V{globalThis.C0VM_VERSION} {globalThis.DEBUG ? "(Debug)" : ""}</p>
-                        <p><FontAwesomeIcon icon={faCircleXmark}/> Not Loaded</p>
+                        <p><FontAwesomeIcon icon={faXmark}/> Not Loaded</p>
                     </div>
                 </footer>
             );
@@ -20,7 +20,7 @@ export default class C0VMApplicationFooter extends React.PureComponent<{state: C
                 <footer>
                     <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"}}>
                         <p>V{globalThis.C0VM_VERSION} {globalThis.DEBUG ? "(Debug)" : ""}</p>
-                        <p><FontAwesomeIcon icon={faCircleCheck}/> Loaded</p>
+                        <p><FontAwesomeIcon icon={faCheck}/> Loaded</p>
                     </div>
                 </footer>
             );
@@ -29,7 +29,7 @@ export default class C0VMApplicationFooter extends React.PureComponent<{state: C
                 <footer>
                     <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"}}>
                         <p>V{globalThis.C0VM_VERSION} {globalThis.DEBUG ? "(Debug)" : ""}</p>
-                        <p><FontAwesomeIcon icon={faCircleCheck}/> Running: Line{s.state.CurrLineNumber} </p>
+                        <p><FontAwesomeIcon icon={faCheck}/> Running: Line{s.state.CurrLineNumber} </p>
                     </div>
                 </footer>
             );

@@ -3,18 +3,13 @@ import ReactDOM from 'react-dom/client';
 
 import './index.less';
 import 'antd/dist/antd.less';
-// import "antd/lib/result/style/index.css";
-// import "antd/lib/tabs/style/index.css";
-// import "antd/lib/notification/style/index.css";
-// import "antd/lib/switch/style/index.css";
-// import "antd/lib/segmented/style/index.css";
 
 import C0VMApplication from './application';
 import AntdEmitter from './utility/antd_emitter';
 import AppCrashFallbackPage from './components/app_crash_fallback';
 
 // Global Variables
-global.C0VM_VERSION = "0.2.6-alpha";
+global.C0VM_VERSION = "0.2.7-alpha";
 
 globalThis.DEBUG = true;
 globalThis.DEBUG_DUMP_MEM = false;
