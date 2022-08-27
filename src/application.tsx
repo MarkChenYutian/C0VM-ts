@@ -1,6 +1,6 @@
 import React from "react";
-import "./application.css";
-import "./embeddable.css";
+import "./application.less";
+import "./embeddable.less";
 
 import MainControlBar from "./components/main-control-bar";
 import C0VMApplicationFooter from "./components/main-footer";

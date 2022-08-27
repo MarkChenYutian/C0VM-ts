@@ -1,0 +1,509 @@
+C0 C0 FF EE       # magic number
+00 17             # version 11, arch = 1 (64 bits)
+
+00 00             # int pool count
+# int pool
+
+00 B7             # string pool total size
+# string pool
+00  # ""
+00  # ""
+2D 3E 00  # "->"
+5B 74 6F 70 5D 20 00  # "[top] "
+54 4F 50 3A 20 00  # "TOP: "
+00  # ""
+00  # ""
+20 7C 20 00  # " | "
+0A 00  # "\n"
+61 00  # "a"
+62 00  # "b"
+62 00  # "b"
+73 74 61 63 6B 5F 74 65 73 74 2E 63 30 3A 20 31 39 37 2E 33 2D 31 39 37 2E 34 34 3A 20 61 73 73 65 72 74 20 66 61 69 6C 65 64 00  # "stack_test.c0: 197.3-197.44: assert failed"
+62 00  # "b"
+73 74 61 63 6B 5F 74 65 73 74 2E 63 30 3A 20 31 39 39 2E 33 2D 31 39 39 2E 34 34 3A 20 61 73 73 65 72 74 20 66 61 69 6C 65 64 00  # "stack_test.c0: 199.3-199.44: assert failed"
+73 74 61 63 6B 5F 74 65 73 74 2E 63 30 3A 20 32 30 30 2E 33 2D 32 30 30 2E 33 30 3A 20 61 73 73 65 72 74 20 66 61 69 6C 65 64 00  # "stack_test.c0: 200.3-200.30: assert failed"
+0A 00  # "\n"
+41 6C 6C 20 74 65 73 74 73 20 70 61 73 73 65 64 0A 00  # "All tests passed\n"
+
+00 0E             # function count
+# function_pool
+
+#<main>
+00                # number of arguments = 0
+01                # number of local variables = 1
+00 71             # code length = 113 bytes
+B8 00 08 # invokestatic 8     # stack_new()
+36 00    # vstore 0           # S = stack_new();
+15 00    # vload 0            # S
+B8 00 0B # invokestatic 11    # stack_print(S)
+57       # pop                # (ignore result)
+14 00 18 # aldc 24            # s[24] = "\n"
+B7 00 00 # invokenative 0     # print("\n")
+57       # pop                # (ignore result)
+15 00    # vload 0            # S
+14 00 1A # aldc 26            # s[26] = "a"
+B8 00 09 # invokestatic 9     # push(S, "a")
+57       # pop                # (ignore result)
+15 00    # vload 0            # S
+14 00 1C # aldc 28            # s[28] = "b"
+B8 00 09 # invokestatic 9     # push(S, "b")
+57       # pop                # (ignore result)
+15 00    # vload 0            # S
+B8 00 0C # invokestatic 12    # stack_peek(S)
+14 00 1E # aldc 30            # s[30] = "b"
+B7 00 01 # invokenative 1     # string_equal(stack_peek(S), "b")
+14 00 20 # aldc 32            # s[32] = "stack_test.c0: 197.3-197.44: assert failed"
+CF       # assert             # assert string_equal(stack_peek(S), "b") [failure message on stack]
+15 00    # vload 0            # S
+B8 00 0C # invokestatic 12    # stack_peek(S)
+14 00 4B # aldc 75            # s[75] = "b"
+B7 00 01 # invokenative 1     # string_equal(stack_peek(S), "b")
+14 00 4D # aldc 77            # s[77] = "stack_test.c0: 199.3-199.44: assert failed"
+CF       # assert             # assert string_equal(stack_peek(S), "b") [failure message on stack]
+15 00    # vload 0            # S
+B8 00 0D # invokestatic 13    # stack_size(S)
+10 02    # bipush 2           # 2
+9F 00 06 # if_cmpeq +6        # if (stack_size(S) == 2) goto <41:cond_true>
+A7 00 08 # goto +8            # goto <42:cond_false>
+# <41:cond_true>
+10 01    # bipush 1           # true
+A7 00 05 # goto +5            # goto <43:cond_end>
+# <42:cond_false>
+10 00    # bipush 0           # false
+# <43:cond_end>
+14 00 78 # aldc 120           # s[120] = "stack_test.c0: 200.3-200.30: assert failed"
+CF       # assert             # assert (stack_size(S) == 2) [failure message on stack]
+15 00    # vload 0            # S
+B8 00 0B # invokestatic 11    # stack_print(S)
+57       # pop                # (ignore result)
+14 00 A3 # aldc 163           # s[163] = "\n"
+B7 00 00 # invokenative 0     # print("\n")
+57       # pop                # (ignore result)
+14 00 A5 # aldc 165           # s[165] = "All tests passed\n"
+B7 00 00 # invokenative 0     # print("All tests passed\n")
+57       # pop                # (ignore result)
+10 00    # bipush 0           # 0
+B0       # return             # 
+
+
+#<is_acyclic>
+01                # number of arguments = 1
+03                # number of local variables = 3
+00 56             # code length = 86 bytes
+15 00    # vload 0            # start
+01       # aconst_null        # NULL
+9F 00 06 # if_cmpeq +6        # if (start == NULL) goto <00:then>
+A7 00 09 # goto +9            # goto <01:else>
+# <00:then>
+10 01    # bipush 1           # true
+B0       # return             # 
+A7 00 03 # goto +3            # goto <02:endif>
+# <01:else>
+# <02:endif>
+15 00    # vload 0            # start
+62 08    # aaddf 8            # &start->next
+2F       # amload             # start->next
+36 01    # vstore 1           # h = start->next;
+15 00    # vload 0            # start
+36 02    # vstore 2           # t = start;
+# <03:loop>
+15 01    # vload 1            # h
+15 02    # vload 2            # t
+A0 00 06 # if_cmpne +6        # if (h != t) goto <04:body>
+A7 00 32 # goto +50           # goto <05:exit>
+# <04:body>
+15 01    # vload 1            # h
+01       # aconst_null        # NULL
+9F 00 12 # if_cmpeq +18       # if (h == NULL) goto <06:then>
+A7 00 03 # goto +3            # goto <09:or>
+# <09:or>
+15 01    # vload 1            # h
+62 08    # aaddf 8            # &h->next
+2F       # amload             # h->next
+01       # aconst_null        # NULL
+9F 00 06 # if_cmpeq +6        # if (h->next == NULL) goto <06:then>
+A7 00 09 # goto +9            # goto <07:else>
+# <06:then>
+10 01    # bipush 1           # true
+B0       # return             # 
+A7 00 03 # goto +3            # goto <08:endif>
+# <07:else>
+# <08:endif>
+15 01    # vload 1            # h
+62 08    # aaddf 8            # &h->next
+2F       # amload             # h->next
+62 08    # aaddf 8            # &h->next->next
+2F       # amload             # h->next->next
+36 01    # vstore 1           # h = h->next->next;
+15 02    # vload 2            # t
+62 08    # aaddf 8            # &t->next
+2F       # amload             # t->next
+36 02    # vstore 2           # t = t->next;
+A7 FF CA # goto -54           # goto <03:loop>
+# <05:exit>
+10 00    # bipush 0           # false
+B0       # return             # 
+
+
+#<is_segment>
+02                # number of arguments = 2
+02                # number of local variables = 2
+00 2A             # code length = 42 bytes
+15 00    # vload 0            # start
+01       # aconst_null        # NULL
+9F 00 06 # if_cmpeq +6        # if (start == NULL) goto <10:then>
+A7 00 09 # goto +9            # goto <11:else>
+# <10:then>
+10 00    # bipush 0           # false
+B0       # return             # 
+A7 00 03 # goto +3            # goto <12:endif>
+# <11:else>
+# <12:endif>
+15 00    # vload 0            # start
+15 01    # vload 1            # end
+9F 00 06 # if_cmpeq +6        # if (start == end) goto <13:then>
+A7 00 09 # goto +9            # goto <14:else>
+# <13:then>
+10 01    # bipush 1           # true
+B0       # return             # 
+A7 00 03 # goto +3            # goto <15:endif>
+# <14:else>
+# <15:endif>
+15 00    # vload 0            # start
+62 08    # aaddf 8            # &start->next
+2F       # amload             # start->next
+15 01    # vload 1            # end
+B8 00 02 # invokestatic 2     # is_segment(start->next, end)
+B0       # return             # 
+
+
+#<print_segment>
+02                # number of arguments = 2
+03                # number of local variables = 3
+00 46             # code length = 70 bytes
+15 00    # vload 0            # start
+36 02    # vstore 2           # p = start;
+# <16:loop>
+15 02    # vload 2            # p
+15 01    # vload 1            # end
+A0 00 06 # if_cmpne +6        # if (p != end) goto <17:body>
+A7 00 38 # goto +56           # goto <18:exit>
+# <17:body>
+14 00 00 # aldc 0             # s[0] = ""
+B7 00 00 # invokenative 0     # print("")
+57       # pop                # (ignore result)
+15 02    # vload 2            # p
+62 00    # aaddf 0            # &p->data
+2F       # amload             # p->data
+B7 00 00 # invokenative 0     # print(p->data)
+57       # pop                # (ignore result)
+14 00 01 # aldc 1             # s[1] = ""
+B7 00 00 # invokenative 0     # print("")
+57       # pop                # (ignore result)
+15 02    # vload 2            # p
+15 01    # vload 1            # end
+A0 00 06 # if_cmpne +6        # if (p != end) goto <19:then>
+A7 00 0D # goto +13           # goto <20:else>
+# <19:then>
+14 00 02 # aldc 2             # s[2] = "->"
+B7 00 00 # invokenative 0     # print("->")
+57       # pop                # (ignore result)
+A7 00 03 # goto +3            # goto <21:endif>
+# <20:else>
+# <21:endif>
+15 02    # vload 2            # p
+62 08    # aaddf 8            # &p->next
+2F       # amload             # p->next
+36 02    # vstore 2           # p = p->next;
+A7 FF C4 # goto -60           # goto <16:loop>
+# <18:exit>
+10 00    # bipush 0           # dummy return value
+B0       # return             # 
+
+
+#<stack_print_unsafe>
+01                # number of arguments = 1
+01                # number of local variables = 1
+00 18             # code length = 24 bytes
+14 00 05 # aldc 5             # s[5] = "[top] "
+B7 00 00 # invokenative 0     # print("[top] ")
+57       # pop                # (ignore result)
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+2F       # amload             # S->top
+15 00    # vload 0            # S
+62 10    # aaddf 16           # &S->floor
+2F       # amload             # S->floor
+B8 00 03 # invokestatic 3     # print_segment(S->top, S->floor)
+57       # pop                # (ignore result)
+10 00    # bipush 0           # dummy return value
+B0       # return             # 
+
+
+#<is_stack>
+01                # number of arguments = 1
+01                # number of local variables = 1
+00 2C             # code length = 44 bytes
+15 00    # vload 0            # S
+01       # aconst_null        # NULL
+A0 00 06 # if_cmpne +6        # if (S != NULL) goto <25:and>
+A7 00 23 # goto +35           # goto <23:cond_false>
+# <25:and>
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+2F       # amload             # S->top
+B8 00 01 # invokestatic 1     # is_acyclic(S->top)
+10 01    # bipush 1           # true
+9F 00 06 # if_cmpeq +6        # if (is_acyclic(S->top) == true) goto <22:cond_true>
+A7 00 13 # goto +19           # goto <23:cond_false>
+# <22:cond_true>
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+2F       # amload             # S->top
+15 00    # vload 0            # S
+62 10    # aaddf 16           # &S->floor
+2F       # amload             # S->floor
+B8 00 02 # invokestatic 2     # is_segment(S->top, S->floor)
+A7 00 05 # goto +5            # goto <24:cond_end>
+# <23:cond_false>
+10 00    # bipush 0           # false
+# <24:cond_end>
+B0       # return             # 
+
+
+#<stack_print_internal>
+01                # number of arguments = 1
+01                # number of local variables = 1
+00 09             # code length = 9 bytes
+15 00    # vload 0            # S
+B8 00 04 # invokestatic 4     # stack_print_unsafe(S)
+57       # pop                # (ignore result)
+10 00    # bipush 0           # dummy return value
+B0       # return             # 
+
+
+#<stack_empty>
+01                # number of arguments = 1
+01                # number of local variables = 1
+00 18             # code length = 24 bytes
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+2F       # amload             # S->top
+15 00    # vload 0            # S
+62 10    # aaddf 16           # &S->floor
+2F       # amload             # S->floor
+9F 00 06 # if_cmpeq +6        # if (S->top == S->floor) goto <26:cond_true>
+A7 00 08 # goto +8            # goto <27:cond_false>
+# <26:cond_true>
+10 01    # bipush 1           # true
+A7 00 05 # goto +5            # goto <28:cond_end>
+# <27:cond_false>
+10 00    # bipush 0           # false
+# <28:cond_end>
+B0       # return             # 
+
+
+#<stack_new>
+00                # number of arguments = 0
+02                # number of local variables = 2
+00 20             # code length = 32 bytes
+BB 18    # new 24             # alloc(stack)
+36 00    # vstore 0           # S = alloc(stack);
+BB 10    # new 16             # alloc(list)
+36 01    # vstore 1           # l = alloc(list);
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+15 01    # vload 1            # l
+4F       # amstore            # S->top = l;
+15 00    # vload 0            # S
+62 10    # aaddf 16           # &S->floor
+15 01    # vload 1            # l
+4F       # amstore            # S->floor = l;
+15 00    # vload 0            # S
+62 00    # aaddf 0            # &S->length
+10 00    # bipush 0           # 0
+4E       # imstore            # S->length = 0;
+15 00    # vload 0            # S
+B0       # return             # 
+
+
+#<push>
+02                # number of arguments = 2
+03                # number of local variables = 3
+00 29             # code length = 41 bytes
+BB 10    # new 16             # alloc(list)
+36 02    # vstore 2           # l = alloc(list);
+15 02    # vload 2            # l
+62 00    # aaddf 0            # &l->data
+15 01    # vload 1            # x
+4F       # amstore            # l->data = x;
+15 02    # vload 2            # l
+62 08    # aaddf 8            # &l->next
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+2F       # amload             # S->top
+4F       # amstore            # l->next = S->top;
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+15 02    # vload 2            # l
+4F       # amstore            # S->top = l;
+15 00    # vload 0            # S
+62 00    # aaddf 0            # &S->length
+59       # dup                # (save &S->length)
+2E       # imload             # S->length
+10 01    # bipush 1           # 1
+60       # iadd               # 
+4E       # imstore            # S->length += 1;
+10 00    # bipush 0           # dummy return value
+B0       # return             # 
+
+
+#<pop>
+01                # number of arguments = 1
+02                # number of local variables = 2
+00 24             # code length = 36 bytes
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+2F       # amload             # S->top
+62 00    # aaddf 0            # &S->top->data
+2F       # amload             # S->top->data
+36 01    # vstore 1           # e = S->top->data;
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+2F       # amload             # S->top
+62 08    # aaddf 8            # &S->top->next
+2F       # amload             # S->top->next
+4F       # amstore            # S->top = S->top->next;
+15 00    # vload 0            # S
+62 00    # aaddf 0            # &S->length
+59       # dup                # (save &S->length)
+2E       # imload             # S->length
+10 01    # bipush 1           # 1
+64       # isub               # 
+4E       # imstore            # S->length -= 1;
+15 01    # vload 1            # e
+B0       # return             # 
+
+
+#<stack_print>
+01                # number of arguments = 1
+02                # number of local variables = 2
+00 59             # code length = 89 bytes
+14 00 0C # aldc 12            # s[12] = "TOP: "
+B7 00 00 # invokenative 0     # print("TOP: ")
+57       # pop                # (ignore result)
+15 00    # vload 0            # S
+62 08    # aaddf 8            # &S->top
+2F       # amload             # S->top
+36 01    # vstore 1           # l = S->top;
+# <29:loop>
+15 01    # vload 1            # l
+15 00    # vload 0            # S
+62 10    # aaddf 16           # &S->floor
+2F       # amload             # S->floor
+A0 00 06 # if_cmpne +6        # if (l != S->floor) goto <30:body>
+A7 00 3E # goto +62           # goto <31:exit>
+# <30:body>
+14 00 12 # aldc 18            # s[18] = ""
+B7 00 00 # invokenative 0     # print("")
+57       # pop                # (ignore result)
+15 01    # vload 1            # l
+62 00    # aaddf 0            # &l->data
+2F       # amload             # l->data
+B7 00 00 # invokenative 0     # print(l->data)
+57       # pop                # (ignore result)
+14 00 13 # aldc 19            # s[19] = ""
+B7 00 00 # invokenative 0     # print("")
+57       # pop                # (ignore result)
+15 01    # vload 1            # l
+62 08    # aaddf 8            # &l->next
+2F       # amload             # l->next
+15 00    # vload 0            # S
+62 10    # aaddf 16           # &S->floor
+2F       # amload             # S->floor
+A0 00 06 # if_cmpne +6        # if (l->next != S->floor) goto <32:then>
+A7 00 0D # goto +13           # goto <33:else>
+# <32:then>
+14 00 14 # aldc 20            # s[20] = " | "
+B7 00 00 # invokenative 0     # print(" | ")
+57       # pop                # (ignore result)
+A7 00 03 # goto +3            # goto <34:endif>
+# <33:else>
+# <34:endif>
+15 01    # vload 1            # l
+62 08    # aaddf 8            # &l->next
+2F       # amload             # l->next
+36 01    # vstore 1           # l = l->next;
+A7 FF BB # goto -69           # goto <29:loop>
+# <31:exit>
+10 00    # bipush 0           # dummy return value
+B0       # return             # 
+
+
+#<stack_peek>
+01                # number of arguments = 1
+02                # number of local variables = 2
+00 12             # code length = 18 bytes
+15 00    # vload 0            # S
+B8 00 0A # invokestatic 10    # pop(S)
+36 01    # vstore 1           # s = pop(S);
+15 00    # vload 0            # S
+15 01    # vload 1            # s
+B8 00 09 # invokestatic 9     # push(S, s)
+57       # pop                # (ignore result)
+15 01    # vload 1            # s
+B0       # return             # 
+
+
+#<stack_size>
+01                # number of arguments = 1
+04                # number of local variables = 4
+00 4D             # code length = 77 bytes
+10 00    # bipush 0           # 0
+36 01    # vstore 1           # i = 0;
+B8 00 08 # invokestatic 8     # stack_new()
+36 02    # vstore 2           # T = stack_new();
+# <35:loop>
+15 00    # vload 0            # S
+B8 00 07 # invokestatic 7     # stack_empty(S)
+10 01    # bipush 1           # true
+9F 00 1F # if_cmpeq +31       # if (stack_empty(S) == true) goto <37:exit>
+A7 00 03 # goto +3            # goto <36:body>
+# <36:body>
+15 00    # vload 0            # S
+B8 00 0A # invokestatic 10    # pop(S)
+36 03    # vstore 3           # s = pop(S);
+15 02    # vload 2            # T
+15 03    # vload 3            # s
+B8 00 09 # invokestatic 9     # push(T, s)
+57       # pop                # (ignore result)
+15 01    # vload 1            # i
+10 01    # bipush 1           # 1
+60       # iadd               # 
+36 01    # vstore 1           # i += 1;
+A7 FF DD # goto -35           # goto <35:loop>
+# <37:exit>
+# <38:loop>
+15 02    # vload 2            # T
+B8 00 07 # invokestatic 7     # stack_empty(T)
+10 01    # bipush 1           # true
+9F 00 14 # if_cmpeq +20       # if (stack_empty(T) == true) goto <40:exit>
+A7 00 03 # goto +3            # goto <39:body>
+# <39:body>
+15 00    # vload 0            # S
+15 02    # vload 2            # T
+B8 00 0A # invokestatic 10    # pop(T)
+B8 00 09 # invokestatic 9     # push(S, pop(T))
+57       # pop                # (ignore result)
+A7 FF E8 # goto -24           # goto <38:loop>
+# <40:exit>
+15 01    # vload 1            # i
+B0       # return             # 
+
+00 02             # native count
+# native pool
+00 01 00 06       # print
+00 02 00 5F       # string_equal
+

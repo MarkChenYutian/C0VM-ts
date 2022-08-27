@@ -1,0 +1,58 @@
+C0 C0 FF EE       # magic number
+00 17             # version 11, arch = 1 (64 bits)
+
+00 00             # int pool count
+# int pool
+
+00 00             # string pool total size
+# string pool
+
+00 01             # function count
+# function_pool
+
+#<main>
+00                # number of arguments = 0
+02                # number of local variables = 2
+00 43             # code length = 67 bytes
+BB 10    # new 16             # alloc(struct T)
+36 00    # vstore 0           # test = alloc(struct T);
+BB 10    # new 16             # alloc(struct T)
+36 01    # vstore 1           # test2 = alloc(struct T);
+15 00    # vload 0            # test
+62 08    # aaddf 8            # &test->next
+15 01    # vload 1            # test2
+4F       # amstore            # test->next = test2;
+15 00    # vload 0            # test
+62 00    # aaddf 0            # &test->boolean
+10 01    # bipush 1           # true
+55       # cmstore            # test->boolean = true;
+15 01    # vload 1            # test2
+62 00    # aaddf 0            # &test2->boolean
+10 00    # bipush 0           # false
+55       # cmstore            # test2->boolean = false;
+15 00    # vload 0            # test
+62 01    # aaddf 1            # &test->character
+10 6D    # bipush 109         # 'm'
+55       # cmstore            # test->character = 'm';
+15 01    # vload 1            # test2
+62 01    # aaddf 1            # &test2->character
+10 63    # bipush 99          # 'c'
+55       # cmstore            # test2->character = 'c';
+15 00    # vload 0            # test
+62 04    # aaddf 4            # &test->count
+10 0A    # bipush 10          # 10
+4E       # imstore            # test->count = 10;
+15 01    # vload 1            # test2
+62 04    # aaddf 4            # &test2->count
+10 0C    # bipush 12          # 12
+4E       # imstore            # test2->count = 12;
+15 01    # vload 1            # test2
+62 08    # aaddf 8            # &test2->next
+15 00    # vload 0            # test
+4F       # amstore            # test2->next = test;
+10 00    # bipush 0           # 0
+B0       # return             # 
+
+00 00             # native count
+# native pool
+

@@ -1,4 +1,6 @@
-### C0VM.ts Main Functionality
+# C0VM.ts ToDo List
+
+## C0VM.ts Main Functionality
 
 - [x] **Function**: `NativeIO::Readline`
 - [ ] **Function**: Change `NativeIO::Readline` to `async` function
@@ -9,8 +11,11 @@
 - [x] **Parser**: Deal with “dummy return value” (occurs at `void` functions)
 - [ ] **Future**: Map the source code line number to bytecode line number **@Iliano**
 - [x] **Type Inference**: Resolve `typedef` in C0 source code automatically
+- [x] **Function**: Support `NativeParse` functions
+- [x] **Function**: Partially support `NativeFloat` functions (`printint` and `printhex`)
+- [ ] **Debugger**: Add `Details` panel in debugger options. Show all C0VM details (`V`, `S`, etc.)
 
-### UI/UX Enhancements
+## UI/UX Enhancements
 
 - [x] **UI**: Optimize workflow
 - [x] **UI**: File import based on popup window dialog
@@ -20,6 +25,7 @@
 - [ ] **UI**: Add border to values in `stacknode`
 - [x] **UI**: Right aligned variable names in stack
 - [x] **UI**: Right aligned struct field names
+- [ ] **UI**: Encapsulate the application using `shadowRoot` in HTML
 - [x] **React**: Add breakpoint as a component state instead of global variable (which may lead to strange problems, sometimes toggled breakpoint does not work at all)
 - [x] **React**: Add execution line (highlight line) as component state instead of global state
 - [x] **Debugger**: Show function call stack
@@ -34,17 +40,17 @@
 - [x] **Debugger**: Just show the function name on debug console (not `f main` as it currently shows)
 - [ ] **Debugger**: Show ptr address on hover on struct component
 - [x] **Debugger**: Darken breakpoint column on hover
-- [ ] Shortcut key for Run and Step
+- [ ] **UX**: Shortcut key for Run and Step
 - [ ] <s>**Debugger**: flexible grid proportion</s>
 
-### Feature Enhancements
+## Feature Enhancements
 
 - [x] **Feature**: Breakpoint, Step and Run
 - [x] **Feature**: Show execution position
 - [x] **Feature**: Compile Multiple Files
 - [x] **Feature**: Compile with flags
 
-### Editor Enhancement TODOs
+## Editor Enhancement
 
 - [ ] <del>**Editor**: Auto language-detection & switch</del>
 - [x] **Editor**: Refresh & Render problem when scrolling
@@ -55,8 +61,9 @@
 - [x] **Editor**: Multiple File Editors (Tabs?)
 - [ ] **Editor**: Jump to the line executing
 - [x] **Syntax Highlighting**: Swap the syntax highlight between instruction and comment
+- [ ] **Syntax Highlighting**: Rewrite the parser generator profile to match with formal definition in `C0Reference.pdf`
 
-### C0VM.ts Backend Server
+## C0VM.ts Backend Server
 
 - [x] **Server**: Change the synchronous system-calls to `async`.
 - [x] **Server**: Support the -d flag option

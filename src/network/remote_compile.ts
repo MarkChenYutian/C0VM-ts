@@ -8,7 +8,7 @@ import * as VM from "../vm_core/vm_interface";
  * will be flattened to:
  * A -> C, B -> C, D -> C
  * 
- * @returns 
+ * @returns A flattened type mapping
  */
 function flatten_typedef(typedef: Map<string, TypeDefInfo>): Map<string, string> {
     const flattened = new Map<string, string>();
