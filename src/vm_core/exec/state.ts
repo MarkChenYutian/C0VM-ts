@@ -38,7 +38,7 @@ export default class C0VM_RuntimeState implements C0VM_RT{
                 P: this.code.functionPool[0]
             },
             CurrLineNumber: 0,
-            TypeRecord: new Map<string, Map<number, Struct_Type_Record>>()
+            TypeRecord: new Map<string, Map<number, Struct_Type_Record>>(),
         };
     }
 

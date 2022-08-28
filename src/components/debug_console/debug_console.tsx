@@ -6,7 +6,7 @@
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDown, faAngleRight, faList, faCodeMerge, faBug } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDown, faAngleRight, faList, faCodeMerge, faBug, faUpRightAndDownLeftFromCenter, faDownLeftAndUpRightToCenter } from "@fortawesome/free-solid-svg-icons";
 
 import { Result, Segmented } from "antd";
 
@@ -74,16 +74,16 @@ export default class DebugConsole extends React.Component
         }
 
         const toggle_full_screen = <button
-            className="base-btn success-btn"
+            className="implicit-btn success-btn"
             onClick={() => {this.props.setFullScreen(true);}}
             style={{marginRight: "1rem"}}
-        >Full Screen</button>;
+        ><FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter}/></button>;
 
         const exit_full_screen = <button
-            className="base-btn danger-btn"
+            className="implicit-btn danger-btn"
             onClick={() => {this.props.setFullScreen(false);}}
             style={{marginRight: "1rem"}}
-        >Exit Full Screen</button>
+        ><FontAwesomeIcon icon={faDownLeftAndUpRightToCenter}/></button>
 
         const full_screen_btn = (this.props.isFullScreen) ? exit_full_screen : toggle_full_screen;
 

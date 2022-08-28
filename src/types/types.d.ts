@@ -42,7 +42,7 @@ type C0Native = {
     // The enumeration type - C0 Native Functions' name
     readonly functionType: C0NativeFuncType;
     // The native function implementation - receive several C0 value and return a C0Value accordingly
-    readonly f: (hooks: ReactUIHook, mem: C0HeapAllocator, ...args: C0Value<C0TypeClass>[]) => 
+    readonly async f: (hooks: ReactUIHook, mem: C0HeapAllocator, ...args: C0Value<C0TypeClass>[]) => 
         C0Value<C0TypeClass>;
 };
 

@@ -47,7 +47,7 @@ function CompilerOptionBtnGroup(props: CompilerOptionPropInterface){
                      justifyContent: "space-between",
                      alignItems: "flex-start",
                      margin: "0 5%"}}>
-            <p style={{margin: "0"}}>Check Contract (<code>-d</code> flag)</p> <Switch onChange={props.flip_d_flag} defaultChecked={props.d_flag_stat} size="default"/> 
+            <p style={{margin: "0"}}>Check Contract (<code>-d</code> flag)</p> <Switch onChange={props.flip_d_flag} defaultChecked={props.d_flag_stat} size="small"/> 
         </div>
     );
 }

@@ -1,6 +1,5 @@
 type C0TypeClass = "<unknown>" | "value" | "ptr" | "string";
 
-
 type C0ValueTypes = "int" | "char" | "bool";
 
 type Maybe<T extends C0TypeClass> = T | "<unknown>";

@@ -1,6 +1,8 @@
 interface C0VMApplicationState {
     crashed      : boolean,         /* C0VM Application top-level error boundary */
+
     dbgFullScreen: boolean,         /* If it is in full screen mode currently */
+    settingMenuOn: boolean,         /* See if the setting menu is on or not */
 
     BC0SourceCode: string,          /* The content of BC0 code editor */
     BC0BreakPoints: Set<number>,    /* Breakpoints activated in BC0 code editor */
@@ -169,4 +171,13 @@ interface ApplicationContextInterface {
     compiler_option: boolean,
     std_out: boolean,
     debug_console: boolean
+}
+
+interface SettingMenuProps {
+    state: C0VMApplicationState,
+    set_app_state<K extends keyof C0VMApplicationState>(
+        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) => (
+            Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) | (Pick<C0VMApplicationState, K> | C0VMApplicationState | null),
+        callback?: () => void
+    ): void;
 }

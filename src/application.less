@@ -1,9 +1,9 @@
 @media screen and (min-width: 950px) {
     div.code-editor {
-        max-width: min(calc(50vw - 1rem), 40rem);
+        max-width: min(calc(50vw - 1rem), 45rem);
     }
     div.io-area {
-        max-width: max(calc(50vw - 1rem), calc(100vw - 40rem));
+        min-width: min(calc(50vw - 1rem), calc(100vw - 46.5rem));
     }
 }
 
@@ -141,14 +141,14 @@ div[data-lang="c0"] .cm-gutter,
 div[data-lang="c0"] .cm-gutters,
 div[data-lang="c0"] .cm-scroller,
 div[data-lang="c0"] .cm-editor {
-    height: calc(100vh - 9.5rem);
+    height: calc(100vh - 9.9rem);
 }
 
 div[data-lang="bc0"] .cm-gutter,
 div[data-lang="bc0"] .cm-gutters,
 div[data-lang="bc0"] .cm-scroller,
 div[data-lang="bc0"] .cm-editor {
-    height: calc(100vh - 7.8rem) !important;
+    height: calc(100vh - 8rem) !important;
 }
 
 div[data-lang="bc0"] .cm-editor {
@@ -204,6 +204,7 @@ pre#c0-output {
 
 .implicit-btn {
     border: none;
+    border-radius: .3rem;
     cursor: pointer;
     background: transparent;
 }
@@ -502,6 +503,19 @@ div.dbg-node-base:hover {
 
 path.react-flow__edge-path {
     stroke-width: 1.5;
+}
+
+/* Setting popup menu */
+div.settings-grid {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+}
+
+div.settings-grid > p {
+    margin-bottom: .3rem;
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 /* Ant Design Components */

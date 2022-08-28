@@ -12,6 +12,7 @@ import AppCrashFallbackPage from "./components/app_crash_fallback";
 
 import { merge_typedef } from "./utility/ui_helper";
 import C0VM_RuntimeState from "./vm_core/exec/state";
+import SettingPopup from "./components/settings";
 
 export default class C0VMApplication extends React.Component<
     {},
@@ -22,12 +23,16 @@ export default class C0VMApplication extends React.Component<
         this.state = {
             crashed: false,
             dbgFullScreen: false,
+            settingMenuOn: false,
+            
             BC0SourceCode: "",
             BC0BreakPoints: new Set(),
             TypedefRecord: new Map(),
+
             C0TabTitles: [{ name: "Untitled_0.c0", key: 0 }],
             C0SourceCodes: [""],
             ActiveEditor: 0,
+
             PrintoutValue: "",
             C0Runtime: undefined,
             CompilerFlags: { d: false },
@@ -47,10 +52,10 @@ export default class C0VMApplication extends React.Component<
         const context: ApplicationContextInterface = this
             .context as ApplicationContextInterface;
 
-        const state = this.state.C0Runtime as C0VM_RuntimeState | undefined;
+        const vm_state = this.state.C0Runtime as C0VM_RuntimeState | undefined;
         let lineNum = 0;
-        if (state !== undefined) {
-            lineNum = state.state.CurrLineNumber;
+        if (vm_state !== undefined) {
+            lineNum = vm_state.state.CurrLineNumber;
         }
 
         const MainControlBarComponent = (
@@ -74,6 +79,7 @@ export default class C0VMApplication extends React.Component<
                 clear_print={() => this.setState({ PrintoutValue: "" })}
             />
         );
+
         const CompilerOptionComponent = context.compiler_option ? (
             <CompilerOption
                 flip_d_flag={() =>
@@ -98,18 +104,24 @@ export default class C0VMApplication extends React.Component<
             <DebugConsole state={this.state.C0Runtime} isFullScreen={this.state.dbgFullScreen} setFullScreen={(s) => this.setState({dbgFullScreen: s})}/>
         ) : null;
 
+        const SettingMenuComponent =  this.state.settingMenuOn ? 
+            <SettingPopup state={this.state} set_app_state={(ns) => this.setState(ns)}/>
+            : null;
+
         if (this.state.dbgFullScreen) {
             return <div className="page-framework">
+                {SettingMenuComponent}
                 {MainControlBarComponent}
                 <div className="main-ui-framework">
                     {DebugConsoleComponent}
                 </div>
-                <C0VMApplicationFooter state={this.state} />
+                <C0VMApplicationFooter state={this.state} open_setting={() => this.setState({settingMenuOn: true})}/>
             </div>;
         }
 
         return (
             <div className="page-framework">
+                {SettingMenuComponent}
                 {MainControlBarComponent}
                 <div className="main-ui-framework">
                     <CodeEditor
@@ -122,13 +134,7 @@ export default class C0VMApplication extends React.Component<
                         set_app_state={(ns: any) => this.setState(ns)}
                         set_typedef={(key, newMap) => {
                             this.setState((old_state) => {
-                                return {
-                                    TypedefRecord: merge_typedef(
-                                        old_state.TypedefRecord,
-                                        key,
-                                        newMap
-                                    ),
-                                };
+                                return {TypedefRecord: merge_typedef(old_state.TypedefRecord, key, newMap),};
                             });
                         }}
                     />
@@ -138,7 +144,7 @@ export default class C0VMApplication extends React.Component<
                         {DebugConsoleComponent}
                     </div>
                 </div>
-                <C0VMApplicationFooter state={this.state} />
+                <C0VMApplicationFooter state={this.state} open_setting={() => this.setState({settingMenuOn: true})}/>
             </div>
         );
     }

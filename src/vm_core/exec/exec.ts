@@ -644,8 +644,13 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             /**
              * Type Inference Type(x) => Type(a)
+             * If x and a are not unknown, then we can and a refers to struct T*, we can use x's type
+             * info to inference the type info of struct T* at offset = a.type.value.offset.
+             * 
+             * Fix: Issue #5, when Type(x) is <unknown>, we should not update the record to prevent overwriting existing record.
              */
-            if (a.type.type !== "<unknown>") {
+            
+            if (a.type.type !== "<unknown>" && x.type.type !== "<unknown>") {
                 const a_concrete = a.type.value as C0Type<"ptr">;
                 if (a_concrete.kind === "struct") {
                     const struct_field_record = state.TypeRecord.get(a_concrete.value);

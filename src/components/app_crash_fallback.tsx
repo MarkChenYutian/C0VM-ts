@@ -63,7 +63,7 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                     <button
                         className="base-btn main-btn"
                         onClick={() => {
-                            this.props.setState({crashed: false, C0Runtime: undefined, PrintoutValue: ""});
+                            this.props.setState({crashed: false, dbgFullScreen: false, settingMenuOn: false, C0Runtime: undefined, PrintoutValue: ""});
                         }}
                     >
                         Restore Editor Content

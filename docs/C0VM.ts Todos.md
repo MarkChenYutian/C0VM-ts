@@ -14,6 +14,7 @@
 - [x] **Function**: Support `NativeParse` functions
 - [x] **Function**: Partially support `NativeFloat` functions (`printint` and `printhex`)
 - [ ] **Debugger**: Add `Details` panel in debugger options. Show all C0VM details (`V`, `S`, etc.)
+- [ ] **Error Handling**: Friendly Error Message
 
 ## UI/UX Enhancements
 

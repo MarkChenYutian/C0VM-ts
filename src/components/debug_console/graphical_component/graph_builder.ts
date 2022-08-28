@@ -315,7 +315,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
 function scan_stack_get_ptrs(state: VM_State): {val: C0Value<"ptr">, lv: number}[] {
     let result = [];
 
-    for (let i = 0; i < state.CallStack.length; i ++) {
+    for (let i = state.CallStack.length - 1; i > -1 ; i --) {
         const frame = state.CallStack[i];
         for (let j = 0; j < frame.V.length; j ++) {
             const val = frame.V[j];

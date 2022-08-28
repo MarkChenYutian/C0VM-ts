@@ -25,9 +25,9 @@ globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
 // For style specification only, writing to printout should be done
 // by calling react hooks
 globalThis.UI_EDITOR_THEME = "light";
-globalThis.UI_ERR_DISPLAY_TIME_SEC = 4;
-globalThis.UI_WARN_DISPLAY_TIME_SEC = 4;
-globalThis.UI_OK_DISPLAY_TIME_SEC = 1;
+globalThis.UI_ERR_DISPLAY_TIME_SEC = 5;
+globalThis.UI_WARN_DISPLAY_TIME_SEC = 5;
+globalThis.UI_OK_DISPLAY_TIME_SEC = 3;
 
 globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8000/compile";
 
