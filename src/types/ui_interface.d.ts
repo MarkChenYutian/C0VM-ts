@@ -64,6 +64,7 @@ interface C0EditorGroupProps {
     
     newPanel     : () => void,
     removePanel  : (key: string) => void,
+    renameCurrTab: () => void,
 
     updateContent: (s: string, key: number) => void,
     updateTypedef: (key: number, newTypeDef: Map<string, string>) => void;

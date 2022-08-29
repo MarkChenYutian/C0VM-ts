@@ -5,7 +5,6 @@ import C0EditorGroup from "./c0-editor-group";
 import { Segmented } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
-import { faSquareCaretLeft, faSquareCaretRight, faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>
@@ -19,57 +18,15 @@ export default class CodeEditor extends React.Component
     }
 
     /**
-     * Move the tab currently selected to its left
-     */
-    move_current_to_left() {
-        let curr_idx = 0;
-        for (let i = 0; i < this.props.C0_TabTitles.length; i ++) {
-            if (this.props.C0_TabTitles[i].key === this.props.C0_ActiveTab) {
-                curr_idx = i;
-                break;
-            }
-        }
-
-        const new_tabs = [...this.props.C0_TabTitles];
-        const new_contents = [...this.props.C0_Contents];
-        [new_tabs[curr_idx], new_tabs[curr_idx - 1]] = [new_tabs[curr_idx - 1], new_tabs[curr_idx]];
-        [new_contents[curr_idx], new_contents[curr_idx - 1]] = [new_contents[curr_idx - 1], new_contents[curr_idx]];
-
-        this.props.set_app_state({C0TabTitles: new_tabs});
-        this.props.set_app_state({C0SourceCodes: new_contents});
-    }
-
-    /**
-     * Move the tab currently selected to its right
-     */
-    move_current_to_right() {
-        let curr_idx = 0;
-        for (let i = 0; i < this.props.C0_TabTitles.length; i ++) {
-            if (this.props.C0_TabTitles[i].key === this.props.C0_ActiveTab) {
-                curr_idx = i;
-                break;
-            }
-        }
-
-        const new_tabs = [...this.props.C0_TabTitles];
-        const new_contents = [...this.props.C0_Contents];
-        [new_tabs[curr_idx], new_tabs[curr_idx + 1]] = [new_tabs[curr_idx + 1], new_tabs[curr_idx]];
-        [new_contents[curr_idx], new_contents[curr_idx + 1]] = [new_contents[curr_idx + 1], new_contents[curr_idx]];
-
-        this.props.set_app_state({C0TabTitles: new_tabs});
-        this.props.set_app_state({C0SourceCodes: new_contents});
-    }
-
-    /**
      * Set a new name for the tab currently selected
      */
     rename_current_tab() {
-        const new_title = prompt("New title for tab:");
+        const new_title = prompt(`New Filename for Tab:`);
         if (new_title === null) return;
         if (new_title === "") {
             globalThis.MSG_EMITTER.warn(
-                "Invalid Name for Editor Tab",
-                "Can't give an editor tab a empty title, no change is applied."
+                "Invalid File Name for Editor Tab",
+                "Can't have empty file name, no change is applied."
             );
             return;
         }
@@ -123,6 +80,8 @@ export default class CodeEditor extends React.Component
                     this.setState((state) => {return {C0_nextKey: state.C0_nextKey + 1}})
                 }}
 
+                renameCurrTab = {() => {this.rename_current_tab()}}
+
                 removePanel = {(key: string) => {
                     const key_tbr = parseInt(key);
                     
@@ -161,34 +120,6 @@ export default class CodeEditor extends React.Component
             />;
         }
 
-        let btn_groups = null;
-        if (this.state.mode === "c0") {
-            btn_groups = 
-            <>
-                    <button
-                        className="implicit-btn editor-tab-btn"
-                        onClick={() => this.rename_current_tab()}
-                        type="button"
-                    >
-                        <FontAwesomeIcon icon={faPenToSquare}/>
-                    </button>
-                    <button
-                        className={"implicit-btn " + (this.props.C0_ActiveTab === this.props.C0_TabTitles[0].key ? "editor-tab-btn-disable" :"editor-tab-btn")}
-                        onClick={() => this.move_current_to_left()}
-                        type="button"
-                    >
-                        <FontAwesomeIcon icon={faSquareCaretLeft}/>
-                    </button>
-                    <button
-                        className={"implicit-btn " + (this.props.C0_ActiveTab === this.props.C0_TabTitles[this.props.C0_TabTitles.length - 1].key ? "editor-tab-btn-disable" :"editor-tab-btn")}
-                        onClick={() => this.move_current_to_right()}
-                        type="button"
-                    >
-                        <FontAwesomeIcon icon={faSquareCaretRight}/>
-                    </button>
-            </>;
-        }
-
         return (
         <div className="code-editor" data-lang={this.state.mode} >
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
@@ -196,7 +127,6 @@ export default class CodeEditor extends React.Component
                     <FontAwesomeIcon icon={faCode}/> Code Editor
                 </h3>
                 <div style={{display: "flex", gap: ".3rem"}}>
-                    {btn_groups}
                     <Segmented
                         options={[
                             { label: "C0", value: "c0" } , 

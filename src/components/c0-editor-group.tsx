@@ -3,6 +3,7 @@ import { Tabs } from "antd";
 import C0Editor from "./c0-editor";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
+import DraggableTabs from "./draggable_tabs";
 
 const { TabPane } = Tabs;
 
@@ -25,14 +26,16 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         };
 
         return (
-        <Tabs
+        <DraggableTabs
+            //@ts-ignore
             type="editable-card"
             activeKey={this.props.activeTab + ""}
             size="small"
             onEdit={on_edit}
+            //@ts-ignore
             onChange={(new_key) => {this.on_change_key(new_key)}}
             addIcon={<FontAwesomeIcon icon={faAdd}/>}
-            onDoubleClick={() => console.log("dbl clicked")}
+            onDoubleClick={() => this.props.renameCurrTab()}
         >
             {
                 this.props.currTabs.map(
@@ -58,7 +61,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                     </TabPane>
                 )
             }
-        </Tabs>
+        </DraggableTabs>
         );
     }
 }

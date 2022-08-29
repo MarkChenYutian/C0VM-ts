@@ -9,7 +9,7 @@ import AntdEmitter from './utility/antd_emitter';
 import AppCrashFallbackPage from './components/app_crash_fallback';
 
 // Global Variables
-global.C0VM_VERSION = "0.2.7-alpha";
+global.C0VM_VERSION = "0.2.8-alpha";
 
 globalThis.DEBUG = true;
 globalThis.DEBUG_DUMP_MEM = false;
