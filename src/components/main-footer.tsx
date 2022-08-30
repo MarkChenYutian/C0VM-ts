@@ -1,4 +1,4 @@
-import { faCheck, faGear, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faGear, faSpinner, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import C0VM_RuntimeState from "../vm_core/exec/state";
@@ -11,6 +11,8 @@ export default class C0VMApplicationFooter extends React.PureComponent<{state: C
             vm_indicator = <p><FontAwesomeIcon icon={faXmark}/> Not Loaded</p>
         } else if (s.state.CurrLineNumber === 0) {
             vm_indicator = <p><FontAwesomeIcon icon={faCheck}/> Loaded</p>
+        } else if (this.props.state.C0Running) {
+            vm_indicator = <p><FontAwesomeIcon icon={faSpinner} spin/> Executing</p>
         } else {
             vm_indicator = <p><FontAwesomeIcon icon={faCheck}/> Running: Line{s.state.CurrLineNumber}</p>;
         }

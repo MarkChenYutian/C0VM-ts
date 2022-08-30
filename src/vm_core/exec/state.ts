@@ -12,6 +12,7 @@ export default class C0VM_RuntimeState implements C0VM_RT{
     public state: VM_State;
     public allocator: C0HeapAllocator;
     public heap_size: undefined | number
+    public step_cnt: number
 
     /**
      * Creating a new C0VM Runtime
@@ -24,6 +25,7 @@ export default class C0VM_RuntimeState implements C0VM_RT{
         this.code = parse(rawByteCode);
         this.heap_size = heapSize;
         this.allocator = createHeap(VM_Memory, heapSize);
+        this.step_cnt = 0;
         const str_ptr = loadStringPool(this.code.stringPool, this.allocator);
         this.state = {
             P: this.code,
@@ -46,7 +48,8 @@ export default class C0VM_RuntimeState implements C0VM_RT{
      * Step forward for the C0VM Runtime State.
      * @returns If the runtime state is able to perform next "step forward"
      */
-    public step_forward(UIHooks: ReactUIHook): boolean {
+    public async step_forward(UIHooks: ReactUIHook): Promise<boolean> {
+        this.step_cnt ++;
         return step(this.state, this.allocator, UIHooks);
     }
 
@@ -54,6 +57,7 @@ export default class C0VM_RuntimeState implements C0VM_RT{
         const C = new C0VM_RuntimeState(this.raw_code, this.heap_size);
         C.state = this.state;
         C.allocator = this.allocator;
+        C.step_cnt = this.step_cnt;
         return C;
     }
 

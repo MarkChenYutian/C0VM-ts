@@ -230,7 +230,7 @@ type VM_State = {
 
 
 declare abstract class C0VM_RT {
-    abstract step_forward(UIHooks: ReactUIHook): boolean;
+    abstract async step_forward(UIHooks: ReactUIHook): Promise<boolean>;
     abstract debug(): any;
 }
 

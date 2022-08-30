@@ -34,6 +34,8 @@ export default class C0VMApplication extends React.Component<
             ActiveEditor: 0,
 
             PrintoutValue: "",
+
+            C0Running: false,
             C0Runtime: undefined,
             CompilerFlags: { d: false },
         };
@@ -61,16 +63,9 @@ export default class C0VMApplication extends React.Component<
         const MainControlBarComponent = (
             <MainControlBar
                 application_state={this.state}
-                update_value={(s) => {
-                    this.setState({ BC0SourceCode: s });
-                }}
-                update_state={(s) => {
-                    if (s === undefined) {
-                        this.setState({ C0Runtime: s });
-                    } else {
-                        this.setState({ C0Runtime: s });
-                    }
-                }}
+                update_running={(s) => this.setState({ C0Running: s })}
+                update_value={(s) => this.setState({ BC0SourceCode: s })}
+                update_state={(s) => this.setState({ C0Runtime: s })}
                 update_print={(s) =>
                     this.setState((state) => {
                         return { PrintoutValue: state.PrintoutValue + s };

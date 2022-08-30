@@ -14,6 +14,7 @@ interface C0VMApplicationState {
 
     PrintoutValue: string,          /* The string to show in the stdout console */
 
+    C0Running: boolean,             /* If the C0VM is running currently */
     C0Runtime: C0VM_RuntimeState | undefined,   /* Runtime of C0VM */
     CompilerFlags: Record<string, boolean>      /* Compiler Flags (-d) */
 };
@@ -26,6 +27,7 @@ type TypeDefInfo = {source: string, key: number}
 interface MainControlProps {
     application_state: C0VMApplicationState,
 
+    update_running: (ns: boolean) => void,
     update_value: (ns: string) => void,
     update_state: (ns: C0RuntimeState | undefined) => void,
     update_print: (ns: string) => void,

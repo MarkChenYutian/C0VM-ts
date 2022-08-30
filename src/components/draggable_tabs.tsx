@@ -1,3 +1,6 @@
+// This whole file is copied from the official example in 
+// https://ant.design/components/tabs/#components-tabs-demo-custom-tab-bar-node
+
 import type { TabsProps } from 'antd';
 import { Tabs } from 'antd';
 import React, { useRef, useState } from 'react';

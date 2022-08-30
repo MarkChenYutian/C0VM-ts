@@ -1,6 +1,7 @@
+import { vm_error } from "../utility/errors";
 import C0VM_RuntimeState from "./exec/state";
 
-export function initialize(s: string, clear_printout: () => void): C0VM_RuntimeState | undefined {
+export async function initialize(s: string, clear_printout: () => void): Promise<C0VM_RuntimeState | undefined> {
     // Clean up environment before initialize.
     clear_printout();
     try {
@@ -17,12 +18,10 @@ export function initialize(s: string, clear_printout: () => void): C0VM_RuntimeS
     }
 }
 
-export function step(s: C0VM_RuntimeState, printout_handler: (s: string) => void): [C0VM_RuntimeState, boolean] {
+export async function step(s: C0VM_RuntimeState, printout_handler: (s: string) => void): Promise<[C0VM_RuntimeState, boolean]> {
     const new_state = s.clone();
     try {
-        const can_continue = new_state.step_forward({
-            print_update: printout_handler
-        });
+        const can_continue = await new_state.step_forward({print_update: printout_handler});
         return [new_state, can_continue];
     } catch(e) {
         globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);   
@@ -31,20 +30,39 @@ export function step(s: C0VM_RuntimeState, printout_handler: (s: string) => void
     }
 }
 
-export function run(s: C0VM_RuntimeState, bp: Set<number>, printout_handler: (s: string) => void): [C0VM_RuntimeState, boolean] {
+export async function run(
+    s: C0VM_RuntimeState,
+    bp: Set<number>,
+    signal: {abort: boolean},
+    resetSig: () => void,
+    printout_handler: (s: string) => void,
+    update_state: (s: C0VM_RuntimeState) => void,
+): Promise<[C0VM_RuntimeState, boolean]> {
     const new_state = s.clone();
     let can_continue = true;
     while (can_continue) {
         try {
-            can_continue = new_state.step_forward({
-                print_update: printout_handler
-            });
+            can_continue = await new_state.step_forward({print_update: printout_handler});
+            if (new_state.step_cnt % C0_TIME_SLICE === 0) {
+                update_state(new_state);    // Update react UI
+                // Since we know that C0_ASYNC_INTERVAL will be a constant, it's safe to disable
+                // eslint on next line
+                // eslint-disable-next-line
+                await new Promise((rs) => setTimeout(rs, C0_ASYNC_INTERVAL));
+            }
+            if (signal.abort) {
+                resetSig();
+                throw new vm_error("Execution aborted manually");
+            }
         } catch(e) {
             globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);
             if(globalThis.DEBUG) console.error(e);
+
+            resetSig();
             return [s, false];
         }
         if (bp.has(new_state.state.CurrLineNumber)) break;
     }
+    resetSig();
     return [new_state, can_continue];
 }

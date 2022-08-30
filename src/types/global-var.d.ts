@@ -19,6 +19,9 @@ declare global {
     var UI_OK_DISPLAY_TIME_SEC: number;     // How many time (sec) an OK mssage will display
 
     var C0_MAX_RECURSION: number;           // Maximum allowed recursion level for C0 runtime
+    var C0_TIME_SLICE: number;              // Number of steps the C0VM can go in a continuous time slice
+    // (after this #step, the control flow will be handled back to UI/main event loop to keep page responsive)
+    var C0_ASYNC_INTERVAL: number;          // Interval between each time slice will be at least these much ms
 
     // Experimental features
     

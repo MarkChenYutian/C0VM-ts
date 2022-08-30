@@ -32,6 +32,8 @@ globalThis.UI_OK_DISPLAY_TIME_SEC = 3;
 globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8000/compile";
 
 globalThis.C0_MAX_RECURSION = 999;
+globalThis.C0_TIME_SLICE = 6000;
+globalThis.C0_ASYNC_INTERVAL = 1;
 
 globalThis.EXP_PRESERVE_TYPE = true;
 
