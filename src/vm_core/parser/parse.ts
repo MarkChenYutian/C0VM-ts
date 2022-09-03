@@ -97,16 +97,6 @@ export default function parse(raw_file: string): C0ByteCode {
         const funcSize = parseInt(funcLines[3].split("#")[0].trim().replace(" ", ""), 16);
 
         // Extract variable Names
-        /**
-         * TODO: constraint propagation
-         * C0Value - type
-         * if type is <unknown>, depending on the comment, update the type
-         * 
-         * f(x) => x + 1, g(x) => x
-         * 
-         * when parsing, keep dict, do type inference
-         * 
-         */
         const varNames = Array(funcNumVars).fill("<anonymous>");
         let funcCode: number[] = [];
         for (let lineNum = 4; lineNum < funcLines.length; lineNum++) {

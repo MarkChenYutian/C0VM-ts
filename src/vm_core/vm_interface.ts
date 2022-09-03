@@ -51,7 +51,7 @@ export async function run(
             }
             if (signal.abort) {
                 resetSig();
-                printout_handler("C0VM.ts: Execution aborted manually.\n");
+                printout_handler("<span>C0VM.ts: Execution aborted manually.</span>\n");
                 globalThis.MSG_EMITTER.warn("Execution Aborted", "Execution is aborted since the user click the 'Abort' button manually.");
                 resetSig();
                 return [s, false];

@@ -3,7 +3,7 @@
         max-width: min(calc(50vw - 1rem), 45rem);
     }
     div.io-area {
-        min-width: min(calc(50vw - 1rem), calc(100vw - 46.5rem));
+        max-width: max(calc(50vw - 1rem), calc(100vw - 46.5rem));
     }
 }
 
@@ -182,6 +182,7 @@ i.editor-load-hint {
 /* IO Area */
 
 pre#c0-output {
+    font-family: monospace;
     padding: 1rem;
     border-radius: 0.3rem;
     background-color: #202030;

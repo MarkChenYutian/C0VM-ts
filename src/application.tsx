@@ -8,9 +8,6 @@ import C0Output from "./components/c0-output";
 import DebugConsole from "./components/debug_console/debug_console";
 import CodeEditor from "./components/code-editor";
 import AppCrashFallbackPage from "./components/app_crash_fallback";
-
-import { merge_typedef } from "./utility/ui_helper";
-import C0VM_RuntimeState from "./vm_core/exec/state";
 import SettingPopup from "./components/settings";
 
 export default class C0VMApplication extends React.Component<
@@ -28,8 +25,7 @@ export default class C0VMApplication extends React.Component<
             BC0BreakPoints: new Set(),
             TypedefRecord: new Map(),
 
-            C0TabTitles: [{ name: "Untitled_0.c0", key: 0 }],
-            C0SourceCodes: [""],
+            C0Editors: [{ title: "Untitled_0.c0", key: 0, content: ""}],
             ActiveEditor: 0,
 
             PrintoutValue: "",
@@ -52,12 +48,6 @@ export default class C0VMApplication extends React.Component<
 
         const context: ApplicationContextInterface = this
             .context as ApplicationContextInterface;
-
-        const vm_state = this.state.C0Runtime as C0VM_RuntimeState | undefined;
-        let lineNum = 0;
-        if (vm_state !== undefined) {
-            lineNum = vm_state.state.CurrLineNumber;
-        }
 
         const MainControlBarComponent = (
             <MainControlBar
@@ -103,18 +93,8 @@ export default class C0VMApplication extends React.Component<
                 {MainControlBarComponent}
                 <div className="main-ui-framework">
                     <CodeEditor
-                        C0_TabTitles={this.state.C0TabTitles}
-                        C0_Contents={this.state.C0SourceCodes}
-                        C0_ActiveTab={this.state.ActiveEditor}
-                        BC0_Content={this.state.BC0SourceCode}
-                        BC0_Breakpoint={this.state.BC0BreakPoints}
-                        BC0_Execline={lineNum}
+                        app_state={this.state}
                         set_app_state={(ns: any) => this.setState(ns)}
-                        set_typedef={(key, newMap) => {
-                            this.setState((old_state) => {
-                                return {TypedefRecord: merge_typedef(old_state.TypedefRecord, key, newMap),};
-                            });
-                        }}
                     />
                     <div className="io-area">
                         {StandardOutputComponent}

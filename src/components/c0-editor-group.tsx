@@ -13,6 +13,16 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         this.props.setActiveTab(parseInt(new_active_key));
     }
 
+    update_tab_order(new_order: React.Key[]): void {
+        const tab_keymap = new Map<number, C0EditorTab>();
+        const result = [];
+        this.props.currTabs.forEach((tab) => tab_keymap.set(tab.key, tab));
+        for (let i = 0; i < new_order.length; i ++) {
+            result.push(tab_keymap.get(parseInt(new_order[i] + "")) as C0EditorTab);
+        }
+        this.props.setTabs(result);
+    }
+
     render() {
         const on_edit = (target_key: any, action: "add" | "remove") => {
             switch (action) {
@@ -31,32 +41,31 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
             type="editable-card"
             activeKey={this.props.activeTab + ""}
             size="small"
-            onEdit={on_edit}
-            //@ts-ignore
-            onChange={(new_key) => {this.on_change_key(new_key)}}
+            onTabEdit={on_edit}
+            onChange={(new_key: string) => {this.on_change_key(new_key)}}
             addIcon={<FontAwesomeIcon icon={faAdd}/>}
-            onDoubleClick={() => this.props.renameCurrTab()}
+            setTabOrder={(s) => this.update_tab_order(s)}
         >
             {
                 this.props.currTabs.map(
-                    (title: EditorTabTitle, index: number) => 
+                    (editor) => 
                     <TabPane
-                        tab={title.name}
-                        key={title.key + ""}
+                        tab={editor.title}
+                        key={editor.key + ""}
                         closable = {this.props.currTabs.length !== 1}
                         closeIcon={<FontAwesomeIcon icon={faXmark}/>}
                     >
                         <C0Editor
                             updateContent = {(s: string) => {
-                                this.props.updateContent(s, index);
+                                this.props.updateContent(s, editor.key);
                             }}
                             updateTypedef = {(nt: Map<string, string>) => {
-                                this.props.updateTypedef(title.key, nt)
+                                this.props.updateTypedef(editor.key, nt)
                             }}
                             updateName    = {(s: string) => {
-                                this.props.setTabName(title.key, s);
+                                this.props.setTabName(editor.key, s);
                             }}
-                            editorValue   = {this.props.currContents[index]}
+                            editorValue   = {editor.content}
                         />
                     </TabPane>
                 )

@@ -87,8 +87,8 @@ export default function MainControlBar(props: MainControlProps) {
         const compile_c0source = () => {
             props.clear_print();
             remote_compile(
-                appState.C0SourceCodes,
-                appState.C0TabTitles.map((v) => v.name),
+                appState.C0Editors.map((v) => v.content),
+                appState.C0Editors.map((v) => v.title),
                 appState.TypedefRecord,
                 props.update_value,
                 props.clear_print,
@@ -100,7 +100,7 @@ export default function MainControlBar(props: MainControlProps) {
         // UI Rendering Functions
         const CompileButton = 
             <button
-                className={"base-btn main-btn unselectable " + (props.application_state.C0SourceCodes[0] === "" ? "disable-btn" : "")}
+                className={"base-btn main-btn unselectable " + (props.application_state.C0Editors[0].content === "" ? "disable-btn" : "")}
                 onClick={compile_c0source}
             >
                 <FontAwesomeIcon icon={faScrewdriverWrench} className="hide-in-mobile"/> {" Compile "}

@@ -47,7 +47,11 @@ const DraggableTabNode = ({ index, children, moveNode }: DraggableTabPaneProps) 
   );
 };
 
-const DraggableTabs: React.FC<{ children: React.ReactNode }> = props => {
+const DraggableTabs: React.FunctionComponent<{
+    children: React.ReactNode,
+    setTabOrder: (s: React.Key[]) => void,
+    onTabEdit: (target: any, action: "add" | "remove") => void,
+  }> = props => {
   const { children } = props;
   const [order, setOrder] = useState<React.Key[]>([]);
 
@@ -69,7 +73,21 @@ const DraggableTabs: React.FC<{ children: React.ReactNode }> = props => {
     newOrder.splice(hoverIndex, 0, dragKey);
 
     setOrder(newOrder);
+    props.setTabOrder(newOrder);
   };
+
+  const removeTabNode = (target_key: any, action: "add" | "remove") => {
+    switch (action) {
+      case "add":
+        break;
+      case "remove":
+        let new_order: React.Key[] = structuredClone(order);
+        new_order = new_order.filter((tab) => tab + "" !== target_key + "");
+        setOrder(new_order);
+        break;
+    }
+    props.onTabEdit(target_key, action);
+  }
 
   const renderTabBar: TabsProps['renderTabBar'] = (tabBarProps, DefaultTabBar) => (
     <DefaultTabBar {...tabBarProps}>
@@ -110,7 +128,7 @@ const DraggableTabs: React.FC<{ children: React.ReactNode }> = props => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Tabs renderTabBar={renderTabBar} {...props}>
+      <Tabs renderTabBar={renderTabBar} onEdit={removeTabNode} {...props}>
         {orderTabs}
       </Tabs>
     </DndProvider>

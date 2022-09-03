@@ -5,6 +5,8 @@ import C0EditorGroup from "./c0-editor-group";
 import { Segmented } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
+import { merge_typedef } from "../utility/ui_helper";
+import C0VM_RuntimeState from "../vm_core/exec/state";
 
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>
@@ -20,102 +22,59 @@ export default class CodeEditor extends React.Component
     /**
      * Set a new name for the tab currently selected
      */
-    rename_current_tab() {
-        const new_title = prompt(`New Filename for Tab:`);
-        if (new_title === null) return;
-        if (new_title === "") {
-            globalThis.MSG_EMITTER.warn(
-                "Invalid File Name for Editor Tab",
-                "Can't have empty file name, no change is applied."
-            );
-            return;
-        }
-
-        this.props.set_app_state((S) => {return {
-            C0TabTitles: S.C0TabTitles.map(
-                    (value) => {
-                        if (value.key === this.props.C0_ActiveTab) return {key: value.key, name: new_title};
-                        return value;
-                    }
-                )
-            };
-        })
-    }
-
     render() {
         let content = undefined;
         if (this.state.mode === "c0") {
             content = <C0EditorGroup
-                activeTab   ={this.props.C0_ActiveTab}
-                currTabs    ={this.props.C0_TabTitles}
-                currContents={this.props.C0_Contents}
-
+                activeTab   ={this.props.app_state.ActiveEditor}
                 setActiveTab = {(i: number) => {
                     this.props.set_app_state({ActiveEditor: i})
                 }}
 
+                currTabs    ={this.props.app_state.C0Editors}
+                setTabs  = {(nt) => this.props.set_app_state({C0Editors: nt})}
                 setTabName   = {(key: number, name: string) => {
                     this.props.set_app_state(
-                        (S) => {return {C0TabTitles: S.C0TabTitles.map(
-                            (tab) => {
-                                if (tab.key === key) return {key: tab.key, name: name};
-                                return tab;
-                            }
+                        (S) => {return {C0Editors: S.C0Editors.map(
+                            (tab) => tab.key === key ? {key: tab.key, title: name, content: tab.content} : tab
                         )}}
                     );
                 }}
 
                 newPanel = {() => {
-                    const new_content = structuredClone(this.props.C0_Contents);
-                    new_content.push("");
-
-                    const new_title: EditorTabTitle[] = structuredClone(this.props.C0_TabTitles);
-                    new_title.push({name: `Untitled_${this.state.C0_nextKey}.c0`, key: this.state.C0_nextKey });
-
-                    this.props.set_app_state({
-                        C0TabTitles: new_title,
-                        C0SourceCodes: new_content,
-                        ActiveEditor: this.state.C0_nextKey,
+                    const new_editors = structuredClone(this.props.app_state.C0Editors);
+                    new_editors.push({
+                        title: `Untitled_${this.state.C0_nextKey}.c0`, key: this.state.C0_nextKey, content: ""
                     });
-                    this.setState((state) => {return {C0_nextKey: state.C0_nextKey + 1}})
+                    this.props.set_app_state({C0Editors: new_editors, ActiveEditor: this.state.C0_nextKey});
+                    this.setState({C0_nextKey: this.state.C0_nextKey + 1})
                 }}
-
-                renameCurrTab = {() => {this.rename_current_tab()}}
 
                 removePanel = {(key: string) => {
                     const key_tbr = parseInt(key);
-                    
-                    const new_tabs = [];
-                    const new_content = [];
-                    
-                    for (let i = 0; i < this.props.C0_TabTitles.length; i ++) {
-                        if (this.props.C0_TabTitles[i].key !== key_tbr) {
-                            new_tabs.push(this.props.C0_TabTitles[i]);
-                            new_content.push(this.props.C0_Contents[i]);
-                        }
-                    }
-
-                    if (this.props.C0_ActiveTab === key_tbr) {
-                        this.props.set_app_state({ActiveEditor: new_tabs[0].key});
-                    }
-
-                    this.props.set_app_state({C0SourceCodes: new_content, C0TabTitles: new_tabs});
+                    let new_editors: C0EditorTab[] = structuredClone(this.props.app_state.C0Editors);
+                    new_editors = new_editors.filter((value) => value.key !== key_tbr);
+                    const new_activeTab = this.props.app_state.ActiveEditor === key_tbr ? new_editors[0].key : this.props.app_state.ActiveEditor;
+                    this.props.set_app_state({C0Editors: new_editors, ActiveEditor: new_activeTab});
                 }}
 
                 updateContent={(s: string, key: number) => {
-                    const ns = structuredClone(this.props.C0_Contents);
-                    ns[key] = s;
-                    this.props.set_app_state({C0SourceCodes: ns});
+                    let ns: C0EditorTab[] = structuredClone(this.props.app_state.C0Editors);
+                    ns = ns.map((tab) => tab.key === key ? {key: tab.key, title: tab.title, content: s} : tab);
+                    this.props.set_app_state({C0Editors: ns});
                 }}
 
-                updateTypedef={this.props.set_typedef}
+                updateTypedef={(key, newMap) => {
+                    this.props.set_app_state({TypedefRecord: merge_typedef(this.props.app_state.TypedefRecord, key, newMap)})
+                }}
             />;
         } else {
+            const vm: C0VM_RuntimeState | undefined = this.props.app_state.C0Runtime;
             content = <BC0Editor
                 updateContent={(s: string) => this.props.set_app_state({BC0SourceCode: s})}
-                editorValue  ={this.props.BC0_Content}
-                execLine     ={this.props.BC0_Execline}
-                breakpointVal={this.props.BC0_Breakpoint}
+                editorValue  ={this.props.app_state.BC0SourceCode}
+                execLine     ={vm === undefined ? 0 : vm.state.CurrLineNumber}
+                breakpointVal={this.props.app_state.BC0BreakPoints}
                 updateBrkPts ={(ns: Set<number>) => {this.props.set_app_state({BC0BreakPoints: ns})}}
             />;
         }

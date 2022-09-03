@@ -8,8 +8,7 @@ interface C0VMApplicationState {
     BC0BreakPoints: Set<number>,    /* Breakpoints activated in BC0 code editor */
     TypedefRecord: Map<string, TypeDefInfo>, /* Record the typedef names for string substitution */
 
-    C0TabTitles: EditorTabTitle[],  /* Code editor tab titles */
-    C0SourceCodes: string[],        /* Content (in differnet tabs) of C0 code editors */
+    C0Editors  : C0EditorTab[],     /* Code editor tab titles */
     ActiveEditor : number,          /* Currently activated tab index of C0Editor */
 
     PrintoutValue: string,          /* The string to show in the stdout console */
@@ -35,18 +34,12 @@ interface MainControlProps {
 };
 
 interface CodeEditorProps {
-    C0_TabTitles: EditorTabTitle[],
-    C0_Contents: string[],
-    C0_ActiveTab: number,
-    BC0_Content: string,
-    BC0_Breakpoint: Set<number>,
-    BC0_Execline: number,
+    app_state: C0VMApplicationState,
     set_app_state<K extends keyof C0VMApplicationState>(
         state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) => (
             Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) | (Pick<C0VMApplicationState, K> | C0VMApplicationState | null),
         callback?: () => void
     ): void;
-    set_typedef: (key: number, newMap: Map<string, string>) => void;
 }
 
 interface CodeEditorState {
@@ -57,22 +50,20 @@ interface CodeEditorState {
 
 interface C0EditorGroupProps {
     activeTab    : number,
-
-    currTabs     : EditorTabTitle[],
-    currContents : string[],
-
     setActiveTab : (i: number) => void,
+
+    currTabs     : C0EditorTab[],
     setTabName   : (key: number, name: string) => void,
+    setTabs      : (nt: C0EditorTab[]) => void,
     
     newPanel     : () => void,
     removePanel  : (key: string) => void,
-    renameCurrTab: () => void,
 
     updateContent: (s: string, key: number) => void,
     updateTypedef: (key: number, newTypeDef: Map<string, string>) => void;
 }
 
-type EditorTabTitle = {name: string, key: number};
+type C0EditorTab = {title: string, key: number, content: string};
 
 interface C0EditorProps {
     updateContent : (s: string) => void,
