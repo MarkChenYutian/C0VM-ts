@@ -1,4 +1,3 @@
-import { vm_error } from "../utility/errors";
 import C0VM_RuntimeState from "./exec/state";
 
 export async function initialize(s: string, clear_printout: () => void): Promise<C0VM_RuntimeState | undefined> {
@@ -52,7 +51,10 @@ export async function run(
             }
             if (signal.abort) {
                 resetSig();
-                throw new vm_error("Execution aborted manually");
+                printout_handler("C0VM.ts: Execution aborted manually.\n");
+                globalThis.MSG_EMITTER.warn("Execution Aborted", "Execution is aborted since the user click the 'Abort' button manually.");
+                resetSig();
+                return [s, false];
             }
         } catch(e) {
             globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);

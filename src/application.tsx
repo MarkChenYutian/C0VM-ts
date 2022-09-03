@@ -4,7 +4,6 @@ import "./embeddable.less";
 
 import MainControlBar from "./components/main-control-bar";
 import C0VMApplicationFooter from "./components/main-footer";
-import CompilerOption from "./components/compiler-option";
 import C0Output from "./components/c0-output";
 import DebugConsole from "./components/debug_console/debug_console";
 import CodeEditor from "./components/code-editor";
@@ -75,22 +74,6 @@ export default class C0VMApplication extends React.Component<
             />
         );
 
-        const CompilerOptionComponent = context.compiler_option ? (
-            <CompilerOption
-                flip_d_flag={() =>
-                    this.setState((state) => {
-                        return {
-                            CompilerFlags: {
-                                ...state.CompilerFlags,
-                                d: !state.CompilerFlags["d"],
-                            },
-                        };
-                    })
-                }
-                d_flag_stat={this.state.CompilerFlags["d"]}
-            />
-        ) : null;
-
         const StandardOutputComponent = context.std_out ? (
             <C0Output printContent={this.state.PrintoutValue} />
         ) : null;
@@ -134,7 +117,6 @@ export default class C0VMApplication extends React.Component<
                         }}
                     />
                     <div className="io-area">
-                        {CompilerOptionComponent}
                         {StandardOutputComponent}
                         {DebugConsoleComponent}
                     </div>

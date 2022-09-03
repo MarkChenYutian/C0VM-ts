@@ -171,7 +171,6 @@ interface ApplicationCrashPageProps {
 
 interface ApplicationContextInterface {
     mode: "full-page" | "embeddable",
-    compiler_option: boolean,
     std_out: boolean,
     debug_console: boolean
 }

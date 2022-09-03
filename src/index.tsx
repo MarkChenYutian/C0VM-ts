@@ -50,7 +50,6 @@ htmlRoots.forEach(
     
     const displayModeContext: React.Context<ApplicationContextInterface> = React.createContext<ApplicationContextInterface>({
       mode: htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable",
-      compiler_option: htmlRoot.dataset["compileoption"] === "on",
       std_out: htmlRoot.dataset["stdoutput"] === "on",
       debug_console: htmlRoot.dataset["debugconsole"] === "on"
     });

@@ -126,16 +126,14 @@ export default class CodeEditor extends React.Component
                 <h3 style={{marginTop: 0, marginBottom: 0}}>
                     <FontAwesomeIcon icon={faCode}/> Code Editor
                 </h3>
-                <div style={{display: "flex", gap: ".3rem"}}>
-                    <Segmented
-                        options={[
-                            { label: "C0", value: "c0" } , 
-                            { label: "BC0",value: "bc0"}
-                        ]}
-                        defaultValue="c0"
-                        onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
-                    />
-                </div>
+                <Segmented
+                    options={[
+                        { label: "C0", value: "c0" } , 
+                        { label: "BC0",value: "bc0"}
+                    ]}
+                    defaultValue="c0"
+                    onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
+                />
             </div>
             {content}
         </div>);

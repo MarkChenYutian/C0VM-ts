@@ -22,14 +22,20 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
                 style={{maxHeight: "80vh", overflowY: "auto"}}
                 >
             <div className="settings-grid">
-                <Divider className="dbg-entire-row">Appearance</Divider>
+                <p>Contract Check (<code>-d</code> Flag)</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={this.props.state.CompilerFlags['d']} onChange={() => {
+                    this.props.set_app_state((state) => {
+                        return {CompilerFlags: {...state.CompilerFlags,
+                                                d: !state.CompilerFlags["d"]}
+                                }
+                    });
+                }}/>
                 <p>Editor Theme</p>
                 <Select defaultValue={UI_EDITOR_THEME} onChange={(value) => {UI_EDITOR_THEME = value}}>
                     <Option value="dark">Dark</Option>
                     <Option value="light">Light</Option>
                 </Select>
 
-                <Divider className="dbg-entire-row">Developer Settings</Divider>
+                <Divider className="dbg-entire-row">Advanced Settings</Divider>
                 <p>Debug Mode</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG} onChange={() => {DEBUG = !DEBUG}}/>
                 <p>Debug - Dump Step</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_STEP} onChange={() => {DEBUG_DUMP_STEP = !DEBUG_DUMP_STEP}}/>
                 <p>Debug - Dump Heap</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_MEM} onChange={() => {DEBUG_DUMP_MEM = !DEBUG_DUMP_MEM}}/>
