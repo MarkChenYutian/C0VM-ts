@@ -1,4 +1,5 @@
 import { vm_error } from "../utility/errors";
+import C0VM_RuntimeState from "../vm_core/exec/state";
 import * as VM from "../vm_core/vm_interface"; 
 
 /**
@@ -34,13 +35,13 @@ function apply_typedef_information(typedef: Map<string, TypeDefInfo>, bytecode: 
 }
 
 export default function remote_compile(
-    content: string[],
-    names: string[],
+    tabs: C0EditorTab[],
     typedefRecord: Map<string, TypeDefInfo>,
     update_content: (s: string) => void,
     clean_printout: () => void,
     update_printout: (s: string) => void,
-    compiler_flags: Record<string, boolean>
+    compiler_flags: Record<string, boolean>,
+    load_c0_runtime: (s: C0VM_RuntimeState | undefined) => void 
 ): void {
     fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${compiler_flags["-d"] ? "true" : "false"}`, {
         method: "POST",
@@ -50,8 +51,8 @@ export default function remote_compile(
             "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
-            codes: content,
-            filenames: names,
+            codes: tabs.map((tab) => tab.content),
+            filenames: tabs.map((tab) => tab.title),
         })
     })
     .then(
@@ -63,9 +64,13 @@ export default function remote_compile(
                 update_printout(result.error as string);
                 throw new vm_error("Compile Failed for c0 source code. See standard output for more information.");
             }
-            const clean_bytecode = apply_typedef_information(typedefRecord, result.bytecode);
-            VM.initialize(clean_bytecode, clean_printout);
-            update_content(clean_bytecode);
+            update_content(result.bytecode);
+            return VM.initialize(result.bytecode, clean_printout, globalThis.MEM_POOL_SIZE, tabs, typedefRecord);
+        }
+    )
+    .then(
+        (state) => {
+            load_c0_runtime(state);
         }
     )
     .catch(

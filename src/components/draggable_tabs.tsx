@@ -51,6 +51,7 @@ const DraggableTabs: React.FunctionComponent<{
     children: React.ReactNode,
     setTabOrder: (s: React.Key[]) => void,
     onTabEdit: (target: any, action: "add" | "remove") => void,
+    config: TabsProps
   }> = props => {
   const { children } = props;
   const [order, setOrder] = useState<React.Key[]>([]);
@@ -128,7 +129,7 @@ const DraggableTabs: React.FunctionComponent<{
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Tabs renderTabBar={renderTabBar} onEdit={removeTabNode} {...props}>
+      <Tabs renderTabBar={renderTabBar} onEdit={removeTabNode} {...props.config}>
         {orderTabs}
       </Tabs>
     </DndProvider>

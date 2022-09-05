@@ -34,6 +34,17 @@ export default class CodeEditor extends React.Component
                 currTabs    ={this.props.app_state.C0Editors}
                 setTabs  = {(nt) => this.props.set_app_state({C0Editors: nt})}
                 setTabName   = {(key: number, name: string) => {
+                    if (name === "") {
+                        globalThis.MSG_EMITTER.warn("Failed to rename editor tab", "Editor tab can't have empty name");
+                        return;
+                    }
+                    for (let i = 0; i < this.props.app_state.C0Editors.length; i ++) {
+                        const tab = this.props.app_state.C0Editors[i];
+                        if (tab.key !== key && tab.title === name) {
+                            globalThis.MSG_EMITTER.warn("Failed to rename editor tab", "Editor tabs must have different name.");
+                            return;
+                        }
+                    }
                     this.props.set_app_state(
                         (S) => {return {C0Editors: S.C0Editors.map(
                             (tab) => tab.key === key ? {key: tab.key, title: name, content: tab.content} : tab

@@ -20,9 +20,9 @@ export default class C0VM_RuntimeState implements C0VM_RT{
      * @param heapSize Heap size (in bytes), optional, if not explicitly designated, then use the 
      * GlobalThis.MEM_POOL_DEFAULT_SIZE as the size.
      */
-    constructor(rawByteCode: string, heapSize?: number) {
+    constructor(rawByteCode: string, heapSize?: number, C0Source?: C0EditorTab[], TypedefRecord?: Map<string, TypeDefInfo>, parsed_result?: C0ByteCode) {
         this.raw_code = rawByteCode;
-        this.code = parse(rawByteCode);
+        this.code = parsed_result === undefined ? parse(rawByteCode, C0Source, TypedefRecord) : parsed_result;
         this.heap_size = heapSize;
         this.allocator = createHeap(VM_Memory, heapSize);
         this.step_cnt = 0;
@@ -54,7 +54,8 @@ export default class C0VM_RuntimeState implements C0VM_RT{
     }
 
     public clone(): C0VM_RuntimeState {
-        const C = new C0VM_RuntimeState(this.raw_code, this.heap_size);
+        const C = new C0VM_RuntimeState(this.raw_code, this.heap_size, undefined, undefined, this.code);
+        
         C.state = this.state;
         C.allocator = this.allocator;
         C.step_cnt = this.step_cnt;

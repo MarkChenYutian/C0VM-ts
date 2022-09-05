@@ -1,240 +1,327 @@
 import { bc0_format_error } from "../../utility/errors";
 import { nativeFuncLoader } from "../native/native_interface";
 
-const int_comment_regex = /(\d+)|(dummy return value)/;
-const bool_comment_regex = /(true)|(false)/;
-const char_comment_regex = /'.*'/;
-
-const arr_comment_regex = /^alloc_array\(([a-zA-Z0-9_\-*[\]\s]+),.+\)/;
-const new_comment_regex = /^alloc\(([a-zA-Z0-9_\-*[\]\s]+)\)/;
-
-const aaddf_comment_regex = /^&.*->([a-zA-z_0-9]+)$/;
-
 /**
- * Parse the bc0 text into byte arrays, load Native Functions from Native Pool
- * @param raw_file A .bc0 string compiled by cc0 with -b flag
- * @returns A parsed C0ByteCode object
- * @throws `bc0_format_error` in many situations - mostly due to discrepency in 
- * declared value (e.g. the size of int pool) and the actual value (actual length
- * of Uint32Array)
- * @todo Known problem - the `parse` function will not be happy to deal with
- * CRLF input. It can only parse files with LF line change character.
+ * Parse the bytecode string to C0ByteCode Data Structure.
+ * Terms: | token | # byte_instruct | # comment |
+ * * If comment starts with ./cache/... 
+ *      We know the bytecode comes from remote compile.
+ *      * If C0Editor != undefined ...
+ *          In this case, go to the source code in C0Editors parameter and resolve the reference
+ *          in comment (start_row.start_col : end_row.end_col).
+ *      * If typedefRecord != undefined ..
+ *          In this case, apply typedef mapping and continue parsing
+ *          ```c0
+ *          typedef struct T* T_t;
+ *          ```
+ *          Then we will replace all T_t in comment with struct T*
+ * 
+ * @param bytecode Bytecode String from .bc0 or remote compiler
+ * @param C0Editors Current c0 source code in editor
+ * @param typedefRecord Typedef information extracted from c0 editors
+ * @returns A parsed bytecode data structure.
  */
-export default function parse(raw_file: string): C0ByteCode {
-    const blocks = raw_file.trim().split("\n\n");
-    if (blocks.length < 6) { throw new bc0_format_error(); }
+export default function parse(bytecode: string, C0Editors?: C0EditorTab[], typedefRecord?: Map<string, TypeDefInfo>): C0ByteCode {
+    const typedef_lib = typedefRecord === undefined ? undefined : flatten_typedef(typedefRecord);
+    const lines = annotate_linenum(bytecode);   // Add line number info to each line
+    const blocks = split_blocks(lines);
 
+    let parser_internal_state: "header" | "int" | "string" | "funchead" | "function" = "header";
+    const parsing: C0ByteCode = {
+        version: -1,
+        intCount: -1,
+        intPool: new Int32Array([]),
+        stringCount: -1,
+        stringPool: new Uint8Array([]),
+        functionCount: -1,
+        functionPool: [],
+        nativeCount: -1,
+        nativePool: []
+    };
 
-    /* Check Header */
-    const header = blocks[0].split("\n");
-    if (header.length !== 2 || !header[0].startsWith("C0 C0 FF EE")) {
-        throw new bc0_format_error();
-    }
-
-
-    /* Load Intpool */
-    const intpool = blocks[1].split("\n");
-    const intpoolSize = parseInt((intpool[0].split("#")[0]).trim().replace(" ", ""), 16);
-
-    if (intpool.length !== intpoolSize + 2) {
-        throw new bc0_format_error();
-    }
-
-    const intpoolVal = new Int32Array(
-        //@ts-ignore    // Kinda bad solution, but we know what a bc0 file looks like for sure
-        new Uint8Array([].concat.apply([],(intpool.slice(2,)
-                .map((row) => row.split(" ")))
-        ).map(
-            (elem: string) => parseInt(elem, 16)
-        )).buffer
-    );
-
-    // console.log("Int Pool Size:", intpoolSize);
-    // console.log("Int Pool:\n", intpoolVal, "\n");
-
-
-    /* Load String Pool */
-    const strpool = blocks[2].split("\n");
-    const strpoolSize = parseInt((strpool[0].split("#")[0]).trim().replace(" ", ""), 16);
-    //@ts-ignore    // Kinda bad solution, but we know what a bc0 file looks like for sure
-    const strpoolVal = new Uint8Array([].concat.apply([],strpool.slice(2,)
-            .map((row) => row.split("#")[0].trim())
-            .map((row) => row.length <= 1 ? [] : row.split(" ").map(
-                (elem: string) => parseInt(elem, 16)
-            ))
-    ));
-
-    // console.log("Str Pool Size:", strpoolSize);
-    // console.log("Str Pool:\n", strpoolVal, "\n");
-
-
-    /* Load Function Pool */
-    const functionNumber = parseInt(
-        blocks[3].split("#")[0].replace(" ", ""), 16
-    );
-    // console.log("Function Count:", functionNumber);
-    // Double Check the file format
-    if (blocks.length !== 5 + functionNumber) { throw new bc0_format_error(); }
-
-
-    /* Load Functions */
-    const functionPool: C0Function[] = [];
-    for (let i = 4; i < 4 + functionNumber; i++) {
-        let global_line_offset = blocks.slice(0,i).reduce(
-            (p:number, curr: string): number => p + curr.split("\n").length,
-            0
-        ) + i;
-
-        let funcLines = blocks[i].split("\n");
-        if (funcLines[0] === ""){
-            funcLines = funcLines.slice(1,);
-            global_line_offset += 1;
+    for (let idx = 0; idx < blocks.length - 1; idx ++) {
+        switch (parser_internal_state) {
+            case "header":
+                parsing.version = parse_magic_header(blocks[idx]);
+                parser_internal_state = "int";
+                break;
+            case "int": 
+                [parsing.intCount, parsing.intPool] = parse_int_pool(blocks[idx]);
+                parser_internal_state = "string";
+                break;
+            case "string":
+                [parsing.stringCount, parsing.stringPool] = parse_str_pool(blocks[idx]);
+                parser_internal_state = "funchead";
+                break;
+            case "funchead":
+                parsing.functionCount = parse_func_head(blocks[idx]);
+                parser_internal_state = "function";
+                break;
+            case "function":
+                parsing.functionPool.push(parse_func_block(blocks[idx], C0Editors, typedef_lib));
+                break;
         }
-
-        const funcName = funcLines[0].slice(2, -1);
-        const funcNumArgs = parseInt(funcLines[1].split("#")[0].trim(), 16);
-        const funcNumVars = parseInt(funcLines[2].split("#")[0].trim(), 16);
-        const funcSize = parseInt(funcLines[3].split("#")[0].trim().replace(" ", ""), 16);
-
-        // Extract variable Names
-        const varNames = Array(funcNumVars).fill("<anonymous>");
-        let funcCode: number[] = [];
-        for (let lineNum = 4; lineNum < funcLines.length; lineNum++) {
-            const [lineBytes, opcodeName, comment] = funcLines[lineNum].split("#")
-                .map((elem) => elem.trim());
-
-            if (lineBytes !== "") {
-                funcCode = funcCode.concat(lineBytes.split(" ")
-                    .map((elem: string) => parseInt(elem, 16))
-                );
-            }
-
-            if (opcodeName !== undefined) {
-                if (opcodeName.startsWith("vload")) {
-                    varNames[parseInt(opcodeName.split(" ")[1])] = comment;
-                } else if (opcodeName.startsWith("vstore")) {
-                    varNames[parseInt(opcodeName.split(" ")[1])] =
-                        comment.split(" ")[0].trim();
-                }
-            }
-        }
-        // Extract DataType from bipush comments
-        let code_byte_counter = 0;
-
-        const comment_mapping = new Map<number, CodeComment>();
-
-        for (let lineNum = 4; lineNum < funcLines.length; lineNum++) {
-            const [lineBytes, opcodeName, comment] = funcLines[lineNum].split("#")
-                .map((elem) => elem.trim());
-            if (lineBytes === "") continue;
-
-            let type: string | undefined = undefined;
-            let fieldName: string | undefined = undefined;
-
-            if (opcodeName.startsWith("bipush")) {
-                if (int_comment_regex.test(comment)) {
-                    type = "int";
-                } else if (bool_comment_regex.test(comment)) {
-                    type = "bool";
-                } else if (char_comment_regex.test(comment)) {
-                    type = "char";
-                } else {
-                    type = "<unknown>";
-                    if (DEBUG) {
-                        console.warn("Failed to inference value type from bipush comment:\n" + funcLines[lineNum]);
-                    }
-                }
-            } else if (opcodeName.startsWith("newarray")) {
-                const parsed_comment = arr_comment_regex.exec(comment);
-                if (parsed_comment === null || parsed_comment[1] === undefined) {
-                    if (globalThis.DEBUG) console.warn(funcLines[lineNum]);
-                    globalThis.MSG_EMITTER.warn(
-                        "Incomplete Type Inference Parse", 
-                        "Failed to parse certain type annotation in .bc0 file. The debug console evaluation may fail on certain variables."
-                    );
-                } else {
-                    type = parsed_comment[1];
-                }
-            } else if (opcodeName.startsWith("new")) {
-                const parsed_comment = new_comment_regex.exec(comment);
-                if (parsed_comment === null || parsed_comment[1] === undefined) {
-                    if (globalThis.DEBUG) console.warn(funcLines[lineNum]);
-                    globalThis.MSG_EMITTER.warn(
-                        "Incomplete Type Inference Parse", 
-                        "Failed to parse certain type annotation in .bc0 file. The debug console evaluation may fail on certain variables."
-                    );
-                } else {
-                    type = parsed_comment[1];
-                }
-            } else if (opcodeName.startsWith("aaddf")) {
-                const parsed_comment = aaddf_comment_regex.exec(comment);
-                if (parsed_comment === null || parsed_comment[1] === undefined) {
-                    if (globalThis.DEBUG) console.warn(funcLines[lineNum]);
-                    globalThis.MSG_EMITTER.warn(
-                        "Incomplete Type Inference Parse", 
-                        "Failed to parse certain type annotation in .bc0 file. The debug console evaluation may fail on certain variables."
-                    );
-                } else {
-                    fieldName = parsed_comment[1];
-                }
-            }
-
-            comment_mapping.set(code_byte_counter, 
-                {
-                    dataType: type,
-                    fieldName: fieldName,
-                    lineNumber: global_line_offset + lineNum + 1
-                }
-            );
-            code_byte_counter += lineBytes.split(" ").length;
-        }
-
-        if (funcSize !== funcCode.length) throw new bc0_format_error();
-
-        functionPool.push({
-            name: funcName,
-            size: funcSize,
-            numArgs: funcNumArgs,
-            numVars: funcNumVars,
-            varName: varNames,
-            code: new Uint8Array(funcCode),
-            comment: comment_mapping
-        });
     }
 
+    // Load Native function here
+    [parsing.nativeCount, parsing.nativePool] = parse_native_block(blocks[blocks.length - 1]);
 
-    /* Load Native Pool */
-    const nativePool = blocks[blocks.length - 1].split("\n");
-    const nativeCount = parseInt(nativePool[0].split("#")[0].trim().replace(" ", ""), 16);
-    const nativeFuncs = nativePool.slice(2,).map(
-        (row) => row.split("#")[0].trim().split(" ")
-    ).map(
-        row => [
-            parseInt(row[0] + row[1], 16),
-            parseInt(row[2] + row[3], 16)
-        ]
-    ).map(
-        row => nativeFuncLoader(row[1], row[0])
-    )
-    if (nativeFuncs.length !== nativeCount) {
-        throw new bc0_format_error();
-    }
-
-    /** Combine Everything together */
-    return {
-        version: parseInt(header[1].split("#")[0].trim().replace(" ", ""), 16),
-
-        intCount: intpoolSize,
-        intPool: intpoolVal,
-
-        stringCount: strpoolSize,
-        stringPool: strpoolVal,
-
-        functionCount: functionNumber,
-        functionPool: functionPool,
-
-        nativeCount: nativeCount,
-        nativePool: nativeFuncs
-    }
+    return parsing;
 }
 
+//// Regex Constants
+const regex_func_name = /#<(.+)>/;
+const regex_aaddf_comment = /^&?.*->\s*([a-zA-Z_0-9]+)$/;
+const regex_arr_comment = /^alloc_array\(\s*([a-zA-Z0-9_\-*[\]\s]+),.+\)/;
+const regex_new_comment = /^alloc\(\s*([a-zA-Z0-9_\-*[\]\s]+)\s*\)/;
+const regex_ref_comment = /^.\/cache\/.*\.c0: \d+\.\d+-\d+.\d+$/;
+
+const regex_int_comment = /(\d+)|(dummy return value)/;
+const regex_bool_comment = /(true)|(false)/;
+const regex_char_comment = /'.*'/;
+////////////////////
+
+function safe_parse_hex(s: string): number {
+    const res = parseInt(s, 16);
+    if (isNaN(res)) throw new bc0_format_error();
+    return res;
+}
+
+function safe_combine_and_parse_hex(s: string): number {
+    return safe_parse_hex(s.replaceAll(" ", ""));
+}
+
+/**
+ * Resolve the nested reference in map automatically
+ * 
+ * e.g. A -> B, D -> B, B -> C
+ * will be flattened to:
+ * A -> C, B -> C, D -> C
+ * 
+ * @returns A flattened type mapping
+ */
+ function flatten_typedef(typedef: Map<string, TypeDefInfo>): Map<string, string> {
+    const flattened = new Map<string, string>();
+    typedef.forEach(
+        (value, key) => {
+            let base_case = value.source;
+            while (typedef.has(base_case)) {
+                base_case = (typedef.get(base_case) as TypeDefInfo).source;
+            }
+            flattened.set(key, base_case);
+        }
+    )
+    return flattened;
+}
+
+function apply_typedef_information(typedef: Map<string, string>, bytecode: string) {
+    let result = bytecode;
+    typedef.forEach(
+        (value, key) => {result = bytecode.replaceAll(key, value);}
+    )
+    return result;
+}
+
+function annotate_linenum(bytecode: string): [string, number][] {
+    return bytecode.split("\n").map((line, index) => [line, index + 1]);
+}
+
+function split_blocks(lines: [string, number][]): [string, number][][] {
+    const result: [string, number][][] = [[]];
+    for (let i = 0; i < lines.length; i ++) {
+        if (lines[i][0] === "") {
+            result.push([]);
+            while(i < lines.length && lines[i][0] === "") i ++;
+            i -= 1;
+            continue;
+        }
+        (result[result.length - 1]).push(lines[i]);
+    }
+    if (result[result.length - 1].length === 0) result.pop();
+    return result;
+}
+
+// Given header block, check for magic number, return version
+function parse_magic_header(header: [string, number][]): number {
+    if (header.length !== 2 || !header[0][0].toUpperCase().startsWith("C0 C0 FF EE")) {
+        throw new bc0_format_error();
+    }
+    return safe_combine_and_parse_hex(header[1][0]);
+}
+
+function resolve_field_name(byte_instruct: string, comment: string): string | undefined {
+    if (!byte_instruct.toUpperCase().startsWith("AADDF")) return undefined;
+    const parsed_comment = regex_aaddf_comment.exec(comment);
+    if (parsed_comment === null) return undefined;
+    return parsed_comment[1];
+}
+
+function resolve_type_info(byte_instruct: string, comment: string): string | undefined {
+    if (byte_instruct.toUpperCase().startsWith("NEWARRAY")) {
+        const parsed_comment = regex_arr_comment.exec(comment);
+        if (parsed_comment === null) return undefined;
+        return parsed_comment[1];
+    } else if (byte_instruct.toUpperCase().startsWith("NEW")) {
+        const parsed_comment = regex_new_comment.exec(comment);
+        if (parsed_comment === null) return undefined;
+        return parsed_comment[1];
+    } else if (byte_instruct.toUpperCase().startsWith("BIPUSH")) {
+        if (regex_int_comment.test(comment)) return "int";
+        if (regex_bool_comment.test(comment)) return "bool";
+        if (regex_char_comment.test(comment)) return "char";
+    }
+    return undefined;
+}
+
+function resolve_var_name(bytes: string, byte_instruct: string, comment: string): [number, string] | undefined {
+    if (byte_instruct.toUpperCase().startsWith("VLOAD")) {
+        return [safe_parse_hex(bytes.split(" ")[1]), comment];
+    } else if (byte_instruct.toUpperCase().startsWith("VSTORE")) {
+        return [safe_parse_hex(bytes.split(" ")[1]), comment.split("=")[0].trim()]
+    }
+    return undefined;
+}
+
+function parse_int_pool(int_block: [string, number][]): [number, Int32Array] {
+    if (int_block.length < 2) throw new bc0_format_error();
+    if (int_block[1][0] !== "# int pool") throw new bc0_format_error();
+
+    const intCount = safe_combine_and_parse_hex(int_block[0][0].split("#")[0]);
+
+    const intLines = int_block.slice(2,undefined).map(([string, _]) => string.split(" ")).flat();
+    const intHexs = new Uint8Array(intLines.map((num) => safe_parse_hex(num)));
+    const intPool = new Int32Array(intHexs.buffer);
+
+    if (intCount !== intPool.length) throw new bc0_format_error();
+
+    return [intCount, intPool]
+}
+
+function parse_str_pool(str_block: [string, number][]): [number, Uint8Array] {
+    if (str_block.length < 2) throw new bc0_format_error();
+    if (str_block[1][0] !== "# string pool") throw new bc0_format_error();
+
+    const strCount = safe_combine_and_parse_hex(str_block[0][0].split("#")[0]);
+
+    const strLines = str_block.slice(2, undefined).map(([string, _]) => string.split("#")[0]);
+    let strBytes = strLines.map((line) => line.split(" ")).flat();
+    strBytes = strBytes.filter((v) => v !== "");
+    const strHexs  = new Uint8Array(strBytes.map((tok) => safe_parse_hex(tok)));
+
+    if (strCount !== strHexs.length) throw new bc0_format_error();
+
+    return [strCount, strHexs];
+}
+
+// Return number of C0Functions in bytecode
+function parse_func_head(func_head: [string, number][]): number {
+    if (func_head.length !== 2) throw new bc0_format_error();
+    if (func_head[1][0] !== "# function_pool") throw new bc0_format_error();
+
+    return safe_combine_and_parse_hex(func_head[0][0].split("#")[0]);
+}
+
+// Load source code content
+function load_c0_content(C0Editors: C0EditorTab[], fileName: string, start_line: number, start: number, end_line: number, end: number): string {
+    const C0Content = C0Editors.filter((tab) => tab.title === fileName);
+    if (C0Content.length !== 1) {
+        MSG_EMITTER.warn("Recompile Required", "Failed to build reference between bytecode and c0 source code, please re-compile the c0 source code.");
+        throw new bc0_format_error();
+    }
+
+    const C0Line = C0Content[0].content.split("\n")[start_line - 1];
+    const result = C0Line.slice(start - 1, end - 1);
+    if (result === "") MSG_EMITTER.warn("Recompile Required", "Failed to build reference between bytecode and c0 source code, please re-compile the code.");
+    return result;
+}
+
+function resolve_src_reference(comment_ref: string): [string, number, number, number, number] | undefined {
+    if (!regex_ref_comment.test(comment_ref)) return undefined;
+    // if (!comment_ref.startsWith("./cache/")) return undefined;
+    const path = comment_ref.split("/");
+    const file = path[path.length - 1];
+    const [file_name, line_range] = file.split(": ");
+    const [start_pos, end_pos] = line_range.split("-");
+    const [start_ln, start_col] = start_pos.split(".").map((tok) => parseInt(tok));
+    const [end_ln, end_col]     = end_pos.split(".").map((tok) => parseInt(tok));
+
+    if (isNaN(start_ln) || isNaN(start_col) || isNaN(end_ln) || isNaN(end_col)) throw new bc0_format_error();
+
+    return [file_name, start_ln, start_col, end_ln, end_col];
+}
+
+function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTab[], typedef_lib ?: Map<string, string>) {
+    if (func_block.length < 4) throw new bc0_format_error();
+    const result: C0Function = {
+        name: "undefined",
+        code: new Uint8Array(),
+        numVars: -1,
+        varName: [],
+        numArgs: -1,
+        size: -1,
+        comment: new Map()
+    };
+    
+    let func_name = regex_func_name.exec(func_block[0][0]);
+    if (func_name === null || func_name[1] === undefined) throw new bc0_format_error();
+
+    result.name = func_name[1];
+    result.numArgs = safe_parse_hex(func_block[1][0].split("#")[0]);
+    result.numVars = safe_parse_hex(func_block[2][0].split("#")[0]);
+    result.varName = new Array(result.numVars).fill("<Anonymous>");
+    result.size = safe_combine_and_parse_hex(func_block[3][0].split("#")[0]);
+
+    let bytecode_pos = 0;
+    const code_num = [];
+    for (let bc_line = 4; bc_line < func_block.length; bc_line ++) {
+        const curr_bc_line = func_block[bc_line][0];
+        if (curr_bc_line.startsWith("#")) continue;
+
+        let [tokens, byte_instruct, comment] = curr_bc_line.split("#");
+        tokens = tokens.trim();
+        byte_instruct = byte_instruct.trim();
+        comment = comment.trim();
+
+        const c0_ref_pos = resolve_src_reference(comment);
+        if (C0Editors !== undefined && c0_ref_pos !== undefined) {
+            comment = load_c0_content(C0Editors, ...c0_ref_pos);
+        }
+        if (c0_ref_pos !== undefined && typedef_lib !== undefined) {
+            comment = apply_typedef_information(typedef_lib, comment);
+        }
+        const num_tokens = tokens.split(" ").map(tok => safe_parse_hex(tok));
+        for (let i = 0; i < num_tokens.length; i ++) code_num.push(num_tokens[i]);
+
+        const var_name = resolve_var_name(tokens, byte_instruct, comment);
+        if (var_name !== undefined) result.varName[var_name[0]] = var_name[1];
+        
+        result.comment.set(bytecode_pos, {
+            lineNumber: func_block[bc_line][1],
+            fieldName: resolve_field_name(byte_instruct, comment),
+            dataType : resolve_type_info(byte_instruct, comment)
+        });
+
+        // Update the PC position
+        bytecode_pos += num_tokens.length;
+        // console.log(tokens, byte_instruct, comment);
+    }
+
+    result.code = new Uint8Array(code_num);
+    return result;
+}
+
+function parse_native_block(native_block: [string, number][]): [number, C0Native[]] {
+    if (native_block.length < 2) throw new bc0_format_error();
+    if (native_block[1][0] !== "# native pool") throw new bc0_format_error();
+
+    const native_count = safe_combine_and_parse_hex(native_block[0][0].split("#")[0]);
+    const native_funcs = [];
+    const native_bytes = native_block.slice(2,).map(([line, _]) => line.split("#")[0].trim());
+    for (let i = 0; i < native_bytes.length; i ++) {
+        const [b1, b2, b3, b4] = native_bytes[i].split(" ");
+        const f_num_arg = safe_parse_hex(b1 + b2);
+        const f_idx_val = safe_parse_hex(b3 + b4);
+        native_funcs.push(nativeFuncLoader(f_idx_val, f_num_arg));
+    }
+    return [native_count, native_funcs];
+}

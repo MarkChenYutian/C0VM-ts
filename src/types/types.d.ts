@@ -59,7 +59,7 @@ type C0ByteCode = {
     functionPool: C0Function[];
     /* Native Functions */
     nativeCount: number;
-    nativePool: (C0Native|undefined)[];
+    nativePool: C0Native[];
 };
 
 

@@ -2,7 +2,7 @@ import * as Arithmetic from "../utility/arithmetic";
 import * as TypeUtil from "../../utility/c0_type_utility";
 
 import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value, build_c0_stringValue } from "../../utility/c0_value_utility";
-import { c0_memory_error, c0_user_error, vm_error, vm_instruct_error } from "../../utility/errors";
+import { c0_memory_error, c0_user_error, vm_error } from "../../utility/errors";
 import { build_null_ptr, read_ptr, shift_ptr } from "../../utility/pointer_utility";
 import { loadString } from "../../utility/string_utility";
 import OpCode from "./opcode";
@@ -502,13 +502,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             const native_F = state.P.nativePool[fidx];
             const args: C0Value<C0TypeClass>[] = [];
 
-            if (native_F === undefined) {
-                throw new vm_instruct_error("Native function not implemented yet!");
-            }
-
             for (let i = 0; i < native_F.numArgs; i ++) {
                 args.unshift(safe_pop_stack(state.TypeRecord, state.CurrFrame.S));
             }
+            
             const res = native_F.f(UIHooks, allocator, ...args);
             state.CurrFrame.S.push(res);
             break;

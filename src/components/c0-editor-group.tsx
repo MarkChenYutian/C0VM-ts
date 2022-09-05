@@ -37,13 +37,21 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
 
         return (
         <DraggableTabs
-            //@ts-ignore
-            type="editable-card"
-            activeKey={this.props.activeTab + ""}
-            size="small"
+            config={{
+                type: "editable-card",
+                activeKey: this.props.activeTab + "",
+                size: "small",
+                onChange: (new_key: string) => {this.on_change_key(new_key)},
+                onTabClick: (key: string, e)   => {
+                    // TODO: Find some way to let alt-key (second key click) toggle rename
+                    if (e.altKey) {
+                        const s = prompt("File name for tab:");
+                        this.props.setTabName(parseInt(key), s === null ? "" : s)
+                    }
+                },
+                addIcon: <FontAwesomeIcon icon={faAdd}/>
+            }}
             onTabEdit={on_edit}
-            onChange={(new_key: string) => {this.on_change_key(new_key)}}
-            addIcon={<FontAwesomeIcon icon={faAdd}/>}
             setTabOrder={(s) => this.update_tab_order(s)}
         >
             {

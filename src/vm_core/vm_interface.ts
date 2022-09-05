@@ -1,10 +1,14 @@
 import C0VM_RuntimeState from "./exec/state";
 
-export async function initialize(s: string, clear_printout: () => void): Promise<C0VM_RuntimeState | undefined> {
+export async function initialize(s: string, clear_printout: () => void,
+    heapSize ?: number,
+    C0Editor ?: C0EditorTab[],
+    TypedefRecord ?: Map<string, TypeDefInfo>
+): Promise<C0VM_RuntimeState | undefined> {
     // Clean up environment before initialize.
     clear_printout();
     try {
-        const ns = new C0VM_RuntimeState(s);
+        const ns = new C0VM_RuntimeState(s, heapSize, C0Editor, TypedefRecord, undefined);
         globalThis.MSG_EMITTER.ok("Load Successfully", "C0VM has load your code successfully. Press Step or Run to see result.");
         if (globalThis.DEBUG_DUMP_MEM) {
             console.log(ns.allocator.debug_getMemPool());
@@ -51,7 +55,7 @@ export async function run(
             }
             if (signal.abort) {
                 resetSig();
-                printout_handler("<span>C0VM.ts: Execution aborted manually.</span>\n");
+                printout_handler("C0VM.ts: Execution aborted manually.\n");
                 globalThis.MSG_EMITTER.warn("Execution Aborted", "Execution is aborted since the user click the 'Abort' button manually.");
                 resetSig();
                 return [s, false];

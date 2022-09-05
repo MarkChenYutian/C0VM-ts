@@ -31,9 +31,8 @@ import * as TypeUtil from "../../utility/c0_type_utility";
 export function nativeFuncLoader(
     index: number,
     numArgs: number
-): C0Native | undefined {
+): C0Native {
     const native = nativeFuncMapping(index);
-    if (native === undefined) return native;
     native.numArgs = numArgs;
     return native;
 }
@@ -43,7 +42,7 @@ export function nativeFuncLoader(
  * @param index The index of Native function
  * @returns A C0Native object that contains the entry-point of native function
  */
-function nativeFuncMapping(index: number): C0Native | undefined {
+function nativeFuncMapping(index: number): C0Native {
     switch (index) {
         /* Command Line Arguments parsing */
         case 0:
