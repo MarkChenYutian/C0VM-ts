@@ -18,8 +18,8 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                                     crashed: false,
                                     C0Runtime: undefined,
                                     PrintoutValue: "",
-                                    C0Editors: [{title: "Untitled_0.c0", key: 0, content: ""}],
-                                    ActiveEditor: 0
+                                    // C0Editors: [{title: "Untitled_0.c0", key: 0, content: ""}],
+                                    ActiveEditor: this.props.state.C0Editors[0].key
                                 });
                             }}
                         >

@@ -61,6 +61,8 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
     }
     // Update line number
     state.CurrLineNumber = comment.lineNumber;
+    state.CurrC0RefLine  = comment.c0RefNumber;
+    //
     switch (F.code[state.CurrFrame.PC]) {
         // dup
         case OpCode.DUP: {

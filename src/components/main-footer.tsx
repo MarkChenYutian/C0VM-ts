@@ -13,6 +13,8 @@ export default class C0VMApplicationFooter extends React.PureComponent<{state: C
             vm_indicator = <p><FontAwesomeIcon icon={faCheck}/> Loaded</p>
         } else if (this.props.state.C0Running) {
             vm_indicator = <p><FontAwesomeIcon icon={faSpinner} spin/> Executing</p>
+        } else if (s.state.CurrC0RefLine !== undefined){
+            vm_indicator = <p><FontAwesomeIcon icon={faCheck}/> Running: {s.state.CurrC0RefLine[0]}, Line{s.state.CurrC0RefLine[1]}</p>
         } else {
             vm_indicator = <p><FontAwesomeIcon icon={faCheck}/> Running: Line{s.state.CurrLineNumber}</p>;
         }

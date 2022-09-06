@@ -28,7 +28,9 @@ type C0Function = {
 type CodeComment = {
     dataType?: string,  // If command = new/new_array/bipush, the type name of variable will be placed here
     fieldName?: string, // If command = aaddf, the field name will be placed here
-    lineNumber: number  // The corresponding line number in .bc0 file
+    // File name, row, can_break_here
+    c0RefNumber?: [string, number, bool], // The corresponding line nunber in .c0 file, if can be resolved
+    lineNumber: number  // The corresponding line number in .bc0 file    
 }
 
 type ReactUIHook = {
@@ -224,6 +226,8 @@ type VM_State = {
     CurrFrame: VM_StackFrame,
     // The line number of .bc0 file that is currently executing
     CurrLineNumber: number,
+    // The line number of .c0 file that is currently executing
+    CurrC0RefLine: [string, number, boolean] | undefined,
     // The type pool (struct type information) hashmap
     TypeRecord: Map<string, Map<number, Struct_Type_Record>>
 };

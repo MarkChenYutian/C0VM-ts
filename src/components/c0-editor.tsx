@@ -1,12 +1,17 @@
 import React from "react";
 import ReactCodeMirror, { basicSetup } from "@uiw/react-codemirror";
 
+import { StateField, RangeSet } from "@codemirror/state";
+import { GutterMarker } from "@codemirror/view";
+
 import LoadDocumentPlugin from "./editor_extension/blank_load";
 import { C0, C0Language } from "./editor_extension/syntax/c0";
 
 import { indentUnit, syntaxTree } from "@codemirror/language";
 import { snippetCompletion } from "@codemirror/autocomplete";
 import { EditorState } from "@codemirror/state";
+import execLineHighlighter from "./editor_extension/exec_position";
+import breakpointGutter from "./editor_extension/breakpoint_marker";
 
 
 function typedefResolver(s: EditorState): Map<string, string> {
@@ -28,6 +33,7 @@ function typedefResolver(s: EditorState): Map<string, string> {
 export default class C0Editor extends React.Component<C0EditorProps>
 {
     render() {
+        const breakpoint_extension = breakpointGutter((n) => {this.props.updateBrkPts(n)});
         return <div className="code-editor">
                     <ReactCodeMirror
                         theme={globalThis.UI_EDITOR_THEME}
@@ -37,14 +43,23 @@ export default class C0Editor extends React.Component<C0EditorProps>
                                 if (v.docChanged) {
                                     this.props.updateContent(v.state.doc.toString());
                                     this.props.updateTypedef(typedefResolver(v.state));
+                                    // Update breakpoints stored in react state from breakpoints in CodeMirror State
+                                    const F = v.state.field(breakpoint_extension[0] as StateField<RangeSet<GutterMarker>>);
+                                    const brk_pts = [];
+                                    for (let cursor = F.iter(); cursor.value !== null; cursor.next()) {
+                                        brk_pts.push(v.state.doc.lineAt(cursor.from).number);
+                                    }
+                                    this.props.setBreakPts(brk_pts);
                                 };
                             }
                         }
                         value = {this.props.editorValue}
                         extensions={[
                             LoadDocumentPlugin(".c0", this.props.updateName),
+                            breakpoint_extension,
                             basicSetup(),
                             indentUnit.of("    "),
+                            execLineHighlighter(this.props.lineNumber),
                             C0(),
                             C0Language.data.of({
                                 autocomplete: [

@@ -10,6 +10,7 @@ interface C0VMApplicationState {
 
     C0Editors  : C0EditorTab[],     /* Code editor tab titles */
     ActiveEditor : number,          /* Currently activated tab index of C0Editor */
+    C0BreakPoint: Set<string> /* Breakpoints on C0 Source code */
 
     PrintoutValue: string,          /* The string to show in the stdout console */
 
@@ -36,19 +37,26 @@ interface MainControlProps {
 interface CodeEditorProps {
     app_state: C0VMApplicationState,
     set_app_state<K extends keyof C0VMApplicationState>(
-        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) => (
-            Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) | (Pick<C0VMApplicationState, K> | C0VMApplicationState | null),
+        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
+                => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
+            | (Pick<C0VMApplicationState, K> 
+            | C0VMApplicationState 
+            | null),
         callback?: () => void
     ): void;
 }
 
 interface CodeEditorState {
     mode: "c0" | "bc0";
-
     C0_nextKey: number
 }
 
 interface C0EditorGroupProps {
+    currLine     : [string, number, boolean] | undefined,
+    c0BreakPoints: Set<string>,
+    setC0BrkPoint: (s: string, ln: number) => void,
+    writeC0BrkPts: (s: Set<string>) => void,
+
     activeTab    : number,
     setActiveTab : (i: number) => void,
 
@@ -66,10 +74,13 @@ interface C0EditorGroupProps {
 type C0EditorTab = {title: string, key: number, content: string};
 
 interface C0EditorProps {
+    lineNumber    : number,
     updateContent : (s: string) => void,
     updateTypedef : (newTypeDef: Map<string, string>) => void,
     editorValue   : string,
     updateName   ?: (s: string) => void,
+    updateBrkPts  : (ln: number) => void,
+    setBreakPts   : (lns: number[]) => void,
 }
 
 interface BC0EditorProps {

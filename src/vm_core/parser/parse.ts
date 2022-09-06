@@ -1,4 +1,4 @@
-import { bc0_format_error } from "../../utility/errors";
+import { bc0_format_error, vm_error } from "../../utility/errors";
 import { nativeFuncLoader } from "../native/native_interface";
 
 /**
@@ -66,6 +66,7 @@ export default function parse(bytecode: string, C0Editors?: C0EditorTab[], typed
     // Load Native function here
     [parsing.nativeCount, parsing.nativePool] = parse_native_block(blocks[blocks.length - 1]);
 
+    if (DEBUG) console.log(parsing);
     return parsing;
 }
 
@@ -225,13 +226,17 @@ function parse_func_head(func_head: [string, number][]): number {
 function load_c0_content(C0Editors: C0EditorTab[], fileName: string, start_line: number, start: number, end_line: number, end: number): string {
     const C0Content = C0Editors.filter((tab) => tab.title === fileName);
     if (C0Content.length !== 1) {
+        if (DEBUG) console.log(fileName, C0Editors);
         MSG_EMITTER.warn("Recompile Required", "Failed to build reference between bytecode and c0 source code, please re-compile the c0 source code.");
         throw new bc0_format_error();
     }
 
     const C0Line = C0Content[0].content.split("\n")[start_line - 1];
+    if (C0Line === undefined) {
+        MSG_EMITTER.warn("Recompile Required", "Failed to build reference between bytecode and c0 source code, please re-compile the code.");
+        return "";
+    }
     const result = C0Line.slice(start - 1, end - 1);
-    if (result === "") MSG_EMITTER.warn("Recompile Required", "Failed to build reference between bytecode and c0 source code, please re-compile the code.");
     return result;
 }
 
@@ -298,12 +303,36 @@ function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTa
         result.comment.set(bytecode_pos, {
             lineNumber: func_block[bc_line][1],
             fieldName: resolve_field_name(byte_instruct, comment),
-            dataType : resolve_type_info(byte_instruct, comment)
+            dataType : resolve_type_info(byte_instruct, comment),
+            c0RefNumber: c0_ref_pos === undefined ? undefined : [c0_ref_pos[0], c0_ref_pos[1], false]
         });
 
         // Update the PC position
         bytecode_pos += num_tokens.length;
-        // console.log(tokens, byte_instruct, comment);
+    }
+
+    // Figure out all the "breakable positions" (a.k.a last byte instruction on the c0 line) in code.
+    const LineKeys = Array.from(result.comment.keys());
+    LineKeys.sort((a, b) => a - b);
+    for (let i = 0; i < LineKeys.length - 1; i ++) {
+        const curr_comment = result.comment.get(LineKeys[i]);
+        const next_comment = result.comment.get(LineKeys[i + 1]);
+        if (curr_comment === undefined || next_comment === undefined) throw new vm_error("Impossible case reached");
+        const curr_c0_line = curr_comment.c0RefNumber;
+        const next_c0_line = next_comment.c0RefNumber;
+        
+        if (curr_c0_line !== undefined && next_c0_line !== undefined 
+            && (next_c0_line[1] !== curr_c0_line[1]     // Different c0 line
+                || next_c0_line[0] !== curr_c0_line[0]  // Different c0 file
+            )) {
+            (curr_comment.c0RefNumber as [string, number, boolean])[2] = true;
+            result.comment.set(LineKeys[i], curr_comment);   
+        }
+    }
+    const last_comment = result.comment.get(LineKeys[LineKeys.length - 1]) as CodeComment;
+    if (last_comment.c0RefNumber !== undefined) {
+        last_comment.c0RefNumber[2] = true;
+        result.comment.set(LineKeys[LineKeys.length - 1], last_comment);
     }
 
     result.code = new Uint8Array(code_num);

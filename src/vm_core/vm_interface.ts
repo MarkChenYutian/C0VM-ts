@@ -36,6 +36,7 @@ export async function step(s: C0VM_RuntimeState, printout_handler: (s: string) =
 export async function run(
     s: C0VM_RuntimeState,
     bp: Set<number>,
+    c0bp: Set<string>,
     signal: {abort: boolean},
     resetSig: () => void,
     printout_handler: (s: string) => void,
@@ -68,6 +69,9 @@ export async function run(
             return [s, false];
         }
         if (bp.has(new_state.state.CurrLineNumber)) break;
+        if (new_state.state.CurrC0RefLine !== undefined &&
+            new_state.state.CurrC0RefLine[2] &&
+            c0bp.has(`${new_state.state.CurrC0RefLine[0]}@${new_state.state.CurrC0RefLine[1]}`)) break;
     }
     resetSig();
     return [new_state, can_continue];

@@ -23,6 +23,18 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         this.props.setTabs(result);
     }
 
+    set_brkpt_for_editor(title: string, lns: number[]) {
+        let brkpt: string[] = Array.from(structuredClone(this.props.c0BreakPoints));
+        brkpt = brkpt.filter((elem) => {
+            const [fileName, ] = elem.split("@");
+            return fileName !== title;
+        });
+        for (let i = 0; i < lns.length; i ++) {
+            brkpt.push(`${title}@${lns[i]}`);
+        }
+        this.props.writeC0BrkPts(new Set(brkpt));
+    }
+
     render() {
         const on_edit = (target_key: any, action: "add" | "remove") => {
             switch (action) {
@@ -56,26 +68,28 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         >
             {
                 this.props.currTabs.map(
-                    (editor) => 
-                    <TabPane
-                        tab={editor.title}
-                        key={editor.key + ""}
-                        closable = {this.props.currTabs.length !== 1}
-                        closeIcon={<FontAwesomeIcon icon={faXmark}/>}
-                    >
-                        <C0Editor
-                            updateContent = {(s: string) => {
-                                this.props.updateContent(s, editor.key);
-                            }}
-                            updateTypedef = {(nt: Map<string, string>) => {
-                                this.props.updateTypedef(editor.key, nt)
-                            }}
-                            updateName    = {(s: string) => {
-                                this.props.setTabName(editor.key, s);
-                            }}
-                            editorValue   = {editor.content}
-                        />
-                    </TabPane>
+                    (editor) => {
+                        let lineNumber = 0;
+                        if (this.props.currLine !== undefined && editor.title === this.props.currLine[0]) {
+                            lineNumber = this.props.currLine[1];
+                        }
+                        return <TabPane
+                            tab={editor.title}
+                            key={editor.key + ""}
+                            closable = {this.props.currTabs.length !== 1}
+                            closeIcon={<FontAwesomeIcon icon={faXmark}/>}
+                        >
+                            <C0Editor
+                                lineNumber    = {lineNumber}
+                                updateContent = {(s: string) => this.props.updateContent(s, editor.key)}
+                                updateTypedef = {(nt: Map<string, string>) => this.props.updateTypedef(editor.key, nt)}
+                                updateName    = {(s: string) => this.props.setTabName(editor.key, s)}
+                                editorValue   = {editor.content}
+                                updateBrkPts  = {(ln) => this.props.setC0BrkPoint(editor.title, ln)}
+                                setBreakPts   = {(lns) => this.set_brkpt_for_editor(editor.title, lns)}
+                            />
+                        </TabPane>;
+                    }
                 )
             }
         </DraggableTabs>

@@ -8,6 +8,7 @@ import remote_compile from "../network/remote_compile";
 import tsLogo from "../assets/ts-logo-128.svg";
 import C0VM_RuntimeState from "../vm_core/exec/state";
 
+// A method to abort c0 program
 function AbortRef(): [{abort: boolean}, () => void, () => void] {
     const token = React.useRef({abort: false});
     const cancel = () => {token.current.abort = true;}
@@ -51,6 +52,7 @@ export default function MainControlBar(props: MainControlProps) {
         const run_result = await VM.run(
                 init_state,
                 appState.BC0BreakPoints,
+                appState.C0BreakPoint,
                 abortSignal,
                 reset,
                 props.update_print,

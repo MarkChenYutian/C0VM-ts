@@ -27,6 +27,7 @@ export default class C0VMApplication extends React.Component<
 
             C0Editors: [{ title: "Untitled_0.c0", key: 0, content: ""}],
             ActiveEditor: 0,
+            C0BreakPoint: new Set(),
 
             PrintoutValue: "",
 
