@@ -3,13 +3,13 @@
 ## C0VM.ts Main Functionality
 
 - [x] **Function**: `NativeIO::Readline`
-- [ ] **Function**: Change `NativeIO::Readline` to `async` function
+- [ ] **Function**: Change `NativeIO::Readline` to `async` function **[Important]**
 - [x] **Function**: Type Inference System during runtime
 - [x] **Function**: Show local variable’s value during runtime
 - [ ] <s>**Function**: Heap allocator garbage collection based on ref count</s>
 - [x] **Debug**: Check the bug when running `buggy_SSA_test.bc0` problem.
 - [x] **Parser**: Deal with “dummy return value” (occurs at `void` functions)
-- [ ] **Future**: Map the source code line number to bytecode line number **@Iliano**
+- [x] **Future**: Map the source code line number to bytecode line number **@Iliano**
 - [x] **Type Inference**: Resolve `typedef` in C0 source code automatically
 - [x] **Function**: Support `NativeParse` functions
 - [x] **Function**: Partially support `NativeFloat` functions (`printint` and `printhex`)
@@ -26,7 +26,7 @@
 - [ ] **UI**: Add border to values in `stacknode`
 - [x] **UI**: Right aligned variable names in stack
 - [x] **UI**: Right aligned struct field names
-- [ ] **UI**: Encapsulate the application using `shadowRoot` in HTML
+- [ ] **React**: Encapsulate the application using `shadowRoot` in HTML
 - [x] **React**: Add breakpoint as a component state instead of global variable (which may lead to strange problems, sometimes toggled breakpoint does not work at all)
 - [x] **React**: Add execution line (highlight line) as component state instead of global state
 - [x] **Debugger**: Show function call stack
@@ -40,8 +40,9 @@
 - [x] **Debugger**: When array is not initialized, it’s by default an empty array (currently displayed as NULL)
 - [x] **Debugger**: Just show the function name on debug console (not `f main` as it currently shows)
 - [ ] **Debugger**: Show ptr address on hover on struct component
+- [ ] **Debugger**: Store break point state when user switch between BC0 and C0 mode using `toJSON` and `fromJSON` serialization methods in Codemirror.
 - [x] **Debugger**: Darken breakpoint column on hover
-- [ ] **UX**: Shortcut key for Run and Step
+- [ ] <s>**UX**: Shortcut key for Run and Step</s>
 - [ ] <s>**Debugger**: flexible grid proportion</s>
 
 ## Feature Enhancements

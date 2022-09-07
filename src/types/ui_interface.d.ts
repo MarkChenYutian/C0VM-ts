@@ -81,6 +81,7 @@ interface C0EditorProps {
     updateName   ?: (s: string) => void,
     updateBrkPts  : (ln: number) => void,
     setBreakPts   : (lns: number[]) => void,
+    editable      : boolean
 }
 
 interface BC0EditorProps {

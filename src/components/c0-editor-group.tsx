@@ -87,6 +87,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                                 editorValue   = {editor.content}
                                 updateBrkPts  = {(ln) => this.props.setC0BrkPoint(editor.title, ln)}
                                 setBreakPts   = {(lns) => this.set_brkpt_for_editor(editor.title, lns)}
+                                editable      = {this.props.currLine === undefined}
                             />
                         </TabPane>;
                     }

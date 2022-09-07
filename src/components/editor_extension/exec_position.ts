@@ -1,8 +1,10 @@
 import { EditorView } from "codemirror";
 import { Decoration, ViewPlugin } from "@codemirror/view";
 
-const currExecLineDeco = Decoration.line({ class: "cm-execLine" });
-function execLineHighlighter(lineNum: number) {
+
+
+function execLineHighlighter(lineNum: number, theme: "light" | "dark") {
+    const currExecLineDeco = Decoration.line({ class: "cm-execLine-" + theme });
     return ViewPlugin.fromClass(class {
         public decorations;
 
