@@ -26,6 +26,7 @@ type TypeDefInfo = {source: string, key: number}
 // The props that main control bar component will accept
 interface MainControlProps {
     application_state: C0VMApplicationState,
+    c0_only          : boolean,
 
     update_running: (ns: boolean) => void,
     update_value: (ns: string) => void,
@@ -44,6 +45,7 @@ interface CodeEditorProps {
             | null),
         callback?: () => void
     ): void;
+    c0_only: boolean
 }
 
 interface CodeEditorState {
@@ -175,7 +177,8 @@ interface ApplicationCrashPageProps {
 interface ApplicationContextInterface {
     mode: "full-page" | "embeddable",
     std_out: boolean,
-    debug_console: boolean
+    debug_console: boolean,
+    c0_only: boolean
 }
 
 interface SettingMenuProps {

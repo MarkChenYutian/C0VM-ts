@@ -50,13 +50,6 @@ export default class C0ValueTabularDisplay extends React.Component<
         const vals = expand_C0Array(this.props.mem, this.props.value as C0Value<"ptr">);
         const content = [];
 
-        if (vals.length > 100) {
-            globalThis.MSG_EMITTER.warn(
-                "Potential Performance Degredation",
-                "You are evaluating a large array in the debug console. Performance of website might be degraded."
-            );
-        }
-
         for (let i = 0; i < vals.length; i ++) {
             content.push(
                 <li key={i + "-exp-value"}>

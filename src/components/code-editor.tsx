@@ -98,7 +98,36 @@ export default class CodeEditor extends React.Component
         this.props.set_app_state({C0BreakPoint: new_state});
     }
 
-    render() {
+    render_c0() {
+        const read_only = this.props.app_state.C0Runtime !== undefined && this.props.app_state.C0Runtime.state.CurrLineNumber !== 0;
+        return (
+            <div className="code-editor" data-lang={this.state.mode} >
+                <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
+                    <h3 style={{marginTop: 0, marginBottom: 0}}>
+                        <FontAwesomeIcon icon={faCode}/> Code Editor {read_only ? "(Read Only when Running)" : ""}
+                    </h3>
+                </div>
+                <C0EditorGroup
+                    currLine        = {(this.props.app_state.C0Runtime as (C0VM_RuntimeState | undefined))?.state.CurrC0RefLine}
+                    activeTab       = {this.props.app_state.ActiveEditor}
+                    setActiveTab    = {(i) => this.props.set_app_state({ActiveEditor: i})}
+                    c0BreakPoints   = {this.props.app_state.C0BreakPoint}
+                    setC0BrkPoint   = {(fileName, line) => this.update_c0_brkpts(fileName, line)}
+                    writeC0BrkPts   = {(brkPts) => this.props.set_app_state({C0BreakPoint: brkPts})}
+                    currTabs        = {this.props.app_state.C0Editors}
+                    setTabs         = {(nt) => this.props.set_app_state({C0Editors: nt})}
+                    setTabName      = {(k, s) => this.set_tab_name(k, s)}
+                    newPanel        = {() => this.create_panel()}
+                    removePanel     = {(key) => this.remove_panel(key)}
+                    updateContent   = {(s, key) => this.update_content(s, key)}
+                    updateTypedef   = {(key, newMap) => {
+                        this.props.set_app_state({TypedefRecord: merge_typedef(this.props.app_state.TypedefRecord, key, newMap)})
+                    }}
+                />
+            </div>);
+    }
+
+    render_all() {
         let content = undefined;
         if (this.state.mode === "c0") {
             content = <C0EditorGroup
@@ -135,7 +164,7 @@ export default class CodeEditor extends React.Component
         <div className="code-editor" data-lang={this.state.mode} >
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
                 <h3 style={{marginTop: 0, marginBottom: 0}}>
-                    <FontAwesomeIcon icon={faCode}/> Code Editor {read_only ? "(Read Only)" : ""}
+                    <FontAwesomeIcon icon={faCode}/> Code Editor {read_only ? "(Read Only when Running)" : ""}
                 </h3>
                 <Segmented
                     options={[
@@ -148,5 +177,10 @@ export default class CodeEditor extends React.Component
             </div>
             {content}
         </div>);
+    }
+
+    render() {
+        if (this.props.c0_only) return this.render_c0();
+        return this.render_all();
     }
 }

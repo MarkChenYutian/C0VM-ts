@@ -1,0 +1,24 @@
+#use <conio>
+
+void print_matrix(int[][] Mat, int m, int n)
+//@requires \length(Mat) == m;
+//@requires \length(Mat[0]) == n; 
+{
+    for (int i = 0; i < m; i ++) {
+        for (int j = 0; j < n; j ++) {
+            printf("%d, ", Mat[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int[][] empty_mat = alloc_array(int[], 3);
+    empty_mat[0] = alloc_array(int, 3);
+    empty_mat[1] = alloc_array(int, 3);
+    empty_mat[2] = alloc_array(int, 3);
+    // empty_mat[2] = empty_mat[1];
+    empty_mat[1][1] = 1;
+    print_matrix(empty_mat, 3, 3);
+    return 0;
+}

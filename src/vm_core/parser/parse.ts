@@ -3,7 +3,7 @@ import { nativeFuncLoader } from "../native/native_interface";
 
 /**
  * Parse the bytecode string to C0ByteCode Data Structure.
- * Terms: | token | # byte_instruct | # comment |
+ * Terms: | token | # byte_instruct | # program_snippet | # comment(?) |
  * * If comment starts with ./cache/... 
  *      We know the bytecode comes from remote compile.
  *      * If C0Editor != undefined ...
@@ -282,7 +282,7 @@ function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTa
         const curr_bc_line = func_block[bc_line][0];
         if (curr_bc_line.startsWith("#")) continue;
 
-        let [tokens, byte_instruct, comment] = curr_bc_line.split("#");
+        let [tokens, byte_instruct, , comment] = curr_bc_line.split("#");
         tokens = tokens.trim();
         byte_instruct = byte_instruct.trim();
         comment = comment.trim();
@@ -314,19 +314,29 @@ function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTa
     // Figure out all the "breakable positions" (a.k.a last byte instruction on the c0 line) in code.
     const LineKeys = Array.from(result.comment.keys());
     LineKeys.sort((a, b) => a - b);
-    for (let i = 0; i < LineKeys.length - 1; i ++) {
+    for (let i = 0; i < LineKeys.length; i ++) {
         const curr_comment = result.comment.get(LineKeys[i]);
-        const next_comment = result.comment.get(LineKeys[i + 1]);
-        if (curr_comment === undefined || next_comment === undefined) throw new vm_error("Impossible case reached");
-        const curr_c0_line = curr_comment.c0RefNumber;
-        const next_c0_line = next_comment.c0RefNumber;
-        
-        if (curr_c0_line !== undefined && next_c0_line !== undefined 
-            && (next_c0_line[1] !== curr_c0_line[1]     // Different c0 line
-                || next_c0_line[0] !== curr_c0_line[0]  // Different c0 file
-            )) {
+        const prev_comment = result.comment.get(LineKeys[i - 1]);
+        // In case of 1st line in each function...
+        if (curr_comment !== undefined && prev_comment === undefined) {
             (curr_comment.c0RefNumber as [string, number, boolean])[2] = true;
-            result.comment.set(LineKeys[i], curr_comment);   
+            result.comment.set(LineKeys[i], curr_comment);
+            continue;
+        }
+        // Make typescript undefined check happy
+        if (curr_comment === undefined || prev_comment === undefined) throw new vm_error("Impossible case reached");
+
+        // Do actual breakpoint marking
+        const curr_c0_line = curr_comment.c0RefNumber;
+        const prev_c0_line = prev_comment.c0RefNumber;
+        
+        if (curr_c0_line !== undefined && prev_c0_line !== undefined 
+            && (prev_c0_line[1] !== curr_c0_line[1]     // Different c0 line
+                || prev_c0_line[0] !== curr_c0_line[0]  // Different c0 file
+            )) {
+            // Change breakpoint behavior to "break before executing bp"
+            (curr_comment.c0RefNumber as [string, number, boolean])[2] = true;
+            result.comment.set(LineKeys[i], curr_comment);
         }
     }
     const last_comment = result.comment.get(LineKeys[LineKeys.length - 1]) as CodeComment;

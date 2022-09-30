@@ -28,9 +28,9 @@ export default function MainControlBar(props: MainControlProps) {
         if (appState.C0Runtime === undefined) {
             const init_state = await VM.initialize(appState.BC0SourceCode, props.clear_print, MEM_POOL_SIZE, appState.C0Editors, appState.TypedefRecord);
             if (init_state === undefined) return;
-            [new_runtime, can_continue] = await VM.step(init_state, props.update_print);
+            [new_runtime, can_continue] = await VM.step(init_state, props.c0_only, props.update_print);
         } else {
-            [new_runtime, can_continue] = await VM.step(appState.C0Runtime, props.update_print);
+            [new_runtime, can_continue] = await VM.step(appState.C0Runtime, props.c0_only, props.update_print);
         }
         if (!can_continue) props.update_state(undefined);
         else props.update_state(new_runtime);

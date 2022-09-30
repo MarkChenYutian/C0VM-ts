@@ -52,11 +52,12 @@ export default class C0VMApplication extends React.Component<
 
         const MainControlBarComponent = (
             <MainControlBar
-                application_state={this.state}
-                update_running={(s) => this.setState({ C0Running: s })}
-                update_value={(s) => this.setState({ BC0SourceCode: s })}
-                update_state={(s) => this.setState({ C0Runtime: s })}
-                update_print={(s) =>
+                application_state   ={this.state}
+                c0_only             = {context.c0_only}
+                update_running      ={(s) => this.setState({ C0Running: s })}
+                update_value        ={(s) => this.setState({ BC0SourceCode: s })}
+                update_state        ={(s) => this.setState({ C0Runtime: s })}
+                update_print        ={(s) =>
                     this.setState((state) => {
                         return { PrintoutValue: state.PrintoutValue + s };
                     })
@@ -96,6 +97,7 @@ export default class C0VMApplication extends React.Component<
                     <CodeEditor
                         app_state={this.state}
                         set_app_state={(ns: any) => this.setState(ns)}
+                        c0_only={context.c0_only}
                     />
                     <div className="io-area">
                         {StandardOutputComponent}

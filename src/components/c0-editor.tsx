@@ -5,10 +5,9 @@ import { StateField, RangeSet } from "@codemirror/state";
 import { GutterMarker } from "@codemirror/view";
 
 import LoadDocumentPlugin from "./editor_extension/blank_load";
-import { C0, C0Language } from "./editor_extension/syntax/c0";
+import { C0 } from "./editor_extension/syntax/c0";
 
 import { indentUnit, syntaxTree } from "@codemirror/language";
-import { snippetCompletion } from "@codemirror/autocomplete";
 import { EditorState } from "@codemirror/state";
 import execLineHighlighter from "./editor_extension/exec_position";
 import breakpointGutter from "./editor_extension/breakpoint_marker";
@@ -45,7 +44,6 @@ export default class C0Editor extends React.Component<C0EditorProps>
                         onUpdate={(v) => 
                             {
                                 if (v.docChanged) {
-                                    // Update breakpoints stored in react state from breakpoints in CodeMirror State
                                     const F = v.state.field(breakpoint_extension[0] as StateField<RangeSet<GutterMarker>>);
                                     const brk_pts = [];
                                     for (let cursor = F.iter(); cursor.value !== null; cursor.next()) {
@@ -54,7 +52,7 @@ export default class C0Editor extends React.Component<C0EditorProps>
                                     this.props.updateContent(v.state.doc.toString());
                                     this.props.updateTypedef(typedefResolver(v.state));
                                     this.props.setBreakPts(brk_pts);
-                                };
+                                }
                             }
                         }
                         value = {this.props.editorValue}
@@ -65,12 +63,6 @@ export default class C0Editor extends React.Component<C0EditorProps>
                             indentUnit.of("    "),
                             execLineHighlighter(this.props.lineNumber, globalThis.UI_EDITOR_THEME),
                             C0(),
-                            C0Language.data.of({
-                                autocomplete: [
-                                    snippetCompletion('for(#{init}; #{cond}; #{incr})\n{\n}', {label: "for loop", type: "text", info: "Snippet: for(init; cond; incr){...}"}),
-                                    snippetCompletion('while(#{cond})\n{\n}', {label: "while loop", type: "text", info: "Snippet: while(cond){...}"}),
-                                ]
-                            }),
                         ]}
                         editable={this.props.editable}
                     />

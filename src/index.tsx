@@ -9,7 +9,7 @@ import AntdEmitter from './utility/antd_emitter';
 import AppCrashFallbackPage from './components/app_crash_fallback';
 
 // Global Variables
-global.C0VM_VERSION = "0.2.10-alpha";
+global.C0VM_VERSION = "0.3.0";
 
 globalThis.DEBUG = true;
 globalThis.DEBUG_DUMP_MEM = false;
@@ -29,7 +29,7 @@ globalThis.UI_ERR_DISPLAY_TIME_SEC = 5;
 globalThis.UI_WARN_DISPLAY_TIME_SEC = 5;
 globalThis.UI_OK_DISPLAY_TIME_SEC = 3;
 
-globalThis.COMPILER_BACKEND_URL = "http://127.0.0.1:8000/compile";
+globalThis.COMPILER_BACKEND_URL = "http://128.2.25.174:7998/compile";
 
 globalThis.C0_MAX_RECURSION = 999;
 globalThis.C0_TIME_SLICE = 500;
@@ -51,7 +51,8 @@ htmlRoots.forEach(
     const displayModeContext: React.Context<ApplicationContextInterface> = React.createContext<ApplicationContextInterface>({
       mode: htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable",
       std_out: htmlRoot.dataset["stdoutput"] === "on",
-      debug_console: htmlRoot.dataset["debugconsole"] === "on"
+      debug_console: htmlRoot.dataset["debugconsole"] === "on",
+      c0_only: htmlRoot.dataset["c0_only"] === "on"
     });
     
     C0VMApplication.contextType = displayModeContext;

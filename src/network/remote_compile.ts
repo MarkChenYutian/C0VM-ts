@@ -2,38 +2,6 @@ import { vm_error } from "../utility/errors";
 import C0VM_RuntimeState from "../vm_core/exec/state";
 import * as VM from "../vm_core/vm_interface"; 
 
-/**
- * Resolve the nested reference in map automatically
- * 
- * e.g. A -> B, D -> B, B -> C
- * will be flattened to:
- * A -> C, B -> C, D -> C
- * 
- * @returns A flattened type mapping
- */
-function flatten_typedef(typedef: Map<string, TypeDefInfo>): Map<string, string> {
-    const flattened = new Map<string, string>();
-    typedef.forEach(
-        (value, key) => {
-            let base_case = value.source;
-            while (typedef.has(base_case)) {
-                base_case = (typedef.get(base_case) as TypeDefInfo).source;
-            }
-            flattened.set(key, base_case);
-        }
-    )
-    return flattened;
-}
-
-function apply_typedef_information(typedef: Map<string, TypeDefInfo>, bytecode: string) {
-    const type_map = flatten_typedef(typedef);
-    let result = bytecode;
-    type_map.forEach(
-        (value, key) => {result = bytecode.replaceAll(key, value);}
-    )
-    return result;
-}
-
 export default function remote_compile(
     tabs: C0EditorTab[],
     typedefRecord: Map<string, TypeDefInfo>,
