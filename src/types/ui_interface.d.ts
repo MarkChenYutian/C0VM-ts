@@ -1,5 +1,6 @@
 interface C0VMApplicationState {
     crashed      : boolean,         /* C0VM Application top-level error boundary */
+    c0_only      : boolean,         /* C0 only mode or not */
 
     dbgFullScreen: boolean,         /* If it is in full screen mode currently */
     settingMenuOn: boolean,         /* See if the setting menu is on or not */
@@ -26,7 +27,6 @@ type TypeDefInfo = {source: string, key: number}
 // The props that main control bar component will accept
 interface MainControlProps {
     application_state: C0VMApplicationState,
-    c0_only          : boolean,
 
     update_running: (ns: boolean) => void,
     update_value: (ns: string) => void,

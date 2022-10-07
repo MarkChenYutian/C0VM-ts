@@ -101,8 +101,8 @@ export default class CodeEditor extends React.Component
     render_c0() {
         const read_only = this.props.app_state.C0Runtime !== undefined && this.props.app_state.C0Runtime.state.CurrLineNumber !== 0;
         return (
-            <div className="code-editor" data-lang={this.state.mode} >
-                <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
+            <div className="code-editor" data-lang={this.state.mode}>
+                <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: ".4rem"}}>
                     <h3 style={{marginTop: 0, marginBottom: 0}}>
                         <FontAwesomeIcon icon={faCode}/> Code Editor {read_only ? "(Read Only when Running)" : ""}
                     </h3>

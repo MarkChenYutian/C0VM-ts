@@ -1,6 +1,6 @@
-import { faGear } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDown, faAngleRight, faGear } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Switch, Modal, Divider, Select } from "antd";
+import { Switch, Modal, Select } from "antd";
 import React from "react";
 
 const { Option } = Select;
@@ -34,13 +34,37 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
                     <Option value="dark">Dark</Option>
                     <Option value="light">Light</Option>
                 </Select>
-
-                <Divider className="dbg-entire-row">Advanced Settings</Divider>
-                <p>Debug Mode</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG} onChange={() => {DEBUG = !DEBUG}}/>
-                <p>Debug - Dump Step</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_STEP} onChange={() => {DEBUG_DUMP_STEP = !DEBUG_DUMP_STEP}}/>
-                <p>Debug - Dump Heap</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_MEM} onChange={() => {DEBUG_DUMP_MEM = !DEBUG_DUMP_MEM}}/>
-                <p>Experimental - Type Reuse</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={EXP_PRESERVE_TYPE} onChange={() => {EXP_PRESERVE_TYPE = !EXP_PRESERVE_TYPE}}/>
+                <AdvancedSetting {...this.props}/>
             </div>
         </Modal>
+    }
+}
+
+
+class AdvancedSetting extends React.Component<
+    SettingMenuProps,
+    {expand: boolean}
+> {
+    constructor(props: SettingMenuProps){
+        super(props);
+        this.state = {expand: false};
+    }
+    render(): React.ReactNode {
+        if (this.state.expand) {
+            return <>
+            <h3 onClick={() => {this.setState({expand: false})}} className="dbg-entire-row">
+                <FontAwesomeIcon icon={faAngleDown}/> Advanced Settings
+            </h3>
+            <p>Expose Bytecode</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={!this.props.state.c0_only} onChange={() => {this.props.set_app_state((state) => {return {c0_only: !state.c0_only}})}}/>
+            <p>Debug Mode</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG} onChange={() => {DEBUG = !DEBUG}}/>
+            <p>Debug - Dump Step</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_STEP} onChange={() => {DEBUG_DUMP_STEP = !DEBUG_DUMP_STEP}}/>
+            <p>Debug - Dump Heap</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_MEM} onChange={() => {DEBUG_DUMP_MEM = !DEBUG_DUMP_MEM}}/>
+            <p>Experimental - Type Reuse</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={EXP_PRESERVE_TYPE} onChange={() => {EXP_PRESERVE_TYPE = !EXP_PRESERVE_TYPE}}/>
+            </>;
+        } else {
+            return <h3 onClick={() => {this.setState({expand: true})}}>
+                <FontAwesomeIcon icon={faAngleRight}/> Advanced Settings
+            </h3>;
+        }
     }
 }

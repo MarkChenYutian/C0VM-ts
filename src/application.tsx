@@ -18,6 +18,7 @@ export default class C0VMApplication extends React.Component<
         super(props);
         this.state = {
             crashed: false,
+            c0_only: true,
             dbgFullScreen: false,
             settingMenuOn: false,
             
@@ -53,7 +54,6 @@ export default class C0VMApplication extends React.Component<
         const MainControlBarComponent = (
             <MainControlBar
                 application_state   ={this.state}
-                c0_only             = {context.c0_only}
                 update_running      ={(s) => this.setState({ C0Running: s })}
                 update_value        ={(s) => this.setState({ BC0SourceCode: s })}
                 update_state        ={(s) => this.setState({ C0Runtime: s })}
@@ -97,7 +97,7 @@ export default class C0VMApplication extends React.Component<
                     <CodeEditor
                         app_state={this.state}
                         set_app_state={(ns: any) => this.setState(ns)}
-                        c0_only={context.c0_only}
+                        c0_only={this.state.c0_only}
                     />
                     <div className="io-area">
                         {StandardOutputComponent}
