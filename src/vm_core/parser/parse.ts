@@ -174,11 +174,11 @@ function resolve_type_info(byte_instruct: string, comment: string): string | und
     return undefined;
 }
 
-function resolve_var_name(bytes: string, byte_instruct: string, comment: string): [number, string] | undefined {
+function resolve_var_name(bytes: string, byte_instruct: string, segment: string): [number, string] | undefined {
     if (byte_instruct.toUpperCase().startsWith("VLOAD")) {
-        return [safe_parse_hex(bytes.split(" ")[1]), comment];
+        return [safe_parse_hex(bytes.split(" ")[1]), segment];
     } else if (byte_instruct.toUpperCase().startsWith("VSTORE")) {
-        return [safe_parse_hex(bytes.split(" ")[1]), comment.split("=")[0].trim()]
+        return [safe_parse_hex(bytes.split(" ")[1]), segment.split("=")[0].trim()]
     }
     return undefined;
 }
@@ -282,7 +282,7 @@ function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTa
         const curr_bc_line = func_block[bc_line][0];
         if (curr_bc_line.startsWith("#")) continue;
 
-        let [tokens, byte_instruct, , comment] = curr_bc_line.split("#");
+        let [tokens, byte_instruct, segment, comment] = curr_bc_line.split("#");
         tokens = tokens.trim();
         byte_instruct = byte_instruct.trim();
         comment = comment.trim();
@@ -297,8 +297,10 @@ function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTa
         const num_tokens = tokens.split(" ").map(tok => safe_parse_hex(tok));
         for (let i = 0; i < num_tokens.length; i ++) code_num.push(num_tokens[i]);
 
-        const var_name = resolve_var_name(tokens, byte_instruct, comment);
-        if (var_name !== undefined) result.varName[var_name[0]] = var_name[1];
+        const var_name = resolve_var_name(tokens, byte_instruct, segment);
+        if (var_name !== undefined && result.varName[var_name[0]] === "<Anonymous>") {
+            result.varName[var_name[0]] = var_name[1];
+        }
         
         result.comment.set(bytecode_pos, {
             lineNumber: func_block[bc_line][1],

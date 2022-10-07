@@ -66,7 +66,7 @@ export function c0_num_tokens(
     }
 
     const str = loadString(arg1, mem);
-    return str.split(/(\s+)/).length;
+    return str.split(/\s+/).length;
 }
 
 export function c0_parse_ints(
@@ -79,7 +79,7 @@ export function c0_parse_ints(
     const base = c0_cvt2_js_value(arg2) as number;
     if (base < 2 || base > 36) throw new c0_value_error("native function int *parse_ints(string s, int base) receives base not in range [2, 36]");
 
-    const tokens = str.split(/(\s+)/);
+    const tokens = str.split(/\s+/);
     const ints: number[] = [];
     for (let i = 0; i < tokens.length; i ++) {
         const parsed = parseInt(tokens[i], base);
@@ -89,9 +89,10 @@ export function c0_parse_ints(
     
     // Create a c0 array and fill ints inside it
     const arrPtr: C0Pointer = mem.malloc(4 + 4 * ints.length);
-    arrPtr.setInt32(0, 4);      // sizeof(int) = 4
+    const arrMem: DataView  = mem.deref(arrPtr);
+    arrMem.setInt32(0, 4);      // sizeof(int) = 4
     for (let i = 0; i < ints.length; i ++) {
-        arrPtr.setInt32(4 * (i + 1), ints[i]);
+        arrMem.setInt32(4 * (i + 1), ints[i]);
     }
 
     return arrPtr;
@@ -102,17 +103,18 @@ export function c0_parse_tokens(
     arg1: C0Value<Maybe<"string">>
 ): C0Pointer {
     const str = loadString(arg1, mem);
-    const tokens = str.split(/(\s+)/);
+    const tokens = str.split(/\s+/);
 
     // Create a c0 array and fill strings inside it
     const arrPtr: C0Pointer = mem.malloc(4 + 8 * tokens.length);
-    arrPtr.setInt32(0, 8);
+    const arrMem: DataView  = mem.deref(arrPtr);
+    arrMem.setInt32(0, 8);
     for (let i = 0; i < tokens.length; i ++) {
         const tokenPtr = allocate_js_string(mem, tokens[i]);
         // Sadly, Safari does not support BigInt (Uint64), so we have
         // to do this in two steps
-        arrPtr.setUint32(4 + 8 * i, tokenPtr.getUint32(0));
-        arrPtr.setUint32(4 + 8 * i + 4, tokenPtr.getUint32(4));
+        arrMem.setUint32(4 + 8 * i, tokenPtr.getUint32(0));
+        arrMem.setUint32(4 + 8 * i + 4, tokenPtr.getUint32(4));
     }
     return arrPtr;
 }
@@ -127,7 +129,7 @@ export function c0_int_tokens(
     const base = c0_cvt2_js_value(arg2) as number;
     if (base < 2 || base > 36) throw new c0_value_error("native function int *int_tokens(string s, int base) receives base not in range [2, 36]");
 
-    const tokens = str.split(/(\s+)/);
+    const tokens = str.split(/\s+/);
     for (let i = 0; i < tokens.length; i ++) {
         const parsed = parseInt(tokens[i], base);
         if (isNaN(parsed)) return false;
