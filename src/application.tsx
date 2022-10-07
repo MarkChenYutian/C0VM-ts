@@ -9,6 +9,7 @@ import DebugConsole from "./components/debug_console/debug_console";
 import CodeEditor from "./components/code-editor";
 import AppCrashFallbackPage from "./components/app_crash_fallback";
 import SettingPopup from "./components/settings";
+import { Row, Col } from "antd";
 
 export default class C0VMApplication extends React.Component<
     {},
@@ -93,17 +94,19 @@ export default class C0VMApplication extends React.Component<
             <div className="page-framework">
                 {SettingMenuComponent}
                 {MainControlBarComponent}
-                <div className="main-ui-framework">
+                <Row className="main-ui-framework">
+                    <Col xs={24} sm={12} lg={11} xxl={9}>
                     <CodeEditor
                         app_state={this.state}
                         set_app_state={(ns: any) => this.setState(ns)}
                         c0_only={this.state.c0_only}
                     />
-                    <div className="io-area">
+                    </Col>
+                    <Col xs={24} sm={12} lg={13} xxl={15} className="io-area">
                         {StandardOutputComponent}
                         {DebugConsoleComponent}
-                    </div>
-                </div>
+                    </Col>
+                </Row>
                 <C0VMApplicationFooter state={this.state} open_setting={() => this.setState({settingMenuOn: true})}/>
             </div>
         );

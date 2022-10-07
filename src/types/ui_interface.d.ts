@@ -178,7 +178,6 @@ interface ApplicationContextInterface {
     mode: "full-page" | "embeddable",
     std_out: boolean,
     debug_console: boolean,
-    c0_only: boolean
 }
 
 interface SettingMenuProps {

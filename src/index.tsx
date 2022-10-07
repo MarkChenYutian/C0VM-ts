@@ -52,7 +52,6 @@ htmlRoots.forEach(
       mode: htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable",
       std_out: htmlRoot.dataset["stdoutput"] === "on",
       debug_console: htmlRoot.dataset["debugconsole"] === "on",
-      c0_only: htmlRoot.dataset["c0_only"] === "on"
     });
     
     C0VMApplication.contextType = displayModeContext;

@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/docs/static/css/main.c688f249.css",
-    "main.js": "/docs/static/js/main.fa77c8a8.js",
+    "main.css": "/docs/static/css/main.78385aec.css",
+    "main.js": "/docs/static/js/main.bca68595.js",
     "static/media/ts-logo-128.svg": "/docs/static/media/ts-logo-128.c76204988f8496c480cbab87d1604986.svg",
     "index.html": "/docs/index.html",
-    "main.c688f249.css.map": "/docs/static/css/main.c688f249.css.map",
-    "main.fa77c8a8.js.map": "/docs/static/js/main.fa77c8a8.js.map"
+    "main.78385aec.css.map": "/docs/static/css/main.78385aec.css.map",
+    "main.bca68595.js.map": "/docs/static/js/main.bca68595.js.map"
   },
   "entrypoints": [
-    "static/css/main.c688f249.css",
-    "static/js/main.fa77c8a8.js"
+    "static/css/main.78385aec.css",
+    "static/js/main.bca68595.js"
   ]
 }
