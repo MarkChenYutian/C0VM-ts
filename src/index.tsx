@@ -29,7 +29,7 @@ globalThis.UI_ERR_DISPLAY_TIME_SEC = 5;
 globalThis.UI_WARN_DISPLAY_TIME_SEC = 5;
 globalThis.UI_OK_DISPLAY_TIME_SEC = 3;
 
-globalThis.COMPILER_BACKEND_URL = "http://128.2.25.174:7998/compile";
+globalThis.COMPILER_BACKEND_URL = "http://15122dbg.tk:7998/compile";
 
 globalThis.C0_MAX_RECURSION = 999;
 globalThis.C0_TIME_SLICE = 500;
