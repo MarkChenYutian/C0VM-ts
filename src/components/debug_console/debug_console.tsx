@@ -51,6 +51,10 @@ export default class DebugConsole extends React.Component
 
     render() {
         if (this.state.err) {
+            // Set tag for MS Clarity session for bug tracking purpose
+            if (window.clarity !== undefined) {
+                window.clarity("set", "VM Error", "Debugger Crashed");
+            }
             return (
                 <div id="c0vm-debug-console" className="debug-console-box">
                     <h3 onClick={() => this.setState((state) => { return { show: !state.show } })}>

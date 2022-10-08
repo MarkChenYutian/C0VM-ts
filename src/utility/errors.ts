@@ -38,8 +38,9 @@ export class c0_memory_error extends Error {
     public readonly name = "C0MemoryError";
     constructor(msg: string) {
         super("C0 Memory Error: " + msg);
-        if (DEBUG) {
-            console.error(this);
+        // Set tag for MS Clarity session for bug tracking purpose
+        if (window.clarity !== undefined) {
+            window.clarity("set", "VM Error", "C0 Memory Error");
         }
     }
 }
@@ -53,6 +54,10 @@ export class c0_value_error extends Error {
     public readonly name = "C0ValueError";
     constructor(msg: string) {
         super("C0 Value Error: " + msg);
+        // Set tag for MS Clarity session for bug tracking purpose
+        if (window.clarity !== undefined) {
+            window.clarity("set", "VM Error", "C0 Value Error");
+        }
     }
 }
 
@@ -74,6 +79,10 @@ export class vm_error extends Error {
     public readonly name = "VMError";
     constructor(msg: string) {
         super("VM Error: " + msg);
+        // Set tag for MS Clarity session for bug tracking purpose
+        if (window.clarity !== undefined) {
+            window.clarity("set", "VM Error", "VM Error");
+        }
     }
 }
 
@@ -84,6 +93,10 @@ export class vm_instruct_error extends Error {
     public readonly name = "VMInstructError";
     constructor(msg: string) {
         super("VM Instruction Error: " + msg);
+        // Set tag for MS Clarity session for bug tracking purpose
+        if (window.clarity !== undefined) {
+            window.clarity("set", "VM Error", "VM Instruct Error");
+        }
     }
 }
 
@@ -102,4 +115,11 @@ export class bc0_format_error extends Error {
  */
 export class internal_error extends Error {
     public readonly name = "Internal Exception";
+    constructor(msg: string){
+        super(msg);
+        // Set tag for MS Clarity session for bug tracking purpose
+        if (window.clarity !== undefined) {
+            window.clarity("set", "VM Error", "Internal Error");
+        }
+    }
 }

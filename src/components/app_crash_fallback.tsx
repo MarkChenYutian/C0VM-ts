@@ -3,6 +3,13 @@ import React from "react";
 import { Result } from "antd";
 
 export default class AppCrashFallbackPage extends React.Component<ApplicationCrashPageProps> {
+    constructor(props: ApplicationCrashPageProps) {
+        super(props);
+        // Set tag for MS Clarity session for bug tracking purpose
+        if (window.clarity !== undefined) {
+            window.clarity("set", "VM Error", "App Crashed");
+        }
+    }
     render() {
         if (globalThis.DEBUG) {
             return <Result

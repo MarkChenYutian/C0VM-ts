@@ -24,10 +24,22 @@ declare global {
     var C0_ASYNC_INTERVAL: number;          // Interval between each time slice will be at least these much ms
 
     // Experimental features
-    
     // Preserve state.TypeRecord when bytecode does not change on restart
     var EXP_PRESERVE_TYPE: boolean;
 
+    // MS Clarity client API
+    var clarity: undefined | ((s: "set", key: "VM Error", 
+        value: 
+            "Internal Error" 
+            | "VM Instruct Error" 
+            | "VM Error" 
+            | "C0 Value Error" 
+            | "C0 Memory Error" 
+            | "App Crashed" 
+            | "Debugger Crashed") => void
+    )
+
+    // Ant design notification emitter
     var MSG_EMITTER: MessageEmitter;
 }
 
