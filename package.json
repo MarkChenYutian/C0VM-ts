@@ -1,7 +1,7 @@
 {
   "name": "c0vm-ts",
   "version": "0.1.0",
-  "homepage": "https://www.15122dbg.tk/docs/",
+  "homepage": "https://visualc0.tk/",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",
