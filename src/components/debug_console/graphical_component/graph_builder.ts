@@ -101,7 +101,7 @@ function BFS_heap_scan(state: VM_State, mem: C0HeapAllocator): [Node<VisData>[],
     job_list = scan_stack_get_ptrs(state);
 
     const output: Node<VisData>[] = [];
-    const edges : Edge<undefined>[] = scan_stack_build_edges(state);
+    let edges : Edge<undefined>[] = scan_stack_build_edges(state);
 
     // The nodes we have already explored will not be expand again
     const drawn_ids: Set<string> = new Set();
@@ -129,9 +129,8 @@ function BFS_heap_scan(state: VM_State, mem: C0HeapAllocator): [Node<VisData>[],
         );
 
         output.push(new_node);
-        new_edge.forEach(
-            (e) => { edges.push(e); }
-        );
+        edges = edges.concat(new_edge);
+        // new_edge.forEach((e) => { edges.push(e); });
         y += dy;
     }
 

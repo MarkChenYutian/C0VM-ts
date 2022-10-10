@@ -120,6 +120,7 @@ interface DebugConsoleState {
 interface TabularDebugEvaluationProps {
     state: VM_State
     mem: C0HeapAllocator
+    cnt: number
 }
 
 interface TabularStackFrameProps {

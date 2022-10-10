@@ -24,9 +24,9 @@ const node_types = {
  * , which makes it hard to write a class component for it)
  */
 export default function GraphicalDebugEvaluation(props: TabularDebugEvaluationProps) {
-    const [calc_node, calc_edge] = build_nodes(props.state, props.mem);
+    const [calc_node, calc_edge]           = build_nodes(props.state, props.mem);
     const [nodes, setNodes, onNodesChange] = useNodesState(calc_node);
-    const [edges, setEdges, ] = useEdgesState(calc_edge);
+    const [edges, setEdges, ]              = useEdgesState(calc_edge);
 
     /** 
      * NOTE: The useEffect hook below will lead to eslint warning, this
@@ -41,14 +41,15 @@ export default function GraphicalDebugEvaluation(props: TabularDebugEvaluationPr
             setEdges(new_edge);
         }, 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [props.state, props.mem, props.state.CurrLineNumber, setNodes, setEdges]
+        [props.cnt]
     );
 
     /**
      * On change node, mark the node that is changed as "dragged"
      * 
      * If new nodes are built, remain the "dragged" nodes at their original position
-     * designated by the user and put other nodes on the screen.
+     * designated by the user and put other nodes on the screen using merge_nodes 
+     * function.
      */
     const nodesChangeWrapper = useCallback(
         (nodeChangeList: NodeChange[]) => {
@@ -56,16 +57,15 @@ export default function GraphicalDebugEvaluation(props: TabularDebugEvaluationPr
                 const nid = nodeChangeList[0].id;
                 setNodes(nodes.map(
                     (node) => {
-                        if (node.id === nid) {
-                            node.data.dragged = true;
-                        }
+                        if (node.id === nid) node.data.dragged = true;
                         return node;
                     }
                 ));
             }
             onNodesChange(nodeChangeList);
         },
-        [onNodesChange, setNodes, nodes]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
     );
 
     /**
@@ -124,6 +124,7 @@ export default function GraphicalDebugEvaluation(props: TabularDebugEvaluationPr
                 onNodeMouseEnter={onEnterNode}
                 onNodeMouseLeave={onLeaveNode}
                 onNodesChange={nodesChangeWrapper}
+                attributionPosition="bottom-left"
             >
                 <Controls/>
                 <Background/>

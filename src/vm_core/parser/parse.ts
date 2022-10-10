@@ -115,14 +115,6 @@ function safe_combine_and_parse_hex(s: string): number {
     return flattened;
 }
 
-function apply_typedef_information(typedef: Map<string, string>, bytecode: string) {
-    let result = bytecode;
-    typedef.forEach(
-        (value, key) => {result = bytecode.replaceAll(key, value);}
-    )
-    return result;
-}
-
 function annotate_linenum(bytecode: string): [string, number][] {
     return bytecode.split("\n").map((line, index) => [line, index + 1]);
 }
@@ -157,15 +149,26 @@ function resolve_field_name(byte_instruct: string, comment: string): string | un
     return parsed_comment[1];
 }
 
-function resolve_type_info(byte_instruct: string, comment: string): string | undefined {
+function resolve_type_info(byte_instruct: string, comment: string, typedef_lib?: Map<string, string>): string | undefined {
     if (byte_instruct.toUpperCase().startsWith("NEWARRAY")) {
         const parsed_comment = regex_arr_comment.exec(comment);
         if (parsed_comment === null) return undefined;
-        return parsed_comment[1];
+        const actual_type = typedef_lib?.get(parsed_comment[1])
+        if (actual_type === undefined) {
+            return parsed_comment[1];
+        } else {
+            return actual_type;
+        }
     } else if (byte_instruct.toUpperCase().startsWith("NEW")) {
         const parsed_comment = regex_new_comment.exec(comment);
         if (parsed_comment === null) return undefined;
-        return parsed_comment[1];
+        
+        const actual_type = typedef_lib?.get(parsed_comment[1])
+        if (actual_type === undefined) {
+            return parsed_comment[1];
+        } else {
+            return actual_type;
+        }
     } else if (byte_instruct.toUpperCase().startsWith("BIPUSH")) {
         if (regex_int_comment.test(comment)) return "int";
         if (regex_bool_comment.test(comment)) return "bool";
@@ -222,27 +225,8 @@ function parse_func_head(func_head: [string, number][]): number {
     return safe_combine_and_parse_hex(func_head[0][0].split("#")[0]);
 }
 
-// Load source code content
-function load_c0_content(C0Editors: C0EditorTab[], fileName: string, start_line: number, start: number, end_line: number, end: number): string {
-    const C0Content = C0Editors.filter((tab) => tab.title === fileName);
-    if (C0Content.length !== 1) {
-        if (DEBUG) console.log(fileName, C0Editors);
-        MSG_EMITTER.warn("Recompile Required", "Failed to build reference between bytecode and c0 source code, please re-compile the c0 source code.");
-        throw new bc0_format_error();
-    }
-
-    const C0Line = C0Content[0].content.split("\n")[start_line - 1];
-    if (C0Line === undefined) {
-        MSG_EMITTER.warn("Recompile Required", "Failed to build reference between bytecode and c0 source code, please re-compile the code.");
-        return "";
-    }
-    const result = C0Line.slice(start - 1, end - 1);
-    return result;
-}
-
 function resolve_src_reference(comment_ref: string): [string, number, number, number, number] | undefined {
     if (!regex_ref_comment.test(comment_ref)) return undefined;
-    // if (!comment_ref.startsWith("./cache/")) return undefined;
     const path = comment_ref.split("/");
     const file = path[path.length - 1];
     const [file_name, line_range] = file.split(": ");
@@ -277,23 +261,25 @@ function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTa
     result.size = safe_combine_and_parse_hex(func_block[3][0].split("#")[0]);
 
     let bytecode_pos = 0;
-    const code_num = [];
+    let c0_mode      = false;
+    const code_num   = [];
+
+
     for (let bc_line = 4; bc_line < func_block.length; bc_line ++) {
         const curr_bc_line = func_block[bc_line][0];
         if (curr_bc_line.startsWith("#")) continue;
 
         let [tokens, byte_instruct, segment, comment] = curr_bc_line.split("#");
-        tokens = tokens.trim();
+
+        tokens        = tokens.trim();
         byte_instruct = byte_instruct.trim();
-        comment = comment.trim();
+        segment       = segment.trim();
+        if (comment !== undefined) {
+            c0_mode   = true
+            comment   = comment.trim();
+        }
 
         const c0_ref_pos = resolve_src_reference(comment);
-        if (C0Editors !== undefined && c0_ref_pos !== undefined) {
-            comment = load_c0_content(C0Editors, ...c0_ref_pos);
-        }
-        if (c0_ref_pos !== undefined && typedef_lib !== undefined) {
-            comment = apply_typedef_information(typedef_lib, comment);
-        }
         const num_tokens = tokens.split(" ").map(tok => safe_parse_hex(tok));
         for (let i = 0; i < num_tokens.length; i ++) code_num.push(num_tokens[i]);
 
@@ -304,8 +290,8 @@ function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTa
         
         result.comment.set(bytecode_pos, {
             lineNumber: func_block[bc_line][1],
-            fieldName: resolve_field_name(byte_instruct, comment),
-            dataType : resolve_type_info(byte_instruct, comment),
+            fieldName: resolve_field_name(byte_instruct, segment),
+            dataType : resolve_type_info(byte_instruct, segment, typedef_lib),
             c0RefNumber: c0_ref_pos === undefined ? undefined : [c0_ref_pos[0], c0_ref_pos[1], false]
         });
 
@@ -313,40 +299,41 @@ function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTa
         bytecode_pos += num_tokens.length;
     }
 
-    // Figure out all the "breakable positions" (a.k.a last byte instruction on the c0 line) in code.
-    const LineKeys = Array.from(result.comment.keys());
-    LineKeys.sort((a, b) => a - b);
-    for (let i = 0; i < LineKeys.length; i ++) {
-        const curr_comment = result.comment.get(LineKeys[i]);
-        const prev_comment = result.comment.get(LineKeys[i - 1]);
-        // In case of 1st line in each function...
-        if (curr_comment !== undefined && prev_comment === undefined) {
-            (curr_comment.c0RefNumber as [string, number, boolean])[2] = true;
-            result.comment.set(LineKeys[i], curr_comment);
-            continue;
-        }
-        // Make typescript undefined check happy
-        if (curr_comment === undefined || prev_comment === undefined) throw new vm_error("Impossible case reached");
+    // Figure out all the "breakable positions" (a.k.a first byte instruction on the c0 line) in code.
+    if (c0_mode) {
+        const LineKeys = Array.from(result.comment.keys());
+        LineKeys.sort((a, b) => a - b);
+        for (let i = 0; i < LineKeys.length; i ++) {
+            const curr_comment = result.comment.get(LineKeys[i]);
+            const prev_comment = result.comment.get(LineKeys[i - 1]);
+            // In case of 1st line in each function...
+            if (curr_comment !== undefined && prev_comment === undefined) {
+                (curr_comment.c0RefNumber as [string, number, boolean])[2] = true;
+                result.comment.set(LineKeys[i], curr_comment);
+                continue;
+            }
+            // Make typescript undefined check happy
+            if (curr_comment === undefined || prev_comment === undefined) throw new vm_error("Impossible case reached");
 
-        // Do actual breakpoint marking
-        const curr_c0_line = curr_comment.c0RefNumber;
-        const prev_c0_line = prev_comment.c0RefNumber;
-        
-        if (curr_c0_line !== undefined && prev_c0_line !== undefined 
-            && (prev_c0_line[1] !== curr_c0_line[1]     // Different c0 line
-                || prev_c0_line[0] !== curr_c0_line[0]  // Different c0 file
-            )) {
-            // Change breakpoint behavior to "break before executing bp"
-            (curr_comment.c0RefNumber as [string, number, boolean])[2] = true;
-            result.comment.set(LineKeys[i], curr_comment);
+            // Do actual breakpoint marking
+            const curr_c0_line = curr_comment.c0RefNumber;
+            const prev_c0_line = prev_comment.c0RefNumber;
+            
+            if (curr_c0_line !== undefined && prev_c0_line !== undefined 
+                && (prev_c0_line[1] !== curr_c0_line[1]     // Different c0 line
+                    || prev_c0_line[0] !== curr_c0_line[0]  // Different c0 file
+                )) {
+                // Change breakpoint behavior to "break before executing bp"
+                (curr_comment.c0RefNumber as [string, number, boolean])[2] = true;
+                result.comment.set(LineKeys[i], curr_comment);
+            }
+        }
+        const last_comment = result.comment.get(LineKeys[LineKeys.length - 1]) as CodeComment;
+        if (last_comment.c0RefNumber !== undefined) {
+            last_comment.c0RefNumber[2] = true;
+            result.comment.set(LineKeys[LineKeys.length - 1], last_comment);
         }
     }
-    const last_comment = result.comment.get(LineKeys[LineKeys.length - 1]) as CodeComment;
-    if (last_comment.c0RefNumber !== undefined) {
-        last_comment.c0RefNumber[2] = true;
-        result.comment.set(LineKeys[LineKeys.length - 1], last_comment);
-    }
-
     result.code = new Uint8Array(code_num);
     return result;
 }

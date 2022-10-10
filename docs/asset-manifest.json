@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.css": "/docs/static/css/main.b7df01a4.css",
-    "main.js": "/docs/static/js/main.a15c1aa0.js",
-    "static/media/ts-logo-128.svg": "/docs/static/media/ts-logo-128.c76204988f8496c480cbab87d1604986.svg",
-    "index.html": "/docs/index.html"
+    "main.css": "/static/css/main.b7df01a4.css",
+    "main.js": "/static/js/main.3c47ed79.js",
+    "static/media/ts-logo-128.svg": "/static/media/ts-logo-128.c76204988f8496c480cbab87d1604986.svg",
+    "index.html": "/index.html"
   },
   "entrypoints": [
     "static/css/main.b7df01a4.css",
-    "static/js/main.a15c1aa0.js"
+    "static/js/main.3c47ed79.js"
   ]
 }

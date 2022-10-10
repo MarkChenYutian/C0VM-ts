@@ -29,7 +29,7 @@ export async function step(s: C0VM_RuntimeState, c0_only: boolean, printout_hand
          * In this way, we can completely hide the bytecode implementation from student
          */
         const [start_file, start_line, ] = new_state.state.CurrC0RefLine;
-        console.log(new_state.state.CurrC0RefLine);
+        if (DEBUG_DUMP_STEP) console.log(new_state.state.CurrC0RefLine);
         
         let can_continue = true;
         while (new_state.state.CurrC0RefLine !== undefined &&

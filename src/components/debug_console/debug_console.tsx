@@ -44,8 +44,8 @@ export default class DebugConsole extends React.Component
         const S = this.props.state as C0VM_RuntimeState;
         if (S === undefined) return this.render_no_valid_state();
         switch (this.state.mode) {
-            case "Table": return <TabularDebugEvaluation state={S.state} mem={S.allocator} />
-            case "Graph": return <GraphicalDebugEvaluation state={S.state} mem={S.allocator} />;
+            case "Table": return <TabularDebugEvaluation state={S.state} mem={S.allocator} cnt={S.step_cnt}/>
+            case "Graph": return <GraphicalDebugEvaluation state={S.state} mem={S.allocator} cnt={S.step_cnt} key={"" + S.step_cnt}/>;
         }
     }
 
