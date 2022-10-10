@@ -1,4 +1,4 @@
-import { faCheck, faGear, faSpinner, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faFileLines, faGear, faSpinner, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import C0VM_RuntimeState from "../vm_core/exec/state";
@@ -25,6 +25,7 @@ export default class C0VMApplicationFooter extends React.PureComponent<{state: C
                     <div style={{display: "flex", gap: ".3rem", alignItems: "center"}}>
                         <span>V{globalThis.C0VM_VERSION} {globalThis.DEBUG ? "(Debug)" : ""}</span>
                         <button className="implicit-btn" onClick={this.props.open_setting}><FontAwesomeIcon icon={faGear}/></button>
+                        <a href="https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/" target="_blank"><button className="implicit-btn"><FontAwesomeIcon icon={faFileLines}/></button></a>
                     </div>
                     {vm_indicator}
                 </div>
