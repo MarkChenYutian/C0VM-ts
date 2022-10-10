@@ -8,12 +8,22 @@ import remote_compile from "../network/remote_compile";
 import tsLogo from "../assets/ts-logo-128.svg";
 import C0VM_RuntimeState from "../vm_core/exec/state";
 
-// A method to abort c0 program
+/**
+ * Use AbortRef() to allow us interrupt current VM execution outside
+ * of React Component Life Cycle
+ */
 function AbortRef(): [{abort: boolean}, () => void, () => void] {
     const token = React.useRef({abort: false});
     const cancel = () => {token.current.abort = true;}
     const reset  = () => {token.current.abort = false;}
     return [token.current, cancel, reset];
+}
+
+function RequiresRecompile(){
+    globalThis.MSG_EMITTER.warn(
+        "Requires Recompile",
+        "The content in code editor has been changed. Recompile the code before executing the program."
+    );
 }
 
 // export default class MainControlBar extends React.Component<MainControlProps>{
@@ -24,6 +34,11 @@ export default function MainControlBar(props: MainControlProps) {
     const [abortSignal, abort, reset] = AbortRef();
 
     const step_c0runtime = async () => {
+        if (appState.contentChanged) {
+            RequiresRecompile();
+            return;
+        }
+
         let new_runtime, can_continue = undefined;
         if (appState.C0Runtime === undefined) {
             const init_state = await VM.initialize(appState.BC0SourceCode, props.clear_print, MEM_POOL_SIZE, appState.C0Editors, appState.TypedefRecord);
@@ -37,6 +52,11 @@ export default function MainControlBar(props: MainControlProps) {
     }
 
     const run_c0runtime = async () => {
+        if (appState.contentChanged) {
+            RequiresRecompile();
+            return;
+        }
+
         let init_state = undefined;
         let new_runtime, can_continue = undefined;
         if (appState.C0Runtime === undefined) {
@@ -88,6 +108,7 @@ export default function MainControlBar(props: MainControlProps) {
 
     const compile_c0source = () => {
         props.clear_print();
+        props.update_contentChange(false);
         remote_compile(
             appState.C0Editors,
             appState.TypedefRecord,

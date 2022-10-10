@@ -1,21 +1,22 @@
 interface C0VMApplicationState {
-    crashed      : boolean,         /* C0VM Application top-level error boundary */
-    c0_only      : boolean,         /* C0 only mode or not */
+    crashed        : boolean,         /* C0VM Application top-level error boundary */
+    c0_only        : boolean,         /* C0 only mode or not */
+    contentChanged : boolean,         /* If content has changed or not (requires re-compile) */
 
-    dbgFullScreen: boolean,         /* If it is in full screen mode currently */
-    settingMenuOn: boolean,         /* See if the setting menu is on or not */
+    dbgFullScreen  : boolean,         /* If it is in full screen mode currently */
+    settingMenuOn  : boolean,         /* See if the setting menu is on or not */
 
-    BC0SourceCode: string,          /* The content of BC0 code editor */
-    BC0BreakPoints: Set<number>,    /* Breakpoints activated in BC0 code editor */
-    TypedefRecord: Map<string, TypeDefInfo>, /* Record the typedef names for string substitution */
+    BC0SourceCode  : string,          /* The content of BC0 code editor */
+    BC0BreakPoints : Set<number>,     /* Breakpoints activated in BC0 code editor */
+    TypedefRecord  : Map<string, TypeDefInfo>, /* Record the typedef names for string substitution */
 
-    C0Editors  : C0EditorTab[],     /* Code editor tab titles */
-    ActiveEditor : number,          /* Currently activated tab index of C0Editor */
-    C0BreakPoint: Set<string> /* Breakpoints on C0 Source code */
+    C0Editors      : C0EditorTab[],   /* Code editor tab titles */
+    ActiveEditor   : number,          /* Currently activated tab index of C0Editor */
+    C0BreakPoint   : Set<string>      /* Breakpoints on C0 Source code */
 
-    PrintoutValue: string,          /* The string to show in the stdout console */
+    PrintoutValue: string,            /* The string to show in the stdout console */
 
-    C0Running: boolean,             /* If the C0VM is running currently */
+    C0Running: boolean,               /* If the C0VM is running currently */
     C0Runtime: C0VM_RuntimeState | undefined,   /* Runtime of C0VM */
     CompilerFlags: Record<string, boolean>      /* Compiler Flags (-d) */
 };
@@ -26,13 +27,14 @@ type TypeDefInfo = {source: string, key: number}
 
 // The props that main control bar component will accept
 interface MainControlProps {
-    application_state: C0VMApplicationState,
+    application_state   : C0VMApplicationState,
 
-    update_running: (ns: boolean) => void,
-    update_value: (ns: string) => void,
-    update_state: (ns: C0RuntimeState | undefined) => void,
-    update_print: (ns: string) => void,
-    clear_print: () => void,
+    update_running      : (ns: boolean) => void,
+    update_value        : (ns: string) => void,
+    update_state        : (ns: C0RuntimeState | undefined) => void,
+    update_print        : (ns: string) => void,
+    update_contentChange: (b: boolean) => void,
+    clear_print         : () => void,
 };
 
 interface CodeEditorProps {

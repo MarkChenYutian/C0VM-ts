@@ -88,7 +88,7 @@ export default class CodeEditor extends React.Component
     update_content(s: string, key: number) {
         let ns: C0EditorTab[] = structuredClone(this.props.app_state.C0Editors);
         ns = ns.map((tab) => tab.key === key ? {key: tab.key, title: tab.title, content: s} : tab);
-        this.props.set_app_state({C0Editors: ns});
+        this.props.set_app_state({C0Editors: ns, contentChanged: true});
     }
 
     update_c0_brkpts(fileName: string, line: number) {

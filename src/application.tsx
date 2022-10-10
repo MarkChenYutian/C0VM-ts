@@ -18,10 +18,11 @@ export default class C0VMApplication extends React.Component<
     constructor(props: {}) {
         super(props);
         this.state = {
-            crashed: false,
-            c0_only: true,
-            dbgFullScreen: false,
-            settingMenuOn: false,
+            crashed        : false,
+            c0_only        : true,
+            contentChanged : true,
+            dbgFullScreen  : false,
+            settingMenuOn  : false,
             
             BC0SourceCode: "",
             BC0BreakPoints: new Set(),
@@ -63,6 +64,7 @@ export default class C0VMApplication extends React.Component<
                         return { PrintoutValue: state.PrintoutValue + s };
                     })
                 }
+                update_contentChange={(b) => this.setState({ contentChanged: b })}
                 clear_print={() => this.setState({ PrintoutValue: "" })}
             />
         );
@@ -96,11 +98,11 @@ export default class C0VMApplication extends React.Component<
                 {MainControlBarComponent}
                 <Row className="main-ui-framework">
                     <Col xs={24} sm={12} lg={11} xxl={9}>
-                    <CodeEditor
-                        app_state={this.state}
-                        set_app_state={(ns: any) => this.setState(ns)}
-                        c0_only={this.state.c0_only}
-                    />
+                        <CodeEditor
+                            app_state={this.state}
+                            set_app_state={(ns: any) => this.setState(ns)}
+                            c0_only={this.state.c0_only}
+                        />
                     </Col>
                     <Col xs={24} sm={12} lg={13} xxl={15} className="io-area">
                         {StandardOutputComponent}
