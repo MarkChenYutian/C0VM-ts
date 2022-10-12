@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/static/css/main.b7df01a4.css",
-    "main.js": "/static/js/main.b2ed84ea.js",
+    "main.js": "/static/js/main.fad2062f.js",
     "static/media/ts-logo-128.svg": "/static/media/ts-logo-128.c76204988f8496c480cbab87d1604986.svg",
     "index.html": "/index.html"
   },
   "entrypoints": [
     "static/css/main.b7df01a4.css",
-    "static/js/main.b2ed84ea.js"
+    "static/js/main.fad2062f.js"
   ]
 }
