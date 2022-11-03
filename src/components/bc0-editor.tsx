@@ -17,7 +17,7 @@ import { indentUnit, language } from "@codemirror/language";
 export default class BC0Editor extends React.Component<BC0EditorProps>
 {
     auto_update(n: number) {
-        const ns: Set<number> = structuredClone(this.props.breakpointVal);
+        const ns: Set<number> = new Set(this.props.breakpointVal);
         if (ns.has(n)) {
             ns.delete(n);
             this.props.updateBrkPts(ns);

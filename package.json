@@ -81,7 +81,6 @@
   "scripts": {
     "start": "craco start",
     "build": "cross-env GENERATE_SOURCEMAP=false BUILD_PATH='./docs' craco build",
-    "postbuild": "echo The generated result does not contain source map, so it might be hard to debug. && echo To generate sourcemap, change the npm build command in package.json",
     "test": "react-scripts test",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
@@ -162,6 +161,7 @@
     "@craco/craco": "^6.4.5",
     "craco-less": "^2.0.0",
     "cross-env": "^7.0.3",
+    "javascript-obfuscator": "^4.0.0",
     "react-flow-renderer": "^10.3.8"
   }
 }

@@ -82,7 +82,7 @@ const DraggableTabs: React.FunctionComponent<{
       case "add":
         break;
       case "remove":
-        let new_order: React.Key[] = structuredClone(order);
+        let new_order: React.Key[] = [...order];
         new_order = new_order.filter((tab) => tab + "" !== target_key + "");
         setOrder(new_order);
         break;

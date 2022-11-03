@@ -46,7 +46,7 @@ export default class CodeEditor extends React.Component
         this.props.set_app_state(
             (S) => {
                 let original_name = "";
-                let new_tabs = structuredClone(S.C0Editors) as C0EditorTab[];
+                let new_tabs = [...S.C0Editors];
                 for (let i = 0; i < new_tabs.length; i ++) {
                     if (new_tabs[i].key === key) {
                         original_name = new_tabs[i].title;
@@ -69,7 +69,7 @@ export default class CodeEditor extends React.Component
     }
 
     create_panel() {
-        const new_editors = structuredClone(this.props.app_state.C0Editors);
+        const new_editors = [...this.props.app_state.C0Editors];
         new_editors.push({
             title: `Untitled_${this.state.C0_nextKey}.c0`, key: this.state.C0_nextKey, content: ""
         });
@@ -79,20 +79,20 @@ export default class CodeEditor extends React.Component
 
     remove_panel(key: string) {
         const key_tbr = parseInt(key);
-        let new_editors: C0EditorTab[] = structuredClone(this.props.app_state.C0Editors);
+        let new_editors: C0EditorTab[] = [...this.props.app_state.C0Editors];
         new_editors = new_editors.filter((value) => value.key !== key_tbr);
         const new_activeTab = this.props.app_state.ActiveEditor === key_tbr ? new_editors[0].key : this.props.app_state.ActiveEditor;
         this.props.set_app_state({C0Editors: new_editors, ActiveEditor: new_activeTab});
     }
 
     update_content(s: string, key: number) {
-        let ns: C0EditorTab[] = structuredClone(this.props.app_state.C0Editors);
+        let ns: C0EditorTab[] = [...this.props.app_state.C0Editors];
         ns = ns.map((tab) => tab.key === key ? {key: tab.key, title: tab.title, content: s} : tab);
         this.props.set_app_state({C0Editors: ns, contentChanged: true});
     }
 
     update_c0_brkpts(fileName: string, line: number) {
-        const new_state: Set<string> = structuredClone(this.props.app_state.C0BreakPoint);
+        const new_state: Set<string> = new Set(this.props.app_state.C0BreakPoint);
         if (new_state.has(`${fileName}@${line}`)) new_state.delete(`${fileName}@${line}`);
         else new_state.add(`${fileName}@${line}`);
         this.props.set_app_state({C0BreakPoint: new_state});

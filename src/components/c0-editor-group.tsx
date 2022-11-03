@@ -24,7 +24,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
     }
 
     set_brkpt_for_editor(title: string, lns: number[]) {
-        let brkpt: string[] = Array.from(structuredClone(this.props.c0BreakPoints));
+        let brkpt: string[] = Array.from(new Set(this.props.c0BreakPoints));
         brkpt = brkpt.filter((elem) => {
             const [fileName, ] = elem.split("@");
             return fileName !== title;
