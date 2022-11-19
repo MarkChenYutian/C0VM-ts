@@ -39,7 +39,7 @@ export default class DetailStackFrame extends React.Component<
         
         // Evaluate All variables in stack
         const stack_info : React.ReactNode[] = [];
-        for (let i = 0; i < this.props.frame.S.length; i ++) {
+        for (let i = this.props.frame.S.length - 1; i >= 0; i --) {
             const to_be_rendered = this.props.frame.S[i];
             stack_info.push(
                 <p key={i + "-stack-name"}>{i} - <code>{Type2String(to_be_rendered.type, this.props.typedefRec)}</code></p>

@@ -13,7 +13,7 @@ import React from "react";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { isNullPtr, read_ptr } from "../../../utility/pointer_utility";
+import { isNullPtr, read_ptr, render_address } from "../../../utility/pointer_utility";
 import { loadString } from "../../../utility/string_utility";
 
 import { deref_C0Value, expand_C0Array, expand_C0Struct, c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
@@ -63,13 +63,16 @@ export default class C0ValueTabularDisplay extends React.Component<
                 </li>
             );
         }
+
+        const [addr, offset, ] = read_ptr(this.props.value.value);
+
         return (
             <div>
                 <button className="implicit-btn dbg-evaluate-tabular-btn" onClick={() => this.setState({expand: false})}>
                 <FontAwesomeIcon icon={faCaretDown}/>
                 </button>
                 <div className="dbg-evaluate-tabular-content">
-                    Array [
+                    Array [ <span className="dbg-extra-information">0x{render_address(addr + offset, 8)}</span>
                     <ul>
                             {content}
                     </ul>
