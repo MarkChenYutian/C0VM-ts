@@ -1,8 +1,7 @@
 import React from "react";
+import DetailStackFrame from "./detail_component/detail_stackframe";
 
-import TabularStackFrame from "./tabular_component/tabular_stackframe";
-
-export default class TabularDebugEvaluation extends React.Component<
+export default class DetailDebugEvaluation extends React.Component<
     DebugConsoleInterface,
     {}
 > {
@@ -10,7 +9,7 @@ export default class TabularDebugEvaluation extends React.Component<
         const result = [];
         for (let i = 0; i < this.props.state.CallStack.length; i ++) {
             result.push(
-                <TabularStackFrame
+                <DetailStackFrame
                     frame={this.props.state.CallStack[i]}
                     mem={this.props.mem}
                     typeRecord={this.props.state.TypeRecord}
@@ -20,7 +19,7 @@ export default class TabularDebugEvaluation extends React.Component<
             );
         }
         result.push(
-            <TabularStackFrame
+            <DetailStackFrame
                 frame={this.props.state.CurrFrame}
                 mem={this.props.mem}
                 typeRecord={this.props.state.TypeRecord}
@@ -28,8 +27,8 @@ export default class TabularDebugEvaluation extends React.Component<
                 key={this.props.state.CallStack.length}
             />
         )
-        return (<div className="debug-console">
-                    {result}
-        </div>);
+        return <div className="debug-console">
+            {result}
+        </div>;
     }
 }

@@ -19,7 +19,7 @@ export default class C0VMApplication extends React.Component<
         super(props);
         this.state = {
             crashed        : false,
-            c0_only        : true,
+            c0_only        : false,
             contentChanged : true,
             dbgFullScreen  : false,
             settingMenuOn  : false,
@@ -74,7 +74,13 @@ export default class C0VMApplication extends React.Component<
         ) : null;
 
         const DebugConsoleComponent = context.debug_console ? (
-            <DebugConsole state={this.state.C0Runtime} isFullScreen={this.state.dbgFullScreen} setFullScreen={(s) => this.setState({dbgFullScreen: s})}/>
+            <DebugConsole 
+                state={this.state.C0Runtime}
+                c0_only={this.state.c0_only}
+                isFullScreen={this.state.dbgFullScreen}
+                typedef={this.state.TypedefRecord}
+                setFullScreen={(s) => this.setState({dbgFullScreen: s})}
+            />
         ) : null;
 
         const SettingMenuComponent =  this.state.settingMenuOn ? 

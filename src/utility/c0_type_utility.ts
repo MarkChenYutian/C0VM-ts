@@ -38,12 +38,23 @@ export function CloneType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
  * @param T The type to be converted to the string
  * @returns The C0 type name (e.g. `int*`)
  */
-export function Type2String(T: C0Type<C0TypeClass>): string {
+export function Type2String(T: C0Type<C0TypeClass>, TypedefRec?: Map<string, TypeDefInfo>): string {
     switch (T.type) {
         case "ptr":
-            if (T.kind === "arr") return Type2String(T.value) + "[]";
-            else if (T.kind === "ptr") return Type2String(T.value) + "*";
-            else if (T.kind === "struct") return T.value;
+            if (T.kind === "arr") return Type2String(T.value, TypedefRec) + "[]";
+            else if (T.kind === "ptr") return Type2String(T.value, TypedefRec) + "*";
+            else if (T.kind === "struct") {
+                if (TypedefRec === undefined) return T.value;
+
+                // Wrap to typedef'd version if possible
+                for (let entry of Array.from(TypedefRec.entries())) {
+                    const key = entry[0];
+                    const value = entry[1];
+                    if (value.source === T.value) return key
+                }
+
+                return T.value;
+            }
             else return "";
         case "string":
             return "string";

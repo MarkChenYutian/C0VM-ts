@@ -1,3 +1,4 @@
+import { String2Type, Type2String } from "../../utility/c0_type_utility";
 import { bc0_format_error, vm_error } from "../../utility/errors";
 import { nativeFuncLoader } from "../native/native_interface";
 
@@ -73,6 +74,7 @@ export default function parse(bytecode: string, C0Editors?: C0EditorTab[], typed
 //// Regex Constants
 const regex_func_name = /#<(.+)>/;
 const regex_aaddf_comment = /^&?.*->\s*([a-zA-Z_0-9]+)$/;
+// const regex_arr_base_comment = /^alloc_array\(\s*([a-zA-Z0-9_\s]+)([*[\]]*),.+\)/;
 const regex_arr_comment = /^alloc_array\(\s*([a-zA-Z0-9_\-*[\]\s]+),.+\)/;
 const regex_new_comment = /^alloc\(\s*([a-zA-Z0-9_\-*[\]\s]+)\s*\)/;
 const regex_ref_comment = /^.*\.c0: \d+\.\d+-\d+.\d+$/;
@@ -153,28 +155,35 @@ function resolve_type_info(byte_instruct: string, comment: string, typedef_lib?:
     if (byte_instruct.toUpperCase().startsWith("NEWARRAY")) {
         const parsed_comment = regex_arr_comment.exec(comment);
         if (parsed_comment === null) return undefined;
-        const actual_type = typedef_lib?.get(parsed_comment[1])
-        if (actual_type === undefined) {
-            return parsed_comment[1];
-        } else {
-            return actual_type;
-        }
+        
+        return Type2String(apply_typedef(String2Type(parsed_comment[1]), typedef_lib));
     } else if (byte_instruct.toUpperCase().startsWith("NEW")) {
         const parsed_comment = regex_new_comment.exec(comment);
         if (parsed_comment === null) return undefined;
         
-        const actual_type = typedef_lib?.get(parsed_comment[1])
-        if (actual_type === undefined) {
-            return parsed_comment[1];
-        } else {
-            return actual_type;
-        }
+        return Type2String(apply_typedef(String2Type(parsed_comment[1]), typedef_lib));
     } else if (byte_instruct.toUpperCase().startsWith("BIPUSH")) {
         if (regex_int_comment.test(comment)) return "int";
         if (regex_bool_comment.test(comment)) return "bool";
         if (regex_char_comment.test(comment)) return "char";
     }
     return undefined;
+}
+
+function apply_typedef(type: C0Type<C0TypeClass>, typedef_lib?: Map<string, string>): C0Type<C0TypeClass>{
+    if (typedef_lib === undefined || type.type === "<unknown>") return type;
+
+    const next_parse = type.value;
+    if (typeof next_parse === "string") return type;
+
+    const type_str = Type2String(type);
+    const concrete = typedef_lib?.get(type_str);
+    if (concrete === undefined) {
+        type.value = apply_typedef(next_parse, typedef_lib)
+    } else {
+        type.value = String2Type(concrete);
+    }
+    return type
 }
 
 function resolve_var_name(bytes: string, byte_instruct: string, segment: string): [number, string] | undefined {

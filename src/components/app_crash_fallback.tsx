@@ -72,7 +72,7 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                 status="error"
                 title="Application Crashed"
                 subTitle="Reload the page to restart the application."
-                extra={
+                extra={[
                     <button
                         className="base-btn main-btn"
                         onClick={() => {
@@ -80,8 +80,13 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                         }}
                     >
                         Restore Editor Content
-                    </button>
-                }
+                    </button>,
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSezT1KhMgCNw0Uuk2nnqQnDtYlpXvbYnQW7VEef9xN759APYA/viewform?usp=sf_link" target="_blank" rel="noreferrer">
+                        <button className="base-btn main-btn">
+                            Report Problem
+                        </button>
+                    </a>
+                ]}
             />;
         }
     }

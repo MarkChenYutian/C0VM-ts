@@ -57,6 +57,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                         mem={this.props.mem}
                         value={vals[i]}
                         typeRecord={this.props.typeRecord}
+                        typedefRec={this.props.typedefRec}
                         default_expand={false}
                     />
                 </li>
@@ -144,6 +145,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                                     mem={this.props.mem}
                                     value={{type: subType, value: this.props.value.value}}
                                     typeRecord={this.props.typeRecord}
+                                    typedefRec={this.props.typedefRec}
                                     default_expand={false}
                                 />
                             )
@@ -171,6 +173,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                                     mem={this.props.mem}
                                     value={deref_value}
                                     typeRecord={this.props.typeRecord}
+                                    typedefRec={this.props.typedefRec}
                                     default_expand={false}
                                 />
                             </li>
@@ -226,6 +229,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                                 value={entry.value}
                                 mem={this.props.mem}
                                 typeRecord={this.props.typeRecord}
+                                typedefRec={this.props.typedefRec}
                                 default_expand={false}
                             />
                         </div>

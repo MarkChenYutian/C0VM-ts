@@ -108,27 +108,31 @@ interface C0OutputPropInterface {
 
 interface DebugConsoleProps {
     state: C0VM_RuntimeState | undefined,
+    c0_only: boolean,
     isFullScreen: boolean,
+    typedef: Map<string, TypeDefInfo>,
     setFullScreen: (s: boolean) => void
 }
 
 
 interface DebugConsoleState {
     show: boolean,
-    mode: "Table" | "Graph",
+    mode: "Table" | "Graph" | "Detail",
     err: boolean
 }
 
-interface TabularDebugEvaluationProps {
+interface DebugConsoleInterface {
     state: VM_State
     mem: C0HeapAllocator
     cnt: number
+    typedef: Map<string, TypeDefInfo>
 }
 
 interface TabularStackFrameProps {
     frame: VM_StackFrame,
     mem: C0HeapAllocator,
-    typeRecord: Map<string, Map<number, Struct_Type_Record>>
+    typeRecord: Map<string, Map<number, Struct_Type_Record>>,
+    typedefRec: Map<string, TypeDefInfo>
 }
 
 
@@ -136,6 +140,7 @@ interface C0ValueTabularDisplayProps {
     mem: C0HeapAllocator,
     value: C0Value<C0TypeClass>,
     typeRecord: Map<string, Map<number, Struct_Type_Record>>,
+    typedefRec: Map<string, TypeDefInfo>,
     default_expand: boolean
 }
 

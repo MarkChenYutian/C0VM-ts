@@ -23,7 +23,7 @@ const node_types = {
  * documentation (all examples in reactflow site are using hooks and functional component
  * , which makes it hard to write a class component for it)
  */
-export default function GraphicalDebugEvaluation(props: TabularDebugEvaluationProps) {
+export default function GraphicalDebugEvaluation(props: DebugConsoleInterface) {
     const [calc_node, calc_edge] = build_nodes(props.state, props.mem);
     const [nodes, setNodes, onNodesChange] = useNodesState(calc_node);
     const [edges, setEdges, ] = useEdgesState(calc_edge);

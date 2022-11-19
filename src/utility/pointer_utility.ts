@@ -88,3 +88,7 @@ export function build_ptr(addr: number, offset: number, size: number) {
 export function build_null_ptr() {
     return build_ptr(0, 0, 0);
 }
+
+export function render_address(address : number, padding : number) {
+    return address.toString(16).padStart(padding, "0").toUpperCase()
+}
