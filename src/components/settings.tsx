@@ -59,7 +59,6 @@ class AdvancedSetting extends React.Component<
             <p>Debug Mode</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG} onChange={() => {DEBUG = !DEBUG}}/>
             <p>Debug - Dump Step</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_STEP} onChange={() => {DEBUG_DUMP_STEP = !DEBUG_DUMP_STEP}}/>
             <p>Debug - Dump Heap</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_MEM} onChange={() => {DEBUG_DUMP_MEM = !DEBUG_DUMP_MEM}}/>
-            <p>Experimental - Type Reuse</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={EXP_PRESERVE_TYPE} onChange={() => {EXP_PRESERVE_TYPE = !EXP_PRESERVE_TYPE}}/>
             </>;
         } else {
             return <h3 onClick={() => {this.setState({expand: true})}}>

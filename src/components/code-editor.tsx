@@ -180,7 +180,7 @@ export default class CodeEditor extends React.Component
     }
 
     render() {
-        if (this.props.c0_only) return this.render_c0();
+        if (this.props.app_state.c0_only) return this.render_c0();
         return this.render_all();
     }
 }

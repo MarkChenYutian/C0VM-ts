@@ -23,10 +23,6 @@ declare global {
     // (after this #step, the control flow will be handled back to UI/main event loop to keep page responsive)
     var C0_ASYNC_INTERVAL: number;          // Interval between each time slice will be at least these much ms
 
-    // Experimental features
-    // Preserve state.TypeRecord when bytecode does not change on restart
-    var EXP_PRESERVE_TYPE: boolean;
-
     // MS Clarity client API
     var clarity: undefined | ((s: "set", key: "VM Error", 
         value: 

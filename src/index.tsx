@@ -35,8 +35,6 @@ globalThis.C0_MAX_RECURSION = 999;
 globalThis.C0_TIME_SLICE = 500;
 globalThis.C0_ASYNC_INTERVAL = 1;
 
-globalThis.EXP_PRESERVE_TYPE = true;
-
 if (globalThis.MSG_EMITTER === undefined) {
   globalThis.MSG_EMITTER = new AntdEmitter();
 }
