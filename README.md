@@ -24,3 +24,88 @@ Link: https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/user-manual/user-
 # Developer Documentation
 
 Link: https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/
+
+# Ongoing Developments 
+
+## C0VM.ts Main Functionality
+
+- [ ] **Error Handling**: Friendly Error Message
+- [ ] **Function**: Change `NativeIO::Readline` to `async` function
+- [ ] **Function**: Improve type inference system - allow struct on stack **[Breaking change required]**
+- [x] **Function**: Type Inference System during runtime
+- [x] **Function**: Show local variable’s value during runtime
+- [x] **Function**: `NativeIO::Readline`
+- [x] **Debug**: Check the bug when running `buggy_SSA_test.bc0` problem.
+- [x] **Parser**: Deal with “dummy return value” (occurs at `void` functions)
+- [x] **Future**: Map the source code line number to bytecode line number **@Iliano**
+- [x] **Type Inference**: Resolve `typedef` in C0 source code automatically
+- [x] **Function**: Support `NativeParse` functions
+- [x] **Function**: Partially support `NativeFloat` functions (`printint` and `printhex`)
+- [x] **Debugger**: Add `Details` panel in debugger options. Show all C0VM details (`V`, `S`, etc.)
+- [ ] <del>**Function**: Heap allocator garbage collection based on ref count</del>
+
+## UI/UX Enhancements
+
+- [ ] **UX**: Shortcut key for Run and Step
+- [ ] **UX**: Rename editor tab on second-key click
+- [ ] **UI**: flexible grid proportion *(Nice to have)*
+- [ ] **React**: Encapsulate the application using `shadowRoot` in HTML *(Nice to have)*
+- [x] **UI**: Add gap between rows in `stacknode` of graphical debugger
+- [x] **UI**: Add border to values in `stacknode`
+- [x] **UI**: Optimize user workflow
+- [x] **UI**: File import based on popup window dialog
+- [x] **UI**: Enable/Disable buttons in main function area based on input area
+- [x] **UI**: Fix CSS style of the react application page
+- [x] **UI**: Right aligned variable names in stack
+- [x] **UI**: Right aligned struct field names
+- [x] **React**: Add breakpoint as a component state instead of global variable (which may lead to strange problems, sometimes toggled breakpoint does not work at all)
+- [x] **React**: Add execution line (highlight line) as component state instead of global state
+
+## Debug Console
+
+- [ ] **Debugger**: Show pointer address on hover on struct component
+- [ ] **Debugger**: Store break point state when user switch between BC0 and C0 mode using `toJSON` and `fromJSON` serialization methods in Codemirror.
+- [x] **Debugger**: Show function call stack
+- [x] **Debugger**: Show struct field value whenever possible
+- [x] **Debugger**: Show array content (elements in `arr`) whenever possible
+- [x] **Debugger**: change pointer value display
+- [x] **Debugger**: Expand first level by default
+- [x] **Debugger**: Make struct debug display more compact
+- [x] **Debugger**: Add a button/arrow on func name collapse/expand
+- [x] **Debugger**: When array is not initialized, it’s by default an empty array (currently displayed as NULL)
+- [x] **Debugger**: Just show the function name on debug console (not `f main` as it currently shows)
+- [x] **Debugger**: Darken breakpoint column on hover
+- [ ] <del>**Debugger**: Add a “step over” option?</del>
+
+
+## Feature Enhancements
+
+- [x] **Feature**: Breakpoint, Step and Run
+- [x] **Feature**: Show execution position
+- [x] **Feature**: Compile Multiple Files
+- [x] **Feature**: Compile with flags
+
+## Editor Enhancement
+
+- [ ] **Syntax Highlighting**: Rewrite the parser generator profile to match with formal definition in `C0Reference.pdf`
+- [ ] **Editor**: Jump to the line executing
+- [ ] **Debug**: Fix drag & drop import not working problem
+- [ ] **Editor**: Import project (folder)
+- [ ] **Editor**: Import object file (`.o0` and `.o1` file)
+- [ ] **Editor**: Autocomplete for C0 Language *(Nice to have)*
+- [ ] **Editor**: Recover editor content based on `localStorage`
+- [x] **Editor**: Refresh & Render problem when scrolling
+- [x] **Editor**: Syntax Highlighting (BC0)
+- [x] **Editor**: Middle comment in BC0 in another color
+- [x] **Editor**: Syntax Highlighting (C0)
+- [x] **Editor**: Multiple File Editors (Tabs?)
+- [x] **Syntax Highlighting**: Swap the syntax highlight between instruction and comment
+- [ ] <del>**Editor**: Auto language-detection & switch</del>
+
+## C0VM.ts Backend Server
+
+- [x] **Server**: Change the synchronous system-calls to `async`.
+- [x] **Server**: Support the -d flag option
+- [x] **Server**: Documentation of Compile-code API
+- [x] **Server**: Extended Bytecode format to allow c0 - bc0 correspondence
+
