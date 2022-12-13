@@ -23,21 +23,38 @@ function safe_pop_stack(typeRecord: Map<string, Map<number, Struct_Type_Record>>
      * 
      * The code below will "auto-deboxing" the type information from type record pool.
      */
-    if (V.type.type === "ptr" && V.type.kind === "struct") {
+    if (TypeUtil.isPointerType(V) && V.type.kind === "struct") {
         const fields = typeRecord.get(V.type.value);
         if (fields !== undefined) {
             const deref_type = fields.get(V.type.offset)?.type;
             if (deref_type !== undefined) {
-                return {
-                    value: V.value,
-                    type: deref_type
-                };
+                return { value: V.value, type: deref_type};
             }
         }
     }
     return V;
 }
 
+
+function updateTypeRecord(state: VM_State, a: C0Value<C0TypeClass>, x: C0Value<C0TypeClass>){
+    if (TypeUtil.isPointerType(a) && TypeUtil.is_struct_pointer(a) && !TypeUtil.isUnknownType(x)){
+        const a_concrete = a.type.value;
+        let struct_field_record = state.TypeRecord.get(a_concrete.value);
+
+        if (struct_field_record === undefined) {
+            struct_field_record = new Map();
+        }
+
+        let field_type_record = struct_field_record.get(a_concrete.offset);
+
+        if (field_type_record === undefined){
+            field_type_record = {}
+        }
+        struct_field_record.set(a_concrete.offset, {name: field_type_record.name, type: x.type});
+
+        state.TypeRecord.set(a_concrete.value, struct_field_record);
+    }
+}
 
 /**
  * Main function of C0VM.ts, perform transformation on VM_State and allocator
@@ -103,6 +120,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IADD expect (value, value)`);
+            }
+
             state.CurrFrame.S.push(
                 build_c0_value(
                     Arithmetic.c_add(x.value, y.value),
@@ -118,6 +140,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IAND expect (value, value)`);
+            }
+
             state.CurrFrame.S.push(
                 build_c0_value(
                     Arithmetic.c_and(x.value, y.value),
@@ -133,6 +160,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IDIV expect (value, value)`);
+            }
+
             state.CurrFrame.S.push(
                 build_c0_value(
                     Arithmetic.c_div(x.value, y.value), 
@@ -148,6 +180,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IMUL expect (value, value)`);
+            }
+
             state.CurrFrame.S.push(
                 build_c0_value(
                     Arithmetic.c_mul(x.value, y.value, globalThis.MSG_EMITTER), 
@@ -163,6 +200,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IOR expect (value, value)`);
+            }
+
             state.CurrFrame.S.push(
                 build_c0_value(
                     Arithmetic.c_or(x.value, y.value),
@@ -178,6 +220,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IREM expect (value, value)`);
+            }
+
             state.CurrFrame.S.push(
                 build_c0_value(
                     Arithmetic.c_rem(x.value, y.value),
@@ -193,6 +240,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: ISHL expect (value, value)`);
+            }
+
             state.CurrFrame.S.push(
                 build_c0_value(
                     Arithmetic.c_lsh(x.value, y.value),
@@ -208,6 +260,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: ISHR expect (value, value)`);
+            }
+
             state.CurrFrame.S.push(
                 build_c0_value(
                     Arithmetic.c_rsh(x.value, y.value),
@@ -223,6 +280,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: ISUB expect (value, value)`);
+            }
+
             state.CurrFrame.S.push(
                 build_c0_value(
                     Arithmetic.c_sub(x.value, y.value),
@@ -238,6 +300,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IXOR expect (value, value)`);
+            }
+
             state.CurrFrame.S.push(
                 build_c0_value(
                     Arithmetic.c_xor(x.value, y.value),
@@ -258,7 +325,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             v.setInt32(0, b);
 
             if (type_note === undefined) {
-                state.CurrFrame.S.push( {value: v, type: { type: "<unknown>" }});
+                throw new vm_error("BIPUSH type reconstruction failed!");
             } else {
                 state.CurrFrame.S.push( build_c0_value(v, (type_note as C0ValueTypes)) );
             }
@@ -314,8 +381,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             state.CurrFrame.PC += 2;
             const to_be_loaded = state.CurrFrame.V[idx];
             if (to_be_loaded === undefined) {
-                throw new vm_error("Unable to load undefined local variable.");
+                throw new vm_error("Uninitialized value: Loading a local variable before it is initialized");
             }
+
             state.CurrFrame.S.push(to_be_loaded);
             break;
         }
@@ -336,12 +404,15 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             state.CurrFrame.PC += 1;
 
             const retval = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
             if (globalThis.DEBUG) {
                 console.log(`return from <${state.CurrFrame.P.name}> with retval:`);
                 console.log(retval);
             }
+
             const restore_frame = state.CallStack.pop();
             if (restore_frame === undefined) {
+                // We are run out of code - program exit from main()
                 return false;
             } else {
                 state.CurrFrame = restore_frame;
@@ -356,8 +427,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const str_ptr = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             if (!TypeUtil.maybeStringType(str_ptr)) {
-                throw new vm_error(`Type unmatch: expected a pointer in C0Value, received a ${str_ptr.type.type}`);
+                throw new vm_error(`Type unmatch: ATHROW expect (string)`);
             }
+
             UIHooks.print_update("C0 Abort: error(...) called by program\n");
             const err_prompt = loadString(str_ptr, allocator);
             UIHooks.print_update(err_prompt + "\n");
@@ -369,13 +441,12 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             state.CurrFrame.PC += 1;
 
             const str_ptr = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
-            if (!TypeUtil.maybeStringType(str_ptr)) {
-                throw new vm_error(`Type unmatch: expected a string in C0Value, received a ${str_ptr.type.type}`);
-            }
             const val = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
-            if (!TypeUtil.maybeValueType(val)) {
-                throw new vm_error(`Type unmatch: expected a value in C0Value, received a ${str_ptr.type.type}`);
+
+            if (!TypeUtil.maybeStringType(str_ptr) || !TypeUtil.maybeValueType(val)) {
+                throw new vm_error(`Type unmatch: ASSERT expect (value, string)`);
             }
+
             if (val.value.getUint32(0) === 0) {
                 UIHooks.print_update("C0 Abort: Assertion Error\n");
                 const err_prompt = loadString(str_ptr, allocator);
@@ -428,8 +499,14 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             const o2 = view.getInt8(state.CurrFrame.PC + 2);
             const offset = (o1 << 8) | o2;
 
+            
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IF_ICMPLT expect (value, value)`);
+            }
+
             if (x.value.getInt32(0) < y.value.getInt32(0)) {
                 state.CurrFrame.PC += offset
             } else {
@@ -446,6 +523,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IF_ICMPGT expect (value, value)`);
+            }
+
             if (x.value.getInt32(0) > y.value.getInt32(0)) {
                 state.CurrFrame.PC += offset
             } else {
@@ -462,6 +544,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IF_ICMPGE expect (value, value)`);
+            }
+
             if (x.value.getInt32(0) >= y.value.getInt32(0)) {
                 state.CurrFrame.PC += offset
             } else {
@@ -478,6 +565,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const y = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
+
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybeValueType(y)){
+                throw new vm_error(`Type unmatch: IF_ICMPLE expect (value, value)`);
+            }
+
             if (x.value.getInt32(0) <= y.value.getInt32(0)) {
                 state.CurrFrame.PC += offset
             } else {
@@ -530,7 +622,6 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             // Switch Context
             state.CallStack.push(state.CurrFrame);
             if (state.CallStack.length > globalThis.C0_MAX_RECURSION) {
-                UIHooks.print_update("C0 Abort: Maximum Recursion Depth Exceeded\n");
                 throw new c0_memory_error("Maximum Recursion Depth Exceeded (current max depth: " + globalThis.C0_MAX_RECURSION + " )");
             }
             state.CurrFrame = {
@@ -549,9 +640,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             const ptr = allocator.malloc(s);
             const T = TypeUtil.String2Type(comment.dataType as string);
             state.CurrFrame.S.push(
-                build_c0_ptrValue(
-                    ptr, "ptr", T
-                )
+                build_c0_ptrValue(ptr, "ptr", T)
             );
             break;
         }
@@ -560,9 +649,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             state.CurrFrame.PC += 1;
 
             const a = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
-            if (a.type.type !== "ptr" && a.type.type !== "<unknown>") {
-                throw new vm_error("Type unmatch, IMLOAD expect to receive a pointer");
+            if (TypeUtil.maybePointerType(a)) {
+                throw new vm_error(`Type unmatch: IMLOAD expect (pointer)`);
             }
+
             const mem_block = allocator.imload(a.value);
             state.CurrFrame.S.push(
                 build_c0_value(mem_block, "int")
@@ -575,29 +665,19 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const a = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
-            if ((x.type.type !== "value" && x.type.type !== "<unknown>")
-                || 
-                (a.type.type !== "ptr" && a.type.type !== "<unknown>")) {
-                throw new vm_error("Type unmatch, IMSTORE expected to have {ptr, value}");
+            if (!TypeUtil.maybeValueType(x)|| !TypeUtil.maybePointerType(a)) {
+                throw new vm_error(`Type unmatch: IMSTORE expect (pointer, value)`);
             }
             allocator.imstore( a.value, x.value );
 
             /**
              * Type Inference Type(a<unknown>) => Type(a<int>)
+             * Since we call imstore on a struct pointer, we know that this offset in
+             * the struct must stores an integer
+             * 
+             * Fix: Issue #5, when Type(x) is <unknown>, we should not update the record
              */
-            if (a.type.type !== "<unknown>") {
-                const a_concrete = a.type.value;
-                if (typeof a_concrete !== "string" && a_concrete.type === "ptr" && a_concrete.kind === "struct") {
-                    const struct_field_record = state.TypeRecord.get(a_concrete.value);
-                    if (struct_field_record === undefined) state.TypeRecord.set(a_concrete.value, new Map());
-
-                    let struct_field_entry = (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).get(a_concrete.offset);
-                    struct_field_entry = Object.assign(struct_field_entry === undefined ? {} : struct_field_entry, {type: x.type});
-                    (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).set(a_concrete.offset, struct_field_entry);
-
-                }
-            }
-
+            updateTypeRecord(state, a, x);
             break;
         }
 
@@ -609,22 +689,16 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 throw new vm_error("Type unmatch, AMLOAD expect to receive a pointer");
             }
             const mem_block = allocator.amload(a.value);
-            if (a.type.type === "ptr") {
-                if (a.type.kind === "struct") {
-                    state.CurrFrame.S.push(
-                        {value: mem_block, type: (TypeUtil.getType(a.type, state.TypeRecord))}
-                    )
+
+            if (TypeUtil.isPointerType(a)){
+                if (a.type.kind === "struct"){
+                    state.CurrFrame.S.push({value: mem_block, type: a.type});
                 } else {
-                    state.CurrFrame.S.push(
-                        {value: mem_block, type: (a.type.value)}
-                    );
+                    state.CurrFrame.S.push({value: mem_block, type: a.type.value});
                 }
             } else {
-                state.CurrFrame.S.push(
-                    {value: mem_block, type: {type: "<unknown>"}}
-                );
+                state.CurrFrame.S.push({value: mem_block, type: {type: "<unknown>"}});
             }
-            
             break;
         }
 
@@ -634,10 +708,8 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const a = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
 
-            if ((x.type.type !== "ptr" && x.type.type !== "<unknown>" && x.type.type !== "string")
-                || 
-                (a.type.type !== "ptr" && a.type.type !== "<unknown>" && a.type.type !== "string")) {
-                throw new vm_error("Type unmatch, AMSTORE expected to have {ptr|string, ptr|string}");
+            if ((!TypeUtil.maybePointerType(x) && !TypeUtil.maybeStringType(x)) || (!TypeUtil.maybePointerType(a))){
+                throw new vm_error("Type unmatch, AMSTORE expected to have (pointer, [pointer | string])");
             }
             allocator.amstore( a.value, x.value );
 
@@ -648,18 +720,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
              * 
              * Fix: Issue #5, when Type(x) is <unknown>, we should not update the record to prevent overwriting existing record.
              */
-            
-            if (a.type.type !== "<unknown>" && x.type.type !== "<unknown>") {
-                const a_concrete = a.type.value as C0Type<"ptr">;
-                if (a_concrete.kind === "struct") {
-                    const struct_field_record = state.TypeRecord.get(a_concrete.value);
-                    if (struct_field_record === undefined) state.TypeRecord.set(a_concrete.value, new Map());
-
-                    let struct_field_entry = (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).get(a_concrete.offset);
-                    struct_field_entry = Object.assign(struct_field_entry === undefined ? {} : struct_field_entry, {type: x.type});
-                    (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).set(a_concrete.offset, struct_field_entry);
-                }
-            }
+            updateTypeRecord(state, a, x);
             break;
         }
 
@@ -668,19 +729,14 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             
             const a = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             if (!TypeUtil.maybePointerType(a)) {
-                throw new vm_error("Type unmatch, CMLOAD expect to receive a pointer");
+                throw new vm_error("Type unmatch, CMLOAD expect to receive (pointer)");
             }
             const mem_block = allocator.cmload(a.value);
-            if (a.type.type === "ptr") {
-                state.CurrFrame.S.push({
-                    value: mem_block,
-                    type: (a.type.value as C0Type<"value">)
-                });
+            
+            if (TypeUtil.isPointerType(a) && a.type.kind !== "struct"){
+                state.CurrFrame.S.push({value: mem_block, type: a.type.value});
             } else {
-                state.CurrFrame.S.push({
-                    value: mem_block,
-                    type: {type: "<unknown>"}
-                });
+                state.CurrFrame.S.push({value: mem_block, type: {type: "<unknown>"}});
             }
             break;
         }
@@ -690,27 +746,15 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             
             const x = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const a = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
-            if ((x.type.type !== "value" && x.type.type !== "<unknown>")
-                || 
-                (a.type.type !== "ptr" && a.type.type !== "<unknown>")) {
-                throw new vm_error("Type unmatch, CMSTORE expected to have {ptr, value}");
+            if (!TypeUtil.maybeValueType(x) || !TypeUtil.maybePointerType(a)) {
+                throw new vm_error("Type unmatch, CMSTORE expected to receive (pointer, value)");
             }
             allocator.cmstore( a.value, x.value );
 
             /**
              * Type Inference Type(a<unknown>), Type(x) => Type(a) = Type(x)
              */
-             if (a.type.type !== "<unknown>") {
-                const a_concrete = a.type.value;
-                if (typeof a_concrete !== "string" && a_concrete.type === "ptr" && a_concrete.kind === "struct") {
-                    const struct_field_record = state.TypeRecord.get(a_concrete.value);
-                    if (struct_field_record === undefined) state.TypeRecord.set(a_concrete.value, new Map());
-                    
-                    let struct_field_entry = (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).get(a_concrete.offset);
-                    struct_field_entry = Object.assign(struct_field_entry === undefined ? {} : struct_field_entry, {type: x.type});
-                    (state.TypeRecord.get(a_concrete.value) as Map<number, Struct_Type_Record>).set(a_concrete.offset, struct_field_entry);
-                }
-            }
+            updateTypeRecord(state, a, x)
 
             break;
         }
@@ -725,12 +769,15 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             }
             const off_ptr = shift_ptr(a.value, f);
 
-            if (a.type.type === "ptr") {
-                const new_type = (TypeUtil.CloneType(a.type) as C0Type<"ptr">);
-                const child_type = new_type.value as C0Type<C0TypeClass>;
-                if (child_type.type !== "ptr" || child_type.kind !== "struct") {
+            const new_type = TypeUtil.CloneType(a.type);
+            const new_value = {value: off_ptr, type: new_type};
+
+            if (TypeUtil.isPointerType(new_value)) {
+                if (!TypeUtil.is_struct_pointer(new_value)) {
                     throw new vm_error("AADDF should only be applied on a struct pointer");
                 }
+
+                const child_type = new_value.type.value;
                 child_type.offset += f;
 
                 // Register the field name on type record.
@@ -747,17 +794,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
                 (state.TypeRecord.get(child_type.value) as Map<number, Struct_Type_Record>).set(child_type.offset, struct_field_entry);
 
-
-                state.CurrFrame.S.push(
-                    {
-                        value: off_ptr,
-                        type: new_type
-                    }
-                );
+                state.CurrFrame.S.push(new_value);
             } else {
-                state.CurrFrame.S.push(
-                    {value: off_ptr, type: {type: "<unknown>"}}
-                );   
+                state.CurrFrame.S.push({value: off_ptr, type: {type: "<unknown>"}});
             }
             break;
         }
@@ -767,22 +806,23 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             state.CurrFrame.PC += 2;
 
             const a = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
-            if (a.type.type !== "value" && a.type.type !== "<unknown>") {
+            if (TypeUtil.maybeValueType(a)) {
                 throw new vm_error("Type unmatch, NEWARRAY expect to receive a value");
             }
 
-            // for the +4 in this malloc, See explanation of t[] in README.md
+            // for the +4 in this malloc, See explanation of t[] in Execution/C0Value and Pointer
             const ptr = allocator.malloc(f * a.value.getUint32(0) + 4);
             const comment_str = comment.dataType;
-            const type = comment_str === undefined ? {type: "<unknown>"} : TypeUtil.String2Type(comment_str);
+            const elem_type = comment_str === undefined ? {type: "<unknown>"} : TypeUtil.String2Type(comment_str);
+            
+            // the first 4 bytes of array is used to store the size of each element
             allocator.deref(ptr).setUint32(0, f);
-            state.CurrFrame.S.push(
-                {
-                    value: ptr,
-                    //@ts-ignore
-                    type: {type: "ptr", kind: "arr", value: type}
-                }
-            );
+            
+            // For some unknown reason, TS checker constantly mark the line below as error
+            //@ts-ignore
+            const arr_pointer : C0Value<C0TypeClass> = {value: ptr, type: {type: "ptr", kind: "arr", value: elem_type}};
+
+            state.CurrFrame.S.push(arr_pointer);
             break;
         }
 
@@ -790,8 +830,8 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             state.CurrFrame.PC += 1;
 
             const a = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
-            if (a.type.type !== "ptr" && a.type.type !== "<unknown>") {
-                throw new vm_error("Type unmatch, expected to have pointer");
+            if (TypeUtil.maybePointerType(a)) {
+                throw new vm_error("Type unmatch, ARRAYLENGTH expected to receive pointer");
             }
 
             const [, , size] = read_ptr(a.value);
@@ -808,24 +848,29 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             const i = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
             const a = safe_pop_stack(state.TypeRecord, state.CurrFrame.S);
-            if (!TypeUtil.maybeValueType(i) || a.type.type !== "ptr") {
-                throw new vm_error("Type unmatch, expected to have {ptr, value}");
+            if (!TypeUtil.maybeValueType(i) || !TypeUtil.maybePointerType(a)) {
+                throw new vm_error("Type unmatch, AADDS expected to have {ptr, value}");
             }
 
-            const s = allocator.deref(a.value).getUint32(0);
-            if (a.type.kind === "arr") {
+            const elem_size = allocator.deref(a.value).getUint32(0);
+            const elem_ptr = shift_ptr(a.value, 4 + elem_size * i.value.getUint32(0));
+
+            if (TypeUtil.isUnknownType(a)){
                 state.CurrFrame.S.push(
                     {
-                        value: shift_ptr(a.value, 4 + s * i.value.getUint32(0)), 
-                        type: {
-                            type: "ptr",
-                            kind: "ptr",
-                            value: (a.type.value as C0Type<C0TypeClass>)
-                        }
+                        value: elem_ptr, 
+                        type: {type: "ptr", kind: "ptr", value: {type: "<unknown>"}}
                     }
-                )
+                );
+            } else if (TypeUtil.isPointerType(a) && a.type.kind === "arr") {
+                state.CurrFrame.S.push(
+                    {
+                        value: elem_ptr, 
+                        type: {type: "ptr", kind: "ptr", value: a.type.value}
+                    }
+                );
             } else {
-                throw new vm_error("AADDS is only expected to apply on ptr<arr> type.")
+                throw new vm_error("Type unmatch: AADDS is only expected to apply on ptr<arr> type.");
             }
             break;
         }

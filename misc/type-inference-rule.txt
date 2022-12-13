@@ -3,6 +3,8 @@ T?: Maybe<T> = T | <unknown>
 
 
 DUP     : S, x: T?            -> S, x: T?, y: T?
+POP     : S, x: T?            -> S
+SWAP    : S, x: T?, y: E?     -> S, y: E?, x: T?
 
 
 IADD    : S, x: int?, y: int? -> S, z: int
@@ -30,7 +32,7 @@ VSTORE  : S, x: T?            -> S
 
 
 ATHROW  : S, x: string?       -> (stack destroyed)
-ASSERT  : S, x: string?, y: bool?, z: bool? -> S
+ASSERT  : S, x: string?, y: bool? -> S
 
 
 NOP     : S                   -> S

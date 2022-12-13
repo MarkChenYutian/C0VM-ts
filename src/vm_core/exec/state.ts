@@ -54,6 +54,11 @@ export default class C0VM_RuntimeState implements C0VM_RT{
         return step(this.state, this.allocator, UIHooks);
     }
 
+    /**
+     * Clone the current runtime state, have this helper because React want all states
+     * to be immutable
+     * @returns a clone of current runtime state
+     */
     public clone(): C0VM_RuntimeState {
         const C = new C0VM_RuntimeState(this.raw_code, this.heap_size, undefined, undefined, this.code);
         
