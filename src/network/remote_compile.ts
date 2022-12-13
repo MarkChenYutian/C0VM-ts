@@ -33,7 +33,7 @@ export default function remote_compile(
                 throw new vm_error("Compile Failed for c0 source code. See standard output for more information.");
             }
             update_content(result.bytecode);
-            return VM.initialize(result.bytecode, clean_printout, globalThis.MEM_POOL_SIZE, tabs, typedefRecord);
+            return VM.initialize(result.bytecode, clean_printout, tabs, typedefRecord, MEM_POOL_SIZE);
         }
     )
     .then(

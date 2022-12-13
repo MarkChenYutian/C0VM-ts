@@ -1,14 +1,14 @@
 import C0VM_RuntimeState from "./exec/state";
 
 export async function initialize(s: string, clear_printout: () => void,
+    C0Editor : C0EditorTab[],
+    TypedefRecord : Map<string, TypeDefInfo>,
     heapSize ?: number,
-    C0Editor ?: C0EditorTab[],
-    TypedefRecord ?: Map<string, TypeDefInfo>
 ): Promise<C0VM_RuntimeState | undefined> {
     // Clean up environment before initialize.
     clear_printout();
     try {
-        const ns = new C0VM_RuntimeState(s, heapSize, C0Editor, TypedefRecord, undefined);
+        const ns = new C0VM_RuntimeState(s, C0Editor, TypedefRecord, heapSize, undefined);
         globalThis.MSG_EMITTER.ok("Load Successfully", "Program is loaded successfully. Press step or run to see result.");
         if (globalThis.DEBUG_DUMP_MEM) {
             console.log(ns.allocator.debug_getMemPool());

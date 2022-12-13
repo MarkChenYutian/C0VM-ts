@@ -1,3 +1,8 @@
+/// <reference types="react-scripts" />
+
+declare module '*.svg';
+
+
 interface C0VMApplicationState {
     crashed        : boolean,         /* C0VM Application top-level error boundary */
     c0_only        : boolean,         /* C0 only mode or not */

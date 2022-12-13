@@ -43,7 +43,7 @@ export default function MainControlBar(props: MainControlProps) {
 
         let new_runtime, can_continue = undefined;
         if (appState.C0Runtime === undefined) {
-            const init_state = await VM.initialize(appState.BC0SourceCode, clear_print, MEM_POOL_SIZE, appState.C0Editors, appState.TypedefRecord);
+            const init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, appState.TypedefRecord, MEM_POOL_SIZE);
             if (init_state === undefined) return;
             [new_runtime, can_continue] = await VM.step(init_state, appState.c0_only, update_print);
         } else {
@@ -66,7 +66,7 @@ export default function MainControlBar(props: MainControlProps) {
         let init_state = undefined;
         let new_runtime, can_continue = undefined;
         if (appState.C0Runtime === undefined) {
-            init_state = await VM.initialize(appState.BC0SourceCode, clear_print, MEM_POOL_SIZE, appState.C0Editors, appState.TypedefRecord);
+            init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, appState.TypedefRecord, MEM_POOL_SIZE);
             if (init_state === undefined) return;
         } else {
             init_state = appState.C0Runtime;
@@ -102,7 +102,7 @@ export default function MainControlBar(props: MainControlProps) {
 
     const restart_c0runtime = async () => {
         clear_print();
-        const new_state = await VM.initialize(appState.BC0SourceCode, clear_print, globalThis.MEM_POOL_SIZE, appState.C0Editors, appState.TypedefRecord);
+        const new_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, appState.TypedefRecord, globalThis.MEM_POOL_SIZE);
         props.set_app_state({C0Runtime: new_state});
     };
 

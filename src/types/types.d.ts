@@ -1,3 +1,32 @@
+type C0TypeClass = "<unknown>" | "value" | "ptr" | "string";
+
+type C0ValueTypes = "int" | "char" | "bool";
+
+type Maybe<T extends C0TypeClass> = T | "<unknown>";
+
+type C0Type<T extends C0TypeClass> = 
+    T extends "value" ? {
+        type: T,
+        value: C0ValueTypes
+    } : 
+    T extends "ptr" ? {
+        type: T,
+        kind: "arr"| "ptr",         // "arr" -> "C[]", "ptr" -> "C*"
+        value: C0Type<C0TypeClass>, // the type "C" in comment above
+    } | {
+        type: T,
+        kind: "struct",
+        value: string,  // If a pointer points to the struct, we record the 
+        offset: number  // struct type name and offset
+    } : 
+    T extends "string" ? {
+        type: T,
+        value: "string"
+    } : 
+    T extends "<unknown>" ? {
+        type: T         // No more type information for unknown
+    } : never;
+
 type C0Function = {
     // function name, inferenced from comments in .bc0 file
     name: string;
@@ -81,7 +110,7 @@ type C0Value<T extends C0TypeClass> = {
 
 // use_official name instead of internal name.
 type C0NativeFuncType =
-    "NATIVE_NOT_IMPLEMENTED"
+    "NATIVE_NOT_RECOGNIZED"
     | "NATIVE_ARGS_FLAG"
     | "NATIVE_ARGS_INT"
     | "NATIVE_ARGS_PARSE"
