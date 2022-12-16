@@ -112,15 +112,12 @@ export default function MainControlBar(props: MainControlProps) {
 
     const compile_c0source = () => {
         clear_print();
-        props.set_app_state({contentChanged: false});
+        // props.set_app_state({contentChanged: false});
         remote_compile(
-            appState.C0Editors,
-            appState.TypedefRecord,
-            (s) => props.set_app_state({BC0SourceCode: s}),
+            appState,
+            props.set_app_state,
             clear_print,
             update_print,
-            appState.CompilerFlags,
-            (s) => props.set_app_state({C0Runtime: s})
         );
     };
 

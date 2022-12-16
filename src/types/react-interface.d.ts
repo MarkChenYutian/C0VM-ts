@@ -2,6 +2,7 @@
 
 declare module '*.svg';
 
+type SetAppStateInput = (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)
 
 interface C0VMApplicationState {
     crashed        : boolean,         /* C0VM Application top-level error boundary */

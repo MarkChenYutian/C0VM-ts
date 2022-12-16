@@ -1,17 +1,13 @@
 import { vm_error } from "../utility/errors";
-import C0VM_RuntimeState from "../vm_core/exec/state";
 import * as VM from "../vm_core/vm_interface"; 
 
 export default function remote_compile(
-    tabs: C0EditorTab[],
-    typedefRecord: Map<string, TypeDefInfo>,
-    update_content: (s: string) => void,
+    app_state: C0VMApplicationState,
+    set_app_state: (update: SetAppStateInput) => void,
     clean_printout: () => void,
     update_printout: (s: string) => void,
-    compiler_flags: Record<string, boolean>,
-    load_c0_runtime: (s: C0VM_RuntimeState | undefined) => void 
 ): void {
-    fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${compiler_flags["-d"] ? "true" : "false"}`, {
+    fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${app_state.CompilerFlags["-d"] ? "true" : "false"}`, {
         method: "POST",
         cache: "no-cache",
         headers: {
@@ -19,8 +15,8 @@ export default function remote_compile(
             "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
-            codes: tabs.map((tab) => tab.content),
-            filenames: tabs.map((tab) => tab.title),
+            codes: app_state.C0Editors.map((tab) => tab.content),
+            filenames: app_state.C0Editors.map((tab) => tab.title),
         })
     })
     .then(
@@ -29,16 +25,19 @@ export default function remote_compile(
     .then(
         (result: any) => {
             if (result.error !== ""){
-                update_printout(result.error as string);
+                update_printout(`<span class="error-output">${result.error as string}</span>`);
                 throw new vm_error("Compile Failed for c0 source code. See standard output for more information.");
             }
-            update_content(result.bytecode);
-            return VM.initialize(result.bytecode, clean_printout, tabs, typedefRecord, MEM_POOL_SIZE);
+            set_app_state({BC0SourceCode: result.bytecode});
+            return VM.initialize(result.bytecode, clean_printout, app_state.C0Editors, app_state.TypedefRecord, MEM_POOL_SIZE);
         }
     )
     .then(
         (state) => {
-            load_c0_runtime(state);
+            set_app_state({
+                contentChanged: false, // Now we can run the new program
+                C0Runtime     : state  // Load the initialized state
+            });
         }
     )
     .catch(

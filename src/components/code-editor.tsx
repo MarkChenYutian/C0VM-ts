@@ -5,10 +5,27 @@ import C0EditorGroup from "./c0-editor-group";
 import { Segmented } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
-import { merge_typedef } from "../utility/ui_helper";
 import C0VM_RuntimeState from "../vm_core/exec/state";
 
 const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.c0$/;
+
+function merge_typedef(original: Map<string, TypeDefInfo>, editor_key: number, newSet: Map<string, string>): Map<string, TypeDefInfo> {
+    const newTypedef = new Map<string, TypeDefInfo>();
+    original.forEach(
+        (value, key) => {
+            if (value.key !== editor_key) {
+                newTypedef.set(key, value);
+            }
+        }
+    )
+    newSet.forEach(
+        (value, key) => {
+            newTypedef.set(key, {source: value, key: editor_key});
+        }
+    );
+    return newTypedef;
+}
+
 
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>

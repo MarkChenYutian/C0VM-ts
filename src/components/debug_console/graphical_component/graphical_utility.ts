@@ -1,3 +1,11 @@
+type NodeTypes = "frame" | "struct" | "array" | "pointer";
+
+const STRUCT_TOP_HEIGHT  = 47;
+const LINE_HEIGHT = 25;
+const TOP_HEIGHT  = 50;
+const LEFT_WIDTH = 95;
+const ARR_ELEM_WIDTH = 82;
+
 export function valid_variable_count(frame: VM_StackFrame): number {
     let cnt = 0;
     for (let i = 0; i < frame.V.length; i ++) {
@@ -7,14 +15,6 @@ export function valid_variable_count(frame: VM_StackFrame): number {
     }
     return cnt;
 }
-
-type NodeTypes = "frame" | "struct" | "array" | "pointer";
-
-const STRUCT_TOP_HEIGHT  = 47;
-const LINE_HEIGHT = 25;
-const TOP_HEIGHT  = 50;
-const LEFT_WIDTH = 95;
-const ARR_ELEM_WIDTH = 82;
 
 // Full of magic number and hard-coded. If change node props in application.css
 // Remember to change this line
