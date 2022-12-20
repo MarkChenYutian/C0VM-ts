@@ -22,7 +22,7 @@ import { nativeFuncLoader } from "../native/native_interface";
  * @param typedefRecord Typedef information extracted from c0 editors
  * @returns A parsed bytecode data structure.
  */
-export default function parse(bytecode: string, C0Editors?: C0EditorTab[], typedefRecord?: Map<string, TypeDefInfo>): C0ByteCode {
+export default function parse(bytecode: string, C0Editors: C0EditorTab[], typedefRecord: Map<string, TypeDefInfo>): C0ByteCode {
     const typedef_lib = typedefRecord === undefined ? undefined : flatten_typedef(typedefRecord);
     const lines = annotate_linenum(bytecode);   // Add line number info to each line
     const blocks = split_blocks(lines);

@@ -1,3 +1,9 @@
+/// <reference types="react-scripts" />
+
+declare module '*.svg';
+
+type SetAppStateInput = (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)
+
 interface C0VMApplicationState {
     crashed        : boolean,         /* C0VM Application top-level error boundary */
     c0_only        : boolean,         /* C0 only mode or not */
@@ -28,13 +34,14 @@ type TypeDefInfo = {source: string, key: number}
 // The props that main control bar component will accept
 interface MainControlProps {
     application_state   : C0VMApplicationState,
-
-    update_running      : (ns: boolean) => void,
-    update_value        : (ns: string) => void,
-    update_state        : (ns: C0RuntimeState | undefined) => void,
-    update_print        : (ns: string) => void,
-    update_contentChange: (b: boolean) => void,
-    clear_print         : () => void,
+    set_app_state<K extends keyof C0VMApplicationState>(
+                            state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
+                                    => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
+                                | (Pick<C0VMApplicationState, K> 
+                                | C0VMApplicationState 
+                                | null),
+                            callback?: () => void
+                        ): void,
 };
 
 interface CodeEditorProps {
@@ -47,7 +54,6 @@ interface CodeEditorProps {
             | null),
         callback?: () => void
     ): void;
-    c0_only: boolean
 }
 
 interface CodeEditorState {
@@ -82,10 +88,10 @@ interface C0EditorProps {
     updateContent : (s: string) => void,
     updateTypedef : (newTypeDef: Map<string, string>) => void,
     editorValue   : string,
-    updateName   ?: (s: string) => void,
     updateBrkPts  : (ln: number) => void,
     setBreakPts   : (lns: number[]) => void,
     editable      : boolean
+    updateName   ?: (s: string) => void,
 }
 
 interface BC0EditorProps {

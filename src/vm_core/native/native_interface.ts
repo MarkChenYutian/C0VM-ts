@@ -9,11 +9,7 @@
  * This file only contains the native function loader & header, the actual
  * functions are defined in other files in this folder.
  */
-import {
-    build_c0_ptrValue,
-    build_c0_stringValue,
-    js_cvt2_c0_value,
-} from "../../utility/c0_value_utility";
+import { build_c0_ptrValue, build_c0_stringValue, js_cvt2_c0_value } from "../../utility/c0_value_utility";
 import { vm_error, vm_instruct_error } from "../../utility/errors";
 
 import * as StringNative from "./native_strings";
@@ -49,25 +45,25 @@ function nativeFuncMapping(index: number): C0Native {
             return {
                 functionType: "NATIVE_ARGS_FLAG",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: () => nativeNotImplemented("NATIVE_ARGS_FLAG"),
             };
         case 1:
             return {
                 functionType: "NATIVE_ARGS_INT",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: () => nativeNotImplemented("NATIVE_ARGS_INT"),
             };
         case 2:
             return {
                 functionType: "NATIVE_ARGS_PARSE",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: () => nativeNotImplemented("NATIVE_ARGS_PARSE"),
             };
         case 3:
             return {
                 functionType: "NATIVE_ARGS_STRING",
                 numArgs: 0,
-                f: nativeNotImplemented,
+                f: () => nativeNotImplemented("NATIVE_ARGS_STRING"),
             };
         /* Native Standard I/O Functions */
         case 4:
@@ -168,119 +164,119 @@ function nativeFuncMapping(index: number): C0Native {
                 },
             };
         /** Double Type calculation */
-        // case 54: {
-        //     return {
-        //         functionType: "NATIVE_DADD",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 55: {
-        //     return {
-        //         functionType: "NATIVE_DDIV",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 56: {
-        //     return {
-        //         functionType: "NATIVE_DLESS",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 57: {
-        //     return {
-        //         functionType: "NATIVE_DMUL",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 59: {
-        //     return {
-        //         functionType: "NATIVE_DSUB",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 60: {
-        //     return {
-        //         functionType: "NATIVE_DTOI",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 61: {
-        //     return {
-        //         functionType: "NATIVE_ITOD",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 62: {
-        //     return {
-        //         functionType: "NATIVE_PRINT_DUB",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        /** Floating Point Operations */
-        // case 67: {
-        //     return {
-        //         functionType: "NATIVE_FADD",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 68: {
-        //     return {
-        //         functionType: "NATIVE_FDIV",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 69: {
-        //     return {
-        //         functionType: "NATIVE_FLESS",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 70: {
-        //     return {
-        //         functionType: "NATIVE_FMUL",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 71: {
-        //     return {
-        //         functionType: "NATIVE_FSUB",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 72: {
-        //     return {
-        //         functionType: "NATIVE_FTOI",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 73: {
-        //     return {
-        //         functionType: "NATIVE_ITOF",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
-        // case 74: {
-        //     return {
-        //         functionType: "NATIVE_PRINT_FPT",
-        //         numArgs: 0,
-        //         f: nativeNotImplemented,
-        //     };
-        // }
+        case 54: {
+            return {
+                functionType: "NATIVE_DADD",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_DADD"),
+            };
+        }
+        case 55: {
+            return {
+                functionType: "NATIVE_DDIV",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_DDIV"),
+            };
+        }
+        case 56: {
+            return {
+                functionType: "NATIVE_DLESS",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_DLESS"),
+            };
+        }
+        case 57: {
+            return {
+                functionType: "NATIVE_DMUL",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_DMUL"),
+            };
+        }
+        case 59: {
+            return {
+                functionType: "NATIVE_DSUB",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_DSUB"),
+            };
+        }
+        case 60: {
+            return {
+                functionType: "NATIVE_DTOI",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_DTOI"),
+            };
+        }
+        case 61: {
+            return {
+                functionType: "NATIVE_ITOD",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_ITOD"),
+            };
+        }
+        case 62: {
+            return {
+                functionType: "NATIVE_PRINT_DUB",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_PRINT_DUB"),
+            };
+        }
+        /* Floating Point Operations */
+        case 67: {
+            return {
+                functionType: "NATIVE_FADD",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_FADD"),
+            };
+        }
+        case 68: {
+            return {
+                functionType: "NATIVE_FDIV",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_FDIV"),
+            };
+        }
+        case 69: {
+            return {
+                functionType: "NATIVE_FLESS",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_FLESS"),
+            };
+        }
+        case 70: {
+            return {
+                functionType: "NATIVE_FMUL",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_FMUL"),
+            };
+        }
+        case 71: {
+            return {
+                functionType: "NATIVE_FSUB",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_FSUB"),
+            };
+        }
+        case 72: {
+            return {
+                functionType: "NATIVE_FTOI",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_FTOI"),
+            };
+        }
+        case 73: {
+            return {
+                functionType: "NATIVE_ITOF",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_ITOF"),
+            };
+        }
+        case 74: {
+            return {
+                functionType: "NATIVE_PRINT_FPT",
+                numArgs: 0,
+                f: () => nativeNotImplemented("NATIVE_PRINT_FPT"),
+            };
+        }
         case 75: {
             return {
                 functionType: "NATIVE_PRINT_HEX",
@@ -737,17 +733,17 @@ function nativeFuncMapping(index: number): C0Native {
         }
         default:
             return {
-                functionType: "NATIVE_NOT_IMPLEMENTED",
+                functionType: "NATIVE_NOT_RECOGNIZED",
                 numArgs: 0,
-                f: nativeNotImplemented
+                f: () => nativeNotImplemented("NATIVE_NOT_RECOGNIZED")
             }; // Everything not (planned to be) implemented yet goes here.
     }
 }
 
 // TODO: fancy error for user - not supporting XXX_FUNCTION
 
-function nativeNotImplemented(): never {
-    throw new vm_instruct_error("Native function not support yet.");
+function nativeNotImplemented(name: C0NativeFuncType): never {
+    throw new vm_instruct_error(`Native function ${name} is not supported yet.`);
 }
 
 /*

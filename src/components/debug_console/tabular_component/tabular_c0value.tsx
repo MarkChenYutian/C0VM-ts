@@ -17,15 +17,15 @@ import { isNullPtr, read_ptr, render_address } from "../../../utility/pointer_ut
 import { loadString } from "../../../utility/string_utility";
 
 import { deref_C0Value, expand_C0Array, expand_C0Struct, c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
-import { isPointerType, isStringType, isUnknownType, isValueType } from "../../../utility/c0_type_utility";
+import { isPointerType, isStringType, isUnknownType, isValueType, is_struct_pointer, Type2String } from "../../../utility/c0_type_utility";
 
 export default class C0ValueTabularDisplay extends React.Component<
     C0ValueTabularDisplayProps,
-    {expand: boolean}
+    { expand: boolean }
 > {
     constructor(props: C0ValueTabularDisplayProps) {
         super(props);
-        this.state = {expand: props.default_expand}
+        this.state = { expand: props.default_expand }
     }
 
     /**
@@ -34,23 +34,23 @@ export default class C0ValueTabularDisplay extends React.Component<
      * 
      * @returns The rendering of array value in C0 Value
      */
-    render_array() {
-        if (isNullPtr(this.props.value.value)) {
+    render_array(value_to_render: C0Value<"ptr">) {
+        if (isNullPtr(value_to_render.value)) {
             // In C0 language, the uninitialized array is recognized as an empty array.
             return <p>[]</p>
         }
         if (!this.state.expand) {
-            return <p onClick={() => this.setState({expand: true})} className="clickable" >
+            return <p onClick={() => this.setState({ expand: true })} className="clickable" >
                 <button className="implicit-btn">
-                    <FontAwesomeIcon icon={faCaretRight}/>
+                    <FontAwesomeIcon icon={faCaretRight} />
                 </button>
                 Array [...]
             </p>
         }
-        const vals = expand_C0Array(this.props.mem, this.props.value as C0Value<"ptr">);
+        const vals = expand_C0Array(this.props.mem, value_to_render);
         const content = [];
 
-        for (let i = 0; i < vals.length; i ++) {
+        for (let i = 0; i < vals.length; i++) {
             content.push(
                 <li key={i + "-exp-value"}>
                     <C0ValueTabularDisplay
@@ -64,17 +64,17 @@ export default class C0ValueTabularDisplay extends React.Component<
             );
         }
 
-        const [addr, offset, ] = read_ptr(this.props.value.value);
+        const [addr, offset,] = read_ptr(value_to_render.value);
 
         return (
             <div>
-                <button className="implicit-btn dbg-evaluate-tabular-btn" onClick={() => this.setState({expand: false})}>
-                <FontAwesomeIcon icon={faCaretDown}/>
+                <button className="implicit-btn dbg-evaluate-tabular-btn" onClick={() => this.setState({ expand: false })}>
+                    <FontAwesomeIcon icon={faCaretDown} />
                 </button>
                 <div className="dbg-evaluate-tabular-content">
                     Array [ <span className="dbg-extra-information">0x{render_address(addr + offset, 8)}</span>
                     <ul>
-                            {content}
+                        {content}
                     </ul>
                     ]
                 </div>
@@ -88,41 +88,24 @@ export default class C0ValueTabularDisplay extends React.Component<
      * 
      * @returns The rendered GUI of the Pointer value
      */
-    render_pointer() {
-        if (isNullPtr(this.props.value.value)) {
+    render_pointer(value_to_render: C0Value<"ptr">) {
+        if (isNullPtr(value_to_render.value)) {
             return <p className="dbg-evaluate-tabular-content">NULL</p>
         }
 
         // When the component is not expended, show Pointer(...)
         if (!this.state.expand) {
             return (
-                <p onClick={() => this.setState({expand: true})} className="clickable" >
+                <p onClick={() => this.setState({ expand: true })} className="clickable" >
                     <button className="implicit-btn">
-                        <FontAwesomeIcon icon={faCaretRight}/>
+                        <FontAwesomeIcon icon={faCaretRight} />
                     </button>
                     Pointer (...)
                 </p>
             );
         }
 
-
-        // When the component is "<unknown>" type, show proper error message.
-        if (this.props.value.type.type === "<unknown>") {
-            return (
-            <div>
-                <button className="implicit-btn dbg-evaluate-tabular-btn" onClick={() => this.setState({expand: false})}>
-                    <FontAwesomeIcon icon={faCaretDown}/>
-                </button>
-                <div className="dbg-evaluate-tabular-content">
-                    Pointer (
-                    <p>Can't expend &lt;unknown&gt; type</p>
-                    )
-                </div>
-            </div>);
-        }
-        // Special cases above! Here's the actual rendering:
-
-        const [addr, offset, ] = read_ptr(this.props.value.value);
+        const [addr, offset,] = read_ptr(this.props.value.value);
 
         // Well... struct is really special here.
         /**
@@ -134,28 +117,25 @@ export default class C0ValueTabularDisplay extends React.Component<
          * Instead, we will need to pass the pointer points to the start of struct and allow 
          * next level of C0ValueTabularDisplay component to perform pointer arithemtic on it.
          */
-        if (this.props.value.type.type === "ptr") {
-            const subType = this.props.value.type.value as C0Type<C0TypeClass>;
-            if (subType.type === "ptr" && subType.kind === "struct") {
-                return (
-                    <div>
-                        <button className="implicit-btn" onClick={() => this.setState({expand: false})}>
-                            <FontAwesomeIcon icon={faCaretDown}/>
-                        </button>
-                        <div className="dbg-evaluate-tabular-content">
-                            Pointer ( <span className="dbg-extra-information">0x{(addr + offset).toString(16).padStart(8, "0").toUpperCase()}</span>
-                                <C0ValueTabularDisplay
-                                    mem={this.props.mem}
-                                    value={{type: subType, value: this.props.value.value}}
-                                    typeRecord={this.props.typeRecord}
-                                    typedefRec={this.props.typedefRec}
-                                    default_expand={false}
-                                />
-                            )
-                        </div>
+        if (isPointerType(value_to_render) && is_struct_pointer(value_to_render)) {
+            return (
+                <div>
+                    <button className="implicit-btn" onClick={() => this.setState({ expand: false })}>
+                        <FontAwesomeIcon icon={faCaretDown} />
+                    </button>
+                    <div className="dbg-evaluate-tabular-content">
+                        Pointer ( <span className="dbg-extra-information">0x{render_address(addr + offset, 8)}</span>
+                        <C0ValueTabularDisplay
+                            mem={this.props.mem}
+                            value={{ type: value_to_render.type.value, value: this.props.value.value }}
+                            typeRecord={this.props.typeRecord}
+                            typedefRec={this.props.typedefRec}
+                            default_expand={false}
+                        />
+                        )
                     </div>
-                );
-            }
+                </div>
+            );
         }
 
         /** 
@@ -165,22 +145,22 @@ export default class C0ValueTabularDisplay extends React.Component<
         const deref_value = deref_C0Value(this.props.mem, this.props.value as C0Value<"ptr">);
         return (
             <div>
-                <button className="implicit-btn dbg-evaluate-tabular-btn" onClick={() => this.setState({expand: false})}>
-                    <FontAwesomeIcon icon={faCaretDown}/>
+                <button className="implicit-btn dbg-evaluate-tabular-btn" onClick={() => this.setState({ expand: false })}>
+                    <FontAwesomeIcon icon={faCaretDown} />
                 </button>
                 <div className="dbg-evaluate-tabular-content">
-                    Pointer ( <span className="dbg-extra-information">0x{(addr + offset).toString(16).padStart(8, "0").toUpperCase()}</span>
-                        <ul>
-                            <li>
-                                <C0ValueTabularDisplay
-                                    mem={this.props.mem}
-                                    value={deref_value}
-                                    typeRecord={this.props.typeRecord}
-                                    typedefRec={this.props.typedefRec}
-                                    default_expand={false}
-                                />
-                            </li>
-                        </ul>
+                    Pointer ( <span className="dbg-extra-information">0x{render_address(addr + offset, 8)}</span>
+                    <ul>
+                        <li>
+                            <C0ValueTabularDisplay
+                                mem={this.props.mem}
+                                value={deref_value}
+                                typeRecord={this.props.typeRecord}
+                                typedefRec={this.props.typedefRec}
+                                default_expand={false}
+                            />
+                        </li>
+                    </ul>
                     )
                 </div>
             </div>
@@ -193,18 +173,18 @@ export default class C0ValueTabularDisplay extends React.Component<
      * 
      * @returns A rendered struct C0Value Component
      */
-    render_struct() {
-        if (isNullPtr(this.props.value.value)) {
+    render_struct(value_to_render: C0Value<"ptr">) {
+        if (isNullPtr(value_to_render.value)) {
             return <p>NULL</p>;
         }
-        
+
         const fields = expand_C0Struct(
             this.props.mem,
             this.props.typeRecord,
             {
-                value: this.props.value.value,
-                type: {type: "ptr", kind: "ptr", value: this.props.value.type}
-            } as C0Value<"ptr">
+                value: value_to_render.value,
+                type: { type: "ptr", kind: "ptr", value: value_to_render.type }
+            }
         );
 
         if (fields.length === 0) {
@@ -213,7 +193,7 @@ export default class C0ValueTabularDisplay extends React.Component<
 
         const StructFields: JSX.Element[] = [];
 
-        for (let i = 0; i < fields.length; i ++) {
+        for (let i = 0; i < fields.length; i++) {
             const entry = fields[i];
             const field_name = <p className="dbg-evaluate-field-name"> {entry.name ?? `Offset @ ${entry.offset}`}:&nbsp;</p>;
             if (entry.value === undefined) {
@@ -242,16 +222,15 @@ export default class C0ValueTabularDisplay extends React.Component<
         }
 
         return (
-            <div style={{marginTop: "0.3rem"}}>
-                <>
-                <code>{(this.props.value.type as C0Type<"ptr">).value as string}</code>
+            <div style={{ marginTop: "0.3rem" }}>
+                <code>{Type2String((value_to_render.type).value)}</code>
                 <ul>
                     {StructFields}
                 </ul>
-                </>
             </div>
         );
     }
+
 
     render(): React.ReactNode {
         if (isValueType(this.props.value)) {
@@ -263,11 +242,11 @@ export default class C0ValueTabularDisplay extends React.Component<
         } else if (isPointerType(this.props.value)) {
             switch (this.props.value.type.kind) {
                 case "arr":
-                    return this.render_array();
+                    return this.render_array(this.props.value);
                 case "ptr":
-                    return this.render_pointer();
+                    return this.render_pointer(this.props.value);
                 case "struct":
-                    return this.render_struct();
+                    return this.render_struct(this.props.value);
             }
         }
     }

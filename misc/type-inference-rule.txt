@@ -1,0 +1,65 @@
+T : arbitrary type (excluding unknown)
+T?: Maybe<T> = T | <unknown>
+
+
+DUP     : S, x: T?            -> S, x: T?, y: T?
+POP     : S, x: T?            -> S
+SWAP    : S, x: T?, y: E?     -> S, y: E?, x: T?
+
+
+IADD    : S, x: int?, y: int? -> S, z: int
+IAND    : S, x: int?, y: int? -> S, z: int
+IDIV    : S, x: int?, y: int? -> S, z: int
+IMUL    : S, x: int?, y: int? -> S, z: int
+IOR     : S, x: int?, y: int? -> S, z: int
+IREM    : S, x: int?, y: int? -> S, z: int
+ISHL    : S, x: int?, y: int? -> S, z: int
+ISHR    : S, x: int?, y: int? -> S, z: int
+ISUB    : S, x: int?, y: int? -> S, z: int
+IXOR    : S, x: int?, y: int? -> S, z: int
+
+
+BIPUSH  : S                   -> S, x: (int | char | bool)?
+ILDC    : S                   -> S, x: int
+ALDC    : S                   -> S, x: string
+
+
+ACONST  : S                   -> S, x: <unknown>*
+
+
+VLOAD   : S                   -> S, x: T?
+VSTORE  : S, x: T?            -> S
+
+
+ATHROW  : S, x: string?       -> (stack destroyed)
+ASSERT  : S, x: string?, y: bool? -> S
+
+
+NOP     : S                   -> S
+GOTO    : S                   -> S
+IF_CMPEQ: S, x: T?, y: T?     -> S
+IF_CMPNE: S, x: T?, y: T?     -> S
+IF_CMPGE: S, x: (int | char | bool)?, y: (int | char | bool)? -> S
+IF_CMPGT: S, x: (int | char | bool)?, y: (int | char | bool)? -> S
+IF_CMPLE: S, x: (int | char | bool)?, y: (int | char | bool)? -> S
+IF_CMPLT: S, x: (int | char | bool)?, y: (int | char | bool)? -> S
+
+
+RETURN  : x: T?                        -> (stack destroyed)
+INVOKESTATIC: S, v1: T?, v2: T?, ...   -> S, v: T?
+INVOKENATIVE: S, v1: T?, v2: T?, ...   -> S, v: T
+
+
+NEW     : S                            -> S, x: T*
+IMLOAD  : S, a: int?*?                 -> S, x: int?
+IMSTORE : S, a: int?*?, x: int?        -> S
+AMLOAD  : S, a: T?*?*?                 -> S, x: T?*
+AMSTORE : S, a: T?*?*?, x: T?*?        -> S
+CMLOAD  : S, a: (char | bool)?*?       -> S, x: (char | bool)?
+CMSTORE : S, a: (char | bool)?*?, x: (char | bool)? -> S
+
+
+AADDF   : S, a: struct E?*             -> S, x: T?*
+NEWARRAY: S, n: int?                   -> S, a: T[]
+ARRAYLENGTH: S, a: T[]                 -> S, n: int
+AADDS   : S, a: T[], n: int?           -> S, b: T*

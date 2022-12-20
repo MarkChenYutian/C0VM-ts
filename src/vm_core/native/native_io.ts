@@ -10,11 +10,15 @@ import { allocate_js_string, loadString } from "../../utility/string_utility";
 
 /**
  * Print string to HTML GUI
+ * 
+ * Update: Since we are now writing output to C0Output component using
+ * dangerouslySetInnerHTML method, we need to sanitize all the program printout manually.
+ * 
  * @param s The string to be printed
  * @returns Whether the print is success or not
  */
 function internal_print(UIHook: ReactUIHook, s: string): boolean {
-    UIHook.print_update(s);
+    UIHook.print_update(s.replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
     return true;
 }
 

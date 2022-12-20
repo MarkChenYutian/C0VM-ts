@@ -20,7 +20,7 @@ export default class C0VM_RuntimeState implements C0VM_RT{
      * @param heapSize Heap size (in bytes), optional, if not explicitly designated, then use the 
      * GlobalThis.MEM_POOL_DEFAULT_SIZE as the size.
      */
-    constructor(rawByteCode: string, heapSize?: number, C0Source?: C0EditorTab[], TypedefRecord?: Map<string, TypeDefInfo>, parsed_result?: C0ByteCode) {
+    constructor(rawByteCode: string, C0Source: C0EditorTab[], TypedefRecord: Map<string, TypeDefInfo>, heapSize?: number, parsed_result?: C0ByteCode) {
         this.raw_code = rawByteCode;
         this.code = parsed_result === undefined ? parse(rawByteCode, C0Source, TypedefRecord) : parsed_result;
         this.heap_size = heapSize;
@@ -54,8 +54,13 @@ export default class C0VM_RuntimeState implements C0VM_RT{
         return step(this.state, this.allocator, UIHooks);
     }
 
+    /**
+     * Clone the current runtime state, have this helper because React want all states
+     * to be immutable
+     * @returns a clone of current runtime state
+     */
     public clone(): C0VM_RuntimeState {
-        const C = new C0VM_RuntimeState(this.raw_code, this.heap_size, undefined, undefined, this.code);
+        const C = new C0VM_RuntimeState(this.raw_code, [], new Map(), this.heap_size, this.code);
         
         C.state = this.state;
         C.allocator = this.allocator;

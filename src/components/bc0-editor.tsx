@@ -5,13 +5,10 @@ import { StateField, RangeSet } from "@codemirror/state";
 import { GutterMarker } from "@codemirror/view";
 
 import breakpointGutter from "./editor_extension/breakpoint_marker";
-// import LoadDocumentPlugin from "./editor_extension/blank_load";
 import execLineHighlighter from "./editor_extension/exec_position";
 import { BC0Language } from "./editor_extension/syntax/bc0";
 
-import { keymap } from "@codemirror/view";
-import { indentWithTab } from "@codemirror/commands";
-import { indentUnit, language } from "@codemirror/language";
+import { language } from "@codemirror/language";
 
 
 export default class BC0Editor extends React.Component<BC0EditorProps>
@@ -53,14 +50,10 @@ export default class BC0Editor extends React.Component<BC0EditorProps>
                     value = {this.props.editorValue}
                     extensions={[
                         breakpoint_extension,
-                        // LoadDocumentPlugin(".bc0", undefined),
                         basicSetup(),
-                        keymap.of([indentWithTab]),
-                        indentUnit.of("    "),
                         language.of(BC0Language),
                         execLineHighlighter(this.props.execLine, globalThis.UI_EDITOR_THEME),
                     ]}
-                    // editable={this.props.execLine === 0}
                     editable={false}
                 />
     }

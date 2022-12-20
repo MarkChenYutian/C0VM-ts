@@ -102,6 +102,8 @@ export class vm_instruct_error extends Error {
 
 /**
  * Unexpected bytecode contend during parsing
+ * @deprecated should not be prompted anymore as we disallow user to
+ * give bytecode to C0VM.ts directly since v0.3.0
  */
 export class bc0_format_error extends Error {
     public readonly name = "BC0FormatError";
