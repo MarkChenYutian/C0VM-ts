@@ -7,8 +7,33 @@ import DraggableTabs from "./draggable_tabs";
 
 const { TabPane } = Tabs;
 
+class EditableTab extends React.Component<{ title: string, editor_key: string, onInput: (key: string, a: string) => void }, { title: string }> {
+    constructor(props: { title: string, editor_key: string, onInput: (a: string) => void }) {
+        super(props);
+        this.state = {
+            title: props.title
+        };
+        this.onChange = this.onChange.bind(this);
+    }
+
+    onChange(e: React.ChangeEvent<HTMLInputElement>) {
+        e.preventDefault();
+        this.setState({title: e.target.value});
+        this.props.onInput(this.props.editor_key, e.target.value);
+    }
+    
+    render() {
+        return (  
+        <>
+            <input type="text" placeholder="Some placeholder" value={this.state.title} onChange={this.onChange}></input>
+        </>
+        );
+    }
+}
+
 export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
 {
+
     on_change_key(new_active_key: string) {
         this.props.setActiveTab(parseInt(new_active_key));
     }
@@ -33,6 +58,10 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
             brkpt.push(`${title}@${lns[i]}`);
         }
         this.props.writeC0BrkPts(new Set(brkpt));
+    }
+
+    set_current_tab_name(key: string, s: string): void {
+        this.props.setTabName(parseInt(key), s === null ? "" : s);
     }
 
     render() {
@@ -74,7 +103,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                             lineNumber = this.props.currLine[1];
                         }
                         return <TabPane
-                            tab={editor.title}
+                            tab={<EditableTab title={editor.title} editor_key={editor.key + ""} onInput={(k, s) => this.set_current_tab_name(k, s)}/>}
                             key={editor.key + ""}
                             closable = {this.props.currTabs.length !== 1}
                             closeIcon={<FontAwesomeIcon icon={faXmark}/>}
