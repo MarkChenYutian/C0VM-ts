@@ -4,33 +4,47 @@ declare module '*.svg';
 
 type SetAppStateInput = (Pick<C0VMApplicationState, any> | C0VMApplicationState | null)
 
-type BreakPoint = {line: number, charPos: number}
+/* Breakpoint representation */
+type BreakPoint = {
+    line: number,       /* The line number that breakpoint is on right now */
+    charPos: number     /* The (character-based) position of breakpoint in codemirror editor */
+}
+
+/* Typedef statements in C0 source code */
+type TypeDefInfo = {
+    source: string, /* source: the original type being aliased */
+    key: number     /* key: the key of editor where this typedef info entry comes from */
+}
+
+/* Describes a C0Editor Tab */
+type C0EditorTab = {
+    title  : string,            /* Title of editor tab */
+    key    : number,            /* Key of editor tab */
+    content: string,            /* Content (raw string) of that tab */
+    breakpoints: BreakPoint[]   /* Breakpoints attatched to that tab */
+};
 
 interface C0VMApplicationState {
     crashed        : boolean,         /* C0VM Application top-level error boundary */
     c0_only        : boolean,         /* C0 only mode or not */
     contentChanged : boolean,         /* If content has changed or not (requires re-compile) */
-
     dbgFullScreen  : boolean,         /* If it is in full screen mode currently */
     settingMenuOn  : boolean,         /* See if the setting menu is on or not */
 
     BC0SourceCode  : string,          /* The content of BC0 code editor */
     BC0BreakPoints : Set<BreakPoint>, /* Breakpoints activated in BC0 code editor */
-    TypedefRecord  : Map<string, TypeDefInfo>, /* Record the typedef names for string substitution */
 
+    TypedefRecord  : Map<string, TypeDefInfo>, /* Record the typedef names for string substitution */
     C0Editors      : C0EditorTab[],   /* Code editor tab titles */
     ActiveEditor   : number,          /* Currently activated tab index of C0Editor */
 
-    PrintoutValue: string,            /* The string to show in the stdout console */
+    PrintoutValue  : string,          /* The string to show in the stdout console */
 
-    C0Running: boolean,               /* If the C0VM is running currently */
-    C0Runtime: C0VM_RuntimeState | undefined,   /* Runtime of C0VM */
-    CompilerFlags: Record<string, boolean>      /* Compiler Flags (-d) */
+    C0Running      : boolean,         /* If the C0VM is running currently */
+    C0Runtime      : C0VM_RuntimeState | undefined,   /* Runtime of C0VM */
+    CompilerFlags  : Record<string, boolean>          /* Compiler Flags (-d) */
 };
 
-/* to: the string of typedef source */
-/* key: the key of editor where this typedef info entry comes from */
-type TypeDefInfo = {source: string, key: number}
 
 // The props that main control bar component will accept
 interface MainControlProps {
@@ -58,34 +72,37 @@ interface CodeEditorProps {
 }
 
 interface CodeEditorState {
-    mode: "c0" | "bc0";
-    C0_nextKey: number
+    mode: "c0" | "bc0";     /* Editor mode (C0 or BC0) */
+    C0_nextKey: number      /* Editor key for next tab */
 }
 
 interface C0EditorGroupProps {
-    currLine     : [string, number, boolean] | undefined,
+    /* currLine = [ FileName, lineNumber, isBreakPoint ] */
+    currLine     : [string, number, boolean] | undefined,   /* Current C0 line the C0VM is executing */
 
-    activeTab    : number,
-    setActiveTab : (i: number) => void,
-
-    currTabs     : C0EditorTab[],
-    setTabName   : (key: number, name: string) => void,
-    setTabs      : (nt: C0EditorTab[]) => void,
+    appState     : C0VMApplicationState,                    /* C0VM Application State */
+    set_app_state<K extends keyof C0VMApplicationState>(
+        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
+                => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
+            | (Pick<C0VMApplicationState, K> 
+            | C0VMApplicationState 
+            | null),
+            callback?: () => void
+        ): void;
     
     newPanel     : () => void,
     removePanel  : (key: string) => void,
 
-    updateContent: (s: string, key: number) => void,
+    updateContent: (key: number, s: string) => void,
     updateTypedef: (key: number, newTypeDef: Map<string, string>) => void;
 }
 
-type C0EditorTab = {title: string, key: number, content: string, breakpoints: BreakPoint[]};
 
 interface C0EditorProps {
-    lineNumber    : number,
-    editorValue   : string,
-    editable      : boolean
-    breakPoints   : BreakPoint[],
+    execLine      : number,                     /* The line number C0VM is currently on (0 if not running on this C0 tab) */
+    editorValue   : string,                     /* Editor content (raw string) */
+    editable      : boolean                     /* Is editor editable? (if false, in read-only mode) */
+    breakPoints   : BreakPoint[],               /* Breakpoints attatched to this editor */
     
     updateContent : (s: string) => void,
     updateTypedef : (newTypeDef: Map<string, string>) => void,
@@ -204,9 +221,8 @@ interface SettingMenuProps {
 
 
 interface BreakpointExtProps {
-    currBps: BreakPoint[],
-    setBps: (ns: BreakPoint[]) => void
+    currBps: BreakPoint[],                  // Current breakpoints
+    setBps: (ns: BreakPoint[]) => void      // Update breakpoints
 }
 
-
-type BreakpointExt = (props: BreakpointExtProps) => (StateField<RangeSet<GutterMarker>> | Extension)[]
+type BreakpointExt = (props: BreakpointExtProps) => ((StateField<RangeSet<GutterMarker>> | Extension)[])

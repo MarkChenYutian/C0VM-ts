@@ -21,9 +21,7 @@ function createBreakpointState(breakpoints: BreakPoint[], setBps: (ns: BreakPoin
     },
 
     update(set, transaction) {
-      // console.log("Before", set);
       set = set.map(transaction.changes);
-      // console.log("After", set);
       for (let e of transaction.effects) {
         if (e.is(breakpointEffect)) {
           if (e.value.on) {
@@ -37,12 +35,11 @@ function createBreakpointState(breakpoints: BreakPoint[], setBps: (ns: BreakPoin
       }
 
       set.update({ filter: (from) => from <= transaction.state.doc.lines });
-      // TODO: use setBps to update the set of all breakpoints
+      
       const newBps: BreakPoint[] = [];
       for (let p = set.iter(); p.value !== null; p.next()){
         newBps.push({charPos: p.from, line: transaction.state.doc.lineAt(p.from).number});
       }
-      // console.log(newBps);
       setBps(newBps);
       return set;
     }

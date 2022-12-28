@@ -15,10 +15,10 @@ function typedefResolver(s: EditorState): Map<string, string> {
     const map = new Map<string, string>();
     for (let ptr = tree.cursor(); ptr.next() !== false; ) {
         if (ptr.type.is("TypeDefinition")) {
-            ptr.firstChild();
-            ptr.nextSibling();
+            ptr.firstChild();       // ptr = typedef keyword itself
+            ptr.nextSibling();      // ptr = Source Type
             const source_type = s.sliceDoc(ptr.from, ptr.to);
-            ptr.nextSibling();
+            ptr.nextSibling();      // ptr = Target Type
             const alias_type = s.sliceDoc(ptr.from, ptr.to);
             map.set(alias_type, source_type);
         }
@@ -30,10 +30,12 @@ export default class C0Editor extends React.Component<C0EditorProps>
 {
     /**
      * Interesting ... a C0Editor can hold the state for itself so there's no need
-     * to update at all
+     * to update unless the execLine is changed
      */
     shouldComponentUpdate(nextProps: Readonly<C0EditorProps>, nextState: Readonly<{}>, nextContext: any): boolean {
-        return this.props.lineNumber !== nextProps.lineNumber;
+        const execLineChanged = this.props.execLine !== nextProps.execLine;
+        const valueChanged = this.props.editorValue !== nextProps.editorValue;
+        return execLineChanged || valueChanged;
     }
 
     render() {
@@ -57,11 +59,11 @@ export default class C0Editor extends React.Component<C0EditorProps>
                         value = {this.props.editorValue}
                         extensions={[
                             LoadDocumentPlugin(".c0", this.props.updateName),
-                            breakpoint_extension,
                             basicSetup(),
                             indentUnit.of("    "),
-                            execLineHighlighter(this.props.lineNumber, globalThis.UI_EDITOR_THEME),
+                            execLineHighlighter(this.props.execLine, globalThis.UI_EDITOR_THEME),
                             C0(),
+                            breakpoint_extension,
                         ]}
                         editable={this.props.editable}
                     />

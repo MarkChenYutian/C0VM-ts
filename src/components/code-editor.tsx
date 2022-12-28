@@ -7,8 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
 import C0VM_RuntimeState from "../vm_core/exec/state";
 
-const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.c0$/;
-
 function merge_typedef(original: Map<string, TypeDefInfo>, editor_key: number, newSet: Map<string, string>): Map<string, TypeDefInfo> {
     const newTypedef = new Map<string, TypeDefInfo>();
     original.forEach(
@@ -39,38 +37,6 @@ export default class CodeEditor extends React.Component
         }
     }
 
-    set_tab_name(key: number, name: string) {
-        if (!regex_valid_file_name.test(name)) {
-            globalThis.MSG_EMITTER.warn(
-                "Failed to rename editor tab", 
-                "Editor tab's name can't contain special character and should end in .c0"
-            );
-            return;
-        }
-        if (this.props.app_state.C0Runtime !== undefined && this.props.app_state.C0Runtime.state.CurrLineNumber !== 0) {
-            globalThis.MSG_EMITTER.warn(
-                "Failed to rename editor tab",
-                "Can't rename editor tab when a C0/BC0 program is running in background"
-            )
-        }
-        for (let i = 0; i < this.props.app_state.C0Editors.length; i ++) {
-            const tab = this.props.app_state.C0Editors[i];
-            if (tab.title === name) {
-                globalThis.MSG_EMITTER.warn("Failed to rename editor tab", "Editor tabs must have different name.");
-                return;
-            }
-        }
-        this.props.set_app_state(
-            (S) => {
-                let new_tabs = [...S.C0Editors];
-                for (let i = 0; i < new_tabs.length; i ++) {
-                    if (new_tabs[i].key === key) new_tabs[i].title = name;
-                }
-                return { C0Editors: new_tabs };
-            }
-        );
-    }
-
     create_panel() {
         const new_editors = [...this.props.app_state.C0Editors];
         new_editors.push({
@@ -91,7 +57,7 @@ export default class CodeEditor extends React.Component
         this.props.set_app_state({C0Editors: new_editors, ActiveEditor: new_activeTab});
     }
 
-    update_content(s: string, key: number) {
+    update_content(key: number, s: string) {
         let ns: C0EditorTab[] = [...this.props.app_state.C0Editors];
         ns = ns.map((tab) => tab.key === key ? {key: tab.key, title: tab.title, content: s, breakpoints: tab.breakpoints} : tab);
         this.props.set_app_state({C0Editors: ns, contentChanged: true});
@@ -108,14 +74,11 @@ export default class CodeEditor extends React.Component
                 </div>
                 <C0EditorGroup
                     currLine        = {(this.props.app_state.C0Runtime as (C0VM_RuntimeState | undefined))?.state.CurrC0RefLine}
-                    activeTab       = {this.props.app_state.ActiveEditor}
-                    setActiveTab    = {(i) => this.props.set_app_state({ActiveEditor: i})}
-                    currTabs        = {this.props.app_state.C0Editors}
-                    setTabs         = {(nt) => this.props.set_app_state({C0Editors: nt})}
-                    setTabName      = {(k, s) => this.set_tab_name(k, s)}
+                    appState        = {this.props.app_state}
+                    set_app_state   = {(ns) => this.props.set_app_state(ns)}
                     newPanel        = {() => this.create_panel()}
                     removePanel     = {(key) => this.remove_panel(key)}
-                    updateContent   = {(s, key) => this.update_content(s, key)}
+                    updateContent   = {(key, s) => this.update_content(key, s)}
                     updateTypedef   = {(key, newMap) => {
                         this.props.set_app_state({TypedefRecord: merge_typedef(this.props.app_state.TypedefRecord, key, newMap)})
                     }}
@@ -128,15 +91,11 @@ export default class CodeEditor extends React.Component
         if (this.state.mode === "c0") {
             content = <C0EditorGroup
                 currLine        = {(this.props.app_state.C0Runtime as (C0VM_RuntimeState | undefined))?.state.CurrC0RefLine}
-                activeTab       = {this.props.app_state.ActiveEditor}
-                currTabs        = {this.props.app_state.C0Editors}
-                
-                setActiveTab    = {(i) => this.props.set_app_state({ActiveEditor: i})}
-                setTabs         = {(nt) => this.props.set_app_state({C0Editors: nt})}
-                setTabName      = {(k, s) => this.set_tab_name(k, s)}
+                appState        = {this.props.app_state}
+                set_app_state   = {(ns) => this.props.set_app_state(ns)}
                 newPanel        = {() => this.create_panel()}
                 removePanel     = {(key) => this.remove_panel(key)}
-                updateContent   = {(s, key) => this.update_content(s, key)}
+                updateContent   = {(key, s) => this.update_content(key, s)}
                 updateTypedef   = {(key, newMap) => {
                     this.props.set_app_state({TypedefRecord: merge_typedef(this.props.app_state.TypedefRecord, key, newMap)})
                 }}
@@ -162,7 +121,7 @@ export default class CodeEditor extends React.Component
                 </h3>
                 <Segmented
                     options={[
-                        { label: "C0", value: "c0" } , 
+                        { label: "C0", value: "c0" }, 
                         { label: "BC0",value: "bc0"}
                     ]}
                     defaultValue="c0"

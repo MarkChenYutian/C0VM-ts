@@ -83,8 +83,6 @@ export default function MainControlBar(props: MainControlProps) {
         const bc0BreakPointArr = Array.from(appState.BC0BreakPoints).map(bp => bp.line);
         const bc0BreakPoints = new Set(bc0BreakPointArr);
 
-        console.table([c0BreakPoint, bc0BreakPointArr], ["C0 BreakPoint", "BC0 BreakPoint"]);
-
         // Initialize AbortController
         props.set_app_state({C0Running: true});
 
@@ -125,7 +123,6 @@ export default function MainControlBar(props: MainControlProps) {
 
     const compile_c0source = () => {
         clear_print();
-        // props.set_app_state({contentChanged: false});
         remote_compile(
             appState,
             props.set_app_state,
