@@ -72,13 +72,24 @@ export default function MainControlBar(props: MainControlProps) {
             init_state = appState.C0Runtime;
         }
 
+        const c0BreakPoint = new Set<string>();
+        for (let i = 0; i < appState.C0Editors.length; i ++){
+            const currentEditor = appState.C0Editors[i];
+            for (let j = 0; j < currentEditor.breakpoints.length; j ++){
+                c0BreakPoint.add(`${currentEditor.title}@${currentEditor.breakpoints[j].line}`);
+            }
+        }
+
+        const bc0BreakPointArr = Array.from(appState.BC0BreakPoints).map(bp => bp.line);
+        const bc0BreakPoints = new Set(bc0BreakPointArr);
+
         // Initialize AbortController
         props.set_app_state({C0Running: true});
 
         const run_result = await VM.run(
                 init_state,
-                appState.BC0BreakPoints,
-                appState.C0BreakPoint,
+                bc0BreakPoints,
+                c0BreakPoint,
                 abortSignal,
                 reset,
                 update_print,
@@ -112,7 +123,6 @@ export default function MainControlBar(props: MainControlProps) {
 
     const compile_c0source = () => {
         clear_print();
-        // props.set_app_state({contentChanged: false});
         remote_compile(
             appState,
             props.set_app_state,

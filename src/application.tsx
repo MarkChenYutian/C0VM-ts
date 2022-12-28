@@ -28,9 +28,8 @@ export default class C0VMApplication extends React.Component<
             BC0BreakPoints: new Set(),
             TypedefRecord: new Map(),
 
-            C0Editors: [{ title: "Untitled_0.c0", key: 0, content: ""}],
+            C0Editors: [{ title: "Untitled_0.c0", key: 0, content: "", breakpoints: []}],
             ActiveEditor: 0,
-            C0BreakPoint: new Set(),
 
             PrintoutValue: "",
 
