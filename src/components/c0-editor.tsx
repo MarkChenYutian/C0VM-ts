@@ -58,12 +58,12 @@ export default class C0Editor extends React.Component<C0EditorProps>
                         }
                         value = {this.props.editorValue}
                         extensions={[
+                            breakpoint_extension,
                             LoadDocumentPlugin(".c0", this.props.updateName),
                             basicSetup(),
                             indentUnit.of("    "),
                             execLineHighlighter(this.props.execLine, globalThis.UI_EDITOR_THEME),
                             C0(),
-                            breakpoint_extension,
                         ]}
                         editable={this.props.editable}
                     />
