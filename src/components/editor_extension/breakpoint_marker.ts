@@ -68,7 +68,11 @@ function toggleBreakpoint(
 
 const breakpointMarker = new (class extends GutterMarker {
   toDOM() {
-    return document.createTextNode("🔴");
+    const span_node = document.createElement("span");
+    span_node.setAttribute("class", "editor-breakpoint");
+    span_node.innerText = " ";
+    return span_node;
+    // return document.createTextNode("🔴");
   }
 })();
 
@@ -92,10 +96,10 @@ const breakpointGutter: BreakpointExt = (props) => {
 
     EditorView.baseTheme({
       ".cm-breakpoint-gutter .cm-gutterElement": {
-        paddingLeft: "1px",
-        paddingTop: "1.5px",
+        paddingLeft: "0px",
+        paddingTop: "0px",
         cursor: "pointer",
-        fontSize: "0.6rem",
+        fontSize: "14px",
       },
     }),
   ];

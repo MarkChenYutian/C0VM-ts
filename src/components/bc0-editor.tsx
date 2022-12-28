@@ -39,7 +39,7 @@ export default class BC0Editor extends React.Component<BC0EditorProps>
                         language.of(BC0Language),
                         execLineHighlighter(this.props.execLine, globalThis.UI_EDITOR_THEME),
                     ]}
-                    editable={true}
+                    editable={false}
                 />
     }
 }
