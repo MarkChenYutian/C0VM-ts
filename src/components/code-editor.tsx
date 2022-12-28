@@ -97,18 +97,6 @@ export default class CodeEditor extends React.Component
         this.props.set_app_state({C0Editors: ns, contentChanged: true});
     }
 
-    update_c0_brkpts(key: number, line: number) {
-        let newTabs = [...this.props.app_state.C0Editors];
-        for (let i = 0; i < newTabs.length; i ++) {
-            if (newTabs[i].key === key && newTabs[i].breakpoints.includes(line)){
-                newTabs[i].breakpoints = newTabs[i].breakpoints.filter((bp) => bp !== line);
-            } else if (newTabs[i].key === key) {
-                newTabs[i].breakpoints.push(line);
-            }
-        }
-        this.props.set_app_state({C0Editors: newTabs})
-    }
-
     render_c0() {
         const read_only = this.props.app_state.C0Runtime !== undefined && this.props.app_state.C0Runtime.state.CurrLineNumber !== 0;
         return (
@@ -122,7 +110,6 @@ export default class CodeEditor extends React.Component
                     currLine        = {(this.props.app_state.C0Runtime as (C0VM_RuntimeState | undefined))?.state.CurrC0RefLine}
                     activeTab       = {this.props.app_state.ActiveEditor}
                     setActiveTab    = {(i) => this.props.set_app_state({ActiveEditor: i})}
-                    setC0BrkPoint   = {(key, line) => this.update_c0_brkpts(key, line)}
                     currTabs        = {this.props.app_state.C0Editors}
                     setTabs         = {(nt) => this.props.set_app_state({C0Editors: nt})}
                     setTabName      = {(k, s) => this.set_tab_name(k, s)}
@@ -142,9 +129,9 @@ export default class CodeEditor extends React.Component
             content = <C0EditorGroup
                 currLine        = {(this.props.app_state.C0Runtime as (C0VM_RuntimeState | undefined))?.state.CurrC0RefLine}
                 activeTab       = {this.props.app_state.ActiveEditor}
-                setActiveTab    = {(i) => this.props.set_app_state({ActiveEditor: i})}
-                setC0BrkPoint   = {(key, line) => this.update_c0_brkpts(key, line)}
                 currTabs        = {this.props.app_state.C0Editors}
+                
+                setActiveTab    = {(i) => this.props.set_app_state({ActiveEditor: i})}
                 setTabs         = {(nt) => this.props.set_app_state({C0Editors: nt})}
                 setTabName      = {(k, s) => this.set_tab_name(k, s)}
                 newPanel        = {() => this.create_panel()}
@@ -157,11 +144,11 @@ export default class CodeEditor extends React.Component
         } else {
             const vm: C0VM_RuntimeState | undefined = this.props.app_state.C0Runtime;
             content = <BC0Editor
-                updateContent={(s: string) => this.props.set_app_state({BC0SourceCode: s})}
+                updateContent={s => this.props.set_app_state({BC0SourceCode: s})}
                 editorValue  ={this.props.app_state.BC0SourceCode}
                 execLine     ={vm === undefined ? 0 : vm.state.CurrLineNumber}
                 breakpointVal={this.props.app_state.BC0BreakPoints}
-                updateBrkPts ={(ns: number[]) => {this.props.set_app_state({BC0BreakPoints: new Set(ns)})}}
+                updateBrkPts ={ns => this.props.set_app_state({BC0BreakPoints: new Set(ns)})}
             />;
         }
 

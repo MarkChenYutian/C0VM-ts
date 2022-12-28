@@ -10,15 +10,14 @@ const breakpointEffect = StateEffect.define<{ pos: number; on: boolean }>({
   },
 });
 
-function createBreakpointState(charPositions: number[], setBps: (ns: number[]) => void) {
+function createBreakpointState(breakpoints: BreakPoint[], setBps: (ns: BreakPoint[]) => void) {
   return StateField.define<RangeSet<GutterMarker>>({
     create() {
-      const currentBreakpoints = charPositions.map(charPos => {
-        return breakpointMarker.range(charPos);
+      const currentBreakpoints = breakpoints.map(breakpoint => {
+        return breakpointMarker.range(breakpoint.charPos);
       })
 
       return RangeSet.empty.update({ add: currentBreakpoints, sort: true })
-      // return RangeSet.empty;
     },
 
     update(set, transaction) {
@@ -39,9 +38,9 @@ function createBreakpointState(charPositions: number[], setBps: (ns: number[]) =
 
       set.update({ filter: (from) => from <= transaction.state.doc.lines });
       // TODO: use setBps to update the set of all breakpoints
-      const newBps = [];
+      const newBps: BreakPoint[] = [];
       for (let p = set.iter(); p.value !== null; p.next()){
-        newBps.push(p.from);
+        newBps.push({charPos: p.from, line: transaction.state.doc.lineAt(p.from).number});
       }
       // console.log(newBps);
       setBps(newBps);
@@ -57,8 +56,6 @@ function toggleBreakpoint(
   pos: number,
   internal_state: StateField<RangeSet<GutterMarker>>,
 ) {
-  // update breakpoint positions
-  // set_brkpnt(view.state.doc.lineAt(pos).number);  // line number = pos + 1
 
   let breakpoints = view.state.field(internal_state);
   let hasBreakpoint = false;

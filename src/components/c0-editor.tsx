@@ -33,7 +33,7 @@ export default class C0Editor extends React.Component<C0EditorProps>
      * to update at all
      */
     shouldComponentUpdate(nextProps: Readonly<C0EditorProps>, nextState: Readonly<{}>, nextContext: any): boolean {
-        return false;
+        return this.props.lineNumber !== nextProps.lineNumber;
     }
 
     render() {

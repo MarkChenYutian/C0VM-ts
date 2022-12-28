@@ -76,16 +76,21 @@ export default function MainControlBar(props: MainControlProps) {
         for (let i = 0; i < appState.C0Editors.length; i ++){
             const currentEditor = appState.C0Editors[i];
             for (let j = 0; j < currentEditor.breakpoints.length; j ++){
-                c0BreakPoint.add(`${currentEditor.title}@${currentEditor.breakpoints[j]}`);
+                c0BreakPoint.add(`${currentEditor.title}@${currentEditor.breakpoints[j].line}`);
             }
         }
+
+        const bc0BreakPointArr = Array.from(appState.BC0BreakPoints).map(bp => bp.line);
+        const bc0BreakPoints = new Set(bc0BreakPointArr);
+
+        console.table([c0BreakPoint, bc0BreakPointArr], ["C0 BreakPoint", "BC0 BreakPoint"]);
 
         // Initialize AbortController
         props.set_app_state({C0Running: true});
 
         const run_result = await VM.run(
                 init_state,
-                appState.BC0BreakPoints,
+                bc0BreakPoints,
                 c0BreakPoint,
                 abortSignal,
                 reset,

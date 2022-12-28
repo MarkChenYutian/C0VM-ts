@@ -23,7 +23,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         this.props.setTabs(result);
     }
 
-    set_brkpt_for_editor(key: number, bps: number[]) {
+    set_brkpt_for_editor(key: number, bps: BreakPoint[]) {
         const newTabs = [...this.props.currTabs];
         for (let i = 0; i < newTabs.length; i ++) {
             if (newTabs[i].key === key) newTabs[i].breakpoints = bps;
@@ -84,7 +84,6 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                                 updateTypedef = {(nt: Map<string, string>) => this.props.updateTypedef(editor.key, nt)}
                                 updateName    = {(s: string) => this.props.setTabName(editor.key, s)}
                                 setBreakPts   = {(lns) => this.set_brkpt_for_editor(editor.key, lns)}
-                                updateBrkPts  = {(ln) => this.props.setC0BrkPoint(editor.key, ln)}
                                 editable      = {this.props.currLine === undefined}
                             />
                         </TabPane>;

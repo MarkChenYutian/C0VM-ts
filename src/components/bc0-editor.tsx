@@ -11,7 +11,9 @@ import { language } from "@codemirror/language";
 export default class BC0Editor extends React.Component<BC0EditorProps>
 {
     shouldComponentUpdate(nextProps: Readonly<BC0EditorProps>, nextState: Readonly<{}>, nextContext: any): boolean {
-        return false;
+        const execLineChanged = this.props.execLine !== nextProps.execLine;
+        const valueChanged = this.props.editorValue !== nextProps.editorValue;
+        return execLineChanged || valueChanged;
     }
 
     render() {

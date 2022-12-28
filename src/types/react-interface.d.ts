@@ -2,7 +2,9 @@
 
 declare module '*.svg';
 
-type SetAppStateInput = (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)
+type SetAppStateInput = (Pick<C0VMApplicationState, any> | C0VMApplicationState | null)
+
+type BreakPoint = {line: number, charPos: number}
 
 interface C0VMApplicationState {
     crashed        : boolean,         /* C0VM Application top-level error boundary */
@@ -13,7 +15,7 @@ interface C0VMApplicationState {
     settingMenuOn  : boolean,         /* See if the setting menu is on or not */
 
     BC0SourceCode  : string,          /* The content of BC0 code editor */
-    BC0BreakPoints : Set<number>,     /* Breakpoints activated in BC0 code editor */
+    BC0BreakPoints : Set<BreakPoint>, /* Breakpoints activated in BC0 code editor */
     TypedefRecord  : Map<string, TypeDefInfo>, /* Record the typedef names for string substitution */
 
     C0Editors      : C0EditorTab[],   /* Code editor tab titles */
@@ -62,7 +64,6 @@ interface CodeEditorState {
 
 interface C0EditorGroupProps {
     currLine     : [string, number, boolean] | undefined,
-    setC0BrkPoint: (k: number, ln: number) => void,
 
     activeTab    : number,
     setActiveTab : (i: number) => void,
@@ -78,27 +79,26 @@ interface C0EditorGroupProps {
     updateTypedef: (key: number, newTypeDef: Map<string, string>) => void;
 }
 
-type C0EditorTab = {title: string, key: number, content: string, breakpoints: number[]};
+type C0EditorTab = {title: string, key: number, content: string, breakpoints: BreakPoint[]};
 
 interface C0EditorProps {
     lineNumber    : number,
     editorValue   : string,
-    breakPoints   : number[],
+    editable      : boolean
+    breakPoints   : BreakPoint[],
     
     updateContent : (s: string) => void,
     updateTypedef : (newTypeDef: Map<string, string>) => void,
-    updateBrkPts  : (ln: number) => void,
-    setBreakPts   : (lns: number[]) => void,
-    editable      : boolean
-    updateName   ?: (s: string) => void,
+    setBreakPts   : (lns: BreakPoint[]) => void,
+    updateName    : (s: string) => void,
 }
 
 interface BC0EditorProps {
     updateContent : (s: string) => void,
     editorValue   : string,
     execLine      : number,
-    breakpointVal : Set<number>,
-    updateBrkPts  : (ns: number[]) => void,
+    breakpointVal : Set<BreakPoint>,
+    updateBrkPts  : (ns: BreakPoint[]) => void,
 }
 
 // The props that CompilerOption component will accept
@@ -204,8 +204,8 @@ interface SettingMenuProps {
 
 
 interface BreakpointExtProps {
-    currBps: number[],
-    setBps: (ns: number[]) => void
+    currBps: BreakPoint[],
+    setBps: (ns: BreakPoint[]) => void
 }
 
 
