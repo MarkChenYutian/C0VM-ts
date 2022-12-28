@@ -18,7 +18,6 @@ interface C0VMApplicationState {
 
     C0Editors      : C0EditorTab[],   /* Code editor tab titles */
     ActiveEditor   : number,          /* Currently activated tab index of C0Editor */
-    C0BreakPoint   : Set<string>      /* Breakpoints on C0 Source code */
 
     PrintoutValue: string,            /* The string to show in the stdout console */
 
@@ -63,9 +62,7 @@ interface CodeEditorState {
 
 interface C0EditorGroupProps {
     currLine     : [string, number, boolean] | undefined,
-    c0BreakPoints: Set<string>,
-    setC0BrkPoint: (s: string, ln: number) => void,
-    writeC0BrkPts: (s: Set<string>) => void,
+    setC0BrkPoint: (k: number, ln: number) => void,
 
     activeTab    : number,
     setActiveTab : (i: number) => void,
@@ -81,13 +78,15 @@ interface C0EditorGroupProps {
     updateTypedef: (key: number, newTypeDef: Map<string, string>) => void;
 }
 
-type C0EditorTab = {title: string, key: number, content: string};
+type C0EditorTab = {title: string, key: number, content: string, breakpoints: number[]};
 
 interface C0EditorProps {
     lineNumber    : number,
+    editorValue   : string,
+    breakPoints   : number[],
+    
     updateContent : (s: string) => void,
     updateTypedef : (newTypeDef: Map<string, string>) => void,
-    editorValue   : string,
     updateBrkPts  : (ln: number) => void,
     setBreakPts   : (lns: number[]) => void,
     editable      : boolean
@@ -99,7 +98,7 @@ interface BC0EditorProps {
     editorValue   : string,
     execLine      : number,
     breakpointVal : Set<number>,
-    updateBrkPts  : (ns: Set<number>) => void,
+    updateBrkPts  : (ns: number[]) => void,
 }
 
 // The props that CompilerOption component will accept
@@ -202,3 +201,12 @@ interface SettingMenuProps {
         callback?: () => void
     ): void;
 }
+
+
+interface BreakpointExtProps {
+    currBps: number[],
+    setBps: (ns: number[]) => void
+}
+
+
+type BreakpointExt = (props: BreakpointExtProps) => (StateField<RangeSet<GutterMarker>> | Extension)[]

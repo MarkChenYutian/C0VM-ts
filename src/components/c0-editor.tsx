@@ -1,9 +1,6 @@
 import React from "react";
 import ReactCodeMirror, { basicSetup } from "@uiw/react-codemirror";
 
-import { StateField, RangeSet } from "@codemirror/state";
-import { GutterMarker } from "@codemirror/view";
-
 import LoadDocumentPlugin from "./editor_extension/blank_load";
 import { C0 } from "./editor_extension/syntax/c0";
 
@@ -31,12 +28,20 @@ function typedefResolver(s: EditorState): Map<string, string> {
 
 export default class C0Editor extends React.Component<C0EditorProps>
 {
-    componentDidMount() {
-        this.props.setBreakPts([]);
+    /**
+     * Interesting ... a C0Editor can hold the state for itself so there's no need
+     * to update at all
+     */
+    shouldComponentUpdate(nextProps: Readonly<C0EditorProps>, nextState: Readonly<{}>, nextContext: any): boolean {
+        return false;
     }
 
     render() {
-        const breakpoint_extension = breakpointGutter((n) => {this.props.updateBrkPts(n)});
+        const breakpoint_extension = breakpointGutter({
+            currBps: this.props.breakPoints,
+            setBps: this.props.setBreakPts
+        });
+        
         return <div className="code-editor">
                     <ReactCodeMirror
                         theme={globalThis.UI_EDITOR_THEME}
@@ -44,14 +49,8 @@ export default class C0Editor extends React.Component<C0EditorProps>
                         onUpdate={(v) => 
                             {
                                 if (v.docChanged) {
-                                    const F = v.state.field(breakpoint_extension[0] as StateField<RangeSet<GutterMarker>>);
-                                    const brk_pts = [];
-                                    for (let cursor = F.iter(); cursor.value !== null; cursor.next()) {
-                                        brk_pts.push(v.state.doc.lineAt(cursor.from).number);
-                                    }
                                     this.props.updateContent(v.state.doc.toString());
                                     this.props.updateTypedef(typedefResolver(v.state));
-                                    this.props.setBreakPts(brk_pts);
                                 }
                             }
                         }

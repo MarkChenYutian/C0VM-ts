@@ -72,13 +72,21 @@ export default function MainControlBar(props: MainControlProps) {
             init_state = appState.C0Runtime;
         }
 
+        const c0BreakPoint = new Set<string>();
+        for (let i = 0; i < appState.C0Editors.length; i ++){
+            const currentEditor = appState.C0Editors[i];
+            for (let j = 0; j < currentEditor.breakpoints.length; j ++){
+                c0BreakPoint.add(`${currentEditor.title}@${currentEditor.breakpoints[j]}`);
+            }
+        }
+
         // Initialize AbortController
         props.set_app_state({C0Running: true});
 
         const run_result = await VM.run(
                 init_state,
                 appState.BC0BreakPoints,
-                appState.C0BreakPoint,
+                c0BreakPoint,
                 abortSignal,
                 reset,
                 update_print,

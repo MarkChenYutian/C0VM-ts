@@ -23,16 +23,12 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         this.props.setTabs(result);
     }
 
-    set_brkpt_for_editor(title: string, lns: number[]) {
-        let brkpt: string[] = Array.from(new Set(this.props.c0BreakPoints));
-        brkpt = brkpt.filter((elem) => {
-            const [fileName, ] = elem.split("@");
-            return fileName !== title;
-        });
-        for (let i = 0; i < lns.length; i ++) {
-            brkpt.push(`${title}@${lns[i]}`);
+    set_brkpt_for_editor(key: number, bps: number[]) {
+        const newTabs = [...this.props.currTabs];
+        for (let i = 0; i < newTabs.length; i ++) {
+            if (newTabs[i].key === key) newTabs[i].breakpoints = bps;
         }
-        this.props.writeC0BrkPts(new Set(brkpt));
+        this.props.setTabs(newTabs);
     }
 
     render() {
@@ -73,6 +69,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                         if (this.props.currLine !== undefined && editor.title === this.props.currLine[0]) {
                             lineNumber = this.props.currLine[1];
                         }
+
                         return <TabPane
                             tab={editor.title}
                             key={editor.key + ""}
@@ -81,12 +78,13 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                         >
                             <C0Editor
                                 lineNumber    = {lineNumber}
+                                editorValue   = {editor.content}
+                                breakPoints   = {editor.breakpoints}
                                 updateContent = {(s: string) => this.props.updateContent(s, editor.key)}
                                 updateTypedef = {(nt: Map<string, string>) => this.props.updateTypedef(editor.key, nt)}
                                 updateName    = {(s: string) => this.props.setTabName(editor.key, s)}
-                                editorValue   = {editor.content}
-                                updateBrkPts  = {(ln) => this.props.setC0BrkPoint(editor.title, ln)}
-                                setBreakPts   = {(lns) => this.set_brkpt_for_editor(editor.title, lns)}
+                                setBreakPts   = {(lns) => this.set_brkpt_for_editor(editor.key, lns)}
+                                updateBrkPts  = {(ln) => this.props.setC0BrkPoint(editor.key, ln)}
                                 editable      = {this.props.currLine === undefined}
                             />
                         </TabPane>;
