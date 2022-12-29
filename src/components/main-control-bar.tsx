@@ -1,5 +1,5 @@
 import React from "react";
-import { faBoltLightning, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { faBoltLightning, faClockRotateLeft, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import * as VM from "../vm_core/vm_interface";
@@ -111,6 +111,64 @@ export default function MainControlBar(props: MainControlProps) {
         else props.set_app_state({C0Runtime: new_runtime});
     }
 
+    const autoStep_c0runtime = async () => {
+        if (appState.contentChanged) {
+            RequiresRecompile();
+            return;
+        }
+
+        let init_state = undefined;
+        // let new_runtime, can_continue = undefined;
+        if (appState.C0Runtime === undefined) {
+            init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, appState.TypedefRecord, print_update, MEM_POOL_SIZE);
+            if (init_state === undefined) return;
+        } else {
+            init_state = appState.C0Runtime;
+        }
+
+        const c0BreakPoint = new Set<string>();
+        for (let i = 0; i < appState.C0Editors.length; i ++){
+            const currentEditor = appState.C0Editors[i];
+            for (let j = 0; j < currentEditor.breakpoints.length; j ++){
+                c0BreakPoint.add(`${currentEditor.title}@${currentEditor.breakpoints[j].line}`);
+            }
+        }
+
+        const bc0BreakPointArr = Array.from(appState.BC0BreakPoints).map(bp => bp.line);
+        const bc0BreakPoints = new Set(bc0BreakPointArr);
+
+        // Initialize AbortController
+        props.set_app_state({C0Running: true});
+
+        VM.autoStep(
+            init_state,
+            bc0BreakPoints,
+            c0BreakPoint,
+            abortSignal,
+            props.application_state.c0_only,
+            reset,
+            print_update,
+            s => props.set_app_state({C0Runtime: s}),
+            () => props.set_app_state({C0Running: false})
+        );
+        // console.log('autoStep');
+        // [new_runtime, can_continue] = [undefined, undefined];
+        // if (typeof run_result !== "undefined") {
+        //     [new_runtime, can_continue] = run_result;
+        // }
+        
+        // // Remove abort controller
+        // // props.set_app_state({C0Running: false});
+
+        // // Program complete execution
+        // if (!can_continue) props.set_app_state({C0Runtime: undefined});
+
+        // Program can still step in future, now paused due to breakpoint
+        // else props.set_app_state({C0Runtime: new_runtime});
+    }
+
+
+
     const restart_c0runtime = async () => {
         clear_print();
         const new_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, appState.TypedefRecord, print_update, globalThis.MEM_POOL_SIZE);
@@ -156,6 +214,14 @@ export default function MainControlBar(props: MainControlProps) {
             <FontAwesomeIcon icon={faPlay} className="hide-in-mobile"/>{" Run "}
         </button>;
     
+    const AutoStepButton = 
+        <button
+            className={"base-btn success-btn unselectable " + (is_bc0_valid && !appState.C0Running ? "" : "disable-btn")}
+            onClick={autoStep_c0runtime}
+        >
+            <FontAwesomeIcon icon={faClockRotateLeft} />{" Auto Step "}
+        </button>;
+    
     const AbortButton = 
         <button
             className="base-btn danger-btn unselectable"
@@ -182,6 +248,7 @@ export default function MainControlBar(props: MainControlProps) {
                 {CompileButton}
                 {StepButton}
                 {RunButton}
+                {AutoStepButton}
                 {appState.C0Running ? AbortButton : RestartButton}
             </div>
         </div>
