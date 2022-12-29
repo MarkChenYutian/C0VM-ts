@@ -433,8 +433,6 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             UIHooks.print_update(`<span class="error-output"> C0 aborted with error prompt </span>`);
             UIHooks.print_update(err_prompt);
             UIHooks.print_update(`<span class="error-output"> called by program </span>`);
-            //UIHooks.print_update(`<span class="error-output"> ${err_msg} </span>`);
-            //UIHooks.print_update(err_prompt + "\n");
             throw new c0_user_error(err_prompt);
         }
 
