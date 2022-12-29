@@ -3,6 +3,7 @@ import C0VM_RuntimeState from "./exec/state";
 export async function initialize(s: string, clear_printout: () => void,
     C0Editor : C0EditorTab[],
     TypedefRecord : Map<string, TypeDefInfo>,
+    print_update: (s: string) => void,
     heapSize ?: number,
 ): Promise<C0VM_RuntimeState | undefined> {
     // Clean up environment before initialize.
@@ -15,13 +16,15 @@ export async function initialize(s: string, clear_printout: () => void,
         }
         return ns;
     } catch (e) {
+        const err = e as Error;
+        print_update(`<span class="error-output"> Program aborted with ${err.message} </span>`);
         globalThis.MSG_EMITTER.warn("Load Failed", "Failed to load code into C0VM");
         if(globalThis.DEBUG) console.error(e);
         return undefined;
     }
 }
 
-export async function step(s: C0VM_RuntimeState, c0_only: boolean, printout_handler: (s: string) => void): Promise<[C0VM_RuntimeState, boolean]> {
+export async function step(s: C0VM_RuntimeState, c0_only: boolean, print_update: (s: string) => void): Promise<[C0VM_RuntimeState, boolean]> {
     const new_state = s.clone();
     if (c0_only && new_state.state.CurrC0RefLine !== undefined) {
         /**
@@ -36,7 +39,7 @@ export async function step(s: C0VM_RuntimeState, c0_only: boolean, printout_hand
                new_state.state.CurrC0RefLine[0] === start_file &&
                new_state.state.CurrC0RefLine[1] === start_line && 
                can_continue) {
-            can_continue = await new_state.step_forward({print_update: printout_handler});
+            can_continue = await new_state.step_forward({print_update: print_update});
         }
         return [new_state, can_continue];
     } else {
@@ -44,10 +47,12 @@ export async function step(s: C0VM_RuntimeState, c0_only: boolean, printout_hand
          * In normal mode, 1 step = 1 step in bytecode execution
          */
         try {
-            const can_continue = await new_state.step_forward({print_update: printout_handler});
+            const can_continue = await new_state.step_forward({print_update: print_update});
             return [new_state, can_continue];
         } catch(e) {
-            globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);   
+            const err = e as Error;
+            print_update(`<span class="error-output"> Program aborted with ${err.message} </span>`);
+            globalThis.MSG_EMITTER.err("Exception during runtime (" + err.name + ")", err.message);   
             if(globalThis.DEBUG) console.error(e);
             return [s, false];
         }
@@ -60,14 +65,14 @@ export async function run(
     c0bp: Set<string>,
     signal: {abort: boolean},
     resetSig: () => void,
-    printout_handler: (s: string) => void,
+    print_update: (s: string) => void,
     update_state: (s: C0VM_RuntimeState) => void,
 ): Promise<[C0VM_RuntimeState, boolean]> {
     const new_state = s.clone();
     let can_continue = true;
     while (can_continue) {
         try {
-            can_continue = await new_state.step_forward({print_update: printout_handler});
+            can_continue = await new_state.step_forward({print_update: print_update});
             /* 
              * When the C0VM has executed C0_TIME_SLICE steps, we force it to pause and
              * give some time to React in order to response to user action & update UI
@@ -89,12 +94,14 @@ export async function run(
              */
             if (signal.abort) {
                 resetSig();
-                printout_handler("C0VM.ts: Execution aborted manually.\n");
+                print_update("C0VM.ts: Execution aborted manually.\n");
                 globalThis.MSG_EMITTER.warn("Execution Aborted", "Execution is aborted since the user click the 'Abort' button manually.");
                 resetSig();
                 return [s, false];
             }
         } catch(e) {
+            const err = e as Error;
+            print_update(`<span class="error-output"> Program aborted with ${err.message} </span>`);
             globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);
             if(globalThis.DEBUG) console.error(e);
 

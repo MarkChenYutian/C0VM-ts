@@ -5,7 +5,7 @@ export default function remote_compile(
     app_state: C0VMApplicationState,
     set_app_state: (update: SetAppStateInput) => void,
     clean_printout: () => void,
-    update_printout: (s: string) => void,
+    print_update: (s: string) => void,
 ): void {
     fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${app_state.CompilerFlags["-d"] ? "true" : "false"}`, {
         method: "POST",
@@ -25,11 +25,11 @@ export default function remote_compile(
     .then(
         (result: any) => {
             if (result.error !== ""){
-                update_printout(`<span class="error-output">${result.error as string}</span>`);
+                print_update(`<span class="error-output">${result.error as string}</span>`);
                 throw new vm_error("Compile Failed for c0 source code. See standard output for more information.");
             }
             set_app_state({BC0SourceCode: result.bytecode});
-            return VM.initialize(result.bytecode, clean_printout, app_state.C0Editors, app_state.TypedefRecord, MEM_POOL_SIZE);
+            return VM.initialize(result.bytecode, clean_printout, app_state.C0Editors, app_state.TypedefRecord, print_update, MEM_POOL_SIZE);
         }
     )
     .then(
