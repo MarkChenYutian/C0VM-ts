@@ -268,9 +268,10 @@ declare abstract class C0VM_RT {
     public state    : VM_State;
     public allocator: C0HeapAllocator;
     public heap_size: number | undefined;
-    public step_cnt: number;
+    public step_cnt : number;
+    public typedef  : Map<string, string>;
 
-    abstract constructor(bytecode: string, c0source: C0EditorTab[], typedef: Map<string, TypeDefInfo>, heapSize?: number, parsed_result?: C0ByteCode)
+    abstract constructor(bytecode: string, c0source: C0EditorTab[], typedef: Map<string, string>, heapSize?: number, parsed_result?: C0ByteCode)
     abstract async step_forward(UIHooks: ReactUIHook): Promise<boolean>;
     abstract clone(): C0VM_RT
     abstract debug(): any;

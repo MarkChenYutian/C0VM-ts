@@ -6,24 +6,6 @@ import { Segmented } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
 
-function merge_typedef(original: Map<string, TypeDefInfo>, editor_key: number, newSet: Map<string, string>): Map<string, TypeDefInfo> {
-    const newTypedef = new Map<string, TypeDefInfo>();
-    original.forEach(
-        (value, key) => {
-            if (value.key !== editor_key) {
-                newTypedef.set(key, value);
-            }
-        }
-    )
-    newSet.forEach(
-        (value, key) => {
-            newTypedef.set(key, {source: value, key: editor_key});
-        }
-    );
-    return newTypedef;
-}
-
-
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>
 {
@@ -80,9 +62,6 @@ export default class CodeEditor extends React.Component
                     newPanel        = {() => this.create_panel()}
                     removePanel     = {(key) => this.remove_panel(key)}
                     updateContent   = {(key, s) => this.update_content(key, s)}
-                    updateTypedef   = {(key, newMap) => {
-                        this.props.set_app_state({TypedefRecord: merge_typedef(this.props.app_state.TypedefRecord, key, newMap)})
-                    }}
                 />
             </div>);
     }
@@ -97,9 +76,6 @@ export default class CodeEditor extends React.Component
                 newPanel        = {() => this.create_panel()}
                 removePanel     = {(key) => this.remove_panel(key)}
                 updateContent   = {(key, s) => this.update_content(key, s)}
-                updateTypedef   = {(key, newMap) => {
-                    this.props.set_app_state({TypedefRecord: merge_typedef(this.props.app_state.TypedefRecord, key, newMap)})
-                }}
             />;
         } else {
             const vm = this.props.app_state.C0Runtime;

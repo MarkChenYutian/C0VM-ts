@@ -11,7 +11,7 @@ import AppCrashFallbackPage from './components/app_crash_fallback';
 // Global Variables
 global.C0VM_VERSION = "0.3.1-Beta";
 
-globalThis.DEBUG = false;
+globalThis.DEBUG = true;
 globalThis.DEBUG_DUMP_MEM = false;
 globalThis.DEBUG_DUMP_STEP = false;
 

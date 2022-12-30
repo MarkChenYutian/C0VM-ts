@@ -2,7 +2,7 @@ import C0VM_RuntimeState from "./exec/state";
 
 export async function initialize(s: string, clear_printout: () => void,
     C0Editor : C0EditorTab[],
-    TypedefRecord : Map<string, TypeDefInfo>,
+    TypedefRecord : Map<string, string>,
     print_update: (s: string) => void,
     heapSize ?: number,
 ): Promise<C0VM_RT | undefined> {
@@ -14,6 +14,14 @@ export async function initialize(s: string, clear_printout: () => void,
         if (globalThis.DEBUG_DUMP_MEM) {
             console.log(ns.allocator.debug_getMemPool());
         }
+
+        if (globalThis.DEBUG){
+            console.log({
+                "Parsed Result": ns.code,
+                "Typedef": ns.typedef,
+            });
+        }
+
         return ns;
     } catch (e) {
         const err = e as Error;

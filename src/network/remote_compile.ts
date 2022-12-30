@@ -1,5 +1,6 @@
 import { vm_error } from "../utility/errors";
 import * as VM from "../vm_core/vm_interface"; 
+import { extract_all_typedef } from "./c0_parser";
 
 export default function remote_compile(
     app_state: C0VMApplicationState,
@@ -28,8 +29,10 @@ export default function remote_compile(
                 print_update(`<span class="error-output">${result.error as string}</span>`);
                 throw new vm_error("Compile Failed for c0 source code. See standard output for more information.");
             }
+            
+            const typedefs = extract_all_typedef(app_state.C0Editors);
             set_app_state({BC0SourceCode: result.bytecode});
-            return VM.initialize(result.bytecode, clean_printout, app_state.C0Editors, app_state.TypedefRecord, print_update, MEM_POOL_SIZE);
+            return VM.initialize(result.bytecode, clean_printout, app_state.C0Editors, typedefs, print_update, MEM_POOL_SIZE);
         }
     )
     .then(

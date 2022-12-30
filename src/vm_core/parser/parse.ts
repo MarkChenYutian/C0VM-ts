@@ -22,8 +22,7 @@ import { nativeFuncLoader } from "../native/native_interface";
  * @param typedefRecord Typedef information extracted from c0 editors
  * @returns A parsed bytecode data structure.
  */
-export default function parse(bytecode: string, C0Editors: C0EditorTab[], typedefRecord: Map<string, TypeDefInfo>): C0ByteCode {
-    const typedef_lib = typedefRecord === undefined ? undefined : flatten_typedef(typedefRecord);
+export default function parse(bytecode: string, C0Editors: C0EditorTab[], typedef_lib: Map<string, string>): C0ByteCode {
     const lines = annotate_linenum(bytecode);   // Add line number info to each line
     const blocks = split_blocks(lines);
 
@@ -67,7 +66,6 @@ export default function parse(bytecode: string, C0Editors: C0EditorTab[], typede
     // Load Native function here
     [parsing.nativeCount, parsing.nativePool] = parse_native_block(blocks[blocks.length - 1]);
 
-    if (DEBUG) console.log(parsing);
     return parsing;
 }
 
@@ -92,29 +90,6 @@ function safe_parse_hex(s: string): number {
 
 function safe_combine_and_parse_hex(s: string): number {
     return safe_parse_hex(s.replaceAll(" ", ""));
-}
-
-/**
- * Resolve the nested reference in map automatically
- * 
- * e.g. A -> B, D -> B, B -> C
- * will be flattened to:
- * A -> C, B -> C, D -> C
- * 
- * @returns A flattened type mapping
- */
- function flatten_typedef(typedef: Map<string, TypeDefInfo>): Map<string, string> {
-    const flattened = new Map<string, string>();
-    typedef.forEach(
-        (value, key) => {
-            let base_case = value.source;
-            while (typedef.has(base_case)) {
-                base_case = (typedef.get(base_case) as TypeDefInfo).source;
-            }
-            flattened.set(key, base_case);
-        }
-    )
-    return flattened;
 }
 
 function annotate_linenum(bytecode: string): [string, number][] {

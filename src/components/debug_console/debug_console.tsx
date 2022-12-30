@@ -38,14 +38,14 @@ export default class DebugConsole extends React.Component
         )
     }
 
-    resolve_render_view(): React.ReactNode {
+    resolve_render_view(typedef: Map<string, string>): React.ReactNode {
         if (this.state.show === false) return null;
         const S = this.props.state;
         if (S === undefined) return this.render_no_valid_state();
         switch (this.state.mode) {
-            case "Table": return <TabularDebugEvaluation   state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={this.props.typedef}/>;
-            case "Graph": return <GraphicalDebugEvaluation state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={this.props.typedef}/>;
-            case "Detail": return <DetailDebugEvaluation   state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={this.props.typedef}/>;
+            case "Table": return <TabularDebugEvaluation   state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={typedef}/>;
+            case "Graph": return <GraphicalDebugEvaluation state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={typedef}/>;
+            case "Detail": return <DetailDebugEvaluation   state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={typedef}/>;
         }
     }
 
@@ -95,6 +95,7 @@ export default class DebugConsole extends React.Component
         ><FontAwesomeIcon icon={faDownLeftAndUpRightToCenter}/></button>
 
         const full_screen_btn = (this.props.isFullScreen) ? exit_full_screen : toggle_full_screen;
+
         const selector_option = this.props.c0_only ?  
                                     [{
                                         label: "Table", value: "Table",
@@ -113,15 +114,15 @@ export default class DebugConsole extends React.Component
                                         label: "Detail", value: "Detail",
                                         icon: <FontAwesomeIcon icon={faTable} />
                                     }];
+        
+        const typedef = this.props.state?.typedef ?? new Map();
+        const revTypedef = new Map<string, string>();
+        typedef.forEach((source, alias) => {revTypedef.set(source, alias)});
+        
         return (
-            <div
-                id="c0vm-debug-console"
-                className={ this.state.show ? "debug-console-box" : "" }
-            >
+            <div id="c0vm-debug-console" className={ this.state.show ? "debug-console-box" : "" }>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                    <h3
-                        onClick={() => this.setState((state) => { return { show: !state.show } })}
-                    >
+                    <h3 onClick={() => this.setState((state) => { return { show: !state.show } })}>
                         <FontAwesomeIcon icon={faBug} />
                         {" Debug Console "}
                         {this.state.show ? <FontAwesomeIcon icon={faAngleDown} /> : <FontAwesomeIcon icon={faAngleRight} />}
@@ -139,7 +140,7 @@ export default class DebugConsole extends React.Component
                             : null
                     }
                 </div>
-                {this.resolve_render_view()}
+                {this.resolve_render_view(revTypedef)}
             </div>
         )
     }
