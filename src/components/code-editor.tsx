@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createRef } from "react";
 import BC0Editor from "./bc0-editor";
 import C0EditorGroup from "./c0-editor-group";
 
@@ -43,7 +43,8 @@ export default class CodeEditor extends React.Component
             title: `Untitled_${this.state.C0_nextKey}.c0`,
             key: this.state.C0_nextKey,
             content: "",
-            breakpoints: []
+            breakpoints: [],
+            innerRef: createRef()
         });
         this.props.set_app_state({C0Editors: new_editors, ActiveEditor: this.state.C0_nextKey});
         this.setState({C0_nextKey: this.state.C0_nextKey + 1})
@@ -59,7 +60,9 @@ export default class CodeEditor extends React.Component
 
     update_content(key: number, s: string) {
         let ns: C0EditorTab[] = [...this.props.app_state.C0Editors];
-        ns = ns.map((tab) => tab.key === key ? {key: tab.key, title: tab.title, content: s, breakpoints: tab.breakpoints} : tab);
+        ns = ns.map((tab) => tab.key === key ? {
+                key: tab.key, title: tab.title, content: s, breakpoints: tab.breakpoints, innerRef: tab.innerRef
+            } : tab);
         this.props.set_app_state({C0Editors: ns, contentChanged: true});
     }
 

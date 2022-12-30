@@ -22,6 +22,7 @@ type C0EditorTab = {
     key    : number,            /* Key of editor tab */
     content: string,            /* Content (raw string) of that tab */
     breakpoints: BreakPoint[]   /* Breakpoints attatched to that tab */
+    innerRef: React.Ref<ReactCodeMirrorRef>
 };
 
 interface C0VMApplicationState {
@@ -103,6 +104,7 @@ interface C0EditorProps {
     editorValue   : string,                     /* Editor content (raw string) */
     editable      : boolean                     /* Is editor editable? (if false, in read-only mode) */
     breakPoints   : BreakPoint[],               /* Breakpoints attatched to this editor */
+    innerRef      : React.Ref<ReactCodeMirrorRef>,
     
     updateContent : (s: string) => void,
     updateTypedef : (newTypeDef: Map<string, string>) => void,

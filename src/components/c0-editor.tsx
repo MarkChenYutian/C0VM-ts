@@ -66,6 +66,7 @@ export default class C0Editor extends React.Component<C0EditorProps>
                             C0(),
                         ]}
                         editable={this.props.editable}
+                        ref     ={this.props.innerRef}
                     />
                 </div>;
     }
