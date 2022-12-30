@@ -13,6 +13,7 @@ type BreakPoint = {
 /* Typedef statements in C0 source code */
 type TypeDefInfo = {
     source: string, /* source: the original type being aliased */
+    // alias: string,  /* alias: the alias type name in source code */
     key: number     /* key: the key of editor where this typedef info entry comes from */
 }
 
@@ -22,7 +23,6 @@ type C0EditorTab = {
     key    : number,            /* Key of editor tab */
     content: string,            /* Content (raw string) of that tab */
     breakpoints: BreakPoint[]   /* Breakpoints attatched to that tab */
-    innerRef: React.Ref<ReactCodeMirrorRef>
 };
 
 interface C0VMApplicationState {
@@ -42,7 +42,7 @@ interface C0VMApplicationState {
     PrintoutValue  : string,          /* The string to show in the stdout console */
 
     C0Running      : boolean,         /* If the C0VM is running currently */
-    C0Runtime      : C0VM_RuntimeState | undefined,   /* Runtime of C0VM */
+    C0Runtime      : C0VM_RT | undefined,   /* Runtime of C0VM */
     CompilerFlags  : Record<string, boolean>          /* Compiler Flags (-d) */
 };
 
@@ -104,7 +104,6 @@ interface C0EditorProps {
     editorValue   : string,                     /* Editor content (raw string) */
     editable      : boolean                     /* Is editor editable? (if false, in read-only mode) */
     breakPoints   : BreakPoint[],               /* Breakpoints attatched to this editor */
-    innerRef      : React.Ref<ReactCodeMirrorRef>,
     
     updateContent : (s: string) => void,
     updateTypedef : (newTypeDef: Map<string, string>) => void,
@@ -131,7 +130,7 @@ interface C0OutputPropInterface {
 };
 
 interface DebugConsoleProps {
-    state: C0VM_RuntimeState | undefined,
+    state: C0VM_RT | undefined,
     c0_only: boolean,
     isFullScreen: boolean,
     typedef: Map<string, TypeDefInfo>,

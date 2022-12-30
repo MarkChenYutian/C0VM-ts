@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React from "react";
 import "./application.less";
 import "./embeddable.less";
 
@@ -28,7 +28,7 @@ export default class C0VMApplication extends React.Component<
             BC0BreakPoints: new Set(),
             TypedefRecord: new Map(),
 
-            C0Editors: [{ title: "Untitled_0.c0", key: 0, content: "", breakpoints: [], innerRef: createRef()}],
+            C0Editors: [{ title: "Untitled_0.c0", key: 0, content: "", breakpoints: [] }],
             ActiveEditor: 0,
 
             PrintoutValue: "",

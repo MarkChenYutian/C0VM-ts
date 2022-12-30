@@ -1,11 +1,12 @@
 import React from "react";
-import { faBoltLightning, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { faBoltLightning, faCode, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import * as VM from "../vm_core/vm_interface";
 import remote_compile from "../network/remote_compile";
 
 import tsLogo from "../assets/ts-logo-128.svg";
+import { extract_typedef } from "../network/c0_parser";
 
 /**
  * Use AbortRef() to allow us interrupt current VM execution outside
@@ -131,6 +132,10 @@ export default function MainControlBar(props: MainControlProps) {
         );
     };
 
+    const test_fn = () => {
+        extract_typedef("typedef struct node node_t;\n typedef struct ll_head ll_head_t;\n int main() { return 0; }");
+    }
+
     // UI Buttons
     const CompileButton = 
         <button
@@ -172,6 +177,15 @@ export default function MainControlBar(props: MainControlProps) {
         >
             <FontAwesomeIcon icon={faUndo} className="hide-in-mobile"/>{" Restart "}
         </button>;
+    
+    const DevTestButton = 
+        <button
+            className="base-btn danger-btn unselectable"
+            id="ctr-btn-restart"
+            onClick={test_fn}
+        >
+            <FontAwesomeIcon icon={faCode} className="hide-in-mobile"/>{" Dev Test "}
+        </button>;
 
     return (
         <div className="main-control">
@@ -179,6 +193,7 @@ export default function MainControlBar(props: MainControlProps) {
                 <h3 className="unselectable">C0VM.<img src={tsLogo} style={{display: "inline-block", height: "1rem", marginBottom: "0.4rem"}} alt="ts"/></h3>
             </a>
             <div className="control-btn-group">
+                {DevTestButton}
                 {CompileButton}
                 {StepButton}
                 {RunButton}

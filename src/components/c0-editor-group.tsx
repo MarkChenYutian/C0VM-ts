@@ -128,7 +128,6 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                                 updateName    = {(name) => this.set_tab_name(editor.key, name)}
                                 setBreakPts   = {(bps)  => this.set_brkpt_for_editor(editor.key, bps)}
                                 editable      = {this.props.currLine === undefined}
-                                innerRef      = {editor.innerRef}
                             />
                         </TabPane>;
                     }

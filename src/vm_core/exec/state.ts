@@ -26,7 +26,9 @@ export default class C0VM_RuntimeState implements C0VM_RT{
         this.heap_size = heapSize;
         this.allocator = createHeap(VM_Memory, heapSize);
         this.step_cnt = 0;
+        
         const str_ptr = loadStringPool(this.code.stringPool, this.allocator);
+        
         this.state = {
             P: this.code,
             C: {
@@ -59,7 +61,7 @@ export default class C0VM_RuntimeState implements C0VM_RT{
      * to be immutable
      * @returns a clone of current runtime state
      */
-    public clone(): C0VM_RuntimeState {
+    public clone(): C0VM_RT {
         const C = new C0VM_RuntimeState(this.raw_code, [], new Map(), this.heap_size, this.code);
         
         C.state = this.state;

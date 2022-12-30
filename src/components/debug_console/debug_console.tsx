@@ -10,8 +10,6 @@ import { faAngleDown, faAngleRight, faList, faCodeMerge, faBug, faUpRightAndDown
 
 import { Result, Segmented } from "antd";
 
-import C0VM_RuntimeState from "../../vm_core/exec/state";
-
 import TabularDebugEvaluation from "./tabular_debugger";
 import GraphicalDebugEvaluation from "./graphical_debugger";
 import DetailDebugEvaluation from "./detail_debugger";
@@ -42,7 +40,7 @@ export default class DebugConsole extends React.Component
 
     resolve_render_view(): React.ReactNode {
         if (this.state.show === false) return null;
-        const S = this.props.state as C0VM_RuntimeState;
+        const S = this.props.state;
         if (S === undefined) return this.render_no_valid_state();
         switch (this.state.mode) {
             case "Table": return <TabularDebugEvaluation   state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={this.props.typedef}/>;

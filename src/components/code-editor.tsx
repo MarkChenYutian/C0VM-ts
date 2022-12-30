@@ -1,11 +1,10 @@
-import React, { createRef } from "react";
+import React from "react";
 import BC0Editor from "./bc0-editor";
 import C0EditorGroup from "./c0-editor-group";
 
 import { Segmented } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
-import C0VM_RuntimeState from "../vm_core/exec/state";
 
 function merge_typedef(original: Map<string, TypeDefInfo>, editor_key: number, newSet: Map<string, string>): Map<string, TypeDefInfo> {
     const newTypedef = new Map<string, TypeDefInfo>();
@@ -44,7 +43,6 @@ export default class CodeEditor extends React.Component
             key: this.state.C0_nextKey,
             content: "",
             breakpoints: [],
-            innerRef: createRef()
         });
         this.props.set_app_state({C0Editors: new_editors, ActiveEditor: this.state.C0_nextKey});
         this.setState({C0_nextKey: this.state.C0_nextKey + 1})
@@ -61,7 +59,7 @@ export default class CodeEditor extends React.Component
     update_content(key: number, s: string) {
         let ns: C0EditorTab[] = [...this.props.app_state.C0Editors];
         ns = ns.map((tab) => tab.key === key ? {
-                key: tab.key, title: tab.title, content: s, breakpoints: tab.breakpoints, innerRef: tab.innerRef
+                key: tab.key, title: tab.title, content: s, breakpoints: tab.breakpoints
             } : tab);
         this.props.set_app_state({C0Editors: ns, contentChanged: true});
     }
@@ -76,7 +74,7 @@ export default class CodeEditor extends React.Component
                     </h3>
                 </div>
                 <C0EditorGroup
-                    currLine        = {(this.props.app_state.C0Runtime as (C0VM_RuntimeState | undefined))?.state.CurrC0RefLine}
+                    currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
                     appState        = {this.props.app_state}
                     set_app_state   = {(ns) => this.props.set_app_state(ns)}
                     newPanel        = {() => this.create_panel()}
@@ -93,7 +91,7 @@ export default class CodeEditor extends React.Component
         let content = undefined;
         if (this.state.mode === "c0") {
             content = <C0EditorGroup
-                currLine        = {(this.props.app_state.C0Runtime as (C0VM_RuntimeState | undefined))?.state.CurrC0RefLine}
+                currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
                 appState        = {this.props.app_state}
                 set_app_state   = {(ns) => this.props.set_app_state(ns)}
                 newPanel        = {() => this.create_panel()}
@@ -104,7 +102,7 @@ export default class CodeEditor extends React.Component
                 }}
             />;
         } else {
-            const vm: C0VM_RuntimeState | undefined = this.props.app_state.C0Runtime;
+            const vm = this.props.app_state.C0Runtime;
             content = <BC0Editor
                 updateContent={s => this.props.set_app_state({BC0SourceCode: s})}
                 editorValue  ={this.props.app_state.BC0SourceCode}
