@@ -7,13 +7,16 @@ import DraggableTabs from "./draggable_tabs";
 
 const { TabPane } = Tabs;
 
-class EditableTab extends React.Component<{ title: string, editor_key: string, onInput: (key: string, a: string) => void }, { title: string }> {
+class EditableTab extends React.Component<{ title: string, editor_key: string, onInput: (key: string, a: string) => void }, { title: string, being_edited: boolean }> {
     constructor(props: { title: string, editor_key: string, onInput: (a: string) => void }) {
         super(props);
         this.state = {
-            title: props.title
+            title: props.title,
+            being_edited: false
         };
         this.onChange = this.onChange.bind(this);
+        this.startEditing = this.startEditing.bind(this);
+        this.stopEditing = this.stopEditing.bind(this);
     }
 
     onChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -21,13 +24,29 @@ class EditableTab extends React.Component<{ title: string, editor_key: string, o
         this.setState({title: e.target.value});
         this.props.onInput(this.props.editor_key, e.target.value);
     }
-    
+
+    startEditing() {
+        this.setState({being_edited: true});
+    }
+
+    stopEditing() {
+        this.setState({being_edited: false});
+    }
+
     render() {
-        return (  
-        <>
-            <input type="text" placeholder="Some placeholder" value={this.state.title} onChange={this.onChange}></input>
-        </>
-        );
+        if (!this.state.being_edited) {
+            return (
+                <>
+                    <span onDoubleClick={this.startEditing}>{this.state.title}</span>
+                </>
+            );
+        } else {
+            return (
+                <>
+                    <input type="text" value={this.state.title} onChange={this.onChange} onBlur={this.stopEditing}></input>
+                </>
+            );
+        }
     }
 }
 
