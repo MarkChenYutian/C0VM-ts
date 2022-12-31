@@ -5,20 +5,29 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
 import DraggableTabs from "./draggable_tabs";
 
+import AutosizeInput from 'react-input-autosize';
+
 const { TabPane } = Tabs;
 
-class EditableTab extends React.Component<{ title: string, editor_key: string, onInput: (key: string, a: string) => void }, { title: string, being_edited: boolean }> {
+class TabNameInput extends AutosizeInput {
+}
+
+class EditableTab extends React.Component<
+    { title: string, editor_key: string, onInput: (key: string, a: string) => void }, 
+    { title: string, being_edited: boolean}
+> {
+
     constructor(props: { title: string, editor_key: string, onInput: (a: string) => void }) {
         super(props);
         this.state = {
             title: props.title,
-            being_edited: false
+            being_edited: false,
         };
         this.onChange = this.onChange.bind(this);
         this.startEditing = this.startEditing.bind(this);
-        this.stopEditing = this.stopEditing.bind(this);
+        this.stopEditing = this.stopEditing.bind(this);    
     }
-
+    
     onChange(e: React.ChangeEvent<HTMLInputElement>) {
         e.preventDefault();
         this.setState({title: e.target.value});
@@ -27,6 +36,7 @@ class EditableTab extends React.Component<{ title: string, editor_key: string, o
 
     startEditing() {
         this.setState({being_edited: true});
+        // this.inputRef.current?.focus();
     }
 
     stopEditing() {
@@ -42,9 +52,15 @@ class EditableTab extends React.Component<{ title: string, editor_key: string, o
             );
         } else {
             return (
-                <>
-                    <input type="text" value={this.state.title} onChange={this.onChange} onBlur={this.stopEditing}></input>
-                </>
+                    <TabNameInput 
+                        className="tab-name"
+                        // inputRef = {this.setInputRef}
+                        type="text" 
+                        value={this.state.title}
+                        onChange={this.onChange} 
+                        onBlur={this.stopEditing}
+                        autoFocus
+                    ></TabNameInput>
             );
         }
     }
