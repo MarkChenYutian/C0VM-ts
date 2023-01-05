@@ -1,11 +1,11 @@
 import { faCheck, faFileLines, faGear, faSpinner, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import C0VM_RuntimeState from "../vm_core/exec/state";
+
 
 export default class C0VMApplicationFooter extends React.PureComponent<{state: C0VMApplicationState, open_setting: () => void}> {
     render() {
-        const s = this.props.state.C0Runtime as (C0VM_RuntimeState | undefined);
+        const s = this.props.state.C0Runtime;
         let vm_indicator;
         if (s === undefined) {
             vm_indicator = <p><FontAwesomeIcon icon={faXmark}/> Not Loaded</p>

@@ -1,19 +1,29 @@
 import C0VM_RuntimeState from "./exec/state";
 
-export async function initialize(s: string, clear_printout: () => void,
+export async function initialize(
+    bytecode: string,
+    clear_printout: () => void,
     C0Editor : C0EditorTab[],
-    TypedefRecord : Map<string, TypeDefInfo>,
     print_update: (s: string) => void,
     heapSize ?: number,
-): Promise<C0VM_RuntimeState | undefined> {
+): Promise<C0VM_RT | undefined> {
     // Clean up environment before initialize.
     clear_printout();
     try {
-        const ns = new C0VM_RuntimeState(s, C0Editor, TypedefRecord, heapSize, undefined);
+        const ns = new C0VM_RuntimeState(bytecode, C0Editor, heapSize);
         globalThis.MSG_EMITTER.ok("Load Successfully", "Program is loaded successfully. Press step or run to see result.");
         if (globalThis.DEBUG_DUMP_MEM) {
             console.log(ns.allocator.debug_getMemPool());
         }
+
+        if (globalThis.DEBUG){
+            console.log({
+                "Parsed Result": ns.code,
+                "Typedef": ns.typedef,
+                "Struct Information": ns.state.TypeRecord,
+            });
+        }
+
         return ns;
     } catch (e) {
         const err = e as Error;
@@ -24,7 +34,7 @@ export async function initialize(s: string, clear_printout: () => void,
     }
 }
 
-export async function step(s: C0VM_RuntimeState, c0_only: boolean, print_update: (s: string) => void): Promise<[C0VM_RuntimeState, boolean]> {
+export async function step(s: C0VM_RT, c0_only: boolean, print_update: (s: string) => void): Promise<[C0VM_RT, boolean]> {
     const new_state = s.clone();
     if (c0_only && new_state.state.CurrC0RefLine !== undefined) {
         /**
@@ -60,14 +70,14 @@ export async function step(s: C0VM_RuntimeState, c0_only: boolean, print_update:
 }
 
 export async function run(
-    s: C0VM_RuntimeState,
+    s: C0VM_RT,
     bp: Set<number>,
     c0bp: Set<string>,
     signal: {abort: boolean},
     resetSig: () => void,
     print_update: (s: string) => void,
-    update_state: (s: C0VM_RuntimeState) => void,
-): Promise<[C0VM_RuntimeState, boolean]> {
+    update_state: (s: C0VM_RT) => void,
+): Promise<[C0VM_RT, boolean]> {
     const new_state = s.clone();
     let can_continue = true;
     while (can_continue) {

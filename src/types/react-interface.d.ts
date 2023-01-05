@@ -13,7 +13,8 @@ type BreakPoint = {
 /* Typedef statements in C0 source code */
 type TypeDefInfo = {
     source: string, /* source: the original type being aliased */
-    key: number     /* key: the key of editor where this typedef info entry comes from */
+    alias: string,  /* alias: the alias type name in source code */
+    // key: number     /* key: the key of editor where this typedef info entry comes from */
 }
 
 /* Describes a C0Editor Tab */
@@ -34,14 +35,13 @@ interface C0VMApplicationState {
     BC0SourceCode  : string,          /* The content of BC0 code editor */
     BC0BreakPoints : Set<BreakPoint>, /* Breakpoints activated in BC0 code editor */
 
-    TypedefRecord  : Map<string, TypeDefInfo>, /* Record the typedef names for string substitution */
     C0Editors      : C0EditorTab[],   /* Code editor tab titles */
     ActiveEditor   : number,          /* Currently activated tab index of C0Editor */
 
     PrintoutValue  : string,          /* The string to show in the stdout console */
 
     C0Running      : boolean,         /* If the C0VM is running currently */
-    C0Runtime      : C0VM_RuntimeState | undefined,   /* Runtime of C0VM */
+    C0Runtime      : C0VM_RT | undefined,   /* Runtime of C0VM */
     CompilerFlags  : Record<string, boolean>          /* Compiler Flags (-d) */
 };
 
@@ -94,7 +94,6 @@ interface C0EditorGroupProps {
     removePanel  : (key: string) => void,
 
     updateContent: (key: number, s: string) => void,
-    updateTypedef: (key: number, newTypeDef: Map<string, string>) => void;
 }
 
 
@@ -105,7 +104,6 @@ interface C0EditorProps {
     breakPoints   : BreakPoint[],               /* Breakpoints attatched to this editor */
     
     updateContent : (s: string) => void,
-    updateTypedef : (newTypeDef: Map<string, string>) => void,
     setBreakPts   : (lns: BreakPoint[]) => void,
     updateName    : (s: string) => void,
 }
@@ -129,10 +127,9 @@ interface C0OutputPropInterface {
 };
 
 interface DebugConsoleProps {
-    state: C0VM_RuntimeState | undefined,
+    state: C0VM_RT | undefined,
     c0_only: boolean,
     isFullScreen: boolean,
-    typedef: Map<string, TypeDefInfo>,
     setFullScreen: (s: boolean) => void
 }
 
@@ -147,22 +144,22 @@ interface DebugConsoleInterface {
     state: VM_State
     mem: C0HeapAllocator
     cnt: number
-    typedef: Map<string, TypeDefInfo>
+    typedef: Map<string, string>
 }
 
 interface TabularStackFrameProps {
     frame: VM_StackFrame,
     mem: C0HeapAllocator,
     typeRecord: Map<string, Map<number, Struct_Type_Record>>,
-    typedefRec: Map<string, TypeDefInfo>
+    typedef: Map<string, string>
 }
 
 
 interface C0ValueTabularDisplayProps {
     mem: C0HeapAllocator,
     value: C0Value<C0TypeClass>,
+    typedef: Map<string, string>,
     typeRecord: Map<string, Map<number, Struct_Type_Record>>,
-    typedefRec: Map<string, TypeDefInfo>,
     default_expand: boolean
 }
 

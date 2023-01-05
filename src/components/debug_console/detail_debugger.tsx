@@ -13,7 +13,7 @@ export default class DetailDebugEvaluation extends React.Component<
                     frame={this.props.state.CallStack[i]}
                     mem={this.props.mem}
                     typeRecord={this.props.state.TypeRecord}
-                    typedefRec={this.props.typedef}
+                    typedef={this.props.typedef}
                     key={i}
                 />
             );
@@ -23,7 +23,7 @@ export default class DetailDebugEvaluation extends React.Component<
                 frame={this.props.state.CurrFrame}
                 mem={this.props.mem}
                 typeRecord={this.props.state.TypeRecord}
-                typedefRec={this.props.typedef}
+                typedef={this.props.typedef}
                 key={this.props.state.CallStack.length}
             />
         )

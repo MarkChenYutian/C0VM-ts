@@ -7,6 +7,7 @@ import remote_compile from "../network/remote_compile";
 
 import tsLogo from "../assets/ts-logo-128.svg";
 
+
 /**
  * Use AbortRef() to allow us interrupt current VM execution outside
  * of React Component Life Cycle
@@ -42,8 +43,9 @@ export default function MainControlBar(props: MainControlProps) {
         }
 
         let new_runtime, can_continue = undefined;
+
         if (appState.C0Runtime === undefined) {
-            const init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, appState.TypedefRecord, print_update, MEM_POOL_SIZE);
+            const init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, print_update, MEM_POOL_SIZE);
             if (init_state === undefined) return;
             [new_runtime, can_continue] = await VM.step(init_state, appState.c0_only, print_update);
         } else {
@@ -65,8 +67,9 @@ export default function MainControlBar(props: MainControlProps) {
 
         let init_state = undefined;
         let new_runtime, can_continue = undefined;
+
         if (appState.C0Runtime === undefined) {
-            init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, appState.TypedefRecord, print_update, MEM_POOL_SIZE);
+            init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, print_update, MEM_POOL_SIZE);
             if (init_state === undefined) return;
         } else {
             init_state = appState.C0Runtime;
@@ -113,7 +116,7 @@ export default function MainControlBar(props: MainControlProps) {
 
     const restart_c0runtime = async () => {
         clear_print();
-        const new_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, appState.TypedefRecord, print_update, globalThis.MEM_POOL_SIZE);
+        const new_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, print_update, globalThis.MEM_POOL_SIZE);
         props.set_app_state({C0Runtime: new_state});
     };
 
@@ -130,11 +133,14 @@ export default function MainControlBar(props: MainControlProps) {
             print_update,
         );
     };
+   
+    const compilebtn_disabled = appState.C0Editors[0].content === "";
+    const stepbtn_disabled    = (!is_bc0_valid) || appState.C0Running || appState.contentChanged;
+    const runbtn_disabled     = (!is_bc0_valid) || appState.C0Running || appState.contentChanged;
 
-    // UI Buttons
     const CompileButton = 
         <button
-            className={"base-btn main-btn unselectable " + (appState.C0Editors[0].content === "" ? "disable-btn" : "")}
+            className={"base-btn main-btn unselectable " + (compilebtn_disabled ? "disable-btn" : "")}
             onClick={compile_c0source}
         >
             <FontAwesomeIcon icon={faScrewdriverWrench} className="hide-in-mobile"/> {" Compile "}
@@ -142,7 +148,7 @@ export default function MainControlBar(props: MainControlProps) {
     
     const StepButton = 
         <button
-            className={"base-btn success-btn unselectable " + (is_bc0_valid && !appState.C0Running ? "" : "disable-btn")}
+            className={"base-btn success-btn unselectable " + (stepbtn_disabled ? "disable-btn" : "")}
             onClick={step_c0runtime}
         >
             <FontAwesomeIcon icon={faStepForward} className="hide-in-mobile"/>{" Step "}
@@ -150,7 +156,7 @@ export default function MainControlBar(props: MainControlProps) {
     
     const RunButton = 
         <button
-            className={"base-btn success-btn unselectable " + (is_bc0_valid && !appState.C0Running ? "" : "disable-btn")}
+            className={"base-btn success-btn unselectable " + (runbtn_disabled ? "disable-btn" : "")}
             onClick={run_c0runtime}
         >
             <FontAwesomeIcon icon={faPlay} className="hide-in-mobile"/>{" Run "}

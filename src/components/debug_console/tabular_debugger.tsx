@@ -13,8 +13,8 @@ export default class TabularDebugEvaluation extends React.Component<
                 <TabularStackFrame
                     frame={this.props.state.CallStack[i]}
                     mem={this.props.mem}
+                    typedef={this.props.typedef}
                     typeRecord={this.props.state.TypeRecord}
-                    typedefRec={this.props.typedef}
                     key={i}
                 />
             );
@@ -23,8 +23,8 @@ export default class TabularDebugEvaluation extends React.Component<
             <TabularStackFrame
                 frame={this.props.state.CurrFrame}
                 mem={this.props.mem}
+                typedef={this.props.typedef}
                 typeRecord={this.props.state.TypeRecord}
-                typedefRec={this.props.typedef}
                 key={this.props.state.CallStack.length}
             />
         )
