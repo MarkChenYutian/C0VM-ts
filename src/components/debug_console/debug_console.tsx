@@ -116,8 +116,8 @@ export default class DebugConsole extends React.Component
                                     }];
         
         const typedef = this.props.state?.typedef ?? new Map();
-        const revTypedef = new Map<string, string>();
-        typedef.forEach((source, alias) => {revTypedef.set(source, alias)});
+        // const revTypedef = new Map<string, string>();
+        // typedef.forEach((source, alias) => {revTypedef.set(source, alias)});
         
         return (
             <div id="c0vm-debug-console" className={ this.state.show ? "debug-console-box" : "" }>
@@ -140,7 +140,7 @@ export default class DebugConsole extends React.Component
                             : null
                     }
                 </div>
-                {this.resolve_render_view(revTypedef)}
+                {this.resolve_render_view(typedef)}
             </div>
         )
     }

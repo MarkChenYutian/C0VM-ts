@@ -1,15 +1,16 @@
 import C0VM_RuntimeState from "./exec/state";
 
-export async function initialize(s: string, clear_printout: () => void,
+export async function initialize(
+    bytecode: string,
+    clear_printout: () => void,
     C0Editor : C0EditorTab[],
-    TypedefRecord : Map<string, string>,
     print_update: (s: string) => void,
     heapSize ?: number,
 ): Promise<C0VM_RT | undefined> {
     // Clean up environment before initialize.
     clear_printout();
     try {
-        const ns = new C0VM_RuntimeState(s, C0Editor, TypedefRecord, heapSize, undefined);
+        const ns = new C0VM_RuntimeState(bytecode, C0Editor, heapSize);
         globalThis.MSG_EMITTER.ok("Load Successfully", "Program is loaded successfully. Press step or run to see result.");
         if (globalThis.DEBUG_DUMP_MEM) {
             console.log(ns.allocator.debug_getMemPool());
@@ -19,6 +20,7 @@ export async function initialize(s: string, clear_printout: () => void,
             console.log({
                 "Parsed Result": ns.code,
                 "Typedef": ns.typedef,
+                "Struct Information": ns.state.TypeRecord,
             });
         }
 

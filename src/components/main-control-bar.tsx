@@ -1,12 +1,11 @@
 import React from "react";
-import { faBoltLightning, faCode, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { faBoltLightning, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import * as VM from "../vm_core/vm_interface";
 import remote_compile from "../network/remote_compile";
 
 import tsLogo from "../assets/ts-logo-128.svg";
-import { extract_all_typedef } from "../network/c0_parser";
 
 
 /**
@@ -43,11 +42,10 @@ export default function MainControlBar(props: MainControlProps) {
             return;
         }
 
-        const typedefs = extract_all_typedef(appState.C0Editors);
         let new_runtime, can_continue = undefined;
 
         if (appState.C0Runtime === undefined) {
-            const init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, typedefs, print_update, MEM_POOL_SIZE);
+            const init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, print_update, MEM_POOL_SIZE);
             if (init_state === undefined) return;
             [new_runtime, can_continue] = await VM.step(init_state, appState.c0_only, print_update);
         } else {
@@ -67,12 +65,11 @@ export default function MainControlBar(props: MainControlProps) {
             return;
         }
 
-        const typedefs = extract_all_typedef(appState.C0Editors);
         let init_state = undefined;
         let new_runtime, can_continue = undefined;
 
         if (appState.C0Runtime === undefined) {
-            init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, typedefs, print_update, MEM_POOL_SIZE);
+            init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, print_update, MEM_POOL_SIZE);
             if (init_state === undefined) return;
         } else {
             init_state = appState.C0Runtime;
@@ -119,8 +116,7 @@ export default function MainControlBar(props: MainControlProps) {
 
     const restart_c0runtime = async () => {
         clear_print();
-        const typedefs = extract_all_typedef(appState.C0Editors);
-        const new_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, typedefs, print_update, globalThis.MEM_POOL_SIZE);
+        const new_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, print_update, globalThis.MEM_POOL_SIZE);
         props.set_app_state({C0Runtime: new_state});
     };
 
@@ -137,15 +133,14 @@ export default function MainControlBar(props: MainControlProps) {
             print_update,
         );
     };
+   
+    const compilebtn_disabled = appState.C0Editors[0].content === "";
+    const stepbtn_disabled    = (!is_bc0_valid) || appState.C0Running || appState.contentChanged;
+    const runbtn_disabled     = (!is_bc0_valid) || appState.C0Running || appState.contentChanged;
 
-    // const test_fn = () => {
-    //     // extract_typedef("typedef struct node node_t;\n typedef struct ll_head ll_head_t;\n int main() { return 0; }");
-    // }
-
-    // UI Buttons
     const CompileButton = 
         <button
-            className={"base-btn main-btn unselectable " + (appState.C0Editors[0].content === "" ? "disable-btn" : "")}
+            className={"base-btn main-btn unselectable " + (compilebtn_disabled ? "disable-btn" : "")}
             onClick={compile_c0source}
         >
             <FontAwesomeIcon icon={faScrewdriverWrench} className="hide-in-mobile"/> {" Compile "}
@@ -153,7 +148,7 @@ export default function MainControlBar(props: MainControlProps) {
     
     const StepButton = 
         <button
-            className={"base-btn success-btn unselectable " + (is_bc0_valid && !appState.C0Running ? "" : "disable-btn")}
+            className={"base-btn success-btn unselectable " + (stepbtn_disabled ? "disable-btn" : "")}
             onClick={step_c0runtime}
         >
             <FontAwesomeIcon icon={faStepForward} className="hide-in-mobile"/>{" Step "}
@@ -161,7 +156,7 @@ export default function MainControlBar(props: MainControlProps) {
     
     const RunButton = 
         <button
-            className={"base-btn success-btn unselectable " + (is_bc0_valid && !appState.C0Running ? "" : "disable-btn")}
+            className={"base-btn success-btn unselectable " + (runbtn_disabled ? "disable-btn" : "")}
             onClick={run_c0runtime}
         >
             <FontAwesomeIcon icon={faPlay} className="hide-in-mobile"/>{" Run "}
@@ -183,15 +178,6 @@ export default function MainControlBar(props: MainControlProps) {
         >
             <FontAwesomeIcon icon={faUndo} className="hide-in-mobile"/>{" Restart "}
         </button>;
-    
-    // const DevTestButton = 
-    //     <button
-    //         className="base-btn danger-btn unselectable"
-    //         id="ctr-btn-restart"
-    //         onClick={test_fn}
-    //     >
-    //         <FontAwesomeIcon icon={faCode} className="hide-in-mobile"/>{" Dev Test "}
-    //     </button>;
 
     return (
         <div className="main-control">
