@@ -5,10 +5,11 @@ import { Extension } from "@codemirror/state";
 
 export const backgroundColor = "#FFFFFF",
     textColor = "#333333",
-    activeColor = "#F7F7F7",
-    selection = "#F3F3F3",
+    activeColor = "#EAEAEA",
+    selection = "#E7E7E7",
     selectText = "#526FFF",
     textBackground = "#BBDEE3",
+    searchBackground = "#AACDD2",
     execLineBackground = "#FFFF90"
 
 
@@ -46,19 +47,45 @@ export const C0LightStyle = EditorView.theme({
     },
     "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection": {
         backgroundColor: selection,
-        color: selectText
+        color: selectText,
+        borderRadius: ".2rem"
     },
     ".cm-selectionMatch": {
         backgroundColor: textBackground
     },
+    ".cm-searchMatch": {
+        backgroundColor: searchBackground
+    },
     ".cm-foldPlaceholder": {
         backgroundColor: backgroundColor,
-        FontFace: "cascadic-code",
+        FontFace: "menlo-regular",
         padding: "0 1rem",
         border: "none"
     },
     ".cm-execLine-light": {
         backgroundColor: execLineBackground
+    },
+    ".cm-foldGutter": {
+        FontFace: "menlo-regular",
+        fontSize: "1rem"
+    },
+    ".cm-breakpoint-gutter": {
+        padding: "0 0 0 .2rem"
+    },
+    "& button.cm-button": {
+        color: "#3577C1",
+        border: "1px solid #3577C1",
+        backgroundColor: "white",
+        backgroundImage: "none",
+        cursor: "pointer",
+        borderRadius: ".3rem"
+    },
+    "& button.cm-button:hover": {
+        color: "#3577C1",
+        border: "1px solid #3577C1",
+        backgroundColor: "#3677C140",
+        backgroundImage: "none",
+        cursor: "pointer"
     }
 }, {dark: false});
 

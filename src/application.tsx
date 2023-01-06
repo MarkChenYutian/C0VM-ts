@@ -66,9 +66,7 @@ export default class C0VMApplication extends React.Component<
             />
         ) : null;
 
-        const SettingMenuComponent =  this.state.settingMenuOn ? 
-            <SettingPopup state={this.state} set_app_state={(ns) => this.setState(ns)}/>
-            : null;
+        const SettingMenuComponent = <SettingPopup state={this.state} set_app_state={(ns) => this.setState(ns)}/>;
 
         if (this.state.dbgFullScreen) {
             return <div className="page-framework">

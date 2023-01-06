@@ -7,7 +7,7 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
     render() {
         return <Modal
                 title={<h3 style={{margin: "0"}}><FontAwesomeIcon icon={faGear}/> Settings</h3>}
-                open ={true}
+                open ={this.props.state.settingMenuOn}
                 closable={false}
                 centered
                 footer  ={[

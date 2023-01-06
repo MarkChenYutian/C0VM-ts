@@ -30,6 +30,7 @@ const C0Language = LRLanguage.define({
             foldNodeProp.add({
                 Scope: foldInside,
                 StructScope: foldInside,
+                CommentBlock: foldInside,
             }),
             indentNodeProp.add({
                 Scope: context => context.baseIndent + context.unit,

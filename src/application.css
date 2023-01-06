@@ -135,8 +135,8 @@ div[data-lang="bc0"] .cm-editor {
 
 .cm-scroller { overflow: auto; }
 .cm-editor { border: 1px solid silver; border-radius: 0 0 0.3rem 0.3rem; }
-.ͼ1.cm-editor.cm-focused { border: 1px solid #52a3f970; outline: none; }
-.cm-breakpoint-gutter:hover { background-color: #F7F7F7; }
+.ͼ1.cm-editor.cm-focused { border: 1px solid silver; outline: none; }
+.cm-breakpoint-gutter:hover { background-color: #EAEAEA; }
 .editor-breakpoint{ margin-top: 3px; height: 14px; width: 14px; background-color: #f6635e; border-radius: 50%; display: inline-block; }
 
 .active-href {
@@ -185,8 +185,8 @@ i.editor-load-hint {
 }
 
 .main-btn {
-    color: #52a3f9;
-    border: 1px solid #52a3f970;
+    color: #3577C1;
+    border: 1px solid #3577C1;
 }
 
 .main-btn:hover {

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Button, Space } from "antd";
+import { Button, Space, Tooltip } from "antd";
 
 import { faBoltLightning, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -29,7 +29,6 @@ function RequiresRecompile(){
     );
 }
 
-// export default class MainControlBar extends React.Component<MainControlProps>{
 export default function MainControlBar(props: MainControlProps) {
     const appState = props.application_state;
     const is_bc0_valid = props.application_state.BC0SourceCode.toUpperCase().startsWith("C0 C0 FF EE");
@@ -192,6 +191,18 @@ export default function MainControlBar(props: MainControlProps) {
         >
             &nbsp;Restart
         </Button>;
+    
+    const display_CompileBtn = compilebtn_disabled ?
+        <Tooltip placement="bottomRight" color="blue" title="Write code in editor to Compile">{CompileButton}</Tooltip>
+         : CompileButton;
+    
+    const display_StepBtn = stepbtn_disabled ?
+        <Tooltip placement="bottomRight" color="blue" title="Compile the code before Step">{StepButton}</Tooltip>
+         : StepButton;
+    
+    const display_RunBtn  = runbtn_disabled ?
+        <Tooltip placement="bottomRight" color="blue" title="Compile the code before Run">{RunButton}</Tooltip>
+         : RunButton;
 
     return (
         <div className="main-control">
@@ -199,9 +210,9 @@ export default function MainControlBar(props: MainControlProps) {
                 <h3 className="unselectable">C0VM.<img src={tsLogo} style={{display: "inline-block", height: "1rem", marginBottom: "0.4rem"}} alt="ts"/></h3>
             </a>
             <Space size="middle">
-                {CompileButton}
-                {StepButton}
-                {RunButton}
+                {display_CompileBtn}
+                {display_StepBtn}
+                {display_RunBtn}
                 {appState.C0Running ? AbortButton : RestartButton}
             </Space>
         </div>
