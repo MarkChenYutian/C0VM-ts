@@ -25,6 +25,12 @@ type C0EditorTab = {
     breakpoints: BreakPoint[]   /* Breakpoints attatched to that tab */
 };
 
+interface C0VMApplicationProps {
+    displayMode    : "full-page" | "embeddable",
+    showStdOut     : boolean,
+    showDebug      : boolean
+}
+
 interface C0VMApplicationState {
     crashed        : boolean,         /* C0VM Application top-level error boundary */
     c0_only        : boolean,         /* C0 only mode or not */
@@ -202,9 +208,7 @@ interface ApplicationCrashPageProps {
 }
 
 interface ApplicationContextInterface {
-    mode: "full-page" | "embeddable",
-    std_out: boolean,
-    debug_console: boolean,
+    theme: "dark" | "light"
 }
 
 interface SettingMenuProps {

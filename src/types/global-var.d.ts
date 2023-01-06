@@ -13,7 +13,6 @@ declare global {
 
     var COMPILER_BACKEND_URL: string;       // The URL for compile API
     
-    var UI_EDITOR_THEME: "dark" | "light";  // Theme of code editors
     var UI_ERR_DISPLAY_TIME_SEC: number;    // How many time (sec) an err message will display
     var UI_WARN_DISPLAY_TIME_SEC: number;   // How many time (sec) a warn message will display
     var UI_OK_DISPLAY_TIME_SEC: number;     // How many time (sec) an OK mssage will display

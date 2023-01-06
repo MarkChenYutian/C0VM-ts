@@ -6,7 +6,6 @@ import 'antd/dist/antd.less';
 
 import C0VMApplication from './application';
 import AntdEmitter from './utility/antd_emitter';
-import AppCrashFallbackPage from './components/app_crash_fallback';
 
 // Global Variables
 global.C0VM_VERSION = "0.3.2-Beta";
@@ -24,7 +23,6 @@ globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
 
 // For style specification only, writing to printout should be done
 // by calling react hooks
-globalThis.UI_EDITOR_THEME = "light";
 globalThis.UI_ERR_DISPLAY_TIME_SEC = 5;
 globalThis.UI_WARN_DISPLAY_TIME_SEC = 5;
 globalThis.UI_OK_DISPLAY_TIME_SEC = 3;
@@ -46,18 +44,22 @@ htmlRoots.forEach(
   (htmlRoot) => {
     const root = ReactDOM.createRoot(htmlRoot);
     
-    const displayModeContext: React.Context<ApplicationContextInterface> = React.createContext<ApplicationContextInterface>({
-      mode: htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable",
-      std_out: htmlRoot.dataset["stdoutput"] === "on",
-      debug_console: htmlRoot.dataset["debugconsole"] === "on",
-    });
+    // const displayModeContext: React.Context<ApplicationContextInterface> = React.createContext<ApplicationContextInterface>({
+    //   mode: htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable",
+    //   std_out: htmlRoot.dataset["stdoutput"] === "on",
+    //   debug_console: htmlRoot.dataset["debugconsole"] === "on",
+    // });
+
+    const displayMode = htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable";
+    const showStdOut  = htmlRoot.dataset["stdoutput"] === "on";
+    const showDebug   = htmlRoot.dataset["debugconsole"] === "on";
     
-    C0VMApplication.contextType = displayModeContext;
-    AppCrashFallbackPage.contextType = displayModeContext;
+    // C0VMApplication.contextType = displayModeContext;
+    // AppCrashFallbackPage.contextType = displayModeContext;
     
     root.render(
       <React.StrictMode>
-        <C0VMApplication/>
+        <C0VMApplication displayMode={displayMode} showStdOut={showStdOut} showDebug={showDebug}/>
       </React.StrictMode>
     );
   }
