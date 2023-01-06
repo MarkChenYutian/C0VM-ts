@@ -47,18 +47,13 @@ export default class CodeEditor extends React.Component
     }
 
     render_c0() {
-        const read_only = this.props.app_state.C0Runtime !== undefined && this.props.app_state.C0Runtime.state.CurrLineNumber !== 0;
         return (
             <div className="code-editor" data-lang={this.state.mode}>
-                <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: ".4rem"}}>
-                    <h3 style={{marginTop: 0, marginBottom: 0}}>
-                        <FontAwesomeIcon icon={faCode}/> Code Editor {read_only ? "(Read Only when Running)" : ""}
-                    </h3>
-                </div>
                 <C0EditorGroup
                     currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
                     appState        = {this.props.app_state}
                     set_app_state   = {(ns) => this.props.set_app_state(ns)}
+                    set_group_state = {(mode) => this.setState({mode: mode})}
                     newPanel        = {() => this.create_panel()}
                     removePanel     = {(key) => this.remove_panel(key)}
                     updateContent   = {(key, s) => this.update_content(key, s)}
@@ -73,40 +68,41 @@ export default class CodeEditor extends React.Component
                 currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
                 appState        = {this.props.app_state}
                 set_app_state   = {(ns) => this.props.set_app_state(ns)}
+                set_group_state = {(mode) => this.setState({mode: mode})}
                 newPanel        = {() => this.create_panel()}
                 removePanel     = {(key) => this.remove_panel(key)}
                 updateContent   = {(key, s) => this.update_content(key, s)}
             />;
         } else {
             const vm = this.props.app_state.C0Runtime;
-            content = <BC0Editor
-                updateContent={s => this.props.set_app_state({BC0SourceCode: s})}
-                editorValue  ={this.props.app_state.BC0SourceCode}
-                execLine     ={vm === undefined ? 0 : vm.state.CurrLineNumber}
-                breakpointVal={this.props.app_state.BC0BreakPoints}
-                updateBrkPts ={ns => this.props.set_app_state({BC0BreakPoints: new Set(ns)})}
-            />;
+            const selector = <Segmented
+                options={[
+                    { label: "C0", value: "c0" }, 
+                    { label: "BC0",value: "bc0"}
+                ]}
+                defaultValue="bc0"
+                onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
+            />
+            content = <>
+                <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "baseline"}}>
+                    <h3 style={{margin: "0"}}><FontAwesomeIcon icon={faCode}/> Bytecode Reader</h3>
+                    {selector}
+                </div>
+                <BC0Editor
+                    updateContent={s => this.props.set_app_state({BC0SourceCode: s})}
+                    editorValue  ={this.props.app_state.BC0SourceCode}
+                    execLine     ={vm === undefined ? 0 : vm.state.CurrLineNumber}
+                    breakpointVal={this.props.app_state.BC0BreakPoints}
+                    updateBrkPts ={ns => this.props.set_app_state({BC0BreakPoints: new Set(ns)})}
+                />
+            </>;
         }
 
-        const read_only = this.props.app_state.C0Runtime !== undefined && this.props.app_state.C0Runtime.state.CurrLineNumber !== 0;
-
         return (
-        <div className="code-editor" data-lang={this.state.mode} >
-            <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
-                <h3 style={{marginTop: 0, marginBottom: 0}}>
-                    <FontAwesomeIcon icon={faCode}/> Code Editor {read_only ? "(Read Only when Running)" : ""}
-                </h3>
-                <Segmented
-                    options={[
-                        { label: "C0", value: "c0" }, 
-                        { label: "BC0",value: "bc0"}
-                    ]}
-                    defaultValue="c0"
-                    onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
-                />
+            <div className="code-editor" data-lang={this.state.mode} >
+                {content}
             </div>
-            {content}
-        </div>);
+        );
     }
 
     render() {

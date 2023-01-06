@@ -96,9 +96,9 @@ interface C0EditorGroupProps {
             callback?: () => void
         ): void;
     
+    set_group_state: (mode: "c0" | "bc0") => void,
     newPanel     : () => void,
     removePanel  : (key: string) => void,
-
     updateContent: (key: number, s: string) => void,
 }
 

@@ -8,7 +8,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleRight, faList, faCodeMerge, faBug, faUpRightAndDownLeftFromCenter, faDownLeftAndUpRightToCenter, faTable } from "@fortawesome/free-solid-svg-icons";
 
-import { Result, Segmented } from "antd";
+import { Result, Segmented, Button, Space } from "antd";
 
 import TabularDebugEvaluation from "./tabular_debugger";
 import GraphicalDebugEvaluation from "./graphical_debugger";
@@ -82,17 +82,16 @@ export default class DebugConsole extends React.Component
                 </div>);
         }
 
-        const toggle_full_screen = <button
-            className="implicit-btn success-btn"
+        const toggle_full_screen = <Button
+            icon={<FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter}/>}
+            type="default"
             onClick={() => {this.props.setFullScreen(true);}}
-            style={{marginRight: "1rem"}}
-        ><FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter}/></button>;
+        />;
 
-        const exit_full_screen = <button
-            className="implicit-btn danger-btn"
+        const exit_full_screen = <Button
+            icon={<FontAwesomeIcon icon={faDownLeftAndUpRightToCenter}/>}
             onClick={() => {this.props.setFullScreen(false);}}
-            style={{marginRight: "1rem"}}
-        ><FontAwesomeIcon icon={faDownLeftAndUpRightToCenter}/></button>
+        />
 
         const full_screen_btn = (this.props.isFullScreen) ? exit_full_screen : toggle_full_screen;
 
@@ -129,14 +128,14 @@ export default class DebugConsole extends React.Component
                     </h3>
                     {
                         this.state.show ?
-                            <div>
+                            <Space>
                                 {full_screen_btn}
                                 <Segmented
-                                        options={selector_option}
-                                        defaultValue={this.state.mode}
-                                        onChange={(value) => { this.setState({ mode: value as "Table" | "Graph" | "Detail" }) }}
+                                    options={selector_option}
+                                    defaultValue={this.state.mode}
+                                    onChange={(value) => { this.setState({ mode: value as "Table" | "Graph" | "Detail" }) }}
                                 />
-                            </div>
+                            </Space>
                             : null
                     }
                 </div>

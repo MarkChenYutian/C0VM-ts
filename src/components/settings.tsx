@@ -1,21 +1,20 @@
 import { faAngleDown, faAngleRight, faGear } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Switch, Modal } from "antd";
+import { Switch, Modal, Button } from "antd";
 import React from "react";
 
 export default class SettingPopup extends React.Component<SettingMenuProps> {
     render() {
         return <Modal
                 title={<h3 style={{margin: "0"}}><FontAwesomeIcon icon={faGear}/> Settings</h3>}
-                visible ={true}
+                open ={true}
                 closable={false}
                 centered
                 footer  ={[
-                    <button
-                        key="apply-setting"
-                        className="base-btn main-btn"
+                    <Button
+                        type="primary"
                         onClick={() => this.props.set_app_state({settingMenuOn: false})}
-                    >Apply</button>
+                    >Apply</Button>
                 ]}
                 style={{maxHeight: "80vh", overflowY: "auto"}}
                 >

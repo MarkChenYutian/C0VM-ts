@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import './index.less';
-import 'antd/dist/antd.less';
+import './index.css';
+import './application.css';
+import './embeddable.css';
+import 'antd/dist/reset.css';
+import { ConfigProvider } from 'antd';
 
 import C0VMApplication from './application';
 import AntdEmitter from './utility/antd_emitter';
@@ -59,7 +62,9 @@ htmlRoots.forEach(
     
     root.render(
       <React.StrictMode>
+        <ConfigProvider theme={{token: {colorPrimary: "#3577C1"}}}>
         <C0VMApplication displayMode={displayMode} showStdOut={showStdOut} showDebug={showDebug}/>
+        </ConfigProvider>
       </React.StrictMode>
     );
   }

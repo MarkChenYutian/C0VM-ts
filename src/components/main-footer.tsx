@@ -21,7 +21,7 @@ export default class C0VMApplicationFooter extends React.PureComponent<{state: C
 
         return (
             <footer>
-                <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"}}>
+                <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", padding: ".2rem 0"}}>
                     <div style={{display: "flex", gap: ".3rem", alignItems: "center"}}>
                         <span>V{globalThis.C0VM_VERSION} {globalThis.DEBUG ? "(Debug)" : ""}</span>
                         <button className="implicit-btn" onClick={this.props.open_setting}><FontAwesomeIcon icon={faGear}/></button>
