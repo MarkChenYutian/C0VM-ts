@@ -7,7 +7,7 @@ import { C0 } from "./editor_extension/syntax/c0";
 import { indentUnit } from "@codemirror/language";
 import execLineHighlighter from "./editor_extension/exec_position";
 import breakpointGutter from "./editor_extension/breakpoint_marker";
-import C0LightTheme from "./editor_extension/editor_theme";
+import C0LightTheme from "./editor_extension/c0editor_theme";
 
 export default class C0Editor extends React.Component<C0EditorProps>
 {

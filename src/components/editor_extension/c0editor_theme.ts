@@ -3,7 +3,7 @@ import {HighlightStyle, syntaxHighlighting} from "@codemirror/language";
 import {tags as t} from "@lezer/highlight";
 import { Extension } from "@codemirror/state";
 
-const backgroundColor = "#FFFFFF",
+export const backgroundColor = "#FFFFFF",
     textColor = "#333333",
     activeColor = "#F7F7F7",
     selection = "#F3F3F3",
@@ -25,12 +25,12 @@ const highlighter = {
 }
 
 
-const C0LightStyle = EditorView.theme({
+export const C0LightStyle = EditorView.theme({
     "&": {
         color: textColor,
         backgroundColor: backgroundColor,
         fontSize: "15px",
-        FontFace: "cascadia-code"
+        FontFace: "menlo-regular"
     },
     ".cm-content": {
         caretColor: "#526FFF",
