@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
 import C0VM_RuntimeState from "../vm_core/exec/state";
 
-const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.c0$/;
+const regex_valid_file_name = /^[0-9a-zA-Z_-]+(?:\.c0|\.c1)$/;
 
 function merge_typedef(original: Map<string, TypeDefInfo>, editor_key: number, newSet: Map<string, string>): Map<string, TypeDefInfo> {
     const newTypedef = new Map<string, TypeDefInfo>();
@@ -43,7 +43,7 @@ export default class CodeEditor extends React.Component
         if (!regex_valid_file_name.test(name)) {
             globalThis.MSG_EMITTER.warn(
                 "Failed to rename editor tab", 
-                "Editor tab's name can't contain special character and should end in .c0"
+                "Editor tab's name can't contain special character and should end in .c0 or .c1"
             );
             return;
         }
