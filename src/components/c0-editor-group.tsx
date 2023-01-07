@@ -9,38 +9,45 @@ import AutosizeInput from 'react-input-autosize';
 
 const { TabPane } = Tabs;
 
-class TabNameInput extends AutosizeInput {
-}
-
 class EditableTab extends React.Component<
-    { title: string, editor_key: string, onInput: (key: string, a: string) => void }, 
-    { title: string, being_edited: boolean}
+    { title: string, editor_key: string, updateName: (key: string, a: string) => void }, 
+    { title: string, being_edited: boolean, wip_title: string}
 > {
 
-    constructor(props: { title: string, editor_key: string, onInput: (a: string) => void }) {
+    constructor(props: { title: string, editor_key: string, updateName: (a: string) => void }) {
         super(props);
         this.state = {
             title: props.title,
             being_edited: false,
+            wip_title: "",
         };
         this.onChange = this.onChange.bind(this);
+        this.onKeyDown = this.onKeyDown.bind(this);
         this.startEditing = this.startEditing.bind(this);
         this.stopEditing = this.stopEditing.bind(this);    
     }
     
     onChange(e: React.ChangeEvent<HTMLInputElement>) {
         e.preventDefault();
-        this.setState({title: e.target.value});
-        this.props.onInput(this.props.editor_key, e.target.value);
+        this.setState({wip_title: e.target.value});
     }
+
+    onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+        if (e.key === 'Enter') {
+            this.stopEditing();
+        }
+    };
 
     startEditing() {
+        this.setState({wip_title: this.state.title});
         this.setState({being_edited: true});
-        // this.inputRef.current?.focus();
     }
 
-    stopEditing() {
+    async stopEditing() {
         this.setState({being_edited: false});
+        await this.props.updateName(this.props.editor_key, this.state.wip_title);
+        this.setState({title: this.props.title}); // update display title
+        this.setState({wip_title: this.state.title}); // resets title if updateName fials
     }
 
     render() {
@@ -52,15 +59,15 @@ class EditableTab extends React.Component<
             );
         } else {
             return (
-                    <TabNameInput 
+                    <AutosizeInput 
                         className="tab-name"
-                        // inputRef = {this.setInputRef}
                         type="text" 
-                        value={this.state.title}
+                        value={this.state.wip_title}
                         onChange={this.onChange} 
+                        onKeyDown={this.onKeyDown}
                         onBlur={this.stopEditing}
                         autoFocus
-                    ></TabNameInput>
+                    ></AutosizeInput>
             );
         }
     }
@@ -138,7 +145,12 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                             lineNumber = this.props.currLine[1];
                         }
                         return <TabPane
-                            tab={<EditableTab title={editor.title} editor_key={editor.key + ""} onInput={(k, s) => this.set_current_tab_name(k, s)}/>}
+                            tab={
+                                <EditableTab 
+                                    title={editor.title} 
+                                    editor_key={editor.key + ""} 
+                                    updateName={(k, s) => this.set_current_tab_name(k, s)}
+                                />}
                             key={editor.key + ""}
                             closable = {this.props.currTabs.length !== 1}
                             closeIcon={<FontAwesomeIcon icon={faXmark}/>}
