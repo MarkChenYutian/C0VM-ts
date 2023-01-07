@@ -33,6 +33,17 @@ export const C0LightStyle = EditorView.theme({
         fontSize: "15px",
         FontFace: "menlo-regular"
     },
+    "&.cm-editor": {
+        border: "1px solid silver",
+        borderRadius: "0 0 0.3rem 0.3rem"
+    },
+    "&.cm-editor.cm-focused": {
+        border: "1px solid silver",
+        outline: "none"
+    },
+    ".cm-scroller": {
+        overflow: "auto"
+    },
     ".cm-content": {
         caretColor: "#526FFF",
     },
@@ -70,7 +81,14 @@ export const C0LightStyle = EditorView.theme({
         fontSize: "1rem"
     },
     ".cm-breakpoint-gutter": {
-        padding: "0 0 0 .2rem"
+        width: "1rem"
+    },
+    ".cm-breakpoint-gutter:hover": {
+        backgroundColor: "#EAEAEA"
+    },
+    "& .cm-editor.cm-focused": {
+        border: "1px solid silver",
+        outline: "none"
     },
     "& button.cm-button": {
         color: "#3577C1",
