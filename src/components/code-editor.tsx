@@ -30,6 +30,20 @@ export default class CodeEditor extends React.Component
         this.setState({C0_nextKey: this.state.C0_nextKey + 1})
     }
 
+
+
+    create_imported_panel(filename: string, text: string) {
+        const new_editors = [...this.props.app_state.C0Editors];
+        new_editors.push({
+            title: filename,
+            key: this.state.C0_nextKey,
+            content: text,
+            breakpoints: [],
+        });
+        this.props.set_app_state({C0Editors: new_editors});
+        this.setState({C0_nextKey: this.state.C0_nextKey + 1})
+    }
+
     remove_panel(key: string) {
         const key_tbr = parseInt(key);
         let new_editors: C0EditorTab[] = [...this.props.app_state.C0Editors];
