@@ -193,15 +193,15 @@ export default function MainControlBar(props: MainControlProps) {
         </Button>;
     
     const display_CompileBtn = compilebtn_disabled ?
-        <Tooltip placement="bottomRight" color="blue" title="Write code in editor to Compile">{CompileButton}</Tooltip>
+        <Tooltip placement="bottomRight" color="#3577C1" title="Write code in editor to Compile">{CompileButton}</Tooltip>
          : CompileButton;
     
     const display_StepBtn = stepbtn_disabled ?
-        <Tooltip placement="bottomRight" color="blue" title="Compile the code before Step">{StepButton}</Tooltip>
+        <Tooltip placement="bottomRight" color="#3577C1" title="Compile the code before Step">{StepButton}</Tooltip>
          : StepButton;
     
     const display_RunBtn  = runbtn_disabled ?
-        <Tooltip placement="bottomRight" color="blue" title="Compile the code before Run">{RunButton}</Tooltip>
+        <Tooltip placement="bottomRight" color="#3577C1" title="Compile the code before Run">{RunButton}</Tooltip>
          : RunButton;
 
     return (

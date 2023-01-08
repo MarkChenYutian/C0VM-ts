@@ -87,6 +87,7 @@ interface C0EditorGroupProps {
     currLine     : [string, number, boolean] | undefined,   /* Current C0 line the C0VM is executing */
 
     appState     : C0VMApplicationState,                    /* C0VM Application State */
+    selector     : JSX.Element | undefined                  /* Code editor mode selector */
     set_app_state<K extends keyof C0VMApplicationState>(
         state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
                 => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 

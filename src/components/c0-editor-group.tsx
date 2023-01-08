@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, TabsProps, Segmented } from "antd";
+import { Tabs, TabsProps } from "antd";
 import C0Editor from "./c0-editor";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
@@ -86,16 +86,8 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
     };
 
     render() {
-        const selector = <Segmented
-                options={[
-                    { label: "C0", value: "c0" }, 
-                    { label: "BC0",value: "bc0"}
-                ]}
-                defaultValue="c0"
-                onChange={(value) => {this.props.set_group_state(value as "c0" | "bc0")}}
-            />
         const tabConfig: TabsProps = {
-            tabBarExtraContent: this.props.appState.c0_only ? undefined : selector,
+            tabBarExtraContent: this.props.selector,
             type: "editable-card",
             activeKey: this.props.appState.ActiveEditor + "",
             size: "small",

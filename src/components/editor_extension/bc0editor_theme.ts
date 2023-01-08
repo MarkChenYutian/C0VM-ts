@@ -16,7 +16,7 @@ const highlighter = {
 const BC0HighlightStyle = HighlightStyle.define([
     {
         tag: [t.comment],
-        color: highlighter.funcColor
+        color: highlighter.commentColor
     },
     {
         tag: [t.keyword],
@@ -32,7 +32,7 @@ const BC0HighlightStyle = HighlightStyle.define([
     },
     {
         tag: [t.attributeName],
-        color: highlighter.commentColor
+        color: highlighter.funcColor
     }
 ]);
 

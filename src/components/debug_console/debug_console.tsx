@@ -68,13 +68,13 @@ export default class DebugConsole extends React.Component
                             status="error"
                             title="Debugger Crashed!"
                             extra={[
-                                <button className="base-btn main-btn" onClick={() => this.setState({ err: false, mode: "Table" })}>
+                                <Button onClick={() => this.setState({ err: false, mode: "Table" })}>
                                     Reload Debugger
-                                </button>,
+                                </Button>,
                                 <a href="https://docs.google.com/forms/d/e/1FAIpQLSezT1KhMgCNw0Uuk2nnqQnDtYlpXvbYnQW7VEef9xN759APYA/viewform?usp=sf_link" target="_blank" rel="noreferrer">
-                                    <button className="base-btn main-btn">
+                                    <Button className="base-btn main-btn">
                                         Report Problem
-                                    </button>
+                                    </Button>
                                 </a>
                             ]}
                         /> : null

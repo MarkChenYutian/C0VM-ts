@@ -2,15 +2,16 @@ import React from "react";
 import BC0Editor from "./bc0-editor";
 import C0EditorGroup from "./c0-editor-group";
 
-import { Segmented } from "antd";
+import { Segmented, Tooltip } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCode } from "@fortawesome/free-solid-svg-icons";
+import { faCode, faLock } from "@fortawesome/free-solid-svg-icons";
 
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>
 {
     constructor(props: CodeEditorProps) {
         super(props);
+
         const tabs = props.app_state.C0Editors;
         this.state = {
             mode: "c0",
@@ -46,12 +47,13 @@ export default class CodeEditor extends React.Component
         this.props.set_app_state({C0Editors: ns, contentChanged: true});
     }
 
-    render_c0() {
+    render_c0(selector: JSX.Element | undefined) {
         return (
             <div className="code-editor" data-lang={this.state.mode}>
                 <C0EditorGroup
                     currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
                     appState        = {this.props.app_state}
+                    selector        = {selector}
                     set_app_state   = {(ns) => this.props.set_app_state(ns)}
                     set_group_state = {(mode) => this.setState({mode: mode})}
                     newPanel        = {() => this.create_panel()}
@@ -61,12 +63,13 @@ export default class CodeEditor extends React.Component
             </div>);
     }
 
-    render_all() {
+    render_all(selector: JSX.Element | undefined) {
         let content = undefined;
         if (this.state.mode === "c0") {
             content = <C0EditorGroup
                 currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
                 appState        = {this.props.app_state}
+                selector        = {selector}
                 set_app_state   = {(ns) => this.props.set_app_state(ns)}
                 set_group_state = {(mode) => this.setState({mode: mode})}
                 newPanel        = {() => this.create_panel()}
@@ -75,14 +78,6 @@ export default class CodeEditor extends React.Component
             />;
         } else {
             const vm = this.props.app_state.C0Runtime;
-            const selector = <Segmented
-                options={[
-                    { label: "C0", value: "c0" }, 
-                    { label: "BC0",value: "bc0"}
-                ]}
-                defaultValue="bc0"
-                onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
-            />
             content = <>
                 <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "baseline"}}>
                     <h3 style={{margin: "0"}}><FontAwesomeIcon icon={faCode}/> Bytecode Reader</h3>
@@ -106,7 +101,41 @@ export default class CodeEditor extends React.Component
     }
 
     render() {
-        if (this.props.app_state.c0_only) return this.render_c0();
-        return this.render_all();
+        let selectorArr: JSX.Element[] = [];
+        
+        if (this.props.app_state.C0Runtime?.state.CurrC0RefLine !== undefined){
+            selectorArr.push(
+                <Tooltip
+                    title="Code editor is read-only now since the program is running."
+                    placement="left"
+                    color="#3577C1"
+                >
+                    <FontAwesomeIcon icon={faLock} key="status_indicator"/>
+                </Tooltip>
+            );
+        }
+
+        if (! this.props.app_state.c0_only){
+            selectorArr.push(<Segmented
+                            key="language_selector"
+                            options={[
+                                { label: "C0", value: "c0" }, 
+                                { label: "BC0",value: "bc0"}
+                            ]}
+                            defaultValue={this.state.mode}
+                            onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
+                        />);
+        }
+
+
+        let selector = undefined;
+        if (selectorArr.length === 1){
+            selector = selectorArr[0];
+        } else if (selectorArr.length === 2) {
+            selector = <div>{selectorArr[0]} {selectorArr[1]}</div>
+        }
+        
+        if (this.props.app_state.c0_only) return this.render_c0(selector);
+        return this.render_all(selector);
     }
 }
