@@ -1,6 +1,11 @@
 import React from "react";
 import BC0Editor from "./bc0-editor";
 import C0EditorGroup from "./c0-editor-group";
+import { Tabs, Button, Input } from 'antd';
+import type { UploadProps } from 'antd';
+import { message, Upload } from 'antd';
+
+import { faBoltLightning, faPlay, faScrewdriverWrench, faStepForward, faUndo, faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 
 import { Segmented } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,6 +21,7 @@ export default class CodeEditor extends React.Component
             mode: "c0",
             C0_nextKey : tabs.length === 0 ? 1 : Math.max(...tabs.map((tab) => tab.key)) + 1
         }
+        this.handle_import_folder = this.handle_import_folder.bind(this);
     }
 
     create_panel() {
@@ -30,7 +36,32 @@ export default class CodeEditor extends React.Component
         this.setState({C0_nextKey: this.state.C0_nextKey + 1})
     }
 
+    handle_import_folder(info: {
+        file: { /* ... */ },
+        fileList: [ /* ... */ ],
+        event: { /* ... */ }
+    }) {
+        console.log(info)
 
+        console.log("handelling import folder")
+        console.log(this)
+        this.create_imported_panel("filename", "text")
+
+        const reader = new FileReader();
+        const F = // file
+
+        reader.onloadend = (e) => {
+            if (reader.result === null) { 
+                console.log("Failed to read input file")
+                return;
+            }
+            const res = reader.result.toString();
+            // append as editor tab?
+        };
+        // reader.readAsText(F, "utf-8");
+
+    
+    }
 
     create_imported_panel(filename: string, text: string) {
         const new_editors = [...this.props.app_state.C0Editors];
@@ -110,6 +141,57 @@ export default class CodeEditor extends React.Component
                 <h3 style={{marginTop: 0, marginBottom: 0}}>
                     <FontAwesomeIcon icon={faCode}/> Code Editor {read_only ? "(Read Only when Running)" : ""}
                 </h3>
+
+                <Upload
+                {...{
+                    name: 'code-import-folder',
+                    showUploadList: false,
+
+                    beforeUpload(F) {
+                        // Access file content here and do something with it
+                        console.log(F);
+
+                        const reader = new FileReader();
+
+                        reader.onload = e => {
+                            if (reader.result === null) { 
+                                console.log("Failed to read input file")
+                                return;
+                            }
+                            const res = reader.result.toString();
+                            // append as editor tab?
+                            console.log(res)
+                        };
+                        reader.readAsText(F, "utf-8");
+                
+                        // Prevent upload
+                        return false;
+                    },
+
+                    // onChange(info) {
+                        // console.log(info)
+                    //   if (info.file.status !== 'uploading') {
+                    //     console.log(info.file, info.fileList);
+                    //   }
+                    //   if (info.file.status === 'done') {
+                    //     message.success(`${info.file.name} file uploaded successfully`);
+                    //   } else if (info.file.status === 'error') {
+                    //     message.error(`${info.file.name} file upload failed.`);
+                    //   }
+                    // },
+                    directory: true
+                }}
+                    // name="code-import"
+                    // directory
+                    // beforeUpload={beforeUpload}
+                    // onChange={handleChange}
+                    // onChange = {(info) => this.handle_import_folder(info)}
+                >
+                    <Button style={{marginRight: "1em"}} icon={<FontAwesomeIcon icon={faFolderOpen}/>}>
+                        {" Import Folder "}
+                    </Button>
+                </Upload>
+
                 <Segmented
                     options={[
                         { label: "C0", value: "c0" }, 

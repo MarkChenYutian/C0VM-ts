@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs } from "antd";
+import { Tabs, Button } from 'antd';
 import C0Editor from "./c0-editor";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
@@ -18,6 +18,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         this.on_change_key = this.on_change_key.bind(this);
         this.update_tab_order = this.update_tab_order.bind(this);
         this.set_brkpt_for_editor = this.set_brkpt_for_editor.bind(this);
+        // this.add_loaded_tab = this.add_loaded_tab.bind(this);
     }
 
     set_tab_name(key: number, name: string){
@@ -85,8 +86,25 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         }
     };
 
+    // add_loaded_tab() {
+    //     this.props.newImportedPanel("HI", "this is the code");
+    //     console.log("attempting to add tab with some info")
+    //     // const newActiveKey = `newTab${newTabIndex.current++}`;
+    //     // setItems([
+    //     //   ...items,
+    //     //   {
+    //     //     label: 'New Tab',
+    //     //     children: 'New Tab Pane',
+    //     //     key: newActiveKey,
+    //     //   },
+    //     // ]);
+    //     // setActiveKey(newActiveKey);
+    // };
+    
+
     render() {
-        return (
+        return ( <>       
+        {/* <Button onClick={this.add_loaded_tab}>ADD</Button> */}
         <DraggableTabs
             config={{
                 type: "editable-card",
@@ -133,6 +151,6 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                 )
             }
         </DraggableTabs>
-        );
+        </>);
     }
 }
