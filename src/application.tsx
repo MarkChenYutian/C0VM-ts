@@ -26,11 +26,9 @@ export default class C0VMApplication extends React.Component<
             
             BC0SourceCode: "",
             BC0BreakPoints: new Set(),
-            TypedefRecord: new Map(),
 
-            C0Editors: [{ title: "Untitled_0.c0", key: 0, content: ""}],
+            C0Editors: [{ title: "Untitled_0.c0", key: 0, content: "", breakpoints: [] }],
             ActiveEditor: 0,
-            C0BreakPoint: new Set(),
 
             PrintoutValue: "",
 
@@ -69,7 +67,6 @@ export default class C0VMApplication extends React.Component<
                 state={this.state.C0Runtime}
                 c0_only={this.state.c0_only}
                 isFullScreen={this.state.dbgFullScreen}
-                typedef={this.state.TypedefRecord}
                 setFullScreen={(s) => this.setState({dbgFullScreen: s})}
             />
         ) : null;

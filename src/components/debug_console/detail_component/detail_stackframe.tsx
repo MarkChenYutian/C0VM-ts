@@ -42,15 +42,15 @@ export default class DetailStackFrame extends React.Component<
         for (let i = this.props.frame.S.length - 1; i >= 0; i --) {
             const to_be_rendered = this.props.frame.S[i];
             stack_info.push(
-                <p key={i + "-stack-name"}>{i} - <code>{Type2String(to_be_rendered.type, this.props.typedefRec)}</code></p>
+                <p key={i + "-stack-name"}>{i} - <code>{Type2String(to_be_rendered.type, this.props.typedef)}</code></p>
             );
             stack_info.push(
                 <C0ValueStackDisplay
                     key={i + "-value"}
                     value={to_be_rendered}
                     mem={this.props.mem}
+                    typedef={this.props.typedef}
                     typeRecord={this.props.typeRecord}
-                    typedefRec={this.props.typedefRec}
                     default_expand={true}
                 />
             );
@@ -66,15 +66,15 @@ export default class DetailStackFrame extends React.Component<
                 );
             } else{
                 var_info.push(
-                    <p key={i + "-var-name"}>{i} - <code>{Type2String(to_be_rendered.type, this.props.typedefRec)} {this.props.frame.P.varName[i]}</code></p>
+                    <p key={i + "-var-name"}>{i} - <code>{Type2String(to_be_rendered.type, this.props.typedef)} {this.props.frame.P.varName[i]}</code></p>
                 );
                 var_info.push(
                     <C0ValueTabularDisplay
                         key={i + "-value"}
                         value={to_be_rendered}
                         mem={this.props.mem}
+                        typedef={this.props.typedef}
                         typeRecord={this.props.typeRecord}
-                        typedefRec={this.props.typedefRec}
                         default_expand={true}
                     />
                 );

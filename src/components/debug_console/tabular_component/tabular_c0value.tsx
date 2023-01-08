@@ -57,7 +57,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                         mem={this.props.mem}
                         value={vals[i]}
                         typeRecord={this.props.typeRecord}
-                        typedefRec={this.props.typedefRec}
+                        typedef={this.props.typedef}
                         default_expand={false}
                     />
                 </li>
@@ -129,7 +129,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                             mem={this.props.mem}
                             value={{ type: value_to_render.type.value, value: this.props.value.value }}
                             typeRecord={this.props.typeRecord}
-                            typedefRec={this.props.typedefRec}
+                            typedef={this.props.typedef}
                             default_expand={false}
                         />
                         )
@@ -155,8 +155,8 @@ export default class C0ValueTabularDisplay extends React.Component<
                             <C0ValueTabularDisplay
                                 mem={this.props.mem}
                                 value={deref_value}
+                                typedef={this.props.typedef}
                                 typeRecord={this.props.typeRecord}
-                                typedefRec={this.props.typedefRec}
                                 default_expand={false}
                             />
                         </li>
@@ -211,8 +211,8 @@ export default class C0ValueTabularDisplay extends React.Component<
                             <C0ValueTabularDisplay
                                 value={entry.value}
                                 mem={this.props.mem}
+                                typedef={this.props.typedef}
                                 typeRecord={this.props.typeRecord}
-                                typedefRec={this.props.typedefRec}
                                 default_expand={false}
                             />
                         </div>

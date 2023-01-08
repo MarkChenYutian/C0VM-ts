@@ -81,7 +81,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "cross-env GENERATE_SOURCEMAP=false BUILD_PATH='./docs' craco build",
+    "build": "cross-env GENERATE_SOURCEMAP=true BUILD_PATH='./docs' craco build",
     "test": "react-scripts test",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"

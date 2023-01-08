@@ -9,9 +9,9 @@ import AntdEmitter from './utility/antd_emitter';
 import AppCrashFallbackPage from './components/app_crash_fallback';
 
 // Global Variables
-global.C0VM_VERSION = "0.3.1-Beta";
+global.C0VM_VERSION = "0.3.2-Beta";
 
-globalThis.DEBUG = false;
+globalThis.DEBUG = true;
 globalThis.DEBUG_DUMP_MEM = false;
 globalThis.DEBUG_DUMP_STEP = false;
 
@@ -29,7 +29,7 @@ globalThis.UI_ERR_DISPLAY_TIME_SEC = 5;
 globalThis.UI_WARN_DISPLAY_TIME_SEC = 5;
 globalThis.UI_OK_DISPLAY_TIME_SEC = 3;
 
-globalThis.COMPILER_BACKEND_URL = "https://15122.ga/visualc0/compile";
+globalThis.COMPILER_BACKEND_URL = "https://cs122.andrew.cmu.edu/visualc0/compile";
 
 globalThis.C0_MAX_RECURSION = 999;
 globalThis.C0_TIME_SLICE = 500;

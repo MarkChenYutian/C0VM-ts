@@ -2,17 +2,20 @@ import { step } from "./exec";
 import { createHeap, VM_Memory } from "../utility/memory";
 import parse from "../parser/parse";
 import { loadStringPool } from "../../utility/string_utility";
+import { extract_all_structType, extract_all_typedef } from "../../network/c0_parser";
 
 /**
  * The C0 Virtual Machine Runtime with interface of operation
  */
 export default class C0VM_RuntimeState implements C0VM_RT{
+    public c0_source: C0EditorTab[];
     public raw_code: string;
     public code: C0ByteCode;
     public state: VM_State;
     public allocator: C0HeapAllocator;
     public heap_size: undefined | number
     public step_cnt: number
+    public typedef: Map<string, string>;
 
     /**
      * Creating a new C0VM Runtime
@@ -20,13 +23,17 @@ export default class C0VM_RuntimeState implements C0VM_RT{
      * @param heapSize Heap size (in bytes), optional, if not explicitly designated, then use the 
      * GlobalThis.MEM_POOL_DEFAULT_SIZE as the size.
      */
-    constructor(rawByteCode: string, C0Source: C0EditorTab[], TypedefRecord: Map<string, TypeDefInfo>, heapSize?: number, parsed_result?: C0ByteCode) {
-        this.raw_code = rawByteCode;
-        this.code = parsed_result === undefined ? parse(rawByteCode, C0Source, TypedefRecord) : parsed_result;
+    constructor(rawByteCode: string, C0Source: C0EditorTab[], heapSize?: number) {
+        this.c0_source = C0Source;
+        this.raw_code  = rawByteCode;
+        this.typedef   = extract_all_typedef(this.c0_source);
+        this.code      = parse(rawByteCode, C0Source, this.typedef);
         this.heap_size = heapSize;
         this.allocator = createHeap(VM_Memory, heapSize);
-        this.step_cnt = 0;
+        this.step_cnt  = 0;
+        
         const str_ptr = loadStringPool(this.code.stringPool, this.allocator);
+        
         this.state = {
             P: this.code,
             C: {
@@ -41,7 +48,7 @@ export default class C0VM_RuntimeState implements C0VM_RT{
             },
             CurrLineNumber: 0,
             CurrC0RefLine: undefined,
-            TypeRecord: new Map<string, Map<number, Struct_Type_Record>>(),
+            TypeRecord: extract_all_structType(C0Source),
         };
     }
 
@@ -59,8 +66,8 @@ export default class C0VM_RuntimeState implements C0VM_RT{
      * to be immutable
      * @returns a clone of current runtime state
      */
-    public clone(): C0VM_RuntimeState {
-        const C = new C0VM_RuntimeState(this.raw_code, [], new Map(), this.heap_size, this.code);
+    public clone(): C0VM_RT {
+        const C = new C0VM_RuntimeState(this.raw_code, this.c0_source, this.heap_size);
         
         C.state = this.state;
         C.allocator = this.allocator;
