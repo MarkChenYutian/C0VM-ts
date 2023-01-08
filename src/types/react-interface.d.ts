@@ -202,3 +202,15 @@ interface SettingMenuProps {
         callback?: () => void
     ): void;
 }
+
+interface EditableTabProps {
+    title: string,
+    editor_key: string,
+    updateName: (key: string, a: string) => void
+}
+
+interface EditableTabState {
+    title: string,
+    being_edited: boolean,
+    wip_title: string
+}

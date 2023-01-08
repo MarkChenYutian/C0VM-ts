@@ -9,12 +9,9 @@ import AutosizeInput from 'react-input-autosize';
 
 const { TabPane } = Tabs;
 
-class EditableTab extends React.Component<
-    { title: string, editor_key: string, updateName: (key: string, a: string) => void }, 
-    { title: string, being_edited: boolean, wip_title: string}
-> {
+class EditableTab extends React.Component<EditableTabProps, EditableTabState> {
 
-    constructor(props: { title: string, editor_key: string, updateName: (a: string) => void }) {
+    constructor(props: EditableTabProps) {
         super(props);
         this.state = {
             title: props.title,
@@ -44,18 +41,18 @@ class EditableTab extends React.Component<
     }
 
     async stopEditing() {
-        this.setState({being_edited: false});
         await this.props.updateName(this.props.editor_key, this.state.wip_title);
-        this.setState({title: this.props.title}); // update display title
-        this.setState({wip_title: this.state.title}); // resets title if updateName fials
+        this.setState({
+            being_edited: false,
+            title: this.props.title,    // update display title
+            wip_title: this.state.title // resets title if updateName fails
+        });
     }
 
     render() {
         if (!this.state.being_edited) {
             return (
-                <>
-                    <span onDoubleClick={this.startEditing}>{this.state.title}</span>
-                </>
+                <span onDoubleClick={this.startEditing}>{this.state.title}</span>
             );
         } else {
             return (

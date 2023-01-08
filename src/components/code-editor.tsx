@@ -55,7 +55,7 @@ export default class CodeEditor extends React.Component
         }
         for (let i = 0; i < this.props.app_state.C0Editors.length; i ++) {
             const tab = this.props.app_state.C0Editors[i];
-            if (tab.title === name) {
+            if (tab.title === name && tab.key !== key) {
                 globalThis.MSG_EMITTER.warn("Failed to rename editor tab", "Editor tabs must have different name.");
                 return;
             }
