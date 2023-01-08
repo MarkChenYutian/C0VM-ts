@@ -5,8 +5,72 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
 import DraggableTabs from "./draggable_tabs";
 
+import AutosizeInput from 'react-input-autosize';
+
 const { TabPane } = Tabs;
 const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.c0$/;
+
+class EditableTab extends React.Component<EditableTabProps, EditableTabState> {
+
+    constructor(props: EditableTabProps) {
+        super(props);
+        this.state = {
+            title: props.title,
+            being_edited: false,
+            wip_title: "",
+        };
+        this.onChange = this.onChange.bind(this);
+        this.onKeyDown = this.onKeyDown.bind(this);
+        this.startEditing = this.startEditing.bind(this);
+        this.stopEditing = this.stopEditing.bind(this);    
+    }
+    
+    onChange(e: React.ChangeEvent<HTMLInputElement>) {
+        e.preventDefault();
+        this.setState({wip_title: e.target.value});
+    }
+
+    onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+        if (e.key === 'Enter') {
+            this.stopEditing();
+        }
+    }
+
+    startEditing() {
+        this.setState({wip_title: this.state.title});
+        this.setState({being_edited: true});
+    }
+
+    async stopEditing() {
+        await this.props.updateName(this.props.editor_key, this.state.wip_title);
+        this.setState({
+            being_edited: false,
+            title: this.props.title,    // update display title
+            wip_title: this.state.title // resets title if updateName fails
+        });
+    }
+
+    render() {
+        if (!this.state.being_edited) {
+            return (
+                <span onDoubleClick={this.startEditing}>{this.state.title}</span>
+            );
+        } else {
+            return (
+                    <AutosizeInput 
+                        className="tab-name"
+                        type="text" 
+                        value={this.state.wip_title}
+                        onChange={this.onChange} 
+                        onKeyDown={this.onKeyDown}
+                        onBlur={this.stopEditing}
+                        autoFocus
+                    ></AutosizeInput>
+            );
+        }
+    }
+}
+
 
 
 export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
@@ -32,11 +96,12 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
             globalThis.MSG_EMITTER.warn(
                 "Failed to rename editor tab",
                 "Can't rename editor tab when a C0/BC0 program is running in background"
-            )
+            );
+            return;
         }
         for (let i = 0; i < this.props.appState.C0Editors.length; i ++) {
             const tab = this.props.appState.C0Editors[i];
-            if (tab.title === name) {
+            if (tab.title === name && tab.key !== key) {
                 globalThis.MSG_EMITTER.warn("Failed to rename editor tab", "Editor tabs must have different name.");
                 return;
             }
@@ -72,6 +137,10 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
             if (newTabs[i].key === key) newTabs[i].breakpoints = bps;
         }
         this.props.set_app_state({C0Editors: newTabs});
+    }
+
+    set_current_tab_name(key: string, s: string): void {
+        this.set_tab_name(parseInt(key), s === null ? "" : s);
     }
 
     on_edit(target_key: any, action: "add" | "remove") {
@@ -114,7 +183,12 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                         }
 
                         return <TabPane
-                            tab={editor.title}
+                            tab={
+                                <EditableTab 
+                                    title={editor.title} 
+                                    editor_key={editor.key + ""} 
+                                    updateName={(k, s) => this.set_current_tab_name(k, s)}
+                                />}
                             key={editor.key + ""}
                             closable = {this.props.appState.C0Editors.length !== 1}
                             closeIcon={<FontAwesomeIcon icon={faXmark}/>}
