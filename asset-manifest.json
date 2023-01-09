@@ -1,14 +1,16 @@
 {
   "files": {
-    "main.css": "/static/css/main.f5c4794b.css",
-    "main.js": "/static/js/main.9e7c4746.js",
+    "main.css": "/static/css/main.febc3c4d.css",
+    "main.js": "/static/js/main.161238f9.js",
+    "static/media/CascadiaMono.ttf": "/static/media/CascadiaMono.d3365ea61baa563ae8df.ttf",
+    "static/media/Menlo-Regular.ttf": "/static/media/Menlo-Regular.92e41f43900c256f2286.ttf",
     "static/media/ts-logo-128.svg": "/static/media/ts-logo-128.c76204988f8496c480cbab87d1604986.svg",
     "index.html": "/index.html",
-    "main.f5c4794b.css.map": "/static/css/main.f5c4794b.css.map",
-    "main.9e7c4746.js.map": "/static/js/main.9e7c4746.js.map"
+    "main.febc3c4d.css.map": "/static/css/main.febc3c4d.css.map",
+    "main.161238f9.js.map": "/static/js/main.161238f9.js.map"
   },
   "entrypoints": [
-    "static/css/main.f5c4794b.css",
-    "static/js/main.9e7c4746.js"
+    "static/css/main.febc3c4d.css",
+    "static/js/main.161238f9.js"
   ]
 }
