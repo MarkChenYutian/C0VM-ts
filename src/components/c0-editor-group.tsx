@@ -2,13 +2,13 @@ import React from "react";
 import { Tabs, TabsProps } from "antd";
 import C0Editor from "./c0-editor";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faAdd, faAngleDown } from "@fortawesome/free-solid-svg-icons";
 import DraggableTabs from "./draggable_tabs";
 
 import AutosizeInput from 'react-18-input-autosize';
 
 const { TabPane } = Tabs;
-const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.c0$/;
+const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.c(0|1)$/;
 
 class EditableTab extends React.Component<EditableTabProps, EditableTabState> {
 
@@ -88,7 +88,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         if (!regex_valid_file_name.test(name)) {
             globalThis.MSG_EMITTER.warn(
                 "Failed to rename editor tab", 
-                "Editor tab's name can't contain special character and should end in .c0"
+                "Editor tab's name can't contain special character and should end in .c0 or .c1"
             );
             return;
         }
@@ -167,7 +167,8 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                     this.set_tab_name(parseInt(key), s === null ? "" : s)
                 }
             },
-            addIcon: <FontAwesomeIcon icon={faAdd}/>
+            addIcon: <FontAwesomeIcon icon={faAdd}/>,
+            moreIcon: <FontAwesomeIcon icon={faAngleDown}/>
         }
 
         return (

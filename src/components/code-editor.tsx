@@ -2,7 +2,7 @@ import React from "react";
 import BC0Editor from "./bc0-editor";
 import C0EditorGroup from "./c0-editor-group";
 
-import { Segmented, Tooltip } from "antd";
+import { Segmented, Space, Tooltip } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faLock } from "@fortawesome/free-solid-svg-icons";
 import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
@@ -124,8 +124,8 @@ export default class CodeEditor extends React.Component
             selectorArr.push(<Segmented
                             key="language_selector"
                             options={[
-                                { label: "C0", value: "c0" }, 
-                                { label: "BC0",value: "bc0"}
+                                { label: "Source", value: "c0" }, 
+                                { label: "ByteC",value: "bc0"}
                             ]}
                             defaultValue={this.state.mode}
                             onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
@@ -137,7 +137,7 @@ export default class CodeEditor extends React.Component
         if (selectorArr.length === 1){
             selector = selectorArr[0];
         } else if (selectorArr.length === 2) {
-            selector = <div>{selectorArr[0]} {selectorArr[1]}</div>
+            selector = <Space size="small">{selectorArr[0]} {selectorArr[1]}</Space>
         }
         
         if (this.props.app_state.c0_only) return this.render_c0(selector);

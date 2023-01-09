@@ -63,6 +63,10 @@ body {
     margin-bottom: 0 !important;
 }
 
+.ant-tabs-nav-more {
+    padding-bottom: 0 !important;
+}
+
 .io-area {
     flex-grow: 1;
     padding-left: .5rem;
