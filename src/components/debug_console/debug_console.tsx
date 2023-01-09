@@ -38,7 +38,7 @@ export default class DebugConsole extends React.Component
         )
     }
 
-    resolve_render_view(typedef: Map<string, string>): React.ReactNode {
+    resolve_render_view(typedef: Map<SourceType, AliasType>): React.ReactNode {
         if (this.state.show === false) return null;
         const S = this.props.state;
         if (S === undefined) return this.render_no_valid_state();
@@ -68,11 +68,11 @@ export default class DebugConsole extends React.Component
                             status="error"
                             title="Debugger Crashed!"
                             extra={[
-                                <Button onClick={() => this.setState({ err: false, mode: "Table" })}>
+                                <Button key="reload" size="large" type="primary" onClick={() => this.setState({ err: false, mode: "Table" })}>
                                     Reload Debugger
                                 </Button>,
-                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSezT1KhMgCNw0Uuk2nnqQnDtYlpXvbYnQW7VEef9xN759APYA/viewform?usp=sf_link" target="_blank" rel="noreferrer">
-                                    <Button className="base-btn main-btn">
+                                <a key="report" href="https://docs.google.com/forms/d/e/1FAIpQLSezT1KhMgCNw0Uuk2nnqQnDtYlpXvbYnQW7VEef9xN759APYA/viewform?usp=sf_link" target="_blank" rel="noreferrer">
+                                    <Button size="large">
                                         Report Problem
                                     </Button>
                                 </a>
@@ -115,8 +115,8 @@ export default class DebugConsole extends React.Component
                                     }];
         
         const typedef = this.props.state?.typedef ?? new Map();
-        // const revTypedef = new Map<string, string>();
-        // typedef.forEach((source, alias) => {revTypedef.set(source, alias)});
+        const revTypedef = new Map<string, string>();
+        typedef.forEach((source, alias) => {revTypedef.set(source, alias)});
         
         return (
             <div id="c0vm-debug-console" className={ this.state.show ? "debug-console-box" : "" }>
@@ -139,7 +139,7 @@ export default class DebugConsole extends React.Component
                             : null
                     }
                 </div>
-                {this.resolve_render_view(typedef)}
+                {this.resolve_render_view(revTypedef)}
             </div>
         )
     }

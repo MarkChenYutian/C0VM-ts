@@ -192,17 +192,17 @@ export function extract_all_structType(editors: C0EditorTab[]){
 }
 
 // Extract all typedefs in current editor
-// in format of {source: alias}
-export function extract_all_typedef(editors: C0EditorTab[]): Map<string, string>{
+// in format of {alias: source}
+export function extract_all_typedef(editors: C0EditorTab[]): Map<AliasType, SourceType>{
     const rawTypedefs = [];
     for (const editor of editors) {
         rawTypedefs.push(...extract_typedef(editor.content));
     }
     const typedef = flatten_typedef(rawTypedefs);
-    const revTypedef = new Map<string, string>();
-    typedef.forEach((source, alias) => {revTypedef.set(source, alias)});
+    // const revTypedef = new Map<string, string>();
+    // typedef.forEach((source, alias) => {revTypedef.set(source, alias)});
 
-    return revTypedef;
+    return typedef;
 }
 
 // Check if all libraries used in program is supported by C0VM.ts

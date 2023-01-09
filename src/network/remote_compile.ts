@@ -16,7 +16,7 @@ export default function remote_compile(
         return;
     }
 
-    fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${app_state.CompilerFlags["-d"] ? "true" : "false"}`, {
+    fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${app_state.CompilerFlags["d"] ? "true" : "false"}`, {
         method: "POST",
         cache: "no-cache",
         headers: {

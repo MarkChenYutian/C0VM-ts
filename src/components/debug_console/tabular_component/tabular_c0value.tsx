@@ -223,7 +223,7 @@ export default class C0ValueTabularDisplay extends React.Component<
 
         return (
             <div style={{ marginTop: "0.3rem" }}>
-                <code>{Type2String((value_to_render.type).value)}</code>
+                <code>{Type2String((value_to_render.type).value, this.props.typedef)}</code>
                 <ul>
                     {StructFields}
                 </ul>

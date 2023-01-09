@@ -338,7 +338,7 @@ div.dbg-node-base:hover {
 }
 
 .dbg-stack-node {
-    width: 15rem;
+    width: 20rem;
     border-right: 2px solid #202030;
     cursor: default;
     border-radius: .3rem 0 0 .3rem;

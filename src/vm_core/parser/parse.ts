@@ -58,7 +58,7 @@ export default function parse(bytecode: string, C0Editors: C0EditorTab[], typede
                 parser_internal_state = "function";
                 break;
             case "function":
-                parsing.functionPool.push(parse_func_block(blocks[idx], C0Editors, typedef_lib));
+                parsing.functionPool.push(parse_func_block(blocks[idx], typedef_lib));
                 break;
         }
     }
@@ -126,7 +126,7 @@ function resolve_field_name(byte_instruct: string, comment: string): string | un
     return parsed_comment[1];
 }
 
-function resolve_type_info(byte_instruct: string, comment: string, typedef_lib?: Map<string, string>): string | undefined {
+function resolve_type_info(byte_instruct: string, comment: string, typedef_lib: Map<AliasType, SourceType>): string | undefined {
     if (byte_instruct.toUpperCase().startsWith("NEWARRAY")) {
         const parsed_comment = regex_arr_comment.exec(comment);
         if (parsed_comment === null) return undefined;
@@ -145,20 +145,18 @@ function resolve_type_info(byte_instruct: string, comment: string, typedef_lib?:
     return undefined;
 }
 
-function apply_typedef(type: C0Type<C0TypeClass>, typedef_lib?: Map<string, string>): C0Type<C0TypeClass>{
-    if (typedef_lib === undefined || type.type === "<unknown>") return type;
-
-    const next_parse = type.value;
-    if (typeof next_parse === "string") return type;
-
+function apply_typedef(type: C0Type<C0TypeClass>, typedef_lib: Map<AliasType, SourceType>): C0Type<C0TypeClass>{
+    if (type.type === "<unknown>") return type;
     const type_str = Type2String(type);
     const concrete = typedef_lib?.get(type_str);
     if (concrete === undefined) {
+        const next_parse = type.value;
+        if (typeof next_parse === "string") return type;
         type.value = apply_typedef(next_parse, typedef_lib)
+        return type
     } else {
-        type.value = String2Type(concrete);
+        return String2Type(concrete);
     }
-    return type
 }
 
 function resolve_var_name(bytes: string, byte_instruct: string, segment: string): [number, string] | undefined {
@@ -223,7 +221,7 @@ function resolve_src_reference(comment_ref: string): [string, number, number, nu
     return [file_name, start_ln, start_col, end_ln, end_col];
 }
 
-function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTab[], typedef_lib ?: Map<string, string>) {
+function parse_func_block(func_block: [string, number][], typedef_lib: Map<string, string>) {
     if (func_block.length < 4) throw new bc0_format_error();
     const result: C0Function = {
         name: "undefined",
@@ -276,7 +274,7 @@ function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTa
             lineNumber: func_block[bc_line][1],
             fieldName: resolve_field_name(byte_instruct, segment),
             dataType : resolve_type_info(byte_instruct, segment, typedef_lib),
-            c0RefNumber: c0_ref_pos === undefined ? undefined : [c0_ref_pos[0], c0_ref_pos[1], false]
+            c0RefNumber: c0_ref_pos === undefined ? ["", 0, false] : [c0_ref_pos[0], c0_ref_pos[1], false]
         });
 
         // Update the PC position
@@ -291,8 +289,8 @@ function parse_func_block(func_block: [string, number][], C0Editors?: C0EditorTa
             const curr_comment = result.comment.get(LineKeys[i]);
             const prev_comment = result.comment.get(LineKeys[i - 1]);
             // In case of 1st line in each function...
-            if (curr_comment !== undefined && prev_comment === undefined) {
-                (curr_comment.c0RefNumber as [string, number, boolean])[2] = true;
+            if (curr_comment !== undefined && prev_comment === undefined && curr_comment.c0RefNumber !== undefined) {
+                curr_comment.c0RefNumber[2] = true;
                 result.comment.set(LineKeys[i], curr_comment);
                 continue;
             }

@@ -173,12 +173,14 @@ interface C0ValueTabularDisplayProps {
 interface C0StackFrameNodeData {
     frame: VM_StackFrame,
     mem: C0HeapAllocator,
+    typedef: Map<string, string>,
     dragged: boolean,
 }
 
 interface C0StructNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
+    typedef: Map<string, string>,
     typeRecord: Map<string, Map<number, Struct_Type_Record>>,
     dragged: boolean,
 }
@@ -186,18 +188,21 @@ interface C0StructNodeData {
 interface C0ArrayNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
+    typedef: Map<string, string>,
     dragged: boolean,
 }
 
 interface C0PointerNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
+    typedef: Map<string, string>,
     dragged: boolean,
 }
 
 interface C0ValueNodeData {
     val: C0Value<"ptr">,
     mem: C0HeapAllocator,
+    typedef: Map<string, string>,
     dragged: boolean,
 }
 
@@ -228,3 +233,12 @@ interface BreakpointExtProps {
 }
 
 type BreakpointExt = (props: BreakpointExtProps) => ((StateField<RangeSet<GutterMarker>> | Extension)[])
+
+
+interface ContextValue {
+    themeColor: string | undefined
+}
+
+
+type AliasType = string;
+type SourceType = string;

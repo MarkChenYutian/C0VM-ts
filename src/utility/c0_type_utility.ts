@@ -38,9 +38,8 @@ export function CloneType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
  * @param T The type to be converted to the string
  * @returns The C0 type name (e.g. `int*`)
  */
-export function Type2String(T: C0Type<C0TypeClass> | string, TypedefRec?: Map<string, string>): string {
+export function Type2String(T: C0Type<C0TypeClass> | string, TypedefRec?: Map<AliasType, SourceType>): string {
     let retVal = "";
-
     if (typeof T === "string") retVal = T;
     else {
         switch (T.type) {

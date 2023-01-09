@@ -9,6 +9,7 @@ import * as VM from "../vm_core/vm_interface";
 import remote_compile from "../network/remote_compile";
 
 import tsLogo from "../assets/ts-logo-128.svg";
+import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
 
 /**
@@ -29,7 +30,7 @@ function RequiresRecompile(){
     );
 }
 
-export default function MainControlBar(props: MainControlProps) {
+function MainControlBarFC(props: MainControlProps & ContextValue) {
     const appState = props.application_state;
     const is_bc0_valid = props.application_state.BC0SourceCode.toUpperCase().startsWith("C0 C0 FF EE");
 
@@ -193,15 +194,15 @@ export default function MainControlBar(props: MainControlProps) {
         </Button>;
     
     const display_CompileBtn = compilebtn_disabled ?
-        <Tooltip placement="bottomRight" color="#3577C1" title="Write code in editor to Compile">{CompileButton}</Tooltip>
+        <Tooltip placement="bottomRight" color={props.themeColor} title="Write code in editor to Compile">{CompileButton}</Tooltip>
          : CompileButton;
     
     const display_StepBtn = stepbtn_disabled ?
-        <Tooltip placement="bottomRight" color="#3577C1" title="Compile the code before Step">{StepButton}</Tooltip>
+        <Tooltip placement="bottomRight" color={props.themeColor} title="Compile the code before Step">{StepButton}</Tooltip>
          : StepButton;
     
     const display_RunBtn  = runbtn_disabled ?
-        <Tooltip placement="bottomRight" color="#3577C1" title="Compile the code before Run">{RunButton}</Tooltip>
+        <Tooltip placement="bottomRight" color={props.themeColor} title="Compile the code before Run">{RunButton}</Tooltip>
          : RunButton;
 
     return (
@@ -217,4 +218,16 @@ export default function MainControlBar(props: MainControlProps) {
             </Space>
         </div>
     );
+}
+
+
+export default function MainControlBar(props: MainControlProps){
+    return  <ConfigConsumer>
+                {(value: ConfigConsumerProps) => 
+                    <MainControlBarFC 
+                        themeColor={value.theme?.token?.colorPrimary}
+                        {...props}
+                    />
+                }
+            </ConfigConsumer>;
 }

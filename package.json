@@ -41,6 +41,7 @@
     "file-loader": "^6.2.0",
     "fs-extra": "^10.0.0",
     "gh-pages": "^4.0.0",
+    "he": "^1.2.0",
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.4.3",
@@ -159,6 +160,7 @@
   },
   "devDependencies": {
     "@craco/craco": "^7.0.0",
+    "@types/he": "^1.1.2",
     "craco-less": "^2.1.0-alpha.0",
     "cross-env": "^7.0.3",
     "javascript-obfuscator": "^4.0.0",

@@ -11,7 +11,7 @@ import { loadString } from "../../../utility/string_utility";
 import { heapNodeTargetHandleID, structSrcHandleID } from "./graph_builder";
 
 export default class C0StructNode extends React.Component<NodeProps<C0StructNodeData>> {
-    render_content(mem: C0HeapAllocator, type: C0Type<"ptr">, value: C0Pointer, typeRecord: Map<string, Map<number, Struct_Type_Record>>) {
+    render_content(mem: C0HeapAllocator, type: C0Type<"ptr">, value: C0Pointer, typedef: Map<SourceType, AliasType>, typeRecord: Map<string, Map<number, Struct_Type_Record>>) {
         if (isNullPtr(value)) throw new internal_error("<C0StructNode/> Receives a NULL pointer");
 
         const c0_val = {value: value, type: type};
@@ -25,7 +25,9 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
             return <p className="dbg-error-information dbg-entire-row">No Struct Information</p>;
         }
 
-        const StructFields: JSX.Element[] = [<p className="dbg-entire-row" key="struct-name"><code>{struct_type.value}</code></p>];
+        const StructFields: JSX.Element[] = [
+                <p className="dbg-entire-row" key="struct-name"><code>{TypeUtil.Type2String(struct_type, typedef)}</code></p>
+            ];
         for (let i = 0; i < fields.length; i ++) {
             const entry = fields[i];
             const to_be_rendered = entry.value;
@@ -49,21 +51,18 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
                     render_content = isNullPtr(to_be_rendered.value) ? "NULL" : " ";
                 }
 
-                StructFields.push(
-                    <>
-                        <p key={"s-val-value-" + entry.offset} className="dbg-frame-content">{render_content}</p>
-                        {
-                            TypeUtil.isPointerType(to_be_rendered) && !isNullPtr(to_be_rendered.value)?
-                            <Handle type="source"
-                                key={structSrcHandleID(entry.offset)}
-                                id={structSrcHandleID(entry.offset)}
-                                position={Position.Right}
-                                style={{ top: calculate_entry_height(i, "struct"), right: "2rem" }}
-                            />
-                            : null
-                        }
-                    </>
-                );
+                StructFields.push(<p key={"s-val-value-" + entry.offset} className="dbg-frame-content">{render_content}</p>);
+
+                if (TypeUtil.isPointerType(to_be_rendered) && !isNullPtr(to_be_rendered.value)) {
+                    StructFields.push(
+                        <Handle type="source"
+                            key={structSrcHandleID(entry.offset)}
+                            id={structSrcHandleID(entry.offset)}
+                            position={Position.Right}
+                            style={{ top: calculate_entry_height(i, "struct"), right: "2rem" }}
+                        />
+                    );
+                }
             }
         }
 
@@ -75,9 +74,9 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
         const ValueType = data.ptr.type as C0Type<"ptr">;
         const ValueValue = data.ptr.value;
 
-        return <div className="dbg-struct-node dbg-node-base">
-            <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem", visibility: "hidden"}} />
-            {this.render_content(data.mem, ValueType, ValueValue, data.typeRecord)}
-        </div>;
+        return  <div className="dbg-struct-node dbg-node-base">
+                    <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem", visibility: "hidden"}} />
+                    {this.render_content(data.mem, ValueType, ValueValue, data.typedef, data.typeRecord)}
+                </div>;
     }
 }

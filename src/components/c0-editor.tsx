@@ -18,7 +18,8 @@ export default class C0Editor extends React.Component<C0EditorProps>
     shouldComponentUpdate(nextProps: Readonly<C0EditorProps>, nextState: Readonly<{}>, nextContext: any): boolean {
         const execLineChanged = this.props.execLine !== nextProps.execLine;
         const valueChanged = this.props.editorValue !== nextProps.editorValue;
-        return execLineChanged || valueChanged;
+        const editableStateChanged = this.props.editable !== nextProps.editable;
+        return execLineChanged || valueChanged || editableStateChanged;
     }
 
     render() {

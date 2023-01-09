@@ -5,6 +5,7 @@ import C0EditorGroup from "./c0-editor-group";
 import { Segmented, Tooltip } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faLock } from "@fortawesome/free-solid-svg-icons";
+import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>
@@ -105,13 +106,17 @@ export default class CodeEditor extends React.Component
         
         if (this.props.app_state.C0Runtime?.state.CurrC0RefLine !== undefined){
             selectorArr.push(
-                <Tooltip
-                    title="Code editor is read-only now since the program is running."
-                    placement="left"
-                    color="#3577C1"
-                >
-                    <FontAwesomeIcon icon={faLock} key="status_indicator"/>
-                </Tooltip>
+                <ConfigConsumer>
+                    {(value: ConfigConsumerProps) => 
+                        <Tooltip
+                            title="Code editor is read-only now since the program is running."
+                            placement="left"
+                            color={value.theme?.token?.colorPrimary}
+                        >
+                            <FontAwesomeIcon icon={faLock} key="status_indicator"/>
+                        </Tooltip>
+                    }
+                </ConfigConsumer>
             );
         }
 
