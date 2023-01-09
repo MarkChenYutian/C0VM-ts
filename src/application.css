@@ -473,3 +473,13 @@ div.settings-grid > p {
 .ant-tabs > .ant-tabs-nav button.ant-tabs-nav-add {
     margin-left: 0;
 }
+
+
+/* Renamable tab */
+
+.tab-name > input{
+    padding: 0;
+    text-decoration: underline;
+    border: none;
+    color: rgb(230, 107, 0);
+}
