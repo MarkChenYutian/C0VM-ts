@@ -49,11 +49,16 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
                     render_content = `"${loadString(to_be_rendered, mem)}"`;
                 } else if (TypeUtil.isPointerType(to_be_rendered)) {
                     render_content = isNullPtr(to_be_rendered.value) ? "NULL" : " ";
+                } else if (TypeUtil.isTagPointerType(to_be_rendered)) {
+                    render_content = isNullPtr(to_be_rendered.value) ? "NULL" : " ";
                 }
 
                 StructFields.push(<p key={"s-val-value-" + entry.offset} className="dbg-frame-content">{render_content}</p>);
 
-                if (TypeUtil.isPointerType(to_be_rendered) && !isNullPtr(to_be_rendered.value)) {
+                if ((
+                    TypeUtil.isPointerType(to_be_rendered) || 
+                    TypeUtil.isTagPointerType(to_be_rendered)
+                ) && !isNullPtr(to_be_rendered.value)) {
                     StructFields.push(
                         <Handle type="source"
                             key={structSrcHandleID(entry.offset)}

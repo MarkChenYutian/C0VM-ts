@@ -85,10 +85,10 @@ export default class C0ValueStackDisplay extends React.Component<
 
         const [ptr, ] = read_tagptr(v.value, this.props.mem);
         if (isNullPtr(ptr)) {
-            return <p className="dbg-evaluate-tabular-content">Tagged Pointer [Tag: <code>{Type2String(v.type.value)}</code>] <span className="dbg-extra-information">NULL</span></p>;
+            return <p className="dbg-evaluate-tabular-content">Tagged Pointer [Tag: <code>{Type2String(v.type.value, this.props.typedef)}</code>] <span className="dbg-extra-information">NULL</span></p>;
         } else {
             const [addr, offset, ] = read_ptr(ptr);
-            return  <p className="dbg-evaluate-tabular-content">Tagged Pointer [Tag: <code>{Type2String(v.type.value)}</code>] 
+            return  <p className="dbg-evaluate-tabular-content">Tagged Pointer [Tag: <code>{Type2String(v.type.value, this.props.typedef)}</code>] 
                         <span className="dbg-extra-information"> 0x{render_address(addr + offset, 8)} = 0x{render_address(addr, 4)} + 0x{render_address(offset, 4)}</span>
                     </p>;
         }

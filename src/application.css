@@ -275,14 +275,14 @@ code {
 }
 
 .dbg-evaluate-tabular-btn {
-    margin-top: 0.3rem;
+    /* margin-top: 0.3rem; */
     margin-bottom: 0.3rem;
     vertical-align: top;
     display: inline-block;
 }
 
 .dbg-evaluate-tabular-content {
-    margin-top: 0.3rem;
+    /* margin-top: 0.3rem; */
     margin-bottom: 0.3rem;
     vertical-align: top;
     display: inline-block;

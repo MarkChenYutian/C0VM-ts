@@ -18,7 +18,7 @@ import { loadString } from "../../../utility/string_utility";
 
 import { deref_C0Value, expand_C0Array, expand_C0Struct, c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
 import { isPointerType, isStringType, isTagPointerType, isUnknownType, isValueType, is_struct_pointer, Type2String } from "../../../utility/c0_type_utility";
-import { read_tagptr, remove_tag } from "../../../utility/tag_ptr_utility";
+import { remove_tag } from "../../../utility/tag_ptr_utility";
 
 export default class C0ValueTabularDisplay extends React.Component<
     C0ValueTabularDisplayProps,

@@ -1,0 +1,22 @@
+struct Generic_Pair {
+    void* first;
+    void* second;
+};
+
+typedef struct Generic_Pair pair;
+typedef pair* pair_t;
+
+int main() {
+    pair_t x = alloc(pair);
+    pair_t y = alloc(pair);
+    y -> first = (void*) alloc(int);
+    y -> second= (void*) alloc(bool);
+    x -> first = (void*) y;
+    x -> second= (void*) alloc(string);
+    y = alloc(pair);
+    int[]* z = alloc(int[]);
+    *z = alloc_array(int, 3);
+    y -> first = (void*) z;
+    y -> second = (void*) x;
+    return 0;
+}

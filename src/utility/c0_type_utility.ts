@@ -109,6 +109,52 @@ export function castToType<T extends C0TypeClass>(V: C0Value<C0TypeClass>, newTy
     return V as C0Value<T>;
 }
 
+// Strip the tag of void* so that we allow same field of struct contains void* with different types
+export function removeTagOnType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
+    switch (T.type) {
+        case "value":
+        case "<unknown>":
+        case "funcptr":
+        case "string":
+            return T;
+        case "ptr":
+            switch (T.kind) {
+                case "arr":
+                case "ptr":
+                    return {type: T.type, kind: T.kind, value: removeTagOnType(T.value)}
+                case "struct":
+                    return T
+            }
+            break;  // To make TS Linter happy
+        case "tagptr":
+            return {type: T.type, value: {type: "<unknown>"}}
+    }
+}
+
+
+export function isCertainType(T: C0Type<C0TypeClass>): boolean {
+    switch (T.type) {
+        case "<unknown>":
+            return false;
+        case "value":
+        case "funcptr":
+        case "string":
+            return true;
+        case "ptr":
+            switch (T.kind) {
+                case "arr":
+                case "ptr":
+                    return isCertainType(T.value);
+                case "struct":
+                    return true;
+            }
+            break;  // To make TS Linter happy
+        case "tagptr":
+            return true;
+    }
+}
+
+
 /**
  * Type Narrowing functions that works better with TS type inference
  */

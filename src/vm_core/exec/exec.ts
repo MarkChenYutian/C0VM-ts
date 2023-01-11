@@ -66,7 +66,7 @@ function updateTypeRecord(state: VM_State, a: C0Value<C0TypeClass>, x: C0Value<C
         if (field_type_record === undefined){
             field_type_record = {}
         }
-        struct_field_record.set(a_concrete.offset, {name: field_type_record.name, type: x.type});
+        struct_field_record.set(a_concrete.offset, {name: field_type_record.name, type: TypeUtil.removeTagOnType(x.type)});
 
         state.TypeRecord.set(a_concrete.value, struct_field_record);
     }
@@ -384,7 +384,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             state.CurrFrame.S.push(
                 {
                     value: build_null_ptr(),
-                    type: {type: "<unknown>"}
+                    type: {type: "ptr", kind: "ptr", value: {type: "<unknown>"}}
                 }
             );
             break;
@@ -411,6 +411,17 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             state.CurrFrame.PC += 2;
 
             const val = safe_pop_stack(state, allocator);
+
+            // In case that someone set local var to NULL deliberately
+            const to_be_replaced = state.CurrFrame.V[idx];
+            if (!TypeUtil.isCertainType(val.type) 
+                && to_be_replaced !== undefined 
+                && TypeUtil.isCertainType(to_be_replaced.type)
+                ) 
+            {
+                val.type = TypeUtil.removeTagOnType(to_be_replaced.type);
+            }
+
             state.CurrFrame.V[idx] = val;
             break;
         }

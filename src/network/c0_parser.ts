@@ -96,7 +96,7 @@ function extract_struct(code: string): Map<string, Struct_Type_Record[]> {
             const fieldTypes: Struct_Type_Record[] = [];
 
             next_real_sibling(ptr);  // ptr is now StructScope
-            ptr.firstChild();   // Moving into StructScope
+            ptr.firstChild();        // Moving into StructScope
 
             while (next_real_sibling(ptr) && ptr.type.is("Type")){
                 const fieldType = String2Type(code.substring(ptr.from, ptr.to));
@@ -141,6 +141,8 @@ export function extract_all_structType(editors: C0EditorTab[]){
             
             // Some manually crafted memory alignment rules...
             switch (structField.type.type) {
+                case "funcptr":
+                case "tagptr":
                 case "ptr": 
                 case "string":
                     offset = Math.ceil(offset / 8) * 8;
@@ -160,6 +162,8 @@ export function extract_all_structType(editors: C0EditorTab[]){
             structTypeRecord.set(offset, structField);
 
             switch (structField.type.type) {
+                case "funcptr":
+                case "tagptr":
                 case "ptr":
                 case "string":
                     offset += 8;
@@ -188,6 +192,7 @@ export function extract_all_structType(editors: C0EditorTab[]){
         }
         structTypeRecords.set(recordName, structTypeRecord);
     }
+
     return structTypeRecords;
 }
 

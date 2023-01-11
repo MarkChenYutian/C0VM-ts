@@ -102,7 +102,6 @@ export function build_c0_ptrValue(value: C0Pointer, kind: "arr" | "ptr", dest_ty
     };
 }
 
-
 export function build_c0_stringValue(value: C0Pointer): C0Value<"string"> {
     return {
         value: value,
@@ -232,6 +231,7 @@ export function expand_C0Struct(mem: C0HeapAllocator, typeRecord: Map<string, Ma
     }
 
     const StructInformation = typeRecord.get(struct_type.value);
+    console.log(StructInformation);
     if (StructInformation === undefined) return [];
     const StructFields: C0StructJSEntry[] = [];
     

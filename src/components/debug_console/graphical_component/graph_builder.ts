@@ -253,7 +253,7 @@ function C0_Value_to_graph(
             for (let i = 0; i < fields.length; i ++) {
                 const fv = fields[i].value; // This is for typescript to know fv !== undefined after the branching
                 if (fv === undefined) continue;
-                if (isPointerType(fv)) {
+                if ((isPointerType(fv) || isTagPointerType(fv)) && !isNullPtr(fv.value)) {
                     result_edge.push(edge_factory(
                         heapNodeID(v, mem),
                         heapNodeID(fv, mem),
@@ -339,17 +339,10 @@ function C0_Value_to_graph(
             delta_y = calculate_node_height(1, "struct");
             ///////// Get Edges /////////
             const val = deref_C0Value(mem, v);
-            if (isPointerType(val) && !isNullPtr(val.value)) {
+            if ((isPointerType(val) || isTagPointerType(val)) && !isNullPtr(val.value)) {
                 result_edge.push(edge_factory(
                     heapNodeID(v, mem),
                     heapNodeID(val, mem),
-                    ptrSrcHandleID()
-                ));
-            } else if (isTagPointerType(val) && !isNullPtr(val.value)) {
-                const real_val = remove_tag(val, mem, state.TagRecord);
-                result_edge.push(edge_factory(
-                    heapNodeID(v, mem),
-                    heapNodeID(real_val, mem),
                     ptrSrcHandleID()
                 ));
             }
