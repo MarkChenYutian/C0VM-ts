@@ -14,7 +14,8 @@ import { isNullPtr, read_ptr, render_address } from "../../../utility/pointer_ut
 import { loadString } from "../../../utility/string_utility";
 
 import { c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
-import { isPointerType, isStringType, isUnknownType, isValueType, getType, castToType } from "../../../utility/c0_type_utility";
+import { isPointerType, isStringType, isUnknownType, isValueType, getType, castToType, isTagPointerType, Type2String } from "../../../utility/c0_type_utility";
+import { read_tagptr } from "../../../utility/tag_ptr_utility";
 
 
 export default class C0ValueStackDisplay extends React.Component<
@@ -32,16 +33,16 @@ export default class C0ValueStackDisplay extends React.Component<
      * 
      * @returns The rendering of array value in C0 Value
      */
-    render_array(v : C0Value<C0TypeClass>) {
-    if (isNullPtr(v.value)) {
-        // In C0 language, the uninitialized array is recognized as an empty array.
-        return <p>[]</p>
-    }
+    render_array(v : C0Value<"ptr">) {
+        if (isNullPtr(v.value)) {
+            // In C0 language, the uninitialized array is recognized as an empty array.
+            return <p>[]</p>
+        }
 
-    const [addr, offset, ] = read_ptr(v.value);
-    return <p>
-        Array [...] <span className="dbg-extra-information">0x{render_address(addr + offset, 8)} = 0x{render_address(addr, 4)} + 0x{render_address(offset, 4)}</span>
-    </p>
+        const [addr, offset, ] = read_ptr(v.value);
+        return <p>
+            Array [...] <span className="dbg-extra-information">0x{render_address(addr + offset, 8)} = 0x{render_address(addr, 4)} + 0x{render_address(offset, 4)}</span>
+        </p>
     }
 
     /**
@@ -50,18 +51,18 @@ export default class C0ValueStackDisplay extends React.Component<
      * 
      * @returns The rendered GUI of the Pointer value
      */
-    render_pointer(v : C0Value<C0TypeClass>) {
-    // We can't expand pointer in stack value
-    if (isNullPtr(v.value)) {
-        return <p className="dbg-evaluate-tabular-content">NULL</p>
-    }
-    
-    const [addr, offset, ] = read_ptr(v.value);
-    return (
-        <p>
-            Pointer <span className="dbg-extra-information">0x{render_address(addr + offset, 8)} = 0x{render_address(addr, 4)} + 0x{render_address(offset, 4)}</span>
-        </p>
-    );
+    render_pointer(v : C0Value<"ptr">) {
+        // We can't expand pointer in stack value
+        if (isNullPtr(v.value)) {
+            return <p className="dbg-evaluate-tabular-content">NULL</p>
+        }
+        
+        const [addr, offset, ] = read_ptr(v.value);
+        return (
+            <p>
+                Pointer <span className="dbg-extra-information">0x{render_address(addr + offset, 8)} = 0x{render_address(addr, 4)} + 0x{render_address(offset, 4)}</span>
+            </p>
+        );
     }
 
     /**
@@ -70,14 +71,27 @@ export default class C0ValueStackDisplay extends React.Component<
      * 
      * @returns A rendered struct C0Value Component
      */
-    render_struct(v : C0Value<C0TypeClass>) {
-        console.log(v);
-        console.log(getType(v.type, this.props.typeRecord));
-
+    render_struct(v : C0Value<"ptr">) {
         // Unpack v
         const v_deref = castToType<C0TypeClass>(v, getType(v.type, this.props.typeRecord))
 
         return this.render_base(v_deref)
+    }
+
+    render_tagptr(v: C0Value<"tagptr">) {
+        if (isNullPtr(v.value)) {
+            return <p className="dbg-evaluate-tabular-content">NULL</p>;
+        }
+
+        const [ptr, ] = read_tagptr(v.value, this.props.mem);
+        if (isNullPtr(ptr)) {
+            return <p className="dbg-evaluate-tabular-content">Tagged Pointer [Tag: <code>{Type2String(v.type.value)}</code>] <span className="dbg-extra-information">NULL</span></p>;
+        } else {
+            const [addr, offset, ] = read_ptr(ptr);
+            return  <p className="dbg-evaluate-tabular-content">Tagged Pointer [Tag: <code>{Type2String(v.type.value)}</code>] 
+                        <span className="dbg-extra-information"> 0x{render_address(addr + offset, 8)} = 0x{render_address(addr, 4)} + 0x{render_address(offset, 4)}</span>
+                    </p>;
+        }
     }
 
     /**
@@ -91,7 +105,7 @@ export default class C0ValueStackDisplay extends React.Component<
         } else if (isStringType(v)) {
             return <p>"{loadString(v, this.props.mem)}"</p>
         } else if (isUnknownType(v)) {
-            return <p>Can't evaluate &lt;unknown&gt; type</p>
+            return <p className="dbg-error-information">Can't evaluate &lt;unknown&gt; type</p>
         } else if (isPointerType(v)) {
             switch (v.type.kind) {
                 case "arr":
@@ -101,6 +115,8 @@ export default class C0ValueStackDisplay extends React.Component<
                 case "struct":
                     return this.render_struct(v);
             }
+        } else if (isTagPointerType(v)) {
+            return this.render_tagptr(v);
         }
     }
 

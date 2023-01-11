@@ -41,7 +41,7 @@ export function calculate_entry_height(lines: number, type: NodeTypes) {
         case "array": 
             return LEFT_WIDTH + ARR_ELEM_WIDTH * (lines - 1) + 0.5 * ARR_ELEM_WIDTH;
         case "pointer":
-            return 0.9 * LINE_HEIGHT;
+            return 0.8 * LINE_HEIGHT;
     }
     
 }

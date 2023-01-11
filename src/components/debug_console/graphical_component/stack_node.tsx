@@ -26,14 +26,13 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
         for (let i = 0; i < data.frame.V.length; i ++) {
             const to_be_rendered = data.frame.V[i];
             if (to_be_rendered !== undefined && data.frame.P.varName[i] !== undefined) {
-                console.log(to_be_rendered.type, data.typedef);
                 contents.push(<p key={"s-val-name-" + i} className="right-aligned"><code>{Type2String(to_be_rendered.type, data.typedef)} {data.frame.P.varName[i]}</code></p>);
                 let render_content = undefined;
                 if (TypeUtil.isValueType(to_be_rendered)) {
                     render_content = c0_value_cvt2_js_string(to_be_rendered);
                 } else if (TypeUtil.isStringType(to_be_rendered)) {
                     render_content = `"${loadString(to_be_rendered, data.mem)}"`;
-                } else if (TypeUtil.isPointerType(to_be_rendered)) {
+                } else if (TypeUtil.isPointerType(to_be_rendered) || TypeUtil.isTagPointerType(to_be_rendered)) {
                     render_content = isNullPtr(to_be_rendered.value) ? "NULL" : " ";
                 } else {
                     render_content = "Unknown value";
@@ -42,7 +41,7 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
                     <div key={"s-val-wrap-" + i}>
                         <p key={"s-val-value-" + i} className="dbg-frame-content">{render_content}</p>
                         {
-                            TypeUtil.isPointerType(to_be_rendered) && !isNullPtr(to_be_rendered.value)?
+                            (TypeUtil.isPointerType(to_be_rendered) || TypeUtil.isTagPointerType(to_be_rendered)) && !isNullPtr(to_be_rendered.value)?
                             <Handle type="source" key={"s-val-ptr-" + i} id={stackSrcHandleID(i)} position={Position.Right} style={{ top: calculate_entry_height(valid_cnt, "frame"), right: "2rem" }}/>
                             : null
                         }

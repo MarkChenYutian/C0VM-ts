@@ -1,13 +1,13 @@
 import React from "react";
 import ReactCodeMirror, { basicSetup } from "@uiw/react-codemirror";
-
-import LoadDocumentPlugin from "./editor_extension/blank_load";
-import { C0 } from "./editor_extension/syntax/c0";
-
 import { indentUnit } from "@codemirror/language";
+
+import LoadDocumentPlugin  from "./editor_extension/blank_load";
+import { C0 }              from "./editor_extension/syntax/c0";
 import execLineHighlighter from "./editor_extension/exec_position";
-import breakpointGutter from "./editor_extension/breakpoint_marker";
-import C0LightTheme from "./editor_extension/c0editor_theme";
+import breakpointGutter    from "./editor_extension/breakpoint_marker";
+import C0LightTheme        from "./editor_extension/c0editor_theme";
+
 
 export default class C0Editor extends React.Component<C0EditorProps>
 {

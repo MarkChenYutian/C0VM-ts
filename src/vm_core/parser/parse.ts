@@ -146,7 +146,7 @@ function resolve_type_info(byte_instruct: string, comment: string, typedef_lib: 
 }
 
 function apply_typedef(type: C0Type<C0TypeClass>, typedef_lib: Map<AliasType, SourceType>): C0Type<C0TypeClass>{
-    if (type.type === "<unknown>") return type;
+    if (type.type === "<unknown>" || type.type === "tagptr" || type.type === "funcptr") return type;
     const type_str = Type2String(type);
     const concrete = typedef_lib?.get(type_str);
     if (concrete === undefined) {

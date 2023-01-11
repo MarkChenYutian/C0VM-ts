@@ -17,7 +17,8 @@ import { isNullPtr, read_ptr, render_address } from "../../../utility/pointer_ut
 import { loadString } from "../../../utility/string_utility";
 
 import { deref_C0Value, expand_C0Array, expand_C0Struct, c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
-import { isPointerType, isStringType, isUnknownType, isValueType, is_struct_pointer, Type2String } from "../../../utility/c0_type_utility";
+import { isPointerType, isStringType, isTagPointerType, isUnknownType, isValueType, is_struct_pointer, Type2String } from "../../../utility/c0_type_utility";
+import { read_tagptr, remove_tag } from "../../../utility/tag_ptr_utility";
 
 export default class C0ValueTabularDisplay extends React.Component<
     C0ValueTabularDisplayProps,
@@ -58,6 +59,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                         value={vals[i]}
                         typeRecord={this.props.typeRecord}
                         typedef={this.props.typedef}
+                        tagRecord={this.props.tagRecord}
                         default_expand={false}
                     />
                 </li>
@@ -88,9 +90,14 @@ export default class C0ValueTabularDisplay extends React.Component<
      * 
      * @returns The rendered GUI of the Pointer value
      */
-    render_pointer(value_to_render: C0Value<"ptr">) {
+    render_pointer(value_to_render: C0Value<"ptr">, is_tagged: boolean) {
         if (isNullPtr(value_to_render.value)) {
             return <p className="dbg-evaluate-tabular-content">NULL</p>
+        }
+
+        let descriptor = <span>Pointer</span>
+        if (is_tagged) {
+            descriptor = <span>Tagged Pointer <code>{ Type2String(value_to_render.type, this.props.typedef) }</code></span>;
         }
 
         // When the component is not expended, show Pointer(...)
@@ -100,12 +107,12 @@ export default class C0ValueTabularDisplay extends React.Component<
                     <button className="implicit-btn">
                         <FontAwesomeIcon icon={faCaretRight} />
                     </button>
-                    Pointer (...)
+                    {descriptor} (...)
                 </p>
             );
         }
 
-        const [addr, offset,] = read_ptr(this.props.value.value);
+        const [addr, offset,] = read_ptr(value_to_render.value);
 
         // Well... struct is really special here.
         /**
@@ -124,12 +131,13 @@ export default class C0ValueTabularDisplay extends React.Component<
                         <FontAwesomeIcon icon={faCaretDown} />
                     </button>
                     <div className="dbg-evaluate-tabular-content">
-                        Pointer ( <span className="dbg-extra-information">0x{render_address(addr + offset, 8)}</span>
+                        {descriptor} ( <span className="dbg-extra-information">0x{render_address(addr + offset, 8)}</span>
                         <C0ValueTabularDisplay
                             mem={this.props.mem}
-                            value={{ type: value_to_render.type.value, value: this.props.value.value }}
+                            value={{ type: value_to_render.type.value, value: value_to_render.value }}
                             typeRecord={this.props.typeRecord}
                             typedef={this.props.typedef}
+                            tagRecord={this.props.tagRecord}
                             default_expand={false}
                         />
                         )
@@ -142,14 +150,14 @@ export default class C0ValueTabularDisplay extends React.Component<
          * Otherwise, we only dereference the value and send it into a child <C0ValueTabularDisplay/>
          * so that values are rendered recursively.
          */
-        const deref_value = deref_C0Value(this.props.mem, this.props.value as C0Value<"ptr">);
+        const deref_value = deref_C0Value(this.props.mem, value_to_render);
         return (
             <div>
                 <button className="implicit-btn dbg-evaluate-tabular-btn" onClick={() => this.setState({ expand: false })}>
                     <FontAwesomeIcon icon={faCaretDown} />
                 </button>
                 <div className="dbg-evaluate-tabular-content">
-                    Pointer ( <span className="dbg-extra-information">0x{render_address(addr + offset, 8)}</span>
+                    {descriptor} ( <span className="dbg-extra-information">0x{render_address(addr + offset, 8)}</span>
                     <ul>
                         <li>
                             <C0ValueTabularDisplay
@@ -157,6 +165,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                                 value={deref_value}
                                 typedef={this.props.typedef}
                                 typeRecord={this.props.typeRecord}
+                                tagRecord={this.props.tagRecord}
                                 default_expand={false}
                             />
                         </li>
@@ -213,6 +222,7 @@ export default class C0ValueTabularDisplay extends React.Component<
                                 mem={this.props.mem}
                                 typedef={this.props.typedef}
                                 typeRecord={this.props.typeRecord}
+                                tagRecord={this.props.tagRecord}
                                 default_expand={false}
                             />
                         </div>
@@ -231,20 +241,39 @@ export default class C0ValueTabularDisplay extends React.Component<
         );
     }
 
+    /**
+     * Render the tagged pointer value by showing tag and the contained actual
+     * pointer.
+     * 
+     * @returns A rendered tagged pointer component
+     */
+    render_tagptr(value_to_render: C0Value<"tagptr">){
+        if (isNullPtr(value_to_render.value)) {
+            return <p className="dbg-evaluate-tabular-content">NULL</p>;
+        }
+        const real_ptr = remove_tag(value_to_render, this.props.mem, this.props.tagRecord);
+        return this.render_pointer(real_ptr, true);
+    }
 
     render(): React.ReactNode {
         if (isValueType(this.props.value)) {
             return <p>{c0_value_cvt2_js_string(this.props.value)}</p>
-        } else if (isStringType(this.props.value)) {
+        }
+        else if (isStringType(this.props.value)) {
             return <p>"{loadString(this.props.value, this.props.mem)}"</p>
-        } else if (isUnknownType(this.props.value)) {
-            return <p>Can't evaluate &lt;unknown&gt; type</p>
-        } else if (isPointerType(this.props.value)) {
+        }
+        else if (isUnknownType(this.props.value)) {
+            return <p className="dbg-error-information">Can't evaluate &lt;unknown&gt; type</p>
+        }
+        else if (isTagPointerType(this.props.value)) {
+            return this.render_tagptr(this.props.value);
+        } 
+        else if (isPointerType(this.props.value)) {
             switch (this.props.value.type.kind) {
                 case "arr":
                     return this.render_array(this.props.value);
                 case "ptr":
-                    return this.render_pointer(this.props.value);
+                    return this.render_pointer(this.props.value, false);
                 case "struct":
                     return this.render_struct(this.props.value);
             }

@@ -14,6 +14,7 @@ export default class TabularDebugEvaluation extends React.Component<
                     frame={this.props.state.CallStack[i]}
                     mem={this.props.mem}
                     typedef={this.props.typedef}
+                    tagRecord={this.props.state.TagRecord}
                     typeRecord={this.props.state.TypeRecord}
                     key={i}
                 />
@@ -25,6 +26,7 @@ export default class TabularDebugEvaluation extends React.Component<
                 mem={this.props.mem}
                 typedef={this.props.typedef}
                 typeRecord={this.props.state.TypeRecord}
+                tagRecord={this.props.state.TagRecord}
                 key={this.props.state.CallStack.length}
             />
         )

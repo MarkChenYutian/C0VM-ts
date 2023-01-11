@@ -49,6 +49,7 @@ export default class C0VM_RuntimeState implements C0VM_RT{
             CurrLineNumber: 0,
             CurrC0RefLine: undefined,
             TypeRecord: extract_all_structType(C0Source),
+            TagRecord: new Map<number, C0Type<"ptr">>()
         };
     }
 

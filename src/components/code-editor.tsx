@@ -1,6 +1,6 @@
 import React from "react";
-import BC0Editor from "./bc0-editor";
-import C0EditorGroup from "./c0-editor-group";
+import BC0Editor from "./code_editor/bc0-editor";
+import C0EditorGroup from "./code_editor/c0-editor-group";
 
 import { Segmented, Space, Tooltip } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

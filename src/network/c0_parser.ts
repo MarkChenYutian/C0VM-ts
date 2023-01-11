@@ -1,4 +1,4 @@
-import { C0Language } from "../components/editor_extension/syntax/c0";
+import { C0Language } from "../components/code_editor/editor_extension/syntax/c0";
 import { String2Type } from "../utility/c0_type_utility";
 
 

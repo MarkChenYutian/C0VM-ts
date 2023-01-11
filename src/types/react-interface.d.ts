@@ -158,7 +158,8 @@ interface TabularStackFrameProps {
     frame: VM_StackFrame,
     mem: C0HeapAllocator,
     typeRecord: Map<string, Map<number, Struct_Type_Record>>,
-    typedef: Map<string, string>
+    typedef: Map<string, string>,
+    tagRecord: Map<number, C0Type<"ptr">>
 }
 
 
@@ -167,6 +168,7 @@ interface C0ValueTabularDisplayProps {
     value: C0Value<C0TypeClass>,
     typedef: Map<string, string>,
     typeRecord: Map<string, Map<number, Struct_Type_Record>>,
+    tagRecord: Map<number, C0Type<"ptr">>,
     default_expand: boolean
 }
 
@@ -189,7 +191,16 @@ interface C0ArrayNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
     typedef: Map<string, string>,
+    tagRecord: Map<number, C0Type<"ptr">>,
     dragged: boolean,
+}
+
+interface C0TagPointerData {
+    tagptr: C0Value<"ptr">,
+    mem: C0HeapAllocator,
+    typedef: Map<string, string>,
+    tagRecord: Map<number, C0Type<"ptr">>,
+    dragged: boolean
 }
 
 interface C0PointerNodeData {
@@ -206,7 +217,7 @@ interface C0ValueNodeData {
     dragged: boolean,
 }
 
-type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData;
+type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData | C0TagPointerData;
 
 interface ApplicationCrashPageProps {
     state: C0VMApplicationState;

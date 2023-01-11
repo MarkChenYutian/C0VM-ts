@@ -1,16 +1,15 @@
 import { EditorView } from "codemirror";
 import { Decoration, DecorationSet, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
-import { internal_error } from "../../utility/errors";
+import { internal_error } from "../../../utility/errors";
 
-function loadFileThroughDialog(e: Event, v: EditorView, update_title?: (s: string) => void) {
+function loadFileThroughDialog(e: Event, v: EditorView, update_title: (s: string) => void) {
     if (e.target === null) throw new internal_error("Failed to read input file");
     const fileList = (e.target as HTMLInputElement).files;
     if (fileList === null) throw new internal_error("Failed to read input file");
 
     const F = fileList[0];
-    if (update_title !== undefined) {
-        update_title(F.name);
-    }
+    
+    update_title(F.name);
     const reader = new FileReader();
 
     reader.onloadend = (e) => {
@@ -25,7 +24,7 @@ function loadFileThroughDialog(e: Event, v: EditorView, update_title?: (s: strin
     reader.readAsText(F, "utf-8");
 }
 
-function onLoadFile(view: EditorView, accept_format: string, update_title?: (s: string) => void) {
+function onLoadFile(view: EditorView, accept_format: string, update_title: (s: string) => void) {
     const inputElem = document.createElement("input");
     inputElem.type = "file";
     inputElem.accept = accept_format;
@@ -37,10 +36,10 @@ function onLoadFile(view: EditorView, accept_format: string, update_title?: (s: 
 // Reference: https://codemirror.net/examples/decoration/
 
 class LoadDocumentWidget extends WidgetType {
-    public update_title ?: (s: string) => void;
+    public update_title  : (s: string) => void;
     public accept_format : string;
 
-    constructor(accept_format: string, update_title?: (s: string) => void) {
+    constructor(accept_format: string, update_title: (s: string) => void) {
         super();
         this.update_title = update_title;
         this.accept_format = accept_format;
@@ -68,7 +67,7 @@ class LoadDocumentWidget extends WidgetType {
     }
 }
 
-function loadDOMWidgetInterface(view: EditorView, accept_format: string,update_title ?: (s: string) => void) {
+function loadDOMWidgetInterface(view: EditorView, accept_format: string, update_title: (s: string) => void) {
     if (view.state.doc.length !== 0) return Decoration.none;
     return Decoration.set([
         Decoration.widget({
@@ -90,10 +89,10 @@ function loadDOMWidgetInterface(view: EditorView, accept_format: string,update_t
  * 
  * @returns ViewPlugin that can be installed on code mirror editor
  */
-function LoadDocumentPlugin(accepted_format: string, update_name ?: (s: string) => void) {
+function LoadDocumentPlugin(accepted_format: string, update_name: (s: string) => void) {
     return ViewPlugin.fromClass(class {
         public decorations   : DecorationSet;
-        public update_title ?: (s: string) => void;
+        public update_title  : (s: string) => void;
         public accept_format : string;
     
         constructor (view: EditorView) {
