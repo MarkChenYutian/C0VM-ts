@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Button, Space, Tooltip } from "antd";
 
-import { faBoltLightning, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { faBoltLightning, faClockRotateLeft, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import * as VM from "../vm_core/vm_interface";
@@ -28,6 +28,17 @@ function RequiresRecompile(){
         "Requires Recompile",
         "The content in code editor has been changed. Recompile the code before executing the program."
     );
+}
+
+function convertC0Bpts(C0Editors: C0EditorTab[]): Set<string>{
+    const c0BreakPoint = new Set<string>();
+    for (let i = 0; i < C0Editors.length; i ++){
+    for (const currentEditor of C0Editors)
+        for (const bpts of currentEditor.breakpoints){
+            c0BreakPoint.add(`${currentEditor.title}@${bpts.line}`);
+        }
+    }
+    return c0BreakPoint;
 }
 
 function MainControlBarFC(props: MainControlProps & ContextValue) {
@@ -60,6 +71,42 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
 
         // Program can still step in future
         else props.set_app_state({C0Runtime: new_runtime});
+    }
+
+    const autoStep_c0runtime = async() =>{
+        if (appState.contentChanged) {
+            RequiresRecompile();
+            return;
+        }
+        let init_state: undefined | C0VM_RT = undefined;
+        //let new_runtime, can_continue = undefined;
+
+        if (appState.C0Runtime === undefined) {
+            init_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, print_update, MEM_POOL_SIZE);
+            if (init_state === undefined) return;
+        } else {
+            init_state = appState.C0Runtime;
+        }
+
+        const c0BreakPoint = convertC0Bpts(appState.C0Editors);
+        const bc0BreakPointArr = Array.from(appState.BC0BreakPoints).map(bp => bp.line);
+        const bc0BreakPoints = new Set(bc0BreakPointArr);
+
+        if (init_state===undefined) return;
+
+        const autoStepFn = VM.autoStep(
+            init_state as C0VM_RT,
+            bc0BreakPoints,
+            c0BreakPoint,
+            abortSignal,
+            props.application_state.c0_only,
+            reset,
+            print_update,
+            s => props.set_app_state({C0Runtime: s}),
+            () => props.set_app_state({C0Running: false})
+        )
+
+        props.set_app_state({C0Running: true}, ()=>autoStepFn);
     }
 
     const run_c0runtime = async () => {
@@ -136,10 +183,32 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
             print_update,
         );
     };
-   
+
     const compilebtn_disabled = appState.C0Running || appState.C0Editors[0].content === "";
     const stepbtn_disabled    = (!is_bc0_valid) || appState.C0Running || appState.contentChanged;
     const runbtn_disabled     = (!is_bc0_valid) || appState.C0Running || appState.contentChanged;
+    const autostepbtn_disabled = (!is_bc0_valid) || appState.C0Running || appState.contentChanged;
+
+    function onKeyPressWrapper(e: KeyboardEvent): void{
+        const is_action_key = e.key==="a" || e.key ==='r' || e.key==="s";
+        if (autostepbtn_disabled && is_action_key && e.ctrlKey) {
+            if (!is_bc0_valid) globalThis.MSG_EMITTER.warn("Action Unavailable","Invalid BC0 code.");
+            else if(appState.C0Running) globalThis.MSG_EMITTER.warn("Action Unavailable","The program is currently running.");
+            else if(appState.contentChanged) RequiresRecompile();
+        }
+        else if (e.ctrlKey) onKeyPress(e.key);
+    }
+    
+    function onKeyPress(key: string): void{
+        if(key==='a') autoStep_c0runtime();
+        else if(key==='r') run_c0runtime();
+        else if(key==='s') step_c0runtime();
+    }
+   
+    useEffect(() =>{
+        document.addEventListener('keydown', onKeyPressWrapper)
+        return () => document.removeEventListener('keydown',onKeyPressWrapper);
+    })
 
     const CompileButton = 
         <Button
@@ -160,6 +229,17 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
             onClick={step_c0runtime}
         >
             &nbsp;Step
+        </Button>;
+    
+    const AutoStepButton =
+        <Button
+            icon={<FontAwesomeIcon icon={faClockRotateLeft}/>}
+            size = "large"
+            type = "primary"
+            disabled={autostepbtn_disabled}
+            onClick={autoStep_c0runtime}
+        >
+            &nbsp;AutoStep
         </Button>;
     
     const RunButton = 
@@ -205,6 +285,10 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
         <Tooltip placement="bottomRight" color={props.themeColor} title="Compile the code before Run">{RunButton}</Tooltip>
          : RunButton;
 
+    const display_AutoStepBtn = autostepbtn_disabled?
+        <Tooltip placement="bottomRight" color={props.themeColor} title="Compile the code before Autostep">{AutoStepButton}</Tooltip>
+        : AutoStepButton;
+
     return (
         <div className="main-control">
             <a href="https://github.com/MarkChenYutian/C0VM-ts" style={{cursor: "pointer", color: "black", textDecoration: "none"}}>
@@ -213,6 +297,7 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
             <Space size="middle">
                 {display_CompileBtn}
                 {display_StepBtn}
+                {display_AutoStepBtn}
                 {display_RunBtn}
                 {appState.C0Running ? AbortButton : RestartButton}
             </Space>
