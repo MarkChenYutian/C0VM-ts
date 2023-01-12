@@ -60,6 +60,7 @@ export default class CodeEditor extends React.Component
     update_content(key: number, s: string) {
         let ns: C0EditorTab[] = [...this.props.app_state.C0Editors];
         ns = ns.map((tab) => tab.key === key ? {key: tab.key, title: tab.title, content: s, breakpoints: tab.breakpoints} : tab);
+        console.log("update_content has run");
         this.props.set_app_state({C0Editors: ns, contentChanged: true});
     }
 

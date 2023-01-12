@@ -167,8 +167,6 @@ export default function MainControlBar(props: MainControlProps) {
         // else props.set_app_state({C0Runtime: new_runtime});
     }
 
-
-
     const restart_c0runtime = async () => {
         clear_print();
         const new_state = await VM.initialize(appState.BC0SourceCode, clear_print, appState.C0Editors, appState.TypedefRecord, print_update, globalThis.MEM_POOL_SIZE);
@@ -201,7 +199,7 @@ export default function MainControlBar(props: MainControlProps) {
     const StepButton = 
         <button
             className={"base-btn success-btn unselectable " + (is_bc0_valid && !appState.C0Running ? "" : "disable-btn")}
-            onClick={step_c0runtime}
+            onClick={props.step}
         >
             <FontAwesomeIcon icon={faStepForward} className="hide-in-mobile"/>{" Step "}
         </button>;
@@ -209,7 +207,7 @@ export default function MainControlBar(props: MainControlProps) {
     const RunButton = 
         <button
             className={"base-btn success-btn unselectable " + (is_bc0_valid && !appState.C0Running ? "" : "disable-btn")}
-            onClick={run_c0runtime}
+            onClick={props.run}
         >
             <FontAwesomeIcon icon={faPlay} className="hide-in-mobile"/>{" Run "}
         </button>;

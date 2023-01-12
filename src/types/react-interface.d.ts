@@ -49,6 +49,8 @@ interface C0VMApplicationState {
 // The props that main control bar component will accept
 interface MainControlProps {
     application_state   : C0VMApplicationState,
+    step          : ()=>void,
+    run           : ()=>void,
     set_app_state<K extends keyof C0VMApplicationState>(
                             state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
                                     => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
