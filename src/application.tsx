@@ -37,6 +37,20 @@ export default class C0VMApplication extends React.Component<
     }
 
     push_pupulated_tab(tab: C0EditorTab) {
+        // check if there's already file with this name and append _num if exists
+        var try_suffix = 1;
+        console.log(tab.title)
+        console.log(this.state.C0Editors.map((tab) => tab.title))
+        while (this.state.C0Editors.map((tab) => tab.title).includes(tab.title)) {
+            console.log(tab.title.substr(0, tab.title.lastIndexOf('.')) + '-fx' + tab.title.substr(tab.title.lastIndexOf('.')))
+            if (!(this.state.C0Editors.map((tab) => tab.title)).includes(tab.title.substr(0, tab.title.lastIndexOf('.')) + '_' + try_suffix + tab.title.substr(tab.title.lastIndexOf('.')))) {
+                tab.title = tab.title.substr(0, tab.title.lastIndexOf('.')) + '_' + try_suffix + tab.title.substr(tab.title.lastIndexOf('.'))
+                globalThis.MSG_EMITTER.warn(`${tab.title} already exists. It will suffixed with the lowest positive integer that makes its file name unique.`);
+                break
+            }
+            try_suffix++
+        }
+
         this.state.C0Editors.push({
             title: tab.title,
             key: (Math.max(...this.state.C0Editors.map((tab) => tab.key)) + 1),

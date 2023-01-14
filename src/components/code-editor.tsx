@@ -42,17 +42,13 @@ export default class CodeEditor extends React.Component
 
     // this function is called for every file in the uploaded directory, recursive.
     handle_import_folder(F: RcFile, FList: RcFile[]) {
-        // Access file content here and do something with it
-        console.debug("received files ", FList);
 
         if (!(F.name.endsWith('.c0') || F.name.endsWith('.c1'))) {
             globalThis.MSG_EMITTER.warn(`${F.name} is not a c0/c1 file and is thus ignored`);
             return Upload.LIST_IGNORE;
         }
-        
+                
         const reader = new FileReader();
-        // create unique key for each upload based on their uid, which is unique.
-        const key = Number(F.uid.replace("rc-upload-", "").replace("-", ""));
 
         reader.onload = e => {
             if (reader.result === null) { 
@@ -62,14 +58,10 @@ export default class CodeEditor extends React.Component
 
             const res = reader.result.toString();
             console.log(res)
-
-            function sleep (time: number) {
-                return new Promise((resolve) => setTimeout(resolve, time));
-            }
            
             this.props.push_pupulated_tab({
                 title: F.name,
-                key: key,
+                key: null, // will get overwritten when push
                 content: res,
                 breakpoints: [],
             })
