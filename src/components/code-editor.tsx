@@ -5,6 +5,7 @@ import { Button } from 'antd';
 import { message, Upload } from 'antd';
 
 import type { RcFile } from 'antd/lib/upload';
+import type { UploadChangeParam, UploadFile } from 'antd/lib/upload';
 
 import { faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 
@@ -39,17 +40,19 @@ export default class CodeEditor extends React.Component
         this.setState({C0_nextKey: this.state.C0_nextKey + 1})
     }
 
-    handle_import_folder(F: RcFile, Flist: RcFile[]) {
+    // this function is called for every file in the uploaded directory, recursive.
+    async handle_import_folder(F: RcFile) {
         // Access file content here and do something with it
-        console.log(F);
-        console.log(Flist);
+        console.debug("received file ", F);
 
         if (!(F.name.endsWith('.c0') || F.name.endsWith('.c1'))) {
-            message.error(`${F.name} is not a c0/c1 file and is thus ignored`);
+            globalThis.MSG_EMITTER.warn(`${F.name} is not a c0/c1 file and is thus ignored`);
             return Upload.LIST_IGNORE;
         }
         
         const reader = new FileReader();
+        // create unique key for each upload based on their uid, which is unique.
+        const key = Number(F.uid.replace("rc-upload-", "").replace("-", ""));
 
         reader.onload = e => {
             if (reader.result === null) { 
@@ -59,24 +62,23 @@ export default class CodeEditor extends React.Component
 
             const res = reader.result.toString();
             console.log(res)
-            this.create_imported_panel(F.name, res)
+
+            function sleep (time: number) {
+                return new Promise((resolve) => setTimeout(resolve, time));
+            }
+           
+            this.props.push_pupulated_tab({
+                title: F.name,
+                key: key,
+                content: res,
+                breakpoints: [],
+            })
+    
         };
         reader.readAsText(F, "utf-8");
 
         // Prevent upload traffic
         return false;
-    }
-
-    create_imported_panel(filename: string, text: string) {
-        const new_editors: C0EditorTab[] = [...this.props.app_state.C0Editors];
-        new_editors.push({
-            title: filename,
-            key: this.state.C0_nextKey,
-            content: text,
-            breakpoints: [],
-        });
-        this.props.set_app_state({C0Editors: new_editors});
-        this.setState({C0_nextKey: this.state.C0_nextKey + 1})
     }
 
     remove_panel(key: string) {
@@ -171,18 +173,20 @@ export default class CodeEditor extends React.Component
             selectorArr.push(
             <>
                 <div style={{display: "flex"}}>
-                    
+
                     <div style={{marginRight: "0.5em", marginLeft: "auto"}}>
                         <Upload
                             name='code-import-folder'
                             directory
                             beforeUpload={this.handle_import_folder}
+                            // onChange={this.handle_import_folder_change}
                             showUploadList={false}
                         >
                             <Button icon={<FontAwesomeIcon icon={faFolderOpen} style={{marginRight: "0.3em"}}/>}>
                                 Import Folder
                             </Button>
                         </Upload>
+
                     </div>
 
                     <Segmented
@@ -192,7 +196,6 @@ export default class CodeEditor extends React.Component
                             { label: "BC0",value: "bc0"}
                         ]}
                         defaultValue={this.state.mode}
-                        onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
                     />
 
                 </div>

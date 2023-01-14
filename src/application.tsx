@@ -36,6 +36,15 @@ export default class C0VMApplication extends React.Component<
         };
     }
 
+    push_pupulated_tab(tab: C0EditorTab) {
+        this.state.C0Editors.push({
+            title: tab.title,
+            key: tab.key,
+            content: tab.content,
+            breakpoints: tab.breakpoints,
+        });
+    }
+
     render() {
         if (this.state.crashed) {
             return (
@@ -88,6 +97,7 @@ export default class C0VMApplication extends React.Component<
                         <CodeEditor
                             app_state={this.state}
                             set_app_state={(ns: any) => this.setState(ns)}
+                            push_pupulated_tab={(tab: C0EditorTab) => this.push_pupulated_tab(tab)}
                         />
                     </Col>
                     <Col xs={24} sm={24} lg={12} xxl={13} className="io-area">
