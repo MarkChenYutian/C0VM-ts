@@ -66,7 +66,7 @@ export default class CodeEditor extends React.Component
     }
 
     create_imported_panel(filename: string, text: string) {
-        const new_editors = [...this.props.app_state.C0Editors];
+        const new_editors: C0EditorTab[] = [...this.props.app_state.C0Editors];
         new_editors.push({
             title: filename,
             key: this.state.C0_nextKey,
@@ -151,8 +151,8 @@ export default class CodeEditor extends React.Component
                         beforeUpload={this.handle_import_folder}
                         showUploadList={false}
                     >
-                        <Button icon={<FontAwesomeIcon icon={faFolderOpen}/>}>
-                            {" Import Folder "}
+                        <Button icon={<FontAwesomeIcon icon={faFolderOpen} style={{marginRight: "0.3em"}}/>}>
+                              Import Folder
                         </Button>
                     </Upload>
                 </div>
