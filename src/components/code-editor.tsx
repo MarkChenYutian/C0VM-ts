@@ -59,7 +59,7 @@ export default class CodeEditor extends React.Component
             const res = reader.result.toString();
             console.log(res)
            
-            this.props.push_pupulated_tab({
+            this.props.push_populated_tab({
                 title: F.name,
                 key: null, // will get overwritten when push
                 content: res,
@@ -102,6 +102,7 @@ export default class CodeEditor extends React.Component
                     newPanel        = {() => this.create_panel()}
                     removePanel     = {(key) => this.remove_panel(key)}
                     updateContent   = {(key, s) => this.update_content(key, s)}
+                    handle_import_folder={(F: RcFile, FList: RcFile[]) => this.handle_import_folder(F, FList)}
                 />
             </div>);
     }
@@ -118,6 +119,7 @@ export default class CodeEditor extends React.Component
                 newPanel        = {() => this.create_panel()}
                 removePanel     = {(key) => this.remove_panel(key)}
                 updateContent   = {(key, s) => this.update_content(key, s)}
+                handle_import_folder={(F: RcFile, FList: RcFile[]) => this.handle_import_folder(F, FList)}
             />;
         } else {
             const vm = this.props.app_state.C0Runtime;
@@ -164,34 +166,14 @@ export default class CodeEditor extends React.Component
 
         if (! this.props.app_state.c0_only){
             selectorArr.push(
-            <>
-                <div style={{display: "flex"}}>
-
-                    <div style={{marginRight: "0.5em", marginLeft: "auto"}}>
-                        <Upload
-                            name='code-import-folder'
-                            directory
-                            beforeUpload={this.handle_import_folder}
-                            showUploadList={false}
-                        >
-                            <Button icon={<FontAwesomeIcon icon={faFolderOpen} style={{marginRight: "0.3em"}}/>}>
-                                Import Folder
-                            </Button>
-                        </Upload>
-
-                    </div>
-
-                    <Segmented
-                        key="language_selector"
-                        options={[
-                            { label: "C0", value: "c0" }, 
-                            { label: "BC0",value: "bc0"}
-                        ]}
-                        defaultValue={this.state.mode}
-                    />
-
-                </div>
-            </>
+                <Segmented
+                    key="language_selector"
+                    options={[
+                        { label: "C0", value: "c0" }, 
+                        { label: "BC0",value: "bc0"}
+                    ]}
+                    defaultValue={this.state.mode}
+                />
             );
         }
 

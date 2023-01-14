@@ -36,7 +36,7 @@ export default class C0VMApplication extends React.Component<
         };
     }
 
-    push_pupulated_tab(tab: C0EditorTab) {
+    push_populated_tab(tab: C0EditorTab) {
         // check if there's already file with this name and append _num if exists
         var try_suffix = 1;
         console.log(tab.title)
@@ -111,7 +111,7 @@ export default class C0VMApplication extends React.Component<
                         <CodeEditor
                             app_state={this.state}
                             set_app_state={(ns: any) => this.setState(ns)}
-                            push_pupulated_tab={(tab: C0EditorTab) => this.push_pupulated_tab(tab)}
+                            push_populated_tab={(tab: C0EditorTab) => this.push_populated_tab(tab)}
                         />
                     </Col>
                     <Col xs={24} sm={24} lg={12} xxl={13} className="io-area">

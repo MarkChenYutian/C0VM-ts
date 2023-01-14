@@ -4,6 +4,8 @@ import C0Editor from "./c0-editor";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
 import DraggableTabs from "./draggable_tabs";
+import type { RcFile } from 'antd/lib/upload';
+
 
 const { TabPane } = Tabs;
 const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.c0$/;
@@ -129,6 +131,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                                 updateName    = {(name) => this.set_tab_name(editor.key, name)}
                                 setBreakPts   = {(bps)  => this.set_brkpt_for_editor(editor.key, bps)}
                                 editable      = {this.props.currLine === undefined}
+                                handle_import_folder = {(F: RcFile, FList: RcFile[]) => this.props.handle_import_folder(F, FList)}
                             />
                         </TabPane>;
                     }

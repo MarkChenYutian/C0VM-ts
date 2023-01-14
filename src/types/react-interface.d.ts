@@ -75,7 +75,7 @@ interface CodeEditorProps {
             | null),
         callback?: () => void
     ): void;
-    push_pupulated_tab: (C0EditorTab) => void
+    push_populated_tab: (C0EditorTab) => void
 }
 
 interface CodeEditorState {
@@ -102,6 +102,7 @@ interface C0EditorGroupProps {
     newPanel     : () => void,
     removePanel  : (key: string) => void,
     updateContent: (key: number, s: string) => void,
+    handle_import_folder: (F: RcFile, FList: RcFile[]) => void,
 }
 
 
@@ -114,6 +115,7 @@ interface C0EditorProps {
     updateContent : (s: string) => void,
     setBreakPts   : (lns: BreakPoint[]) => void,
     updateName    : (s: string) => void,
+    handle_import_folder: (F: RcFile, FList: RcFile[]) => void,
 }
 
 interface BC0EditorProps {
