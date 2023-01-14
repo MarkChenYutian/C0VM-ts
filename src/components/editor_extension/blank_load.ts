@@ -49,17 +49,12 @@ class LoadDocumentWidget extends WidgetType {
     toDOM(view: EditorView): HTMLElement {
         const load_dom = document.createElement("i");
         load_dom.appendChild(document.createTextNode("Load a file by "));
-        let tmp = document.createElement("b");
-        tmp.textContent = "Drag & Drop"
-        load_dom.appendChild(tmp);
-        load_dom.appendChild(document.createTextNode(" or "));
-        tmp = document.createElement("a");
+        let tmp = document.createElement("a");
         tmp.className = "active-href";
         tmp.onclick = () => onLoadFile(view, this.accept_format, this.update_title);
         tmp.textContent = "Load Manually"
         load_dom.appendChild(tmp);
-        load_dom.appendChild(document.createElement("br"));
-        load_dom.appendChild(document.createTextNode("Or type anything in editor to remove this message."))
+        load_dom.appendChild(document.createTextNode(" or type anything in editor to remove this message."))
         load_dom.className = "editor-load-hint";
         return load_dom;
     }

@@ -1,3 +1,13 @@
+@font-face {
+  font-family: menlo-regular;
+  src: url("assets/Menlo-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: cascadia-mono;
+  src: url("assets/CascadiaMono.ttf") format("truetype");
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

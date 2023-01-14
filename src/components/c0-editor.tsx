@@ -7,6 +7,7 @@ import { C0 } from "./editor_extension/syntax/c0";
 import { indentUnit } from "@codemirror/language";
 import execLineHighlighter from "./editor_extension/exec_position";
 import breakpointGutter from "./editor_extension/breakpoint_marker";
+import C0LightTheme from "./editor_extension/c0editor_theme";
 
 export default class C0Editor extends React.Component<C0EditorProps>
 {
@@ -17,7 +18,8 @@ export default class C0Editor extends React.Component<C0EditorProps>
     shouldComponentUpdate(nextProps: Readonly<C0EditorProps>, nextState: Readonly<{}>, nextContext: any): boolean {
         const execLineChanged = this.props.execLine !== nextProps.execLine;
         const valueChanged = this.props.editorValue !== nextProps.editorValue;
-        return execLineChanged || valueChanged;
+        const editableStateChanged = this.props.editable !== nextProps.editable;
+        return execLineChanged || valueChanged || editableStateChanged;
     }
 
     render() {
@@ -28,7 +30,7 @@ export default class C0Editor extends React.Component<C0EditorProps>
         
         return <div className="code-editor">
                     <ReactCodeMirror
-                        theme={globalThis.UI_EDITOR_THEME}
+                        theme={C0LightTheme}
                         basicSetup={false}
                         onUpdate={(v) => 
                             {
@@ -43,7 +45,7 @@ export default class C0Editor extends React.Component<C0EditorProps>
                             LoadDocumentPlugin(".c0", this.props.updateName),
                             basicSetup(),
                             indentUnit.of("    "),
-                            execLineHighlighter(this.props.execLine, globalThis.UI_EDITOR_THEME),
+                            execLineHighlighter(this.props.execLine, "light"),
                             C0(),
                         ]}
                         editable={this.props.editable}

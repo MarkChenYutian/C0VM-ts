@@ -25,6 +25,12 @@ type C0EditorTab = {
     breakpoints: BreakPoint[]   /* Breakpoints attatched to that tab */
 };
 
+interface C0VMApplicationProps {
+    displayMode    : "full-page" | "embeddable",
+    showStdOut     : boolean,
+    showDebug      : boolean
+}
+
 interface C0VMApplicationState {
     crashed        : boolean,         /* C0VM Application top-level error boundary */
     c0_only        : boolean,         /* C0 only mode or not */
@@ -81,6 +87,7 @@ interface C0EditorGroupProps {
     currLine     : [string, number, boolean] | undefined,   /* Current C0 line the C0VM is executing */
 
     appState     : C0VMApplicationState,                    /* C0VM Application State */
+    selector     : JSX.Element | undefined                  /* Code editor mode selector */
     set_app_state<K extends keyof C0VMApplicationState>(
         state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
                 => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
@@ -90,9 +97,9 @@ interface C0EditorGroupProps {
             callback?: () => void
         ): void;
     
+    set_group_state: (mode: "c0" | "bc0") => void,
     newPanel     : () => void,
     removePanel  : (key: string) => void,
-
     updateContent: (key: number, s: string) => void,
 }
 
@@ -166,12 +173,14 @@ interface C0ValueTabularDisplayProps {
 interface C0StackFrameNodeData {
     frame: VM_StackFrame,
     mem: C0HeapAllocator,
+    typedef: Map<string, string>,
     dragged: boolean,
 }
 
 interface C0StructNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
+    typedef: Map<string, string>,
     typeRecord: Map<string, Map<number, Struct_Type_Record>>,
     dragged: boolean,
 }
@@ -179,18 +188,21 @@ interface C0StructNodeData {
 interface C0ArrayNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
+    typedef: Map<string, string>,
     dragged: boolean,
 }
 
 interface C0PointerNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
+    typedef: Map<string, string>,
     dragged: boolean,
 }
 
 interface C0ValueNodeData {
     val: C0Value<"ptr">,
     mem: C0HeapAllocator,
+    typedef: Map<string, string>,
     dragged: boolean,
 }
 
@@ -202,9 +214,7 @@ interface ApplicationCrashPageProps {
 }
 
 interface ApplicationContextInterface {
-    mode: "full-page" | "embeddable",
-    std_out: boolean,
-    debug_console: boolean,
+    theme: "dark" | "light"
 }
 
 interface SettingMenuProps {
@@ -223,3 +233,12 @@ interface BreakpointExtProps {
 }
 
 type BreakpointExt = (props: BreakpointExtProps) => ((StateField<RangeSet<GutterMarker>> | Extension)[])
+
+
+interface ContextValue {
+    themeColor: string | undefined
+}
+
+
+type AliasType = string;
+type SourceType = string;

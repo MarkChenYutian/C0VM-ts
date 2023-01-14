@@ -8,15 +8,17 @@ import type { RcFile } from 'antd/lib/upload';
 
 import { faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 
-import { Segmented } from "antd";
+import { Segmented, Tooltip } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCode } from "@fortawesome/free-solid-svg-icons";
+import { faCode, faLock } from "@fortawesome/free-solid-svg-icons";
+import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>
 {
     constructor(props: CodeEditorProps) {
         super(props);
+
         const tabs = props.app_state.C0Editors;
         this.state = {
             mode: "c0",
@@ -93,19 +95,15 @@ export default class CodeEditor extends React.Component
         this.props.set_app_state({C0Editors: ns, contentChanged: true});
     }
 
-    render_c0() {
-        const read_only = this.props.app_state.C0Runtime !== undefined && this.props.app_state.C0Runtime.state.CurrLineNumber !== 0;
+    render_c0(selector: JSX.Element | undefined) {
         return (
             <div className="code-editor" data-lang={this.state.mode}>
-                <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: ".4rem"}}>
-                    <h3 style={{marginTop: 0, marginBottom: 0}}>
-                        <FontAwesomeIcon icon={faCode}/> Code Editor {read_only ? "(Read Only when Running)" : ""}
-                    </h3>
-                </div>
                 <C0EditorGroup
                     currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
                     appState        = {this.props.app_state}
+                    selector        = {selector}
                     set_app_state   = {(ns) => this.props.set_app_state(ns)}
+                    set_group_state = {(mode) => this.setState({mode: mode})}
                     newPanel        = {() => this.create_panel()}
                     removePanel     = {(key) => this.remove_panel(key)}
                     updateContent   = {(key, s) => this.update_content(key, s)}
@@ -113,65 +111,104 @@ export default class CodeEditor extends React.Component
             </div>);
     }
 
-    render_all() {
+    render_all(selector: JSX.Element | undefined) {
         let content = undefined;
         if (this.state.mode === "c0") {
             content = <C0EditorGroup
                 currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
                 appState        = {this.props.app_state}
+                selector        = {selector}
                 set_app_state   = {(ns) => this.props.set_app_state(ns)}
+                set_group_state = {(mode) => this.setState({mode: mode})}
                 newPanel        = {() => this.create_panel()}
                 removePanel     = {(key) => this.remove_panel(key)}
                 updateContent   = {(key, s) => this.update_content(key, s)}
             />;
         } else {
             const vm = this.props.app_state.C0Runtime;
-            content = <BC0Editor
-                updateContent={s => this.props.set_app_state({BC0SourceCode: s})}
-                editorValue  ={this.props.app_state.BC0SourceCode}
-                execLine     ={vm === undefined ? 0 : vm.state.CurrLineNumber}
-                breakpointVal={this.props.app_state.BC0BreakPoints}
-                updateBrkPts ={ns => this.props.set_app_state({BC0BreakPoints: new Set(ns)})}
-            />;
+            content = <>
+                <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "baseline"}}>
+                    <h3 style={{margin: "0"}}><FontAwesomeIcon icon={faCode}/> Bytecode Reader</h3>
+                    {selector}
+                </div>
+                <BC0Editor
+                    updateContent={s => this.props.set_app_state({BC0SourceCode: s})}
+                    editorValue  ={this.props.app_state.BC0SourceCode}
+                    execLine     ={vm === undefined ? 0 : vm.state.CurrLineNumber}
+                    breakpointVal={this.props.app_state.BC0BreakPoints}
+                    updateBrkPts ={ns => this.props.set_app_state({BC0BreakPoints: new Set(ns)})}
+                />
+            </>;
         }
 
-        const read_only = this.props.app_state.C0Runtime !== undefined && this.props.app_state.C0Runtime.state.CurrLineNumber !== 0;
-
         return (
-        <div className="code-editor" data-lang={this.state.mode} >
-            <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
-                <h3 style={{marginTop: 0, marginBottom: 0}}>
-                    <FontAwesomeIcon icon={faCode}/> Code Editor {read_only ? "(Read Only when Running)" : ""}
-                </h3>
-
-                <div style={{marginRight: "0.5em", marginLeft: "auto"}}>
-                    <Upload
-                        name='code-import-folder'
-                        directory
-                        beforeUpload={this.handle_import_folder}
-                        showUploadList={false}
-                    >
-                        <Button icon={<FontAwesomeIcon icon={faFolderOpen} style={{marginRight: "0.3em"}}/>}>
-                              Import Folder
-                        </Button>
-                    </Upload>
-                </div>
-
-                <Segmented
-                    options={[
-                        { label: "C0", value: "c0" }, 
-                        { label: "BC0",value: "bc0"}
-                    ]}
-                    defaultValue="c0"
-                    onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
-                />
+            <div className="code-editor" data-lang={this.state.mode} >
+                {content}
             </div>
-            {content}
-        </div>);
+        );
     }
 
     render() {
-        if (this.props.app_state.c0_only) return this.render_c0();
-        return this.render_all();
+        let selectorArr: JSX.Element[] = [];
+        
+        if (this.props.app_state.C0Runtime?.state.CurrC0RefLine !== undefined){
+            selectorArr.push(
+                <ConfigConsumer>
+                    {(value: ConfigConsumerProps) => 
+                        <Tooltip
+                            title="Code editor is read-only now since the program is running."
+                            placement="left"
+                            color={value.theme?.token?.colorPrimary}
+                        >
+                            <FontAwesomeIcon icon={faLock} key="status_indicator"/>
+                        </Tooltip>
+                    }
+                </ConfigConsumer>
+            );
+        }
+
+        if (! this.props.app_state.c0_only){
+            selectorArr.push(
+            <>
+                <div style={{display: "flex"}}>
+                    
+                    <div style={{marginRight: "0.5em", marginLeft: "auto"}}>
+                        <Upload
+                            name='code-import-folder'
+                            directory
+                            beforeUpload={this.handle_import_folder}
+                            showUploadList={false}
+                        >
+                            <Button icon={<FontAwesomeIcon icon={faFolderOpen} style={{marginRight: "0.3em"}}/>}>
+                                Import Folder
+                            </Button>
+                        </Upload>
+                    </div>
+
+                    <Segmented
+                        key="language_selector"
+                        options={[
+                            { label: "C0", value: "c0" }, 
+                            { label: "BC0",value: "bc0"}
+                        ]}
+                        defaultValue={this.state.mode}
+                        onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
+                    />
+
+                </div>
+            </>
+            );
+        }
+
+
+        let selector = undefined;
+        if (selectorArr.length === 1){
+            selector = selectorArr[0];
+        } else if (selectorArr.length === 2) {
+            selector = <div>{selectorArr[0]} {selectorArr[1]}</div>
+        }
+        
+        if (this.props.app_state.c0_only) return this.render_c0(selector);
+        return this.render_all(selector);
     }
 }

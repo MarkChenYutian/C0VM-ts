@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs } from 'antd';
+import { Tabs, TabsProps } from "antd";
 import C0Editor from "./c0-editor";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
@@ -86,22 +86,24 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
     };    
 
     render() {
+        const tabConfig: TabsProps = {
+            tabBarExtraContent: this.props.selector,
+            type: "editable-card",
+            activeKey: this.props.appState.ActiveEditor + "",
+            size: "small",
+            onChange: (new_key: string) => {this.on_change_key(new_key)},
+            onTabClick: (key: string, e)   => {
+                if (e.altKey) {
+                    const s = prompt("File name for tab:");
+                    this.set_tab_name(parseInt(key), s === null ? "" : s)
+                }
+            },
+            addIcon: <FontAwesomeIcon icon={faAdd}/>
+        }
+
         return (
         <DraggableTabs
-            config={{
-                type: "editable-card",
-                activeKey: this.props.appState.ActiveEditor + "",
-                size: "small",
-                onChange: (new_key: string) => {this.on_change_key(new_key)},
-                onTabClick: (key: string, e)   => {
-                    // TODO: Find some way to let alt-key (second key click) toggle rename
-                    if (e.altKey) {
-                        const s = prompt("File name for tab:");
-                        this.set_tab_name(parseInt(key), s === null ? "" : s)
-                    }
-                },
-                addIcon: <FontAwesomeIcon icon={faAdd}/>
-            }}
+            config={tabConfig}
             onTabEdit={this.on_edit}
             setTabOrder={this.update_tab_order}
         >

@@ -3,7 +3,7 @@ import * as TypeUtil from "../../utility/c0_type_utility";
 
 import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value, build_c0_stringValue } from "../../utility/c0_value_utility";
 import { c0_assertion_error, c0_memory_error, c0_user_error, vm_error } from "../../utility/errors";
-import { build_null_ptr, read_ptr, shift_ptr } from "../../utility/pointer_utility";
+import { build_null_ptr, isNullPtr, read_ptr, shift_ptr } from "../../utility/pointer_utility";
 import { loadString } from "../../utility/string_utility";
 import OpCode from "./opcode";
 
@@ -430,9 +430,6 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 throw new vm_error(`Type unmatch: ATHROW expect (string)`);
             }
             const err_prompt = loadString(str_ptr, allocator);
-            UIHooks.print_update(`<span class="error-output"> C0 aborted with error prompt </span>`);
-            UIHooks.print_update(err_prompt);
-            UIHooks.print_update(`<span class="error-output"> called by program </span>`);
             throw new c0_user_error(err_prompt);
         }
 
@@ -448,9 +445,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             }
 
             if (val.value.getUint32(0) === 0) {
-                UIHooks.print_update(`<span class="error-output"> C0 aborted with assertion error </span>\n`);
                 const err_prompt = loadString(str_ptr, allocator).substring(45);
-                UIHooks.print_update(err_prompt);
                 throw new c0_assertion_error(err_prompt);
             }
             break;
@@ -767,6 +762,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             if (!TypeUtil.maybePointerType(a)) {
                 throw new vm_error("Type unmatch, AADDF expect to receive a pointer");
             }
+
+            if (isNullPtr(a.value)) {
+                throw new c0_memory_error("Trying to shift the NULL pointer");
+            }
+
             const off_ptr = shift_ptr(a.value, f);
 
             const new_type = TypeUtil.CloneType(a.type);

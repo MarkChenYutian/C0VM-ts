@@ -24,9 +24,8 @@ const node_types = {
  * , which makes it hard to write a class component for it)
  */
 export default function GraphicalDebugEvaluation(props: DebugConsoleInterface) {
-    const [calc_node, calc_edge] = build_nodes(props.state, props.mem);
-    const [nodes, setNodes, onNodesChange] = useNodesState(calc_node);
-    const [edges, setEdges, ] = useEdgesState(calc_edge);
+    const [nodes, setNodes, onNodesChange] = useNodesState([]);
+    const [edges, setEdges, ] = useEdgesState([]);
 
     /** 
      * NOTE: The useEffect hook below will lead to eslint warning, this
@@ -36,8 +35,9 @@ export default function GraphicalDebugEvaluation(props: DebugConsoleInterface) {
      */
     useEffect(
         () => {
-            const [new_node, new_edge] = build_nodes(props.state, props.mem);
-            setNodes(merge_nodes(nodes, new_node));
+            const [new_node, new_edge] = build_nodes(props.state, props.mem, props.typedef);
+            const merged_nodes = merge_nodes(nodes, new_node);
+            setNodes(merged_nodes);
             setEdges(new_edge);
         }, 
         // eslint-disable-next-line react-hooks/exhaustive-deps

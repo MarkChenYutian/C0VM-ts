@@ -18,10 +18,10 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.11.41",
-    "@types/react": "^18.0.14",
+    "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.5",
     "@uiw/react-codemirror": "^4.9.4",
-    "antd": "^4.21.3",
+    "antd": "^5.1.2",
     "babel-jest": "^27.4.2",
     "babel-loader": "^8.2.3",
     "babel-plugin-macros": "^3.1.0",
@@ -41,6 +41,7 @@
     "file-loader": "^6.2.0",
     "fs-extra": "^10.0.0",
     "gh-pages": "^4.0.0",
+    "he": "^1.2.0",
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.4.3",
@@ -61,7 +62,7 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-refresh": "^0.11.0",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "^5.0.0",
     "resolve": "^1.20.0",
     "resolve-url-loader": "^4.0.0",
     "sass-loader": "^12.3.0",
@@ -79,8 +80,8 @@
     "workbox-webpack-plugin": "^6.4.1"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "cross-env GENERATE_SOURCEMAP=true BUILD_PATH='./docs' craco build",
+    "start": "react-scripts start",
+    "build": "cross-env GENERATE_SOURCEMAP=true BUILD_PATH='./docs' react-scripts build",
     "test": "react-scripts test",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
@@ -158,8 +159,9 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^6.4.5",
-    "craco-less": "^2.0.0",
+    "@craco/craco": "^7.0.0",
+    "@types/he": "^1.1.2",
+    "craco-less": "^2.1.0-alpha.0",
     "cross-env": "^7.0.3",
     "javascript-obfuscator": "^4.0.0",
     "react-flow-renderer": "^10.3.8"

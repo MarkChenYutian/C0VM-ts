@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Result } from "antd";
+import { Button, Result } from "antd";
 
 export default class AppCrashFallbackPage extends React.Component<ApplicationCrashPageProps> {
     constructor(props: ApplicationCrashPageProps) {
@@ -18,20 +18,24 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                 subTitle={<p>Please report this problem to our GitHub Repo!</p>}
                 extra={
                     <>
-                        <button
-                            className="base-btn main-btn"
+                        <Button
+                            size="large"
+                            type="primary"
                             onClick={() => {
                                 this.props.setState({
                                     crashed: false,
                                     C0Runtime: undefined,
-                                    PrintoutValue: "",
-                                    // C0Editors: [{title: "Untitled_0.c0", key: 0, content: ""}],
                                     ActiveEditor: this.props.state.C0Editors[0].key
                                 });
                             }}
                         >
                             Restore Editor Content
-                        </button>
+                        </Button>
+                        <a href="https://github.com/MarkChenYutian/C0VM-ts/issues" target="_blank" rel="noreferrer">
+                            <Button size="large">
+                                Open a New Issue
+                            </Button>
+                        </a>
                         <div style={{textAlign: "left"}}>
                         <h3>How to report?</h3>
                         <h4>Step 1</h4>
@@ -40,7 +44,7 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                             JSON.stringify(
                                 {
                                     Version: globalThis.C0VM_VERSION,
-                                    ReactState: this.props.state,
+                                    SourceCode: this.props.state.C0Editors,
                                     ReactContext: this.context,
                                     GlobalState: {
                                         configuration: {
@@ -58,11 +62,6 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                         <p>
                             Open a new issue and paste the state dump above into issue description.
                         </p>
-                        <a href="https://github.com/MarkChenYutian/C0VM-ts/issues" target="_blank" rel="noreferrer">
-                            <button className="base-btn main-btn">
-                                Open a New Issue
-                            </button>
-                        </a>
                         </div>
                     </>
                 }
@@ -71,20 +70,22 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
             return <Result
                 status="error"
                 title="Application Crashed"
-                subTitle="Reload the page to restart the application."
+                subTitle="Click 'Reload Application' to restore your source code files."
                 extra={[
-                    <button
-                        className="base-btn main-btn"
+                    <Button
+                        key="restore-btn"
+                        size="large"
+                        type="primary"
                         onClick={() => {
                             this.props.setState({crashed: false, dbgFullScreen: false, settingMenuOn: false, C0Runtime: undefined, PrintoutValue: ""});
                         }}
                     >
-                        Restore Editor Content
-                    </button>,
-                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSezT1KhMgCNw0Uuk2nnqQnDtYlpXvbYnQW7VEef9xN759APYA/viewform?usp=sf_link" target="_blank" rel="noreferrer">
-                        <button className="base-btn main-btn">
+                        Reload Application
+                    </Button>,
+                    <a key="report-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSezT1KhMgCNw0Uuk2nnqQnDtYlpXvbYnQW7VEef9xN759APYA/viewform?usp=sf_link" target="_blank" rel="noreferrer">
+                        <Button type="default" size="large">
                             Report Problem
-                        </button>
+                        </Button>
                     </a>
                 ]}
             />;

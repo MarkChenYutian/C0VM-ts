@@ -6,6 +6,7 @@
  * cc0/libs/conio/conio.c
  * 
  */
+import { encode } from "he";
 import { allocate_js_string, loadString } from "../../utility/string_utility";
 
 /**
@@ -18,7 +19,7 @@ import { allocate_js_string, loadString } from "../../utility/string_utility";
  * @returns Whether the print is success or not
  */
 function internal_print(UIHook: ReactUIHook, s: string): boolean {
-    UIHook.print_update(s.replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
+    UIHook.print_update(encode(s));
     return true;
 }
 

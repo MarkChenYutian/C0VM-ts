@@ -1,4 +1,7 @@
 import React from "react";
+
+import { Button, Space, Tooltip } from "antd";
+
 import { faBoltLightning, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -6,6 +9,7 @@ import * as VM from "../vm_core/vm_interface";
 import remote_compile from "../network/remote_compile";
 
 import tsLogo from "../assets/ts-logo-128.svg";
+import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
 
 /**
@@ -26,8 +30,7 @@ function RequiresRecompile(){
     );
 }
 
-// export default class MainControlBar extends React.Component<MainControlProps>{
-export default function MainControlBar(props: MainControlProps) {
+function MainControlBarFC(props: MainControlProps & ContextValue) {
     const appState = props.application_state;
     const is_bc0_valid = props.application_state.BC0SourceCode.toUpperCase().startsWith("C0 C0 FF EE");
 
@@ -134,62 +137,97 @@ export default function MainControlBar(props: MainControlProps) {
         );
     };
    
-    const compilebtn_disabled = appState.C0Editors[0].content === "";
+    const compilebtn_disabled = appState.C0Running || appState.C0Editors[0].content === "";
     const stepbtn_disabled    = (!is_bc0_valid) || appState.C0Running || appState.contentChanged;
     const runbtn_disabled     = (!is_bc0_valid) || appState.C0Running || appState.contentChanged;
 
     const CompileButton = 
-        <button
-            className={"base-btn main-btn unselectable " + (compilebtn_disabled ? "disable-btn" : "")}
+        <Button
+            icon = {<FontAwesomeIcon icon={faScrewdriverWrench}/>}
+            size = "large"
+            disabled = {compilebtn_disabled}
             onClick={compile_c0source}
         >
-            <FontAwesomeIcon icon={faScrewdriverWrench} className="hide-in-mobile"/> {" Compile "}
-        </button>;
+            &nbsp;Compile
+        </Button>;
     
     const StepButton = 
-        <button
-            className={"base-btn success-btn unselectable " + (stepbtn_disabled ? "disable-btn" : "")}
+        <Button
+            icon={<FontAwesomeIcon icon={faStepForward}/>}
+            size = "large"
+            type = "primary"
+            disabled={stepbtn_disabled}
             onClick={step_c0runtime}
         >
-            <FontAwesomeIcon icon={faStepForward} className="hide-in-mobile"/>{" Step "}
-        </button>;
+            &nbsp;Step
+        </Button>;
     
     const RunButton = 
-        <button
-            className={"base-btn success-btn unselectable " + (runbtn_disabled ? "disable-btn" : "")}
+        <Button
+            icon={<FontAwesomeIcon icon={faPlay}/>}
+            size = "large"
+            type = "primary"
+            disabled={runbtn_disabled}
             onClick={run_c0runtime}
         >
-            <FontAwesomeIcon icon={faPlay} className="hide-in-mobile"/>{" Run "}
-        </button>;
+            &nbsp;Run
+        </Button>;
     
     const AbortButton = 
-        <button
-            className="base-btn danger-btn unselectable"
+        <Button
+            icon   ={<FontAwesomeIcon icon={faBoltLightning}/>}
+            size = "large"
+            danger
             onClick={abort_c0runtime}
         >
-            <FontAwesomeIcon icon={faBoltLightning} className="hide-in-mobile"/>{" Abort "}
-        </button>;
+            &nbsp;Abort
+        </Button>;
     
     const RestartButton = 
-        <button
-            className="base-btn danger-btn unselectable"
-            id="ctr-btn-restart"
+        <Button
+            icon   ={<FontAwesomeIcon icon={faUndo}/>}
+            size = "large"
+            danger
             onClick={restart_c0runtime}
         >
-            <FontAwesomeIcon icon={faUndo} className="hide-in-mobile"/>{" Restart "}
-        </button>;
+            &nbsp;Restart
+        </Button>;
+    
+    const display_CompileBtn = compilebtn_disabled ?
+        <Tooltip placement="bottomRight" color={props.themeColor} title="Write code in editor to Compile">{CompileButton}</Tooltip>
+         : CompileButton;
+    
+    const display_StepBtn = stepbtn_disabled ?
+        <Tooltip placement="bottomRight" color={props.themeColor} title="Compile the code before Step">{StepButton}</Tooltip>
+         : StepButton;
+    
+    const display_RunBtn  = runbtn_disabled ?
+        <Tooltip placement="bottomRight" color={props.themeColor} title="Compile the code before Run">{RunButton}</Tooltip>
+         : RunButton;
 
     return (
         <div className="main-control">
             <a href="https://github.com/MarkChenYutian/C0VM-ts" style={{cursor: "pointer", color: "black", textDecoration: "none"}}>
                 <h3 className="unselectable">C0VM.<img src={tsLogo} style={{display: "inline-block", height: "1rem", marginBottom: "0.4rem"}} alt="ts"/></h3>
             </a>
-            <div className="control-btn-group">
-                {CompileButton}
-                {StepButton}
-                {RunButton}
+            <Space size="middle">
+                {display_CompileBtn}
+                {display_StepBtn}
+                {display_RunBtn}
                 {appState.C0Running ? AbortButton : RestartButton}
-            </div>
+            </Space>
         </div>
     );
+}
+
+
+export default function MainControlBar(props: MainControlProps){
+    return  <ConfigConsumer>
+                {(value: ConfigConsumerProps) => 
+                    <MainControlBarFC 
+                        themeColor={value.theme?.token?.colorPrimary}
+                        {...props}
+                    />
+                }
+            </ConfigConsumer>;
 }

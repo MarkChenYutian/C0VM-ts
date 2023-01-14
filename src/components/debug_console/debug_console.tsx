@@ -8,7 +8,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleRight, faList, faCodeMerge, faBug, faUpRightAndDownLeftFromCenter, faDownLeftAndUpRightToCenter, faTable } from "@fortawesome/free-solid-svg-icons";
 
-import { Result, Segmented } from "antd";
+import { Result, Segmented, Button, Space } from "antd";
 
 import TabularDebugEvaluation from "./tabular_debugger";
 import GraphicalDebugEvaluation from "./graphical_debugger";
@@ -38,7 +38,7 @@ export default class DebugConsole extends React.Component
         )
     }
 
-    resolve_render_view(typedef: Map<string, string>): React.ReactNode {
+    resolve_render_view(typedef: Map<SourceType, AliasType>): React.ReactNode {
         if (this.state.show === false) return null;
         const S = this.props.state;
         if (S === undefined) return this.render_no_valid_state();
@@ -68,13 +68,13 @@ export default class DebugConsole extends React.Component
                             status="error"
                             title="Debugger Crashed!"
                             extra={[
-                                <button className="base-btn main-btn" onClick={() => this.setState({ err: false, mode: "Table" })}>
+                                <Button key="reload" size="large" type="primary" onClick={() => this.setState({ err: false, mode: "Table" })}>
                                     Reload Debugger
-                                </button>,
-                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSezT1KhMgCNw0Uuk2nnqQnDtYlpXvbYnQW7VEef9xN759APYA/viewform?usp=sf_link" target="_blank" rel="noreferrer">
-                                    <button className="base-btn main-btn">
+                                </Button>,
+                                <a key="report" href="https://docs.google.com/forms/d/e/1FAIpQLSezT1KhMgCNw0Uuk2nnqQnDtYlpXvbYnQW7VEef9xN759APYA/viewform?usp=sf_link" target="_blank" rel="noreferrer">
+                                    <Button size="large">
                                         Report Problem
-                                    </button>
+                                    </Button>
                                 </a>
                             ]}
                         /> : null
@@ -82,17 +82,16 @@ export default class DebugConsole extends React.Component
                 </div>);
         }
 
-        const toggle_full_screen = <button
-            className="implicit-btn success-btn"
+        const toggle_full_screen = <Button
+            icon={<FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter}/>}
+            type="default"
             onClick={() => {this.props.setFullScreen(true);}}
-            style={{marginRight: "1rem"}}
-        ><FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter}/></button>;
+        />;
 
-        const exit_full_screen = <button
-            className="implicit-btn danger-btn"
+        const exit_full_screen = <Button
+            icon={<FontAwesomeIcon icon={faDownLeftAndUpRightToCenter}/>}
             onClick={() => {this.props.setFullScreen(false);}}
-            style={{marginRight: "1rem"}}
-        ><FontAwesomeIcon icon={faDownLeftAndUpRightToCenter}/></button>
+        />
 
         const full_screen_btn = (this.props.isFullScreen) ? exit_full_screen : toggle_full_screen;
 
@@ -116,8 +115,8 @@ export default class DebugConsole extends React.Component
                                     }];
         
         const typedef = this.props.state?.typedef ?? new Map();
-        // const revTypedef = new Map<string, string>();
-        // typedef.forEach((source, alias) => {revTypedef.set(source, alias)});
+        const revTypedef = new Map<string, string>();
+        typedef.forEach((source, alias) => {revTypedef.set(source, alias)});
         
         return (
             <div id="c0vm-debug-console" className={ this.state.show ? "debug-console-box" : "" }>
@@ -129,18 +128,18 @@ export default class DebugConsole extends React.Component
                     </h3>
                     {
                         this.state.show ?
-                            <div>
+                            <Space>
                                 {full_screen_btn}
                                 <Segmented
-                                        options={selector_option}
-                                        defaultValue={this.state.mode}
-                                        onChange={(value) => { this.setState({ mode: value as "Table" | "Graph" | "Detail" }) }}
+                                    options={selector_option}
+                                    defaultValue={this.state.mode}
+                                    onChange={(value) => { this.setState({ mode: value as "Table" | "Graph" | "Detail" }) }}
                                 />
-                            </div>
+                            </Space>
                             : null
                     }
                 </div>
-                {this.resolve_render_view(typedef)}
+                {this.resolve_render_view(revTypedef)}
             </div>
         )
     }

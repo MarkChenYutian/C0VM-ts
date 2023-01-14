@@ -6,6 +6,7 @@ import execLineHighlighter from "./editor_extension/exec_position";
 import { BC0Language } from "./editor_extension/syntax/bc0";
 
 import { language } from "@codemirror/language";
+import BC0LightTheme from "./editor_extension/bc0editor_theme";
 
 
 export default class BC0Editor extends React.Component<BC0EditorProps>
@@ -23,7 +24,7 @@ export default class BC0Editor extends React.Component<BC0EditorProps>
         });
 
         return  <ReactCodeMirror
-                    theme={globalThis.UI_EDITOR_THEME}
+                    theme={BC0LightTheme}
                     basicSetup={false}
                     onUpdate={(v) => 
                         {
@@ -37,7 +38,7 @@ export default class BC0Editor extends React.Component<BC0EditorProps>
                         breakpoint_extension,
                         basicSetup(),
                         language.of(BC0Language),
-                        execLineHighlighter(this.props.execLine, globalThis.UI_EDITOR_THEME),
+                        execLineHighlighter(this.props.execLine, "light"),
                     ]}
                     editable={false}
                 />

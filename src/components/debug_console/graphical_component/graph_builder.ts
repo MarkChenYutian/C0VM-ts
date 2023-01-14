@@ -53,7 +53,7 @@ export function ptrSrcHandleID() {
  * @returns A set of nodes (vertex) and edges that makes are in the heap memory space and
  * contains stack frames to represent a graphical visualization.
  */
-export function build_nodes(state: VM_State, mem: C0HeapAllocator):
+export function build_nodes(state: VM_State, mem: C0HeapAllocator, typedef: Map<SourceType, AliasType>):
 [Node<VisData>[], Edge<undefined>[]]
 {
     // Step 1. Build stack memory nodes
@@ -64,7 +64,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator):
     nodes.push({
         id: `stack-${state.CallStack.length}`,
         position: {x, y},
-        data: {frame: state.CurrFrame, mem: mem, dragged: false},
+        data: {frame: state.CurrFrame, mem, typedef, dragged: false},
         type: "stackNode",
         draggable: false
     });
@@ -74,7 +74,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator):
         nodes.push({
             id: stackNodeID(i),
             position: {x, y},
-            data: {frame: state.CallStack[i], mem: mem, dragged: false},
+            data: {frame: state.CallStack[i], mem, typedef, dragged: false},
             type: "stackNode",
             draggable: false
         });
@@ -83,7 +83,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator):
     
 
     // Step 2. Build heap memory nodes
-    let [heap_nodes, edges] = BFS_heap_scan(state, mem);
+    let [heap_nodes, edges] = BFS_heap_scan(state, mem, typedef);
     nodes = nodes.concat(heap_nodes);
 
     return [nodes, edges];
@@ -94,7 +94,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator):
  * @param mem The heap memory allocator
  * @returns A set of nodes and edges that represents the situation of heap memory space
  */
-function BFS_heap_scan(state: VM_State, mem: C0HeapAllocator): [Node<VisData>[], Edge<undefined>[]]
+function BFS_heap_scan(state: VM_State, mem: C0HeapAllocator, typedef: Map<SourceType, AliasType>): [Node<VisData>[], Edge<undefined>[]]
 {
     // Initialize the "fringe (to-be-explored)" in BFS
     let job_list: {val: C0Value<"ptr">, lv: number}[] = [];
@@ -122,7 +122,7 @@ function BFS_heap_scan(state: VM_State, mem: C0HeapAllocator): [Node<VisData>[],
             curr_lv = lv;
         }
 
-        const [new_node, new_edge, dy] = C0_Value_to_graph(val, state, mem, x, y);
+        const [new_node, new_edge, dy] = C0_Value_to_graph(val, state, mem, typedef, x, y);
 
         get_successors(val, mem, state, lv).forEach(
             (v) => { job_list.push(v); }
@@ -198,7 +198,7 @@ function get_successors(V: C0Value<"ptr">, M: C0HeapAllocator, S: VM_State, lv: 
  * @param y y-coordinate to place this node
  * @returns [Node itself, Edges sourced from this node, delta_y]
  */
-function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAllocator, x: number, y: number): [Node<VisData>, Edge<undefined>[], number] {
+function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAllocator, typedef: Map<SourceType, AliasType>, x: number, y: number): [Node<VisData>, Edge<undefined>[], number] {
     const heap_node_extent: CoordinateExtent = [[310, 0], [10000, 10000]];
     let result_data = undefined;
     let result_edge: Edge<undefined>[] = [];
@@ -208,7 +208,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
         result_data = {
             id: heapNodeID(v),
             position: {x, y},
-            data: {ptr: v, mem: mem, typeRecord: state.TypeRecord, dragged: false},
+            data: {ptr: v, mem, typedef, typeRecord: state.TypeRecord, dragged: false},
             type: "structNode",
             extent: heap_node_extent
         };
@@ -233,7 +233,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
         result_data = {
             id: heapNodeID(v),
             position: {x, y},
-            data: {ptr: v, mem: mem, dragged: false},
+            data: {ptr: v, mem, typedef, dragged: false},
             type: "arrayNode",
             extent: heap_node_extent
         }
@@ -259,7 +259,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
                 result_data = {
                     id: heapNodeID(v),
                     position: {x, y},
-                    data: {ptr: v, mem: mem, dragged: false},
+                    data: {ptr: v, mem, typedef, dragged: false},
                     type: "unknownNode",
                     extent: heap_node_extent
                 };
@@ -268,7 +268,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
                 result_data = {
                     id: heapNodeID(v),
                     position: {x, y},
-                    data: {ptr: v, mem: mem, dragged: false},
+                    data: {ptr: v, mem, typedef, dragged: false},
                     type: "pointerNode",
                     extent: heap_node_extent
                 };
@@ -278,7 +278,7 @@ function C0_Value_to_graph(v: C0Value<"ptr">, state: VM_State, mem: C0HeapAlloca
                 result_data = {
                     id: heapNodeID(v),
                     position: {x, y},
-                    data: {val: v, mem: mem, dragged: false},
+                    data: {val: v, mem, typedef, dragged: false},
                     type: "valueNode",
                     extent: heap_node_extent
                 };
@@ -373,7 +373,8 @@ function scan_stack_build_edges(state: VM_State): Edge<undefined>[] {
  */
 function edge_factory(source: string, target: string, sourceHandle: string): Edge<undefined> {
     return {
-        source, target, id: `${source}@${sourceHandle}>${target}`, sourceHandle,
+        source, target, id: `${source}@${sourceHandle}>${target}`, sourceHandle, 
+        targetHandle: "target",
         zIndex: 999,
         markerEnd: {type: MarkerType.Arrow}
     };

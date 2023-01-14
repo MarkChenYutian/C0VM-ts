@@ -1,6 +1,4 @@
 import React from "react";
-import "./application.less";
-import "./embeddable.less";
 
 import MainControlBar from "./components/main-control-bar";
 import C0VMApplicationFooter from "./components/main-footer";
@@ -12,10 +10,10 @@ import SettingPopup from "./components/settings";
 import { Row, Col } from "antd";
 
 export default class C0VMApplication extends React.Component<
-    {},
+    C0VMApplicationProps,
     C0VMApplicationState
 > {
-    constructor(props: {}) {
+    constructor(props: C0VMApplicationProps) {
         super(props);
         this.state = {
             crashed        : false,
@@ -48,9 +46,6 @@ export default class C0VMApplication extends React.Component<
             );
         }
 
-        const context: ApplicationContextInterface = this
-            .context as ApplicationContextInterface;
-
         const MainControlBarComponent = (
             <MainControlBar
                 application_state   ={this.state}
@@ -58,11 +53,11 @@ export default class C0VMApplication extends React.Component<
             />
         );
 
-        const StandardOutputComponent = context.std_out ? (
+        const StandardOutputComponent = this.props.showStdOut ? (
             <C0Output printContent={this.state.PrintoutValue} />
         ) : null;
 
-        const DebugConsoleComponent = context.debug_console ? (
+        const DebugConsoleComponent   = this.props.showDebug ? (
             <DebugConsole 
                 state={this.state.C0Runtime}
                 c0_only={this.state.c0_only}
@@ -71,9 +66,7 @@ export default class C0VMApplication extends React.Component<
             />
         ) : null;
 
-        const SettingMenuComponent =  this.state.settingMenuOn ? 
-            <SettingPopup state={this.state} set_app_state={(ns) => this.setState(ns)}/>
-            : null;
+        const SettingMenuComponent = <SettingPopup state={this.state} set_app_state={(ns) => this.setState(ns)}/>;
 
         if (this.state.dbgFullScreen) {
             return <div className="page-framework">
@@ -91,13 +84,13 @@ export default class C0VMApplication extends React.Component<
                 {SettingMenuComponent}
                 {MainControlBarComponent}
                 <Row className="main-ui-framework">
-                    <Col xs={24} sm={12} lg={11} xxl={9}>
+                    <Col xs={24} sm={24} lg={12} xxl={11}>
                         <CodeEditor
                             app_state={this.state}
                             set_app_state={(ns: any) => this.setState(ns)}
                         />
                     </Col>
-                    <Col xs={24} sm={12} lg={13} xxl={15} className="io-area">
+                    <Col xs={24} sm={24} lg={12} xxl={13} className="io-area">
                         {StandardOutputComponent}
                         {DebugConsoleComponent}
                     </Col>
