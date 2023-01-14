@@ -1,13 +1,9 @@
 import React from "react";
 import BC0Editor from "./bc0-editor";
 import C0EditorGroup from "./c0-editor-group";
-import { Button } from 'antd';
-import { message, Upload } from 'antd';
+import { Upload } from 'antd';
 
 import type { RcFile } from 'antd/lib/upload';
-import type { UploadChangeParam, UploadFile } from 'antd/lib/upload';
-
-import { faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 
 import { Segmented, Tooltip } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -52,12 +48,11 @@ export default class CodeEditor extends React.Component
 
         reader.onload = e => {
             if (reader.result === null) { 
-                console.log("Failed to read input file")
+                console.error("Failed to read input file")
                 return Upload.LIST_IGNORE;
             }
 
             const res = reader.result.toString();
-            console.log(res)
            
             this.props.push_populated_tab({
                 title: F.name,

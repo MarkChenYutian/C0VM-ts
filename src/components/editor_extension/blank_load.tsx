@@ -1,7 +1,7 @@
 import { EditorView } from "codemirror";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom/client";
-import { message, Upload, Button } from 'antd';
+import { Upload, Button } from 'antd';
 import type { RcFile } from 'antd/lib/upload';
 
 import { Decoration, DecorationSet, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
@@ -42,43 +42,32 @@ function GhostImportFolderButton() {
     const buttonRef = useRef() as React.MutableRefObject<HTMLInputElement>;
 
     useEffect(() => {
-      console.log("effect")
-      console.log(buttonRef.current)
-      buttonRef.current.click()
+        buttonRef.current.click();
     }, [buttonRef]);
 
     return (
-        <Button ref={buttonRef} id="GhostImportFolderButton" onClick={(e) => {console.log("hi")}} >
+        <Button ref={buttonRef} id="GhostImportFolderButton">
             Import Folder
         </Button>
     );
 }
 
-function onLoadFolder(handle_import_folder ?: (F: RcFile, FList: RcFile[]) => void) {
-
-    console.log("handle_import_folder func:", handle_import_folder)
-
+function onLoadFolder(
+    handle_import_folder?: (F: RcFile, FList: RcFile[]) => void
+) {
     let tmp_dom = document.createElement("div");
-    tmp_dom.onclick = (e) => {
-        console.log(e.currentTarget)
-    };
-    tmp_dom.id = "idsomething";
-
     const root = ReactDOM.createRoot(tmp_dom as HTMLElement);
-    console.log(root)
 
-    // load_dom.appendChild(tmp_dom);
     root.render(
         <Upload
-            name='code-import-folder'
+            name="code-import-folder"
             directory
             beforeUpload={handle_import_folder}
             showUploadList={false}
         >
-            { <GhostImportFolderButton /> }
+            {<GhostImportFolderButton />}
         </Upload>
     );
-
 }
 
 
@@ -137,15 +126,6 @@ function loadDOMWidgetInterface(view: EditorView, accept_format: string,update_t
     ]);
 }
 
-// function loadDOMWidgetInterface2(view: EditorView, handle_import_folder: (F: RcFile, FList: RcFile[]) => void) {
-//     if (view.state.doc.length !== 0) return Decoration.none;
-//     return Decoration.set([
-//         Decoration.widget({
-//             widget: new LoadDocumentWidget(accept_format, update_title),
-//             side: 0,
-//         }).range(0)
-//     ]);
-// }
 
 /**
  * Entry point of LoadDocumentPlugin
@@ -156,6 +136,11 @@ function loadDOMWidgetInterface(view: EditorView, accept_format: string,update_t
  * @param update_name React call back function to update some internal states in 
  * react component. When the file is loaded, this function will be called with 
  * argument (s: string) where s is the file name of loaded file. [Optional]
+ * 
+ * @param handle_import_folder Antd component call back function to add files to 
+ * the editor state. Handles duplicate names and key assignment. [Optional]
+ * Argument is the same as what antd passes to the beforeUpload callback on the 
+ * Upload component.
  * 
  * @returns ViewPlugin that can be installed on code mirror editor
  */
@@ -181,24 +166,5 @@ function LoadDocumentPlugin(accepted_format: string, update_name ?: (s: string) 
         decorations: v => v.decorations
     });
 }
-
-// function ImportFolderPlugin(handle_import_folder: (F: RcFile, FList: RcFile[]) => void) {
-//     return ViewPlugin.fromClass(class {
-//         public decorations   : DecorationSet;
-//         public handle_import_folder: (F: RcFile, FList: RcFile[]) => void
-    
-//         constructor (view: EditorView) {
-//             this.handle_import_folder = handle_import_folder;
-//             this.decorations = loadDOMWidgetInterface2(view, this.handle_import_folder);
-//         }
-
-//         update(update: ViewUpdate) {
-//             this.decorations = loadDOMWidgetInterface2(update.view, this.handle_import_folder);
-//             return;
-//         }
-//     }, {
-//         // decorations: v => v.decorations
-//     });
-// }
 
 export { LoadDocumentPlugin };
