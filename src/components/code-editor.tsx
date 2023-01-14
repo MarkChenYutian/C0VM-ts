@@ -41,9 +41,9 @@ export default class CodeEditor extends React.Component
     }
 
     // this function is called for every file in the uploaded directory, recursive.
-    async handle_import_folder(F: RcFile) {
+    handle_import_folder(F: RcFile, FList: RcFile[]) {
         // Access file content here and do something with it
-        console.debug("received file ", F);
+        console.debug("received files ", FList);
 
         if (!(F.name.endsWith('.c0') || F.name.endsWith('.c1'))) {
             globalThis.MSG_EMITTER.warn(`${F.name} is not a c0/c1 file and is thus ignored`);
@@ -73,6 +73,7 @@ export default class CodeEditor extends React.Component
                 content: res,
                 breakpoints: [],
             })
+            this.setState({C0_nextKey: Math.max(this.state.C0_nextKey, ...this.props.app_state.C0Editors.map((tab) => tab.key)) + 1})
     
         };
         reader.readAsText(F, "utf-8");
@@ -179,7 +180,6 @@ export default class CodeEditor extends React.Component
                             name='code-import-folder'
                             directory
                             beforeUpload={this.handle_import_folder}
-                            // onChange={this.handle_import_folder_change}
                             showUploadList={false}
                         >
                             <Button icon={<FontAwesomeIcon icon={faFolderOpen} style={{marginRight: "0.3em"}}/>}>

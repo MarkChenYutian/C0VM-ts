@@ -39,7 +39,7 @@ export default class C0VMApplication extends React.Component<
     push_pupulated_tab(tab: C0EditorTab) {
         this.state.C0Editors.push({
             title: tab.title,
-            key: tab.key,
+            key: (Math.max(...this.state.C0Editors.map((tab) => tab.key)) + 1),
             content: tab.content,
             breakpoints: tab.breakpoints,
         });
