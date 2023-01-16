@@ -1,21 +1,19 @@
 import React from "react";
 import BC0Editor from "./bc0-editor";
 import C0EditorGroup from "./c0-editor-group";
-import { Upload } from 'antd';
 
-import type { RcFile } from 'antd/lib/upload';
-
-import { Segmented, Tooltip } from "antd";
+import { Segmented, Tooltip, Upload } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faLock } from "@fortawesome/free-solid-svg-icons";
 import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
+
+import type { RcFile } from 'antd/lib/upload';
 
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>
 {
     constructor(props: CodeEditorProps) {
         super(props);
-
         const tabs = props.app_state.C0Editors;
         this.state = {
             mode: "c0",

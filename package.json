@@ -56,6 +56,7 @@
     "postcss-preset-env": "^7.0.1",
     "prompts": "^2.4.2",
     "react": "^18.2.0",
+    "react-18-input-autosize": "^3.0.0",
     "react-app-polyfill": "^3.0.0",
     "react-dev-utils": "^12.0.1",
     "react-dnd": "^16.0.1",
@@ -81,7 +82,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "cross-env GENERATE_SOURCEMAP=true BUILD_PATH='./docs' react-scripts build",
+    "build": "cross-env GENERATE_SOURCEMAP=true BUILD_PATH='./build' react-scripts build",
     "test": "react-scripts test",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
@@ -159,9 +160,7 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^7.0.0",
     "@types/he": "^1.1.2",
-    "craco-less": "^2.1.0-alpha.0",
     "cross-env": "^7.0.3",
     "javascript-obfuscator": "^4.0.0",
     "react-flow-renderer": "^10.3.8"

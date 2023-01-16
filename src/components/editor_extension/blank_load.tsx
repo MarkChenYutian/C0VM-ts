@@ -3,10 +3,13 @@ import ReactDOM from "react-dom/client";
 
 import { Upload, Button } from 'antd';
 import { EditorView } from "codemirror";
-import type { RcFile } from 'antd/lib/upload';
 
 import { Decoration, DecorationSet, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
 import { internal_error } from "../../utility/errors";
+
+import type { RcFile } from 'antd/lib/upload';
+
+
 
 function loadFileThroughDialog(e: Event, v: EditorView, update_title?: (s: string) => void) {
     if (e.target === null) throw new internal_error("Failed to read input file");
@@ -105,6 +108,7 @@ class LoadDocumentWidget extends WidgetType {
 
         load_dom.appendChild(document.createElement("br"));
         load_dom.appendChild(document.createTextNode("Or type anything in editor to remove this message."))
+
         load_dom.className = "editor-load-hint";
         return load_dom;
     }
