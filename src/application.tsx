@@ -36,26 +36,6 @@ export default class C0VMApplication extends React.Component<
         };
     }
 
-    push_populated_tab(tab: C0EditorTab) {
-        // check if there's already file with this name and append _num if exists
-        var try_suffix = 1;
-        while (this.state.C0Editors.map((tab) => tab.title).includes(tab.title)) {
-            if (!(this.state.C0Editors.map((tab) => tab.title)).includes(tab.title.substr(0, tab.title.lastIndexOf('.')) + '_' + try_suffix + tab.title.substr(tab.title.lastIndexOf('.')))) {
-                tab.title = tab.title.substr(0, tab.title.lastIndexOf('.')) + '_' + try_suffix + tab.title.substr(tab.title.lastIndexOf('.'))
-                globalThis.MSG_EMITTER.warn(`${tab.title} already exists. It will suffixed with the lowest positive integer that makes its file name unique.`);
-                break
-            }
-            try_suffix++
-        }
-
-        this.state.C0Editors.push({
-            title: tab.title,
-            key: (Math.max(...this.state.C0Editors.map((tab) => tab.key)) + 1),
-            content: tab.content,
-            breakpoints: tab.breakpoints,
-        });
-    }
-
     render() {
         if (this.state.crashed) {
             return (
@@ -108,7 +88,6 @@ export default class C0VMApplication extends React.Component<
                         <CodeEditor
                             app_state={this.state}
                             set_app_state={(ns: any) => this.setState(ns)}
-                            push_populated_tab={(tab: C0EditorTab) => this.push_populated_tab(tab)}
                         />
                     </Col>
                     <Col xs={24} sm={24} lg={12} xxl={13} className="io-area">

@@ -75,7 +75,6 @@ interface CodeEditorProps {
             | null),
         callback?: () => void
     ): void;
-    push_populated_tab: (C0EditorTab) => void
 }
 
 interface CodeEditorState {

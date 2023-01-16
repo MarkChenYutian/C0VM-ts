@@ -1,7 +1,8 @@
-import { EditorView } from "codemirror";
 import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom/client";
+
 import { Upload, Button } from 'antd';
+import { EditorView } from "codemirror";
 import type { RcFile } from 'antd/lib/upload';
 
 import { Decoration, DecorationSet, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
@@ -38,6 +39,7 @@ function onLoadFile(view: EditorView, accept_format: string, update_title?: (s: 
     inputElem.click();
 }
 
+// Fake button used to trigger the Ant Design Upload Component...
 function GhostImportFolderButton() {
     const buttonRef = useRef() as React.MutableRefObject<HTMLInputElement>;
 
@@ -72,7 +74,6 @@ function onLoadFolder(
 
 
 // Reference: https://codemirror.net/examples/decoration/
-
 class LoadDocumentWidget extends WidgetType {
     public update_title ?: (s: string) => void;
     public handle_import_folder ?: (F: RcFile, FList: RcFile[]) => void
@@ -94,15 +95,16 @@ class LoadDocumentWidget extends WidgetType {
         tmp.textContent = "Load Manually"
         load_dom.appendChild(tmp);
 
-        load_dom.appendChild(document.createTextNode(" or "))
-
+        load_dom.appendChild(document.createElement("br"));
+        load_dom.appendChild(document.createTextNode("Or "))
         let tmp2 = document.createElement("a");
         tmp2.className = "active-href";
         tmp2.textContent = "Import Folder"
         tmp2.onclick = () => onLoadFolder(this.handle_import_folder);
         load_dom.appendChild(tmp2);
 
-        load_dom.appendChild(document.createTextNode(" or type anything in editor to remove this message."))
+        load_dom.appendChild(document.createElement("br"));
+        load_dom.appendChild(document.createTextNode("Or type anything in editor to remove this message."))
         load_dom.className = "editor-load-hint";
         return load_dom;
     }
@@ -116,7 +118,7 @@ class LoadDocumentWidget extends WidgetType {
     }
 }
 
-function loadDOMWidgetInterface(view: EditorView, accept_format: string,update_title ?: (s: string) => void, handle_import_folder ?: (F: RcFile, FList: RcFile[]) => void) {
+function loadDOMWidgetInterface(view: EditorView, accept_format: string, update_title ?: (s: string) => void, handle_import_folder ?: (F: RcFile, FList: RcFile[]) => void) {
     if (view.state.doc.length !== 0) return Decoration.none;
     return Decoration.set([
         Decoration.widget({

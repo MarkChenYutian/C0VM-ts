@@ -43,7 +43,6 @@ export default class C0Editor extends React.Component<C0EditorProps>
                         extensions={[
                             breakpoint_extension,
                             LoadDocumentPlugin(".c0", this.props.updateName, this.props.handle_import_folder),
-                            // ImportFolderPlugin(this.props.handle_import_folder),
                             basicSetup(),
                             indentUnit.of("    "),
                             execLineHighlighter(this.props.execLine, "light"),

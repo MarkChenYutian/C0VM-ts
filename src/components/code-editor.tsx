@@ -24,6 +24,43 @@ export default class CodeEditor extends React.Component
         this.handle_import_folder = this.handle_import_folder.bind(this);
     }
 
+    push_populated_tab(tab: C0EditorTab) {
+        // check if there's already file with this name and append _num if exists
+        let try_suffix = 1;
+        let is_conflict = false;
+        const all_titles = this.props.app_state.C0Editors.map((tab) => tab.title);
+        const extension  = tab.title.slice(tab.title.lastIndexOf("."));
+        const file_name  = tab.title.slice(0, tab.title.lastIndexOf("."));
+        const new_key    = Math.max(...this.props.app_state.C0Editors.map((tab) => tab.key)) + 1;
+
+        tab.key = new_key;
+
+        while (all_titles.includes(tab.title)) {
+            if (!all_titles.includes(file_name + '_' + try_suffix + extension)) {
+                tab.title = file_name + '_' + try_suffix + extension;
+                is_conflict = true;
+                break;
+            }
+            try_suffix++
+        }
+
+        if (is_conflict) {
+            globalThis.MSG_EMITTER.warn(
+                "Duplicated File Name",
+                `${file_name + extension} already exists. It is renamed to ${tab.title} to ensure all tabs have unique name.`
+            );
+        }
+
+        this.props.set_app_state((S) => {
+            const new_tabs = [...S.C0Editors, tab]
+            for (let i = 0; i < new_tabs.length; i ++) {
+                new_tabs[i].key = i;
+            }
+            return {C0Editors: new_tabs, ActiveEditor: new_tabs[0].key};
+        });
+        this.setState((S) => {return {C0_nextKey: S.C0_nextKey + 1}});
+    }
+
     create_panel() {
         const new_editors = [...this.props.app_state.C0Editors];
         new_editors.push({
@@ -33,14 +70,17 @@ export default class CodeEditor extends React.Component
             breakpoints: [],
         });
         this.props.set_app_state({C0Editors: new_editors, ActiveEditor: this.state.C0_nextKey});
-        this.setState({C0_nextKey: this.state.C0_nextKey + 1})
+        this.setState({C0_nextKey: this.state.C0_nextKey + 1});
     }
 
     // this function is called for every file in the uploaded directory, recursive.
+    // the function is called by ant design component "Upload"
     handle_import_folder(F: RcFile, FList: RcFile[]) {
-
         if (!(F.name.endsWith('.c0') || F.name.endsWith('.c1'))) {
-            globalThis.MSG_EMITTER.warn(`${F.name} is not a c0/c1 file and is thus ignored`);
+            globalThis.MSG_EMITTER.warn(
+                "File is not Imported",
+                `${F.name} is not a c0/c1 file and is thus ignored.`
+            );
             return Upload.LIST_IGNORE;
         }
                 
@@ -54,14 +94,12 @@ export default class CodeEditor extends React.Component
 
             const res = reader.result.toString();
            
-            this.props.push_populated_tab({
+            this.push_populated_tab({
                 title: F.name,
-                key: null, // will get overwritten when push
+                key: -1,
                 content: res,
                 breakpoints: [],
             })
-            this.setState({C0_nextKey: Math.max(this.state.C0_nextKey, ...this.props.app_state.C0Editors.map((tab) => tab.key)) + 1})
-    
         };
         reader.readAsText(F, "utf-8");
 
@@ -97,7 +135,7 @@ export default class CodeEditor extends React.Component
                     newPanel        = {() => this.create_panel()}
                     removePanel     = {(key) => this.remove_panel(key)}
                     updateContent   = {(key, s) => this.update_content(key, s)}
-                    handle_import_folder={(F: RcFile, FList: RcFile[]) => this.handle_import_folder(F, FList)}
+                    handle_import_folder = {(F: RcFile, FList: RcFile[]) => this.handle_import_folder(F, FList)}
                 />
             </div>);
     }
