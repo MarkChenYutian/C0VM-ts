@@ -123,8 +123,19 @@ export async function autoStep(
     }
     resetSig();
     update_state(new_state);
-    setTimeout(() => {autoStep(new_state,bp,c0bp,signal,c0_only,resetSig,print_update,update_state,resetC0Running)}, 500);
-    return;
+
+    let step_interval = 1500;
+    if (globalThis.AUTOSTEP_INTERVAL === "Fast") {
+        step_interval = 500;
+    } else if (globalThis.AUTOSTEP_INTERVAL === "Slow") {
+        step_interval = 1500;
+    }
+
+    setTimeout(
+        () => {
+            autoStep(new_state,bp,c0bp,signal,c0_only,resetSig,print_update,update_state,resetC0Running)
+        }, step_interval
+    );
 }
 
 export async function run(

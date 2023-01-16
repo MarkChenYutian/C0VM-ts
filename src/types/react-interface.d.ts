@@ -32,23 +32,23 @@ interface C0VMApplicationProps {
 }
 
 interface C0VMApplicationState {
-    crashed        : boolean,         /* C0VM Application top-level error boundary */
-    c0_only        : boolean,         /* C0 only mode or not */
-    contentChanged : boolean,         /* If content has changed or not (requires re-compile) */
-    dbgFullScreen  : boolean,         /* If it is in full screen mode currently */
-    settingMenuOn  : boolean,         /* See if the setting menu is on or not */
+    crashed        : boolean,               /* C0VM Application top-level error boundary */
+    c0_only        : boolean,               /* C0 only mode or not */
+    contentChanged : boolean,               /* If content has changed or not (requires re-compile) */
+    dbgFullScreen  : boolean,               /* If it is in full screen mode currently */
+    settingMenuOn  : boolean,               /* See if the setting menu is on or not */
 
-    BC0SourceCode  : string,          /* The content of BC0 code editor */
-    BC0BreakPoints : Set<BreakPoint>, /* Breakpoints activated in BC0 code editor */
+    BC0SourceCode  : string,                /* The content of BC0 code editor */
+    BC0BreakPoints : Set<BreakPoint>,       /* Breakpoints activated in BC0 code editor */
 
-    C0Editors      : C0EditorTab[],   /* Code editor tab titles */
-    ActiveEditor   : number,          /* Currently activated tab index of C0Editor */
+    C0Editors      : C0EditorTab[],         /* Code editor tab titles */
+    ActiveEditor   : number,                /* Currently activated tab index of C0Editor */
 
-    PrintoutValue  : string,          /* The string to show in the stdout console */
+    PrintoutValue  : string,                /* The string to show in the stdout console */
 
-    C0Running      : boolean,         /* If the C0VM is running currently */
+    C0Running      : boolean,               /* If the C0VM is running currently */
     C0Runtime      : C0VM_RT | undefined,   /* Runtime of C0VM */
-    CompilerFlags  : Record<string, boolean>          /* Compiler Flags (-d) */
+    CompilerFlags  : Record<string, boolean>    /* Compiler Flags (-d) */
 };
 
 
