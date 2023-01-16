@@ -11,7 +11,7 @@ import C0VMApplication from './application';
 import AntdEmitter from './utility/antd_emitter';
 
 // Global Variables
-global.C0VM_VERSION = "0.3.2-Beta";
+global.C0VM_VERSION = "0.3.3-Beta";
 
 globalThis.DEBUG = true;
 globalThis.DEBUG_DUMP_MEM = false;
@@ -35,6 +35,7 @@ globalThis.COMPILER_BACKEND_URL = "https://cs122.andrew.cmu.edu/visualc0/compile
 globalThis.C0_MAX_RECURSION = 999;
 globalThis.C0_TIME_SLICE = 500;
 globalThis.C0_ASYNC_INTERVAL = 1;
+globalThis.AUTOSTEP_INTERVAL = "Slow";
 
 if (globalThis.MSG_EMITTER === undefined) {
   globalThis.MSG_EMITTER = new AntdEmitter();

@@ -84,13 +84,13 @@ export default class C0VMApplication extends React.Component<
                 {SettingMenuComponent}
                 {MainControlBarComponent}
                 <Row className="main-ui-framework">
-                    <Col xs={24} sm={24} lg={12} xxl={11}>
+                    <Col xs={24} sm={12} lg={12} xxl={11}>
                         <CodeEditor
                             app_state={this.state}
                             set_app_state={(ns: any) => this.setState(ns)}
                         />
                     </Col>
-                    <Col xs={24} sm={24} lg={12} xxl={13} className="io-area">
+                    <Col xs={24} sm={12} lg={12} xxl={13} className="io-area">
                         {StandardOutputComponent}
                         {DebugConsoleComponent}
                     </Col>

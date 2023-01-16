@@ -1,6 +1,6 @@
 import { faAngleDown, faAngleRight, faGear } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Switch, Modal, Button } from "antd";
+import { Switch, Modal, Button, Select } from "antd";
 import React from "react";
 
 export default class SettingPopup extends React.Component<SettingMenuProps> {
@@ -19,14 +19,37 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
                 style={{maxHeight: "80vh", overflowY: "auto"}}
                 >
             <div className="settings-grid">
-                <p>Contract Check (<code>-d</code> Flag)</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={this.props.state.CompilerFlags['d']} onChange={() => {
+                <p>Contract Check (<code>-d</code> Flag)</p>
+                <Switch
+                    size="small"
+                    style={{justifySelf: "right"}} 
+                    defaultChecked={this.props.state.CompilerFlags['d']}
+                    onChange={() => {
                     this.props.set_app_state((state) => {
                         return {CompilerFlags: {...state.CompilerFlags,
                                                 d: !state.CompilerFlags["d"]}
                                 }
                     });
                 }}/>
-                <p>Expose Bytecode</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={!this.props.state.c0_only} onChange={() => {this.props.set_app_state((state) => {return {c0_only: !state.c0_only}})}}/>
+
+                <p>Expose Bytecode</p>
+                <Switch size="small" style={{justifySelf: "right"}} defaultChecked={!this.props.state.c0_only} onChange={() => {this.props.set_app_state((state) => {return {c0_only: !state.c0_only}})}}/>
+
+                <p>AutoStep Speed</p>
+                <Select
+                    size="small"
+                    defaultValue={globalThis.AUTOSTEP_INTERVAL}
+                    options={[
+                        {value: "Fast", label: "Fast (0.5 s)"},
+                        {value: "Slow", label: "Slow (1.5 s)"}
+                    ]}
+                    onChange={
+                        (value: string) => {
+                            if (value === "Fast" || value === "Slow") globalThis.AUTOSTEP_INTERVAL = value;
+                        }
+                    }
+                />
+
                 <AdvancedSetting {...this.props}/>
             </div>
         </Modal>

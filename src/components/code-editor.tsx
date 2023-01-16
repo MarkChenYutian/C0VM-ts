@@ -204,6 +204,7 @@ export default class CodeEditor extends React.Component
                         { label: "BC0",value: "bc0"}
                     ]}
                     defaultValue={this.state.mode}
+                    onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
                 />
             );
         }
