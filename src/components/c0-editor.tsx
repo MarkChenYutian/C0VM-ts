@@ -1,7 +1,7 @@
 import React from "react";
 import ReactCodeMirror, { basicSetup } from "@uiw/react-codemirror";
 
-import LoadDocumentPlugin from "./editor_extension/blank_load";
+import { LoadDocumentPlugin } from "./editor_extension/blank_load";
 import { C0 } from "./editor_extension/syntax/c0";
 
 import { indentUnit } from "@codemirror/language";
@@ -42,7 +42,7 @@ export default class C0Editor extends React.Component<C0EditorProps>
                         value = {this.props.editorValue}
                         extensions={[
                             breakpoint_extension,
-                            LoadDocumentPlugin(".c0", this.props.updateName),
+                            LoadDocumentPlugin(".c0", this.props.updateName, this.props.handle_import_folder),
                             basicSetup(),
                             indentUnit.of("    "),
                             execLineHighlighter(this.props.execLine, "light"),
