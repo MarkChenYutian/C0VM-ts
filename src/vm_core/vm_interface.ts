@@ -1,3 +1,4 @@
+import { replacer } from "../utility/ui_utility";
 import C0VM_RuntimeState from "./exec/state";
 
 export async function initialize(
@@ -17,10 +18,17 @@ export async function initialize(
         }
 
         if (globalThis.DEBUG){
+            print_update("<span class='dbg-evaluate-field-name'>[DEBUG] Parsed Information from C0 Source Code:<br>" + 
+                JSON.stringify(
+                    { "Typedef": ns.typedef, "Struct Information": ns.state.TypeRecord }
+                    , replacer, "&nbsp;"
+                ) + 
+                "</span>"
+            );
             console.log({
-                "Parsed Result": ns.code,
+                "Code": ns.code,
                 "Typedef": ns.typedef,
-                "Struct Information": ns.state.TypeRecord,
+                "Struct Information": ns.state.TypeRecord
             });
         }
 

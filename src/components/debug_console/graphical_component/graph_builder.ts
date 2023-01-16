@@ -70,7 +70,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator, typedef: Map<
     nodes.push({
         id: `stack-${state.CallStack.length}`,
         position: {x, y},
-        data: {frame: state.CurrFrame, mem, typedef, dragged: false},
+        data: {frame: state.CurrFrame, mem, state, typedef, dragged: false},
         type: "stackNode",
         draggable: false
     });
@@ -80,7 +80,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator, typedef: Map<
         nodes.push({
             id: stackNodeID(i),
             position: {x, y},
-            data: {frame: state.CallStack[i], mem, typedef, dragged: false},
+            data: {frame: state.CallStack[i], mem, state, typedef, dragged: false},
             type: "stackNode",
             draggable: false
         });
@@ -242,7 +242,7 @@ function C0_Value_to_graph(
             result_data = {
                 id: heapNodeID(v, mem),
                 position: {x, y},
-                data: {ptr: v, mem, typedef, typeRecord: state.TypeRecord, dragged: false},
+                data: {ptr: v, mem, typedef, state, dragged: false},
                 type: "structNode",
                 extent: heap_node_extent
             };
@@ -267,7 +267,7 @@ function C0_Value_to_graph(
             result_data = {
                 id: heapNodeID(v, mem),
                 position: {x, y},
-                data: {ptr: v, mem, typedef, tagRecord: state.TagRecord, dragged: false},
+                data: {ptr: v, mem, typedef, state, dragged: false},
                 type: "arrayNode",
                 extent: heap_node_extent
             }
@@ -293,7 +293,7 @@ function C0_Value_to_graph(
                     result_data = {
                         id: heapNodeID(v, mem),
                         position: {x, y},
-                        data: {ptr: v, mem, typedef, dragged: false},
+                        data: {ptr: v, mem, typedef, state, dragged: false},
                         type: "unknownNode",
                         extent: heap_node_extent
                     };
@@ -302,7 +302,7 @@ function C0_Value_to_graph(
                     result_data = {
                         id: heapNodeID(v, mem),
                         position: {x, y},
-                        data: {ptr: v, mem, typedef, dragged: false},
+                        data: {ptr: v, mem, typedef, state, dragged: false},
                         type: "pointerNode",
                         extent: heap_node_extent
                     };
@@ -312,7 +312,7 @@ function C0_Value_to_graph(
                     result_data = {
                         id: heapNodeID(v, mem),
                         position: {x, y},
-                        data: {val: v, mem, typedef, dragged: false},
+                        data: {val: v, mem, typedef, state, dragged: false},
                         type: "valueNode",
                         extent: heap_node_extent
                     };
@@ -321,7 +321,7 @@ function C0_Value_to_graph(
                     result_data = {
                         id: heapNodeID(v, mem),
                         position: {x, y},
-                        data: {tagptr: v, mem, typedef, tagRecord: state.TagRecord, dragged: false},
+                        data: {tagptr: v, mem, typedef, state, dragged: false},
                         type: "tagPtrNode",
                         extent: heap_node_extent
                     };
@@ -330,7 +330,7 @@ function C0_Value_to_graph(
                     result_data = {
                         id: heapNodeID(v, mem),
                         position: {x, y},
-                        data: {val: v, mem, typedef, dragged: false},
+                        data: {val: v, mem, typedef, state, dragged: false},
                         type: "funcPtrNode",
                         extent: heap_node_extent
                     }

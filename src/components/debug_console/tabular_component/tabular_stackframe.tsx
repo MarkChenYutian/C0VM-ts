@@ -37,9 +37,8 @@ export default class TabularStackFrame extends React.Component<
                     key={i + "-value"}
                     value={to_be_rendered}
                     mem={this.props.mem}
+                    state={this.props.state}
                     typedef={this.props.typedef}
-                    typeRecord={this.props.typeRecord}
-                    tagRecord={this.props.tagRecord}
                     default_expand={true}
                 />
             )

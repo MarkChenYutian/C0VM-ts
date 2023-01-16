@@ -11,10 +11,9 @@ export default class DetailDebugEvaluation extends React.Component<
             result.push(
                 <DetailStackFrame
                     frame={this.props.state.CallStack[i]}
+                    state={this.props.state}
                     mem={this.props.mem}
-                    typeRecord={this.props.state.TypeRecord}
                     typedef={this.props.typedef}
-                    tagRecord={this.props.state.TagRecord}
                     key={i}
                 />
             );
@@ -22,10 +21,9 @@ export default class DetailDebugEvaluation extends React.Component<
         result.push(
             <DetailStackFrame
                 frame={this.props.state.CurrFrame}
+                state={this.props.state}
                 mem={this.props.mem}
-                typeRecord={this.props.state.TypeRecord}
                 typedef={this.props.typedef}
-                tagRecord={this.props.state.TagRecord}
                 key={this.props.state.CallStack.length}
             />
         )

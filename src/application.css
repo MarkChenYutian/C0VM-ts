@@ -296,7 +296,7 @@ p.dbg-error-information {
     color: #bbbbbb;
 }
 
-p.dbg-evaluate-field-name {
+.dbg-evaluate-field-name {
     color: #006cae;
 }
 

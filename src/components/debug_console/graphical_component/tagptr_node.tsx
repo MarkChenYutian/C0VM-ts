@@ -23,7 +23,7 @@ export default class C0TagPtrNode extends React.Component<NodeProps<C0TagPointer
             </div>;    
         }
 
-        const real_ptr = remove_tag(tagged_ptr, this.props.data.mem, this.props.data.tagRecord);
+        const real_ptr = remove_tag(tagged_ptr, this.props.data.mem, this.props.data.state.TagRecord);
 
         return  <div className="dbg-struct-node dbg-node-base">
                     <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem", visibility: "hidden"}} />

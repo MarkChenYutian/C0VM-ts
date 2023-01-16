@@ -224,6 +224,13 @@ export function deref_C0Value(mem: C0HeapAllocator, V: C0Value<"ptr">): C0Value<
     };
 }
 
+/**
+ * Expand the fields of a C0Struct
+ * @param mem The heap memory allocator
+ * @param typeRecord TypeRecord for all structs in C0VM
+ * @param v The C0Value struct pointer (struct T*) you want to get all fields info from
+ * @returns A list of C0StructEntry that shows the entry information
+ */
 export function expand_C0Struct(mem: C0HeapAllocator, typeRecord: Map<string, Map<number, Struct_Type_Record>>, v: C0Value<"ptr">): C0StructJSEntry[]{
     const struct_type = v.type.value;
     if (typeof struct_type === "string" || struct_type.type !== "ptr" || struct_type.kind !== "struct") {
@@ -231,7 +238,6 @@ export function expand_C0Struct(mem: C0HeapAllocator, typeRecord: Map<string, Ma
     }
 
     const StructInformation = typeRecord.get(struct_type.value);
-    console.log(StructInformation);
     if (StructInformation === undefined) return [];
     const StructFields: C0StructJSEntry[] = [];
     
@@ -250,7 +256,7 @@ export function expand_C0Struct(mem: C0HeapAllocator, typeRecord: Map<string, Ma
                 type: {type: "ptr", kind: "ptr", value: record_type}
             };
 
-            const deref_value = deref_C0Value(mem, ptr_to_field as C0Value<"ptr">);
+            const deref_value = deref_C0Value(mem, ptr_to_field);
             StructFields.push({
                 name: record_name, offset: offset, value: deref_value
             })

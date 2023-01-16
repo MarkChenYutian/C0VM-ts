@@ -9,6 +9,7 @@ import { calculate_entry_height } from "./graphical_utility";
 import { isNullPtr } from "../../../utility/pointer_utility";
 import { loadString } from "../../../utility/string_utility";
 import { heapNodeTargetHandleID, structSrcHandleID } from "./graph_builder";
+import { read_funcPtr } from "../../../utility/func_ptr_utility";
 
 export default class C0StructNode extends React.Component<NodeProps<C0StructNodeData>> {
     render_content(mem: C0HeapAllocator, type: C0Type<"ptr">, value: C0Pointer, typedef: Map<SourceType, AliasType>, typeRecord: Map<string, Map<number, Struct_Type_Record>>) {
@@ -51,6 +52,12 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
                     render_content = isNullPtr(to_be_rendered.value) ? "NULL" : " ";
                 } else if (TypeUtil.isTagPointerType(to_be_rendered)) {
                     render_content = isNullPtr(to_be_rendered.value) ? "NULL" : " ";
+                } else if (TypeUtil.isFuncPointerType(to_be_rendered)) {
+                    const [idx, native] = read_funcPtr(to_be_rendered);
+                    const nativeDisplay = native ? "native" : "static";
+                    const functionName  = native ? this.props.data.state.P.nativePool[idx].functionType
+                                                    : this.props.data.state.P.functionPool[idx].name;
+                    render_content = isNullPtr(to_be_rendered.value) ? "NULL" : `&${functionName}, ${nativeDisplay}`;
                 }
 
                 StructFields.push(<p key={"s-val-value-" + entry.offset} className="dbg-frame-content">{render_content}</p>);
@@ -81,7 +88,7 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
 
         return  <div className="dbg-struct-node dbg-node-base">
                     <Handle position={Position.Left} type="target" id={heapNodeTargetHandleID()} style={{top: "1rem", visibility: "hidden"}} />
-                    {this.render_content(data.mem, ValueType, ValueValue, data.typedef, data.typeRecord)}
+                    {this.render_content(data.mem, ValueType, ValueValue, data.typedef, data.state.TypeRecord)}
                 </div>;
     }
 }

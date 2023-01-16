@@ -17,8 +17,9 @@ import { isNullPtr, read_ptr, render_address } from "../../../utility/pointer_ut
 import { loadString } from "../../../utility/string_utility";
 
 import { deref_C0Value, expand_C0Array, expand_C0Struct, c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
-import { isPointerType, isStringType, isTagPointerType, isUnknownType, isValueType, is_struct_pointer, Type2String } from "../../../utility/c0_type_utility";
+import { isFuncPointerType, isPointerType, isStringType, isTagPointerType, isUnknownType, isValueType, is_struct_pointer, Type2String } from "../../../utility/c0_type_utility";
 import { remove_tag } from "../../../utility/tag_ptr_utility";
+import { read_funcPtr } from "../../../utility/func_ptr_utility";
 
 export default class C0ValueTabularDisplay extends React.Component<
     C0ValueTabularDisplayProps,
@@ -55,11 +56,10 @@ export default class C0ValueTabularDisplay extends React.Component<
             content.push(
                 <li key={i + "-exp-value"}>
                     <C0ValueTabularDisplay
+                        state={this.props.state}
                         mem={this.props.mem}
                         value={vals[i]}
-                        typeRecord={this.props.typeRecord}
                         typedef={this.props.typedef}
-                        tagRecord={this.props.tagRecord}
                         default_expand={false}
                     />
                 </li>
@@ -133,11 +133,10 @@ export default class C0ValueTabularDisplay extends React.Component<
                     <div className="dbg-evaluate-tabular-content">
                         {descriptor} ( <span className="dbg-extra-information">0x{render_address(addr + offset, 8)}</span>
                         <C0ValueTabularDisplay
+                            state={this.props.state}
                             mem={this.props.mem}
                             value={{ type: value_to_render.type.value, value: value_to_render.value }}
-                            typeRecord={this.props.typeRecord}
                             typedef={this.props.typedef}
-                            tagRecord={this.props.tagRecord}
                             default_expand={false}
                         />
                         )
@@ -162,10 +161,9 @@ export default class C0ValueTabularDisplay extends React.Component<
                         <li>
                             <C0ValueTabularDisplay
                                 mem={this.props.mem}
+                                state={this.props.state}
                                 value={deref_value}
                                 typedef={this.props.typedef}
-                                typeRecord={this.props.typeRecord}
-                                tagRecord={this.props.tagRecord}
                                 default_expand={false}
                             />
                         </li>
@@ -189,7 +187,7 @@ export default class C0ValueTabularDisplay extends React.Component<
 
         const fields = expand_C0Struct(
             this.props.mem,
-            this.props.typeRecord,
+            this.props.state.TypeRecord,
             {
                 value: value_to_render.value,
                 type: { type: "ptr", kind: "ptr", value: value_to_render.type }
@@ -220,9 +218,8 @@ export default class C0ValueTabularDisplay extends React.Component<
                             <C0ValueTabularDisplay
                                 value={entry.value}
                                 mem={this.props.mem}
+                                state={this.props.state}
                                 typedef={this.props.typedef}
-                                typeRecord={this.props.typeRecord}
-                                tagRecord={this.props.tagRecord}
                                 default_expand={false}
                             />
                         </div>
@@ -251,8 +248,23 @@ export default class C0ValueTabularDisplay extends React.Component<
         if (isNullPtr(value_to_render.value)) {
             return <p className="dbg-evaluate-tabular-content">NULL</p>;
         }
-        const real_ptr = remove_tag(value_to_render, this.props.mem, this.props.tagRecord);
+        const real_ptr = remove_tag(value_to_render, this.props.mem, this.props.state.TagRecord);
         return this.render_pointer(real_ptr, true);
+    }
+
+    render_funcptr(v: C0Value<"funcptr">) {
+        if (isNullPtr(v.value)) {
+            return <p className="dbg-evaluate-tabular-content">NULL</p>;
+        }
+
+        const [index, isNative] = read_funcPtr(v);
+        const funcName = isNative ?
+                this.props.state.P.nativePool[index].functionType
+                : this.props.state.P.functionPool[index].name;
+
+        return  <p className="dbg-evaluate-tabular-content">Function Pointer [<code>{funcName}</code>] 
+                    <span className="dbg-extra-information"> Index: {index}, {isNative ? " Native" : " Static" }</span>
+                </p>;
     }
 
     render(): React.ReactNode {
@@ -267,7 +279,10 @@ export default class C0ValueTabularDisplay extends React.Component<
         }
         else if (isTagPointerType(this.props.value)) {
             return this.render_tagptr(this.props.value);
-        } 
+        }
+        else if (isFuncPointerType(this.props.value))  {
+            return this.render_funcptr(this.props.value);
+        }
         else if (isPointerType(this.props.value)) {
             switch (this.props.value.type.kind) {
                 case "arr":

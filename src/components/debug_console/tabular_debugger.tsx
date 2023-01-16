@@ -13,9 +13,8 @@ export default class TabularDebugEvaluation extends React.Component<
                 <TabularStackFrame
                     frame={this.props.state.CallStack[i]}
                     mem={this.props.mem}
+                    state={this.props.state}
                     typedef={this.props.typedef}
-                    tagRecord={this.props.state.TagRecord}
-                    typeRecord={this.props.state.TypeRecord}
                     key={i}
                 />
             );
@@ -24,14 +23,13 @@ export default class TabularDebugEvaluation extends React.Component<
             <TabularStackFrame
                 frame={this.props.state.CurrFrame}
                 mem={this.props.mem}
+                state={this.props.state}
                 typedef={this.props.typedef}
-                typeRecord={this.props.state.TypeRecord}
-                tagRecord={this.props.state.TagRecord}
                 key={this.props.state.CallStack.length}
             />
         )
         return (<div className="debug-console">
                     {result}
-        </div>);
+                </div>);
     }
 }

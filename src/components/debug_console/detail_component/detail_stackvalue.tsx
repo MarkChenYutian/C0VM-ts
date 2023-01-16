@@ -14,8 +14,9 @@ import { isNullPtr, read_ptr, render_address } from "../../../utility/pointer_ut
 import { loadString } from "../../../utility/string_utility";
 
 import { c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";
-import { isPointerType, isStringType, isUnknownType, isValueType, getType, castToType, isTagPointerType, Type2String } from "../../../utility/c0_type_utility";
+import { isPointerType, isStringType, isUnknownType, isValueType, getType, castToType, isTagPointerType, Type2String, isFuncPointerType } from "../../../utility/c0_type_utility";
 import { read_tagptr } from "../../../utility/tag_ptr_utility";
+import { read_funcPtr } from "../../../utility/func_ptr_utility";
 
 
 export default class C0ValueStackDisplay extends React.Component<
@@ -73,7 +74,7 @@ export default class C0ValueStackDisplay extends React.Component<
      */
     render_struct(v : C0Value<"ptr">) {
         // Unpack v
-        const v_deref = castToType<C0TypeClass>(v, getType(v.type, this.props.typeRecord))
+        const v_deref = castToType<C0TypeClass>(v, getType(v.type, this.props.state.TypeRecord))
 
         return this.render_base(v_deref)
     }
@@ -85,6 +86,7 @@ export default class C0ValueStackDisplay extends React.Component<
 
         const [ptr, ] = read_tagptr(v.value, this.props.mem);
         if (isNullPtr(ptr)) {
+            // Should not happen, but just in case ...
             return <p className="dbg-evaluate-tabular-content">Tagged Pointer [Tag: <code>{Type2String(v.type.value, this.props.typedef)}</code>] <span className="dbg-extra-information">NULL</span></p>;
         } else {
             const [addr, offset, ] = read_ptr(ptr);
@@ -92,6 +94,21 @@ export default class C0ValueStackDisplay extends React.Component<
                         <span className="dbg-extra-information"> 0x{render_address(addr + offset, 8)} = 0x{render_address(addr, 4)} + 0x{render_address(offset, 4)}</span>
                     </p>;
         }
+    }
+
+    render_funcptr(v: C0Value<"funcptr">) {
+        if (isNullPtr(v.value)) {
+            return <p className="dbg-evaluate-tabular-content">NULL</p>;
+        }
+
+        const [index, isNative] = read_funcPtr(v);
+        const funcName = isNative ?
+                this.props.state.P.nativePool[index].functionType
+                : this.props.state.P.functionPool[index].name;
+
+        return  <p className="dbg-evaluate-tabular-content">Function Pointer [<code>{funcName}</code>] 
+                    <span className="dbg-extra-information"> Index: {index}, {isNative ? " Native" : " Static" }</span>
+                </p>;
     }
 
     /**
@@ -117,6 +134,8 @@ export default class C0ValueStackDisplay extends React.Component<
             }
         } else if (isTagPointerType(v)) {
             return this.render_tagptr(v);
+        } else if (isFuncPointerType(v)) {
+            return this.render_funcptr(v);
         }
     }
 

@@ -77,7 +77,7 @@ export default class C0ArrayNode extends React.Component<NodeProps<C0ArrayNodeDa
                         </div>
                     );
                 } else {
-                    const real_ptr = remove_tag(to_be_rendered, this.props.data.mem, this.props.data.tagRecord);
+                    const real_ptr = remove_tag(to_be_rendered, this.props.data.mem, this.props.data.state.TagRecord);
                     result.push(
                         <div key={"elem-" + i} className="dbg-elem-box">
                             <p key={"idx-" + i} className="dbg-evaluate-arr-idx">{i} - <code>{TypeUtil.Type2String(real_ptr.type, this.props.data.typedef)}</code></p>

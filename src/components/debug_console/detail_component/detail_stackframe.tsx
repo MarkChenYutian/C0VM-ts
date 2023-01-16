@@ -49,9 +49,8 @@ export default class DetailStackFrame extends React.Component<
                     key={i + "-value"}
                     value={to_be_rendered}
                     mem={this.props.mem}
+                    state={this.props.state}
                     typedef={this.props.typedef}
-                    typeRecord={this.props.typeRecord}
-                    tagRecord={this.props.tagRecord}
                     default_expand={true}
                 />
             );
@@ -73,10 +72,9 @@ export default class DetailStackFrame extends React.Component<
                     <C0ValueTabularDisplay
                         key={i + "-value"}
                         value={to_be_rendered}
+                        state={this.props.state}
                         mem={this.props.mem}
                         typedef={this.props.typedef}
-                        typeRecord={this.props.typeRecord}
-                        tagRecord={this.props.tagRecord}
                         default_expand={true}
                     />
                 );

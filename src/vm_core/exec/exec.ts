@@ -5,8 +5,9 @@ import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value, bui
 import { c0_assertion_error, c0_memory_error, c0_user_error, vm_error } from "../../utility/errors";
 import { build_null_ptr, isNullPtr, read_ptr, shift_ptr } from "../../utility/pointer_utility";
 import { loadString } from "../../utility/string_utility";
-import OpCode from "./opcode";
 import { build_tagptr, read_tagptr } from "../../utility/tag_ptr_utility";
+import { create_funcPtr, read_funcPtr } from "../../utility/func_ptr_utility";
+import OpCode from "./opcode";
 
 /**
  * Pop out a value from C0VM Stack with stack-size check
@@ -732,9 +733,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             if ((!TypeUtil.maybePointerType(x) && 
                  !TypeUtil.maybeStringType(x) && 
-                 !TypeUtil.maybeTagPointerType(x)) 
+                 !TypeUtil.maybeTagPointerType(x) &&
+                 !TypeUtil.maybeFuncPointerType(x))
                  || (!TypeUtil.maybePointerType(a))){
-                throw new vm_error("Type unmatch, AMSTORE expected to have (pointer, [pointer | string | tag_ptr])");
+                throw new vm_error("Type unmatch, AMSTORE expected to have (pointer, [pointer | string | tag_ptr | funcptr])");
             }
             allocator.amstore( a.value, x.value );
 
@@ -982,14 +984,68 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
         }
 
         case OpCode.ADDROF_STATIC: {
+            const view = new DataView(F.code.buffer);
+            const o1 = view.getInt8(state.CurrFrame.PC + 1);
+            const o2 = view.getInt8(state.CurrFrame.PC + 2);
+            const index = (o1 << 8) | o2;
+            state.CurrFrame.PC += 3;
+
+            state.CurrFrame.S.push(create_funcPtr(index, state.P, false));
             break;
         }
 
         case OpCode.ADDROF_NATIVE: {
+            const view = new DataView(F.code.buffer);
+            const o1 = view.getInt8(state.CurrFrame.PC + 1);
+            const o2 = view.getInt8(state.CurrFrame.PC + 2);
+            const index = (o1 << 8) | o2;
+            state.CurrFrame.PC += 3;
+
+            state.CurrFrame.S.push(create_funcPtr(index, state.P, true));
             break;
         }
 
         case OpCode.INVOKEDYNAMIC: {
+            state.CurrFrame.PC += 1;
+
+            const fp = safe_pop_stack(state, allocator);
+            if (!TypeUtil.isFuncPointerType(fp)) {
+                throw new vm_error(`Type unmatch: INVOKEDYNAMIC is only expected to apply on <funcptr> type`);
+            }
+
+            const [fIndex, isNative] = read_funcPtr(fp);
+
+            if (isNative) {
+                const native_F = state.P.nativePool[fIndex];
+                const args: C0Value<C0TypeClass>[] = [];
+
+                for (let i = 0; i < native_F.numArgs; i ++) {
+                    args.unshift(safe_pop_stack(state, allocator));
+                }
+                
+                const res = native_F.f(UIHooks, allocator, ...args);
+                state.CurrFrame.S.push(res);
+            } else {
+                const called_F = state.P.functionPool[fIndex];
+
+                // Extract Arguments
+                const called_F_vars: VM_LocalVariables = new Array(called_F.numVars).fill(undefined);
+                for (let i = called_F.numArgs - 1; i >= 0; i --) {
+                    called_F_vars[i] = safe_pop_stack(state, allocator);
+                }
+                // Switch Context
+                state.CallStack.push(state.CurrFrame);
+                if (state.CallStack.length > globalThis.C0_MAX_RECURSION) {
+                    throw new c0_memory_error("Maximum Recursion Depth Exceeded (current max depth: " + globalThis.C0_MAX_RECURSION + " )");
+                }
+                state.CurrFrame = {
+                    PC: 0,
+                    S: [],
+                    V: called_F_vars,
+                    P: called_F
+                };
+            }
+            
             break;
         }
 

@@ -37,10 +37,12 @@ function extract_typedef(code: string): TypeDefInfo[] {
 
     for (let ptr = syntaxTree.cursor(); ptr.next() !== false; ){
         if (ptr.type.is("TypeDefinition")){
-            ptr.firstChild();       // ptr = typedef keyword itself
-            ptr.nextSibling();      // ptr = Source Type
+            ptr.firstChild();               // ptr = typedef keyword itself
+            next_real_sibling(ptr);         // ptr = Source Type
+            if (!ptr.type.is("Type")) { continue; }
             const source_type = code.substring(ptr.from, ptr.to);
-            ptr.nextSibling();      // ptr = Target Type
+            next_real_sibling(ptr);         // ptr = Target Type
+            if (!ptr.type.is("Type")) { continue; }
             const alias_type = code.substring(ptr.from, ptr.to);
             
             typedefs.push({ source: source_type, alias: alias_type });

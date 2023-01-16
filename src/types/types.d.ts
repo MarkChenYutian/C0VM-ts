@@ -28,7 +28,9 @@ type C0Type<T extends C0TypeClass> =
         value: C0Type<Maybe<"ptr">>
     } :
     T extends "funcptr" ? {
-        type: T 
+        type: T ,
+        kind: "native" | "static",
+        fname: string
     } :
     T extends "<unknown>" ? {
         type: T         // No more type information for unknown

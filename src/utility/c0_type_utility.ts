@@ -31,7 +31,7 @@ export function CloneType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
         case "tagptr":
             return {type: T.type, value: CloneType(T.value) as C0Type<"ptr">};
         case "funcptr":
-            return {type: T.type};
+            return {type: T.type, kind: T.kind, fname: T.fname};
         case "<unknown>":
             return {type: T.type};
     }
@@ -80,9 +80,11 @@ export function Type2String(T: C0Type<C0TypeClass> | string, TypedefRec?: Map<Al
  * @param S The string to be parsed into the C0Type Object
  * @returns A C0Type object based parsed from S
  */
-export function String2Type(S: string): C0Type<C0TypeClass> {
+export function String2Type(S: string): C0Type<Exclude<C0TypeClass, "funcptr">> {
     if (S === "void*") return { type: "tagptr", value: {type: "<unknown>"}};
-    else if (S === "&func") return { type: "funcptr" };
+    // else if (S === "&func") return { type: "funcptr", kind: "static", fname: "" };
+    // There's no need to support String2Type on funcptr because we can't actually recover the information and 
+    // we won't need this
     else if (S.endsWith("*")) return { type: "ptr", kind: "ptr", value: String2Type(S.slice(0, S.length - 1)) };
     else if (S.endsWith("[]")) return { type: "ptr", kind: "arr", value: String2Type(S.slice(0, S.length - 2)) };
     else if (S === "string") return { type: "string", value: "string" };
@@ -114,7 +116,6 @@ export function removeTagOnType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
     switch (T.type) {
         case "value":
         case "<unknown>":
-        case "funcptr":
         case "string":
             return T;
         case "ptr":
@@ -127,7 +128,9 @@ export function removeTagOnType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
             }
             break;  // To make TS Linter happy
         case "tagptr":
-            return {type: T.type, value: {type: "<unknown>"}}
+            return { type: T.type, value: {type: "<unknown>"} }
+        case "funcptr":
+            return { type: T.type, kind: "native", fname: "<unknown>" }
     }
 }
 
