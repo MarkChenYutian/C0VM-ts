@@ -1,0 +1,9 @@
+#use <conio>
+
+int main() {
+    string S = "A nested file";
+    string name = readline();
+    println(S);
+    printf("Hello %s!\n", name);
+    return 0;
+}

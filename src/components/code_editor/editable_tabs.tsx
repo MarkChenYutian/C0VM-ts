@@ -15,6 +15,12 @@ export default class EditableTab extends React.Component<EditableTabProps, Edita
         this.startEditing = this.startEditing.bind(this);
         this.stopEditing = this.stopEditing.bind(this);    
     }
+
+    componentDidUpdate(prevProps: EditableTabProps) {
+        if (this.props.title !== prevProps.title) {
+            this.setState({title: this.props.title})
+        }
+    }
     
     onChange(e: React.ChangeEvent<HTMLInputElement>) {
         e.preventDefault();

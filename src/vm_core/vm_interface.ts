@@ -78,6 +78,75 @@ export async function step(s: C0VM_RT, c0_only: boolean, print_update: (s: strin
     }
 }
 
+export async function autoStep(
+    s: C0VM_RT,
+    bp: Set<number>,
+    c0bp: Set<string>,
+    signal: {abort: boolean},
+    c0_only: boolean,
+    resetSig: () => void,
+    print_update: (s: string) => void,
+    update_state: (s: C0VM_RT|undefined) => void,
+    resetC0Running: () => void,
+): Promise<void> 
+{
+    if(globalThis.DEBUG) console.log('Running autostep...');
+    if (signal.abort) {
+        resetSig();
+        print_update("C0VM.ts: Execution aborted manually.\n");
+        globalThis.MSG_EMITTER.warn("Execution Aborted", "Execution is aborted since the user click the 'Abort' button manually.");
+        resetSig();
+        resetC0Running();
+        return;
+    }
+    let new_state = s.clone();
+    let can_continue = true;
+    try {
+        [new_state,can_continue] = await step(new_state,c0_only,print_update);
+    } catch(e) {
+        const err = e as Error;
+        print_update(`<span class="error-output"> Program aborted with ${err.message} </span>`);
+        globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);
+        if(globalThis.DEBUG) console.error(e);
+        resetSig();
+        resetC0Running();
+        return;
+    }
+    if (!can_continue){
+        resetSig();
+        update_state(undefined);
+        resetC0Running();
+        return;
+    }
+    if (bp.has(new_state.state.CurrLineNumber)){
+        resetSig();
+        resetC0Running();
+        return;
+    } 
+    if (new_state.state.CurrC0RefLine !== undefined &&
+        new_state.state.CurrC0RefLine[2] &&
+        c0bp.has(`${new_state.state.CurrC0RefLine[0]}@${new_state.state.CurrC0RefLine[1]}`)){ 
+            resetSig();
+            resetC0Running();
+            return;
+    }
+    resetSig();
+    update_state(new_state);
+
+    let step_interval = 1500;
+    if (globalThis.AUTOSTEP_INTERVAL === "Fast") {
+        step_interval = 500;
+    } else if (globalThis.AUTOSTEP_INTERVAL === "Slow") {
+        step_interval = 1500;
+    }
+
+    setTimeout(
+        () => {
+            autoStep(new_state,bp,c0bp,signal,c0_only,resetSig,print_update,update_state,resetC0Running)
+        }, step_interval
+    );
+}
+
 export async function run(
     s: C0VM_RT,
     bp: Set<number>,

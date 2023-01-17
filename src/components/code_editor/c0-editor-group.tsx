@@ -1,14 +1,15 @@
-import React, { ReactNode } from "react";
-import { TabsProps } from "antd";
-
+import React from "react";
+import { Tabs, TabsProps } from "antd";
+import C0Editor from "./c0-editor";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faAdd, faAngleDown } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
 
 import DraggableTabs from "./draggable_tabs";
 import EditableTab from "./editable_tabs";
-import C0Editor from "./c0-editor";
-import TabPane from "antd/es/tabs/TabPane";
 
+import type { RcFile } from 'antd/lib/upload';
+
+const { TabPane } = Tabs;
 const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.c(0|1)$/;
 
 
@@ -27,7 +28,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         if (!regex_valid_file_name.test(name)) {
             globalThis.MSG_EMITTER.warn(
                 "Failed to rename editor tab", 
-                "Editor tab's name can't contain special character and should end in .c0 or .c1"
+                "Editor tab's name can't contain special character and should end in .c0"
             );
             return;
         }
@@ -82,45 +83,6 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         this.set_tab_name(parseInt(key), s === null ? "" : s);
     }
 
-    generate_tabs(): ReactNode[] {
-        const tabItems: ReactNode[] = [];
-
-        for (const editor of this.props.appState.C0Editors) {
-            let lineNumber = 0;
-            if (this.props.currLine !== undefined && editor.title === this.props.currLine[0]) {
-                lineNumber = this.props.currLine[1];
-            }
-
-            const tabElement =  <EditableTab 
-                                    title={editor.title} 
-                                    editor_key={editor.key.toString()} 
-                                    updateName={(k, s) => this.set_current_tab_name(k, s)}
-                                />;
-            const editorElem =  <C0Editor
-                                    execLine      = {lineNumber}
-                                    editorValue   = {editor.content}
-                                    breakPoints   = {editor.breakpoints}
-                                    updateContent = {(s) => this.props.updateContent(editor.key, s)}
-                                    updateName    = {(name) => this.set_tab_name(editor.key, name)}
-                                    setBreakPts   = {(bps)  => this.set_brkpt_for_editor(editor.key, bps)}
-                                    editable      = {this.props.currLine === undefined}
-                                />;
-            
-            tabItems.push(
-                <TabPane
-                    tab      = {tabElement}
-                    key      = {editor.key.toString()}
-                    closable = {this.props.appState.C0Editors.length !== 1}
-                    closeIcon= {<FontAwesomeIcon icon={faXmark}/>}
-                >
-                    {editorElem}
-                </TabPane>
-            );
-        }
-
-        return tabItems;
-    }
-
     on_edit(target_key: any, action: "add" | "remove") {
         switch (action) {
             case "add":
@@ -130,7 +92,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                 this.props.removePanel(target_key);
                 break;
         }
-    };
+    };    
 
     render() {
         const tabConfig: TabsProps = {
@@ -145,16 +107,49 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                     this.set_tab_name(parseInt(key), s === null ? "" : s)
                 }
             },
-            addIcon: <FontAwesomeIcon icon={faAdd}/>,
-            moreIcon: <FontAwesomeIcon icon={faAngleDown}/>
+            addIcon: <FontAwesomeIcon icon={faAdd}/>
         }
 
-        return  <DraggableTabs
-                    config={tabConfig}
-                    onTabEdit={this.on_edit}
-                    setTabOrder={this.update_tab_order}
-                >
-                    {this.generate_tabs()}
-                </DraggableTabs>;
+        return (
+        <DraggableTabs
+            config={tabConfig}
+            onTabEdit={this.on_edit}
+            setTabOrder={this.update_tab_order}
+        >
+            {
+                this.props.appState.C0Editors.map(
+                    (editor) => {
+                        let lineNumber = 0;
+                        if (this.props.currLine !== undefined && editor.title === this.props.currLine[0]) {
+                            lineNumber = this.props.currLine[1];
+                        }
+
+                        return <TabPane
+                            tab={
+                                <EditableTab 
+                                    title={editor.title} 
+                                    editor_key={editor.key + ""} 
+                                    updateName={(k, s) => this.set_current_tab_name(k, s)}
+                                />}
+                            key={editor.key + ""}
+                            closable = {this.props.appState.C0Editors.length !== 1}
+                            closeIcon={<FontAwesomeIcon icon={faXmark}/>}
+                        >
+                            <C0Editor
+                                execLine      = {lineNumber}
+                                editorValue   = {editor.content}
+                                breakPoints   = {editor.breakpoints}
+                                updateContent = {(s) => this.props.updateContent(editor.key, s)}
+                                updateName    = {(name) => this.set_tab_name(editor.key, name)}
+                                setBreakPts   = {(bps)  => this.set_brkpt_for_editor(editor.key, bps)}
+                                editable      = {this.props.currLine === undefined}
+                                handle_import_folder = {(F: RcFile, FList: RcFile[]) => this.props.handle_import_folder(F, FList)}
+                            />
+                        </TabPane>;
+                    }
+                )
+            }
+        </DraggableTabs>
+        );
     }
 }

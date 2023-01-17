@@ -21,6 +21,7 @@ declare global {
     var C0_TIME_SLICE: number;              // Number of steps the C0VM can go in a continuous time slice
     // (after this #step, the control flow will be handled back to UI/main event loop to keep page responsive)
     var C0_ASYNC_INTERVAL: number;          // Interval between each time slice will be at least these much ms
+    var AUTOSTEP_INTERVAL: "Fast" | "Slow"; // Interval between each step during AUTOSTEP, in ms
 
     // MS Clarity client API
     var clarity: undefined | ((s: "set", key: "VM Error", 
