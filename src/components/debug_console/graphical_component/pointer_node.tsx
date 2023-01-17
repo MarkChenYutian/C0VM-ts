@@ -32,7 +32,7 @@ export default class C0PointerNode extends React.Component<NodeProps<C0PointerNo
                 position={Position.Right}
                 type="source"
                 id={ptrSrcHandleID()}
-                style={{ top: calculate_entry_height(1, "pointer"), right: "1.8rem" }}
+                style={{ top: calculate_entry_height(1, "pointer"), right: "1rem" }}
             />
         </div>);
     }

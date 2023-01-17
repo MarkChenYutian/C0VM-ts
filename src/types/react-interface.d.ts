@@ -36,6 +36,8 @@ interface C0VMApplicationState {
     c0_only        : boolean,               /* C0 only mode or not */
     contentChanged : boolean,               /* If content has changed or not (requires re-compile) */
     dbgFullScreen  : boolean,               /* If it is in full screen mode currently */
+
+    tutorialOn     : boolean,               /* See if the tutorial page is on or not */
     settingMenuOn  : boolean,               /* See if the setting menu is on or not */
 
     BC0SourceCode  : string,                /* The content of BC0 code editor */
@@ -64,6 +66,20 @@ interface MainControlProps {
                             callback?: () => void
                         ): void,
 };
+
+
+interface TutorialPanelProps {
+    state : C0VMApplicationState,
+    set_app_state<K extends keyof C0VMApplicationState>(
+        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
+                => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
+            | (Pick<C0VMApplicationState, K> 
+            | C0VMApplicationState 
+            | null),
+        callback?: () => void
+    ): void
+}
+
 
 interface CodeEditorProps {
     app_state: C0VMApplicationState,
@@ -158,23 +174,24 @@ interface DebugConsoleInterface {
 
 interface TabularStackFrameProps {
     frame: VM_StackFrame,
+    state: VM_State,
     mem: C0HeapAllocator,
-    typeRecord: Map<string, Map<number, Struct_Type_Record>>,
-    typedef: Map<string, string>
+    typedef: Map<string, string>,
 }
 
 
 interface C0ValueTabularDisplayProps {
+    state: VM_State,
     mem: C0HeapAllocator,
     value: C0Value<C0TypeClass>,
     typedef: Map<string, string>,
-    typeRecord: Map<string, Map<number, Struct_Type_Record>>,
     default_expand: boolean
 }
 
 interface C0StackFrameNodeData {
     frame: VM_StackFrame,
     mem: C0HeapAllocator,
+    state: VM_State,
     typedef: Map<string, string>,
     dragged: boolean,
 }
@@ -182,8 +199,8 @@ interface C0StackFrameNodeData {
 interface C0StructNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
+    state: VM_State,
     typedef: Map<string, string>,
-    typeRecord: Map<string, Map<number, Struct_Type_Record>>,
     dragged: boolean,
 }
 
@@ -191,13 +208,31 @@ interface C0ArrayNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
     typedef: Map<string, string>,
+    state: VM_State,
     dragged: boolean,
+}
+
+interface C0TagPointerData {
+    tagptr: C0Value<"ptr">,
+    mem: C0HeapAllocator,
+    typedef: Map<string, string>,
+    state: VM_State,
+    dragged: boolean
 }
 
 interface C0PointerNodeData {
     ptr: C0Value<"ptr">,
     mem: C0HeapAllocator,
     typedef: Map<string, string>,
+    state: VM_State,
+    dragged: boolean,
+}
+
+interface C0FuncPtrNodeData {
+    ptr: C0Value<"ptr">,
+    mem: C0HeapAllocator,
+    typedef: Map<string, string>,
+    state: VM_State,
     dragged: boolean,
 }
 
@@ -205,10 +240,11 @@ interface C0ValueNodeData {
     val: C0Value<"ptr">,
     mem: C0HeapAllocator,
     typedef: Map<string, string>,
+    state: VM_State,
     dragged: boolean,
 }
 
-type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData;
+type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData | C0TagPointerData | C0FuncPtrNodeData;
 
 interface ApplicationCrashPageProps {
     state: C0VMApplicationState;

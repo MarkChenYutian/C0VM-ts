@@ -1,0 +1,28 @@
+struct Generic_Pair {
+    void* first;
+    void* second;
+};
+
+typedef int ret_val_fn();
+typedef struct Generic_Pair pair;
+typedef pair* pair_t;
+
+int f() { return 42; }
+
+int main() {
+    pair_t x = alloc(pair);
+    pair_t y = alloc(pair);
+    y -> first = (void*) alloc(int);
+    y -> second= (void*) alloc(bool);
+    x -> first = (void*) y;
+    x -> second= (void*) alloc(string);
+    y = alloc(pair);
+    int[]* z = alloc(int[]);
+    *z = alloc_array(int, 3);
+    y -> first = (void*) z;
+
+    ret_val_fn** fptr = alloc(ret_val_fn*);
+    *fptr = &f;
+    y -> second = (void*) fptr;
+    return 0;
+}

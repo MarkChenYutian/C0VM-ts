@@ -43,6 +43,12 @@ const OpCode = {
     INVOKESTATIC : 0xb8,
     INVOKENATIVE : 0xb7,
     RETURN : 0xb0,
+    CHECKTAG: 0xc0,
+    HASTAG : 0xc1,
+    ADDTAG : 0xc2,
+    ADDROF_STATIC: 0x16,
+    ADDROF_NATIVE: 0x17,
+    INVOKEDYNAMIC: 0xb6
 }
 
 export default OpCode;

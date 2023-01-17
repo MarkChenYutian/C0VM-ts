@@ -1,8 +1,8 @@
 import React from "react";
-import BC0Editor from "./bc0-editor";
-import C0EditorGroup from "./c0-editor-group";
+import BC0Editor from "./code_editor/bc0-editor";
+import C0EditorGroup from "./code_editor/c0-editor-group";
 
-import { Segmented, Tooltip, Upload } from "antd";
+import { Segmented, Space, Tooltip, Upload } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faLock } from "@fortawesome/free-solid-svg-icons";
 import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
@@ -20,6 +20,7 @@ export default class CodeEditor extends React.Component
             C0_nextKey : tabs.length === 0 ? 1 : Math.max(...tabs.map((tab) => tab.key)) + 1
         }
         this.handle_import_folder = this.handle_import_folder.bind(this);
+        if (DEBUG) console.debug("handle_import_folder in CodeEditor is", this.handle_import_folder)
     }
 
     push_populated_tab(tab: C0EditorTab) {
@@ -74,6 +75,8 @@ export default class CodeEditor extends React.Component
     // this function is called for every file in the uploaded directory, recursive.
     // the function is called by ant design component "Upload"
     handle_import_folder(F: RcFile, FList: RcFile[]) {
+        if (DEBUG) console.debug("received a folder upload, processing one of them")
+
         if (!(F.name.endsWith('.c0') || F.name.endsWith('.c1'))) {
             globalThis.MSG_EMITTER.warn(
                 "File is not Imported",
@@ -196,17 +199,15 @@ export default class CodeEditor extends React.Component
         }
 
         if (! this.props.app_state.c0_only){
-            selectorArr.push(
-                <Segmented
-                    key="language_selector"
-                    options={[
-                        { label: "C0", value: "c0" }, 
-                        { label: "BC0",value: "bc0"}
-                    ]}
-                    defaultValue={this.state.mode}
-                    onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
-                />
-            );
+            selectorArr.push(<Segmented
+                            key="language_selector"
+                            options={[
+                                { label: "Source", value: "c0" }, 
+                                { label: "ByteC",value: "bc0"}
+                            ]}
+                            defaultValue={this.state.mode}
+                            onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}
+                        />);
         }
 
 
@@ -214,7 +215,7 @@ export default class CodeEditor extends React.Component
         if (selectorArr.length === 1){
             selector = selectorArr[0];
         } else if (selectorArr.length === 2) {
-            selector = <div>{selectorArr[0]} {selectorArr[1]}</div>
+            selector = <Space size="small">{selectorArr[0]} {selectorArr[1]}</Space>
         }
         
         if (this.props.app_state.c0_only) return this.render_c0(selector);

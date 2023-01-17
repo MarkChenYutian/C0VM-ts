@@ -1,12 +1,11 @@
 import React from "react";
 import ReactCodeMirror, { basicSetup } from "@uiw/react-codemirror";
-
-import breakpointGutter from "./editor_extension/breakpoint_marker";
-import execLineHighlighter from "./editor_extension/exec_position";
-import { BC0Language } from "./editor_extension/syntax/bc0";
-
 import { language } from "@codemirror/language";
-import BC0LightTheme from "./editor_extension/bc0editor_theme";
+
+import breakpointGutter    from "./editor_extension/breakpoint_marker";
+import execLineHighlighter from "./editor_extension/exec_position";
+import { BC0Language }     from "./editor_extension/syntax/bc0";
+import BC0LightTheme       from "./editor_extension/bc0editor_theme";
 
 
 export default class BC0Editor extends React.Component<BC0EditorProps>

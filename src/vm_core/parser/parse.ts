@@ -75,7 +75,7 @@ const regex_aaddf_comment = /^&?.*->\s*([a-zA-Z_0-9]+)$/;
 // const regex_arr_base_comment = /^alloc_array\(\s*([a-zA-Z0-9_\s]+)([*[\]]*),.+\)/;
 const regex_arr_comment = /^alloc_array\(\s*([a-zA-Z0-9_\-*[\]\s]+),.+\)/;
 const regex_new_comment = /^alloc\(\s*([a-zA-Z0-9_\-*[\]\s]+)\s*\)/;
-const regex_ref_comment = /^.*\.c0: \d+\.\d+-\d+.\d+$/;
+const regex_ref_comment = /^.*\.c(0|1): \d+\.\d+-\d+.\d+$/;
 
 const regex_int_comment = /(\d+)|(dummy return value)/;
 const regex_bool_comment = /(true)|(false)/;
@@ -146,7 +146,7 @@ function resolve_type_info(byte_instruct: string, comment: string, typedef_lib: 
 }
 
 function apply_typedef(type: C0Type<C0TypeClass>, typedef_lib: Map<AliasType, SourceType>): C0Type<C0TypeClass>{
-    if (type.type === "<unknown>") return type;
+    if (type.type === "<unknown>" || type.type === "tagptr" || type.type === "funcptr") return type;
     const type_str = Type2String(type);
     const concrete = typedef_lib?.get(type_str);
     if (concrete === undefined) {

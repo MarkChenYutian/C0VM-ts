@@ -50,6 +50,15 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
                     }
                 />
 
+                <p>Reset Tutorial Page</p>
+                <Button 
+                    size="middle"
+                    onClick={() => {
+                        localStorage.clear();
+                        globalThis.MSG_EMITTER.ok("Tutorial Page Reset Success", "Refresh this webpage and the tutorial will pop up!")
+                    }}
+                >Reset Tutorial</Button>
+
                 <AdvancedSetting {...this.props}/>
             </div>
         </Modal>

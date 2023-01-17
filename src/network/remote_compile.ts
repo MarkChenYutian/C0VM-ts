@@ -34,7 +34,7 @@ export default function remote_compile(
     .then(
         (result: any) => {
             if (result.error !== ""){
-                print_update(`<span class="error-output">${result.error as string}</span>`);
+                print_update(`<span class="stdout-error">${result.error as string}</span>`);
                 throw new vm_error("Compile Failed for c0 source code. See standard output for more information.");
             }
             

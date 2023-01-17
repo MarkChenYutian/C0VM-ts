@@ -1,0 +1,16 @@
+int main() {
+    void*[] A = alloc_array(void*, 4);
+    A[0] = (void*) alloc(int);
+    A[1] = (void*) alloc(string);
+    A[2] = (void*) alloc(bool);
+
+    int* m = (int*) A[0];
+    string* n = (string*) A[1];
+    bool* b = (bool*) A[2];
+
+    *m = 1024;
+    *n = "Hello World";
+    *b = true;
+    
+    return 0;
+}

@@ -192,7 +192,7 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
     const execbtn_disabled    = execMode === "Run" ? runbtn_disabled : autostepbtn_disabled;
 
     function onKeyPressWrapper(e: KeyboardEvent): void{
-        const is_action_key = e.key==="a" || e.key ==='r' || e.key==="s";
+        const is_action_key = e.key==="t" || e.key ==='r' || e.key==="s";
         if (autostepbtn_disabled && is_action_key && e.ctrlKey) {
             if (!is_bc0_valid) globalThis.MSG_EMITTER.warn("Action Unavailable","Invalid BC0 code.");
             else if(appState.C0Running) globalThis.MSG_EMITTER.warn("Action Unavailable","The program is currently running.");
@@ -202,7 +202,7 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
     }
     
     function onKeyPress(key: string): void{
-        if(key==='a') autoStep_c0runtime();
+        if(key==='t') autoStep_c0runtime();
         else if(key==='r') run_c0runtime();
         else if(key==='s') step_c0runtime();
     }

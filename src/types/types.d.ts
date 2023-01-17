@@ -1,4 +1,4 @@
-type C0TypeClass = "<unknown>" | "value" | "ptr" | "string";
+type C0TypeClass = "<unknown>" | "value" | "ptr" | "string" | "tagptr" | "funcptr" ;
 
 type C0ValueTypes = "int" | "char" | "bool";
 
@@ -23,9 +23,17 @@ type C0Type<T extends C0TypeClass> =
         type: T,
         value: "string"
     } : 
+    T extends "tagptr" ? {
+        type: T,
+        value: C0Type<Maybe<"ptr">>
+    } :
+    T extends "funcptr" ? {
+        type: T
+    } :
     T extends "<unknown>" ? {
         type: T         // No more type information for unknown
-    } : never;
+    } : 
+    never;
 
 type C0Function = {
     // function name, inferenced from comments in .bc0 file
@@ -258,7 +266,11 @@ type VM_State = {
     // The line number of .c0 file that is currently executing
     CurrC0RefLine: [string, number, boolean] | undefined,
     // The type pool (struct type information) hashmap
-    TypeRecord: Map<string, Map<number, Struct_Type_Record>>
+    TypeRecord: Map<string, Map<number, Struct_Type_Record>>,
+    // The tag pointer recording hashmap
+    TagRecord: Map<number, C0Type<"ptr">>,
+    // The set of function type names
+    FuncTypeRecord: Set<string>
 };
 
 

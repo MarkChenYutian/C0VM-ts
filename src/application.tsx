@@ -8,6 +8,7 @@ import CodeEditor from "./components/code-editor";
 import AppCrashFallbackPage from "./components/app_crash_fallback";
 import SettingPopup from "./components/settings";
 import { Row, Col } from "antd";
+import TutorialEditor from "./components/tutorial_editor";
 
 export default class C0VMApplication extends React.Component<
     C0VMApplicationProps,
@@ -15,11 +16,18 @@ export default class C0VMApplication extends React.Component<
 > {
     constructor(props: C0VMApplicationProps) {
         super(props);
+
+        const hideTutorialPanel = localStorage.getItem("hideTutorial");
+        let showTutorial = false;
+        if (hideTutorialPanel === null) showTutorial = true;
+
         this.state = {
             crashed        : false,
             c0_only        : false,
             contentChanged : true,
             dbgFullScreen  : false,
+
+            tutorialOn     : showTutorial,
             settingMenuOn  : false,
             
             BC0SourceCode: "",
@@ -66,7 +74,8 @@ export default class C0VMApplication extends React.Component<
             />
         ) : null;
 
-        const SettingMenuComponent = <SettingPopup state={this.state} set_app_state={(ns) => this.setState(ns)}/>;
+        const TutorialPanelComponent = <TutorialEditor state={this.state} set_app_state={(ns) => this.setState(ns)}/>;
+        const SettingMenuComponent   = <SettingPopup state={this.state} set_app_state={(ns) => this.setState(ns)}/>;
 
         if (this.state.dbgFullScreen) {
             return <div className="page-framework">
@@ -81,6 +90,7 @@ export default class C0VMApplication extends React.Component<
 
         return (
             <div className="page-framework">
+                {TutorialPanelComponent}
                 {SettingMenuComponent}
                 {MainControlBarComponent}
                 <Row className="main-ui-framework">

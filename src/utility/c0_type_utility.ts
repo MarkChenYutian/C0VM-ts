@@ -28,6 +28,10 @@ export function CloneType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
                 return {type: T.type, kind: T.kind, value: CloneType(T.value)};
         case "string":
             return {type: T.type, value: T.value};
+        case "tagptr":
+            return {type: T.type, value: CloneType(T.value) as C0Type<"ptr">};
+        case "funcptr":
+            return {type: T.type};
         case "<unknown>":
             return {type: T.type};
     }
@@ -52,6 +56,12 @@ export function Type2String(T: C0Type<C0TypeClass> | string, TypedefRec?: Map<Al
             case "string":
                 retVal = "string";
                 break;
+            case "tagptr":
+                retVal = "void*";
+                break;
+            case "funcptr":
+                retVal = "&func";
+                break;
             case "<unknown>":
                 retVal = "<unknown>";
                 break;
@@ -70,8 +80,12 @@ export function Type2String(T: C0Type<C0TypeClass> | string, TypedefRec?: Map<Al
  * @param S The string to be parsed into the C0Type Object
  * @returns A C0Type object based parsed from S
  */
-export function String2Type(S: string): C0Type<C0TypeClass> {
-    if (S.endsWith("*")) return { type: "ptr", kind: "ptr", value: String2Type(S.slice(0, S.length - 1)) };
+export function String2Type(S: string): C0Type<Exclude<C0TypeClass, "funcptr">> {
+    if (S === "void*") return { type: "tagptr", value: {type: "<unknown>"}};
+    // else if (S === "&func") return { type: "funcptr", kind: "static", fname: "" };
+    // There's no need to support String2Type on funcptr because we can't actually recover the information and 
+    // we won't need this
+    else if (S.endsWith("*")) return { type: "ptr", kind: "ptr", value: String2Type(S.slice(0, S.length - 1)) };
     else if (S.endsWith("[]")) return { type: "ptr", kind: "arr", value: String2Type(S.slice(0, S.length - 2)) };
     else if (S === "string") return { type: "string", value: "string" };
     else if (S === "int" || S === "char" || S === "bool") return { type: "value", value: S };
@@ -97,6 +111,70 @@ export function castToType<T extends C0TypeClass>(V: C0Value<C0TypeClass>, newTy
     return V as C0Value<T>;
 }
 
+// Strip the tag of void* so that we allow same field of struct contains void* with different types
+export function removeTagOnType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
+    switch (T.type) {
+        case "value":
+        case "<unknown>":
+        case "string":
+            return T;
+        case "ptr":
+            switch (T.kind) {
+                case "arr":
+                case "ptr":
+                    return {type: T.type, kind: T.kind, value: removeTagOnType(T.value)}
+                case "struct":
+                    return T
+            }
+            break;  // To make TS Linter happy
+        case "tagptr":
+            return { type: T.type, value: {type: "<unknown>"} }
+        case "funcptr":
+            return { type: T.type }
+    }
+}
+
+// Check if the type is "certain" - i.e. does not contain <unknown> on all levels
+export function isCertainType(T: C0Type<C0TypeClass>): boolean {
+    switch (T.type) {
+        case "<unknown>":
+            return false;
+        case "value":
+        case "funcptr":
+        case "string":
+            return true;
+        case "ptr":
+            switch (T.kind) {
+                case "arr":
+                case "ptr":
+                    return isCertainType(T.value);
+                case "struct":
+                    return true;
+            }
+            break;  // To make TS Linter happy
+        case "tagptr":
+            return true;
+    }
+}
+
+// Convert T* into function pointer type if T is a registered function type in F
+export function stripFuncPtrType(T: C0Type<C0TypeClass>, F: Set<string>): C0Type<C0TypeClass> {
+    // T is struct pointer type
+    if (T.type === "ptr" && T.kind === "ptr" && T.value.type === "ptr" && T.value.kind === "struct") {
+        if (F.has(T.value.value)) {
+            return { type: "funcptr" }
+        }  
+    } else if (T.type === "ptr") {
+        const internal_type = T.value;
+        if (typeof internal_type !== "string") {
+            T.value = stripFuncPtrType(internal_type, F);
+        }
+    } else if (T.type === "tagptr") {
+        T.value = stripFuncPtrType(T.value, F) as C0Type<"ptr">;
+    }
+    return T;
+}
+
 /**
  * Type Narrowing functions that works better with TS type inference
  */
@@ -113,6 +191,14 @@ export function maybeValueType(V: C0Value<C0TypeClass>): V is C0Value<Maybe<"val
 
 export function maybePointerType(V: C0Value<C0TypeClass>): V is C0Value<Maybe<"ptr">> {
     return V.type.type === "ptr" || V.type.type === "<unknown>";
+}
+
+export function maybeTagPointerType(V: C0Value<C0TypeClass>): V is C0Value<Maybe<"tagptr">> {
+    return V.type.type === "tagptr" || V.type.type === "<unknown>";
+}
+
+export function maybeFuncPointerType(V: C0Value<C0TypeClass>): V is C0Value<Maybe<"funcptr">> {
+    return V.type.type === "funcptr" || V.type.type === "<unknown>";
 }
 
 // A failed version of 
@@ -134,6 +220,14 @@ export function isPointerType(V: C0Value<C0TypeClass>): V is C0Value<"ptr"> {
 
 export function isUnknownType(V: C0Value<C0TypeClass>): V is C0Value<"<unknown>"> {
     return V.type.type === "<unknown>";
+}
+
+export function isTagPointerType(V: C0Value<C0TypeClass>): V is C0Value<"tagptr"> {
+    return V.type.type === "tagptr";
+}
+
+export function isFuncPointerType(V: C0Value<C0TypeClass>): V is C0Value<"funcptr"> {
+    return V.type.type === "funcptr";
 }
 
 export function is_struct_pointer(V: C0Value<"ptr">): V is {

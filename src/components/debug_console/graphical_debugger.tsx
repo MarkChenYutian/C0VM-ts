@@ -7,13 +7,19 @@ import C0StructNode from "./graphical_component/struct_node";
 import C0ArrayNode from "./graphical_component/array_node";
 import C0PointerNode from "./graphical_component/pointer_node";
 import C0ValueNode from "./graphical_component/value_node";
+import C0UnknownNode from "./graphical_component/unknown_node";
+import C0TagPtrNode from "./graphical_component/tagptr_node";
+import C0FuncPtrNode from "./graphical_component/funcptr_node";
 
 const node_types = {
     stackNode: C0StackFrameNode,
     structNode: C0StructNode,
     arrayNode: C0ArrayNode,
     pointerNode: C0PointerNode,
-    valueNode: C0ValueNode
+    valueNode: C0ValueNode,
+    unknownNode: C0UnknownNode,
+    tagPtrNode: C0TagPtrNode,
+    funcPtrNode: C0FuncPtrNode
 };
 
 /**

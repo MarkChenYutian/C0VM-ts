@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import './application.css';
 import './embeddable.css';
-import 'antd/dist/reset.css';
+import 'antd/dist/reset.css'
 import { ConfigProvider } from 'antd';
 
 import C0VMApplication from './application';

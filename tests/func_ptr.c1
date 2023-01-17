@@ -1,0 +1,24 @@
+typedef int funcptr_fn ();
+
+struct T {
+    funcptr_fn* f;
+    funcptr_fn* g;
+};
+
+int f() {
+    return 0;
+}
+
+int g() {
+    return 42;
+}
+
+int main() {
+    struct T* T1 = alloc(struct T);
+    funcptr_fn** ptr = alloc(funcptr_fn*);
+    *ptr = &g;
+    T1 -> f = &g;
+    T1 -> g = &f;
+    (*T1 -> f)();
+    return 0;
+}
