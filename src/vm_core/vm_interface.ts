@@ -18,9 +18,10 @@ export async function initialize(
         }
 
         if (globalThis.DEBUG){
-            print_update("<span class='dbg-evaluate-field-name'>[DEBUG] Parsed Information from C0 Source Code:<br>" + 
+            print_update(
+                "<span class='stdout-info'>[DEBUG] Parsed Information from C0 Source Code:<br>" + 
                 JSON.stringify(
-                    { "Typedef": ns.typedef, "Struct Information": ns.state.TypeRecord }
+                    { "Typedef": ns.typedef, "Struct Information": ns.state.TypeRecord, "Function Type": ns.state.FuncTypeRecord }
                     , replacer, "&nbsp;"
                 ) + 
                 "</span>"

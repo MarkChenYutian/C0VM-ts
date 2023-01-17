@@ -31,9 +31,10 @@ function extract_all_libraries(editors: C0EditorTab[]): Set<string>{
  * @param code C0 code
  * @returns a list of typedefs in format {source: T, alais: T'}
  */
-function extract_typedef(code: string): TypeDefInfo[] {
+function extract_typedef(code: string): [TypeDefInfo[], Set<string>] {
     const syntaxTree = C0Language.parser.parse(code);
     const typedefs: TypeDefInfo[] = [];
+    const funcTypes = new Set<string> ();
 
     for (let ptr = syntaxTree.cursor(); ptr.next() !== false; ){
         if (ptr.type.is("TypeDefinition")){
@@ -42,14 +43,21 @@ function extract_typedef(code: string): TypeDefInfo[] {
             if (!ptr.type.is("Type")) { continue; }
             const source_type = code.substring(ptr.from, ptr.to);
             next_real_sibling(ptr);         // ptr = Target Type
-            if (!ptr.type.is("Type")) { continue; }
-            const alias_type = code.substring(ptr.from, ptr.to);
-            
-            typedefs.push({ source: source_type, alias: alias_type });
+            if (ptr.type.is("Identifier")) { 
+                // This is a function type definition!
+                // typedef int retNum_fn();
+                const function_type = code.substring(ptr.from, ptr.to);
+                funcTypes.add(function_type);
+            } else {
+                // This is a normal type definition
+                // typdef T T';
+                const alias_type = code.substring(ptr.from, ptr.to);
+                typedefs.push({ source: source_type, alias: alias_type });
+            }
         }
     }
 
-    return typedefs
+    return [typedefs, funcTypes];
 }
 
 /**
@@ -125,7 +133,7 @@ function extract_all_structs(editors: C0EditorTab[]): Map<string, Struct_Type_Re
 
 export function extract_all_structType(editors: C0EditorTab[]){
     const structInformation = extract_all_structs(editors);
-    const typeAlias         = extract_all_typedef(editors);
+    const [typeAlias,]      = extract_all_typedef(editors);
     const structTypeRecords = new Map<string, Map<number, Struct_Type_Record>>();
     
     for (let [structName, structFields] of Array.from(structInformation)){
@@ -200,16 +208,18 @@ export function extract_all_structType(editors: C0EditorTab[]){
 
 // Extract all typedefs in current editor
 // in format of {alias: source}
-export function extract_all_typedef(editors: C0EditorTab[]): Map<AliasType, SourceType>{
-    const rawTypedefs = [];
+export function extract_all_typedef(editors: C0EditorTab[]): [Map<AliasType, SourceType>, Set<string>]{
+    const rawTypedefs: TypeDefInfo[] = [];
+    const functionTypes = [];
     for (const editor of editors) {
-        rawTypedefs.push(...extract_typedef(editor.content));
+        const [typedef, functype] = extract_typedef(editor.content)
+        rawTypedefs.push(...typedef);
+        functionTypes.push(...Array.from(functype));
     }
     const typedef = flatten_typedef(rawTypedefs);
-    // const revTypedef = new Map<string, string>();
-    // typedef.forEach((source, alias) => {revTypedef.set(source, alias)});
+    const funcTypes = new Set(functionTypes);
 
-    return typedef;
+    return [typedef, funcTypes];
 }
 
 // Check if all libraries used in program is supported by C0VM.ts

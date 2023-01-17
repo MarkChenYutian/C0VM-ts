@@ -31,7 +31,7 @@ export function CloneType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
         case "tagptr":
             return {type: T.type, value: CloneType(T.value) as C0Type<"ptr">};
         case "funcptr":
-            return {type: T.type, kind: T.kind, fname: T.fname};
+            return {type: T.type};
         case "<unknown>":
             return {type: T.type};
     }
@@ -130,11 +130,11 @@ export function removeTagOnType(T: C0Type<C0TypeClass>): C0Type<C0TypeClass> {
         case "tagptr":
             return { type: T.type, value: {type: "<unknown>"} }
         case "funcptr":
-            return { type: T.type, kind: "native", fname: "<unknown>" }
+            return { type: T.type }
     }
 }
 
-
+// Check if the type is "certain" - i.e. does not contain <unknown> on all levels
 export function isCertainType(T: C0Type<C0TypeClass>): boolean {
     switch (T.type) {
         case "<unknown>":
@@ -157,6 +157,23 @@ export function isCertainType(T: C0Type<C0TypeClass>): boolean {
     }
 }
 
+// Convert T* into function pointer type if T is a registered function type in F
+export function stripFuncPtrType(T: C0Type<C0TypeClass>, F: Set<string>): C0Type<C0TypeClass> {
+    // T is struct pointer type
+    if (T.type === "ptr" && T.kind === "ptr" && T.value.type === "ptr" && T.value.kind === "struct") {
+        if (F.has(T.value.value)) {
+            return { type: "funcptr" }
+        }  
+    } else if (T.type === "ptr") {
+        const internal_type = T.value;
+        if (typeof internal_type !== "string") {
+            T.value = stripFuncPtrType(internal_type, F);
+        }
+    } else if (T.type === "tagptr") {
+        T.value = stripFuncPtrType(T.value, F) as C0Type<"ptr">;
+    }
+    return T;
+}
 
 /**
  * Type Narrowing functions that works better with TS type inference

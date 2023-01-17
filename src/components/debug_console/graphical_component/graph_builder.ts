@@ -330,7 +330,7 @@ function C0_Value_to_graph(
                     result_data = {
                         id: heapNodeID(v, mem),
                         position: {x, y},
-                        data: {val: v, mem, typedef, state, dragged: false},
+                        data: {ptr: v, mem, typedef, state, dragged: false},
                         type: "funcPtrNode",
                         extent: heap_node_extent
                     }

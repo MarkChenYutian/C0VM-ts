@@ -28,9 +28,7 @@ type C0Type<T extends C0TypeClass> =
         value: C0Type<Maybe<"ptr">>
     } :
     T extends "funcptr" ? {
-        type: T ,
-        kind: "native" | "static",
-        fname: string
+        type: T
     } :
     T extends "<unknown>" ? {
         type: T         // No more type information for unknown
@@ -270,7 +268,9 @@ type VM_State = {
     // The type pool (struct type information) hashmap
     TypeRecord: Map<string, Map<number, Struct_Type_Record>>,
     // The tag pointer recording hashmap
-    TagRecord: Map<number, C0Type<"ptr">>
+    TagRecord: Map<number, C0Type<"ptr">>,
+    // The set of function type names
+    FuncTypeRecord: Set<string>
 };
 
 

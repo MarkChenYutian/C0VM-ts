@@ -9,10 +9,16 @@ int f() {
     return 0;
 }
 
+int g() {
+    return 42;
+}
+
 int main() {
     struct T* T1 = alloc(struct T);
-    T1 -> f = &f;
+    funcptr_fn** ptr = alloc(funcptr_fn*);
+    *ptr = &g;
+    T1 -> f = &g;
     T1 -> g = &f;
-    (*T1 -> g)();
+    (*T1 -> f)();
     return 0;
 }

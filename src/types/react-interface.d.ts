@@ -210,6 +210,14 @@ interface C0PointerNodeData {
     dragged: boolean,
 }
 
+interface C0FuncPtrNodeData {
+    ptr: C0Value<"ptr">,
+    mem: C0HeapAllocator,
+    typedef: Map<string, string>,
+    state: VM_State,
+    dragged: boolean,
+}
+
 interface C0ValueNodeData {
     val: C0Value<"ptr">,
     mem: C0HeapAllocator,
@@ -218,7 +226,7 @@ interface C0ValueNodeData {
     dragged: boolean,
 }
 
-type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData | C0TagPointerData;
+type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData | C0TagPointerData | C0FuncPtrNodeData;
 
 interface ApplicationCrashPageProps {
     state: C0VMApplicationState;

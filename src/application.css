@@ -438,6 +438,10 @@ div.dbg-node-base:hover {
     background-color: #c0c0c00F;
 }
 
+.stdout-info {
+    color: #0287da;
+}
+
 .right-aligned {
     text-align: right;
 }

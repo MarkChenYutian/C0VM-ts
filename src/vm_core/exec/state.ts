@@ -24,9 +24,11 @@ export default class C0VM_RuntimeState implements C0VM_RT{
      * GlobalThis.MEM_POOL_DEFAULT_SIZE as the size.
      */
     constructor(rawByteCode: string, C0Source: C0EditorTab[], heapSize?: number) {
+        const [typedef, functype] = extract_all_typedef(C0Source);
+
         this.c0_source = C0Source;
         this.raw_code  = rawByteCode;
-        this.typedef   = extract_all_typedef(this.c0_source);
+        this.typedef   = typedef
         this.code      = parse(rawByteCode, C0Source, this.typedef);
         this.heap_size = heapSize;
         this.allocator = createHeap(VM_Memory, heapSize);
@@ -49,7 +51,8 @@ export default class C0VM_RuntimeState implements C0VM_RT{
             CurrLineNumber: 0,
             CurrC0RefLine: undefined,
             TypeRecord: extract_all_structType(C0Source),
-            TagRecord: new Map<number, C0Type<"ptr">>()
+            TagRecord: new Map<number, C0Type<"ptr">>(),
+            FuncTypeRecord: functype
         };
     }
 

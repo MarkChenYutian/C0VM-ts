@@ -661,7 +661,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             state.CurrFrame.PC += 2;
 
             const ptr = allocator.malloc(s);
-            const T = TypeUtil.String2Type(comment.dataType as string);
+            const T = TypeUtil.stripFuncPtrType(TypeUtil.String2Type(comment.dataType as string), state.FuncTypeRecord);
             state.CurrFrame.S.push(
                 build_c0_ptrValue(ptr, "ptr", T)
             );
@@ -845,7 +845,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             // for the +4 in this malloc, See explanation of t[] in Execution/C0Value and Pointer
             const ptr = allocator.malloc(f * a.value.getUint32(0) + 4);
             const comment_str = comment.dataType;
-            const elem_type = comment_str === undefined ? {type: "<unknown>"} : TypeUtil.String2Type(comment_str);
+            const elem_type = comment_str === undefined ? 
+                {type: "<unknown>"} : 
+                TypeUtil.stripFuncPtrType(TypeUtil.String2Type(comment_str), state.FuncTypeRecord);
             
             // the first 4 bytes of array is used to store the size of each element
             allocator.deref(ptr).setUint32(0, f);
