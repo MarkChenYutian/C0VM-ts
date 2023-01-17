@@ -160,10 +160,6 @@ i.editor-load-hint {
     flex-grow: 1;
 }
 
-.error-output {
-    color: #f27b7b;
-}
-
 /* Buttons */
 
 .base-btn {
@@ -440,6 +436,10 @@ div.dbg-node-base:hover {
 
 .stdout-info {
     color: #0287da;
+}
+
+.stdout-error {
+    color: #f27b7b;
 }
 
 .right-aligned {

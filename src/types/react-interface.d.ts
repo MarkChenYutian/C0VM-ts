@@ -36,6 +36,8 @@ interface C0VMApplicationState {
     c0_only        : boolean,               /* C0 only mode or not */
     contentChanged : boolean,               /* If content has changed or not (requires re-compile) */
     dbgFullScreen  : boolean,               /* If it is in full screen mode currently */
+
+    tutorialOn     : boolean,               /* See if the tutorial page is on or not */
     settingMenuOn  : boolean,               /* See if the setting menu is on or not */
 
     BC0SourceCode  : string,                /* The content of BC0 code editor */
@@ -64,6 +66,20 @@ interface MainControlProps {
                             callback?: () => void
                         ): void,
 };
+
+
+interface TutorialPanelProps {
+    state : C0VMApplicationState,
+    set_app_state<K extends keyof C0VMApplicationState>(
+        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
+                => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
+            | (Pick<C0VMApplicationState, K> 
+            | C0VMApplicationState 
+            | null),
+        callback?: () => void
+    ): void
+}
+
 
 interface CodeEditorProps {
     app_state: C0VMApplicationState,

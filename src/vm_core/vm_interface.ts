@@ -24,7 +24,7 @@ export async function initialize(
                     { "Typedef": ns.typedef, "Struct Information": ns.state.TypeRecord, "Function Type": ns.state.FuncTypeRecord }
                     , replacer, "&nbsp;"
                 ) + 
-                "</span>"
+                "</span><br>"
             );
             console.log({
                 "Code": ns.code,
@@ -36,7 +36,7 @@ export async function initialize(
         return ns;
     } catch (e) {
         const err = e as Error;
-        print_update(`<span class="error-output"> Program aborted with error message: <br/>${err.message} </span>`);
+        print_update(`<span class="stdout-error"> Program aborted with error message: <br/>${err.message} </span>`);
         globalThis.MSG_EMITTER.warn("Load Failed", "Failed to load code into C0VM");
         if(globalThis.DEBUG) console.error(e);
         return undefined;
@@ -70,7 +70,7 @@ export async function step(s: C0VM_RT, c0_only: boolean, print_update: (s: strin
             return [new_state, can_continue];
         } catch(e) {
             const err = e as Error;
-            print_update(`<span class="error-output"> Program aborted with error message: <br/>${err.message} </span>`);
+            print_update(`<span class="stdout-error"> Program aborted with error message: <br/>${err.message} </span>`);
             globalThis.MSG_EMITTER.err("Exception during runtime (" + err.name + ")", err.message);   
             if(globalThis.DEBUG) console.error(e);
             return [s, false];
@@ -105,7 +105,7 @@ export async function autoStep(
         [new_state,can_continue] = await step(new_state,c0_only,print_update);
     } catch(e) {
         const err = e as Error;
-        print_update(`<span class="error-output"> Program aborted with ${err.message} </span>`);
+        print_update(`<span class="stdout-error"> Program aborted with ${err.message} </span>`);
         globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);
         if(globalThis.DEBUG) console.error(e);
         resetSig();
@@ -189,7 +189,7 @@ export async function run(
             }
         } catch(e) {
             const err = e as Error;
-            print_update(`<span class="error-output"> Program aborted with error message: <br/>${err.message} </span>`);
+            print_update(`<span class="stdout-error"> Program aborted with error message: <br/>${err.message} </span>`);
             globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);
             if(globalThis.DEBUG) console.error(e);
 
