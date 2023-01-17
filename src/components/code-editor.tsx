@@ -20,7 +20,7 @@ export default class CodeEditor extends React.Component
             C0_nextKey : tabs.length === 0 ? 1 : Math.max(...tabs.map((tab) => tab.key)) + 1
         }
         this.handle_import_folder = this.handle_import_folder.bind(this);
-        console.debug("handle_import_folder in CodeEditor is", this.handle_import_folder)
+        if (DEBUG) console.debug("handle_import_folder in CodeEditor is", this.handle_import_folder)
     }
 
     push_populated_tab(tab: C0EditorTab) {
@@ -75,7 +75,7 @@ export default class CodeEditor extends React.Component
     // this function is called for every file in the uploaded directory, recursive.
     // the function is called by ant design component "Upload"
     handle_import_folder(F: RcFile, FList: RcFile[]) {
-        console.debug("received a folder upload, processing one of them")
+        if (DEBUG) console.debug("received a folder upload, processing one of them")
 
         if (!(F.name.endsWith('.c0') || F.name.endsWith('.c1'))) {
             globalThis.MSG_EMITTER.warn(

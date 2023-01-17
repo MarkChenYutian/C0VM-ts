@@ -22,7 +22,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         this.on_change_key = this.on_change_key.bind(this);
         this.update_tab_order = this.update_tab_order.bind(this);
         this.set_brkpt_for_editor = this.set_brkpt_for_editor.bind(this);
-        console.debug("handle_import_folder prop in C0EditorGroup is", this.props.handle_import_folder)
+        if (DEBUG) console.debug("handle_import_folder prop in C0EditorGroup is", this.props.handle_import_folder);
     }
 
     set_tab_name(key: number, name: string){
