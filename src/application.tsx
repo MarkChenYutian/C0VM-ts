@@ -23,7 +23,7 @@ export default class C0VMApplication extends React.Component<
 
         this.state = {
             crashed        : false,
-            c0_only        : false,
+            c0_only        : true,
             contentChanged : true,
             dbgFullScreen  : false,
 
