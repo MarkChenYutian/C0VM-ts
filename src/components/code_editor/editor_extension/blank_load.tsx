@@ -10,6 +10,12 @@ import { internal_error } from "../../../utility/errors";
 import type { RcFile } from 'antd/lib/upload';
 
 
+function do_support_directory_upload(): boolean {
+    const inputElem = document.createElement("input");
+    inputElem.type = "file";
+    return "webkitdirectory" in inputElem;
+}
+
 
 function loadFileThroughDialog(e: Event, v: EditorView, update_title?: (s: string) => void) {
     if (e.target === null) throw new internal_error("Failed to read input file");
@@ -102,13 +108,15 @@ class LoadDocumentWidget extends WidgetType {
         tmp.textContent = "Load Manually"
         load_dom.appendChild(tmp);
 
-        load_dom.appendChild(document.createElement("br"));
-        load_dom.appendChild(document.createTextNode("Or "))
-        let tmp2 = document.createElement("a");
-        tmp2.className = "active-href";
-        tmp2.textContent = "Import Folder"
-        tmp2.onclick = () => onLoadFolder(this.handle_import_folder);
-        load_dom.appendChild(tmp2);
+        if (do_support_directory_upload()) {
+            load_dom.appendChild(document.createElement("br"));
+            load_dom.appendChild(document.createTextNode("Or "))
+            let tmp2 = document.createElement("a");
+            tmp2.className = "active-href";
+            tmp2.textContent = "Import Folder"
+            tmp2.onclick = () => onLoadFolder(this.handle_import_folder);
+            load_dom.appendChild(tmp2);
+        }
 
         load_dom.appendChild(document.createElement("br"));
         load_dom.appendChild(document.createTextNode("Or type anything in editor to remove this message."))
