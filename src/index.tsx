@@ -11,14 +11,14 @@ import C0VMApplication from './application';
 import AntdEmitter from './utility/antd_emitter';
 
 // Global Variables
-global.C0VM_VERSION = "1.0.0";
+global.C0VM_VERSION = "1.0.1";
 
 globalThis.DEBUG = false;
 globalThis.DEBUG_DUMP_MEM = false;
 globalThis.DEBUG_DUMP_STEP = false;
 
-globalThis.MEM_POOL_SIZE = 1024 * 50;
-globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 50;
+globalThis.MEM_POOL_SIZE = 1024 * 100;
+globalThis.MEM_POOL_DEFAULT_SIZE = 1024 * 100;
 globalThis.MEM_POOL_MAX_SIZE = 0xFFFF_FFFE;
 globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
 

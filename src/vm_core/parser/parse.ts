@@ -139,8 +139,10 @@ function resolve_type_info(byte_instruct: string, comment: string, typedef_lib: 
         return Type2String(apply_typedef(String2Type(parsed_comment[1]), typedef_lib));
     } else if (byte_instruct.toUpperCase().startsWith("BIPUSH")) {
         if (regex_int_comment.test(comment)) return "int";
-        if (regex_bool_comment.test(comment)) return "bool";
-        if (regex_char_comment.test(comment)) return "char";
+        else if (regex_bool_comment.test(comment)) return "bool";
+        else if (regex_char_comment.test(comment)) return "char";
+        else return "bool"; // noticed that cc0 compiler may not always generate type hint on comment column
+        // For instance, when running assert(!f(x)), a 1 will be pushed onto stack and run ixor with f(x)
     }
     return undefined;
 }

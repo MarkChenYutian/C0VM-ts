@@ -1,9 +1,0 @@
-#use <conio>
-
-int main() {
-    string S = "Hello world! -- by C0VM.ts";
-    string name = readline();
-    println(S);
-    printf("Hello %s!\n", name);
-    return 0;
-}

@@ -1,0 +1,6 @@
+#use <conio>
+
+int main() {
+    printf("Bahhhhhhhahahhahahahah");
+    return 0;
+}

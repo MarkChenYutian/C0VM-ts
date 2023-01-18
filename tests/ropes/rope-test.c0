@@ -1,0 +1,350 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2022                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+#use <conio>
+#use <parse>
+
+// You are welcome to define helper functions for your tests
+
+// A safe checker that put a layer of abstraction on all dirty things
+void safe_property_checker( string instructions1, string instructions2,
+                            rope_t start_point, rope_t start_point2)
+{
+  rope_t ptr = start_point;
+  int n1 = string_length(instructions1);
+  int n2 = string_length(instructions2);
+  for (int i = 0; i < n1; i ++){
+    assert (ptr != NULL);
+    if (string_charat(instructions1, i) == 'l'){
+      ptr = ptr -> left;
+    } else if (string_charat(instructions1, i) == 'r'){
+      ptr = ptr -> right;
+    }
+  }
+  rope_t ptr2 = start_point2;
+  for (int i = 0; i < n2; i ++){
+    assert (ptr2 != NULL);
+    if (string_charat(instructions2, i) == 'l'){
+      ptr2 = ptr2 -> left;
+    } else if (string_charat(instructions2, i) == 'r'){
+      ptr2 = ptr2 -> right;
+    }
+  }
+  assert (ptr == ptr2);
+}
+
+
+int main() {
+  // Create a few ropes
+  // Example
+  rope_t example1 = rope_join(rope_join(rope_new("happ"), rope_new("y birth")), rope_new("day!"));
+
+  // Flaw 1
+  rope_t simple_fail3 = rope_new("a");
+  rope_t simple_fail3_n2 = rope_new("a");
+  simple_fail3 -> left = simple_fail3_n2;
+  simple_fail3 -> len = 4;
+  simple_fail3_n2 -> len = 0; // Trick checkers
+  simple_fail3 -> right = simple_fail3;
+  // Flaw 1, but symmetrical
+  rope_t simple_fail3s = rope_new("a");
+  rope_t simple_fail3s_n2 = rope_new("a");
+  simple_fail3s -> right = simple_fail3s_n2;
+  simple_fail3s -> len = 4;
+  simple_fail3_n2 -> len = 0; // Trick checkers
+  simple_fail3s -> left = simple_fail3s;
+
+  // Success 1, thanks HEHEHEHEHA
+  // https://www.diderot.one/courses/115/post-office/63037
+  rope_t success_1 = rope_join(
+    rope_join(rope_new("r"),
+              rope_join(rope_new("o"),
+                        rope_new("xxx"))),
+    rope_join(rope_new("p"), rope_new("l"))
+  );
+  // Prevent segfault when rope_join is buggy
+  assert (success_1 != NULL);
+  assert (success_1 -> left != NULL);
+  assert (success_1 -> right != NULL);
+  assert (success_1 -> left -> right != NULL);
+  assert (success_1 -> left -> right -> right != NULL);
+
+  success_1 -> left -> right -> right -> left = rope_new("o");
+  success_1 -> left -> right -> right -> right = success_1 -> right;
+
+  // Failure Case 1
+  rope_t simple_fail1 = rope_new("a");
+  rope_t simple_fail1_n1 = rope_new("b");
+  simple_fail1 -> left = simple_fail1_n1;
+
+  // Just a symmetrical one
+  rope_t simple_fail1s = rope_new("a");
+  rope_t simple_fail1s_n1 = rope_new("b");
+  simple_fail1s -> right = simple_fail1s_n1;
+
+  // Failure Case 2 - overflow should not be allowed(?)
+  rope_t simple_fail2 = rope_join(rope_new("a"), rope_new("b"));
+  // Prevent segfault when rope_join is buggy
+  assert (simple_fail2 -> left != NULL && simple_fail2 -> right != NULL);
+  simple_fail2 -> left -> len = int_max();
+  simple_fail2 -> right -> len = int_max();
+  simple_fail2 -> len = -2;
+
+  // Failure Case 4 - empty node should not exist
+  rope_t simple_fail4 = rope_new("a");
+  simple_fail4 -> len = 0;
+  simple_fail4 -> data = "";
+
+  // Failure Case 5 - loopy rope
+  rope_t loopy_fail = rope_join(rope_new("abc"), rope_new("b"));
+  rope_t node_neg1 = rope_new("a");
+  node_neg1 -> len = -1;
+  // Prevent segfault when rope_join is buggy
+  assert (loopy_fail -> left != NULL && loopy_fail -> right != NULL);
+  loopy_fail -> left -> left = loopy_fail;
+  loopy_fail -> left -> right = node_neg1;
+
+  // Failure Case 5s - symmetrical to case 5
+  rope_t loopy_fail_s = rope_join(rope_new("a"), rope_new("abc"));
+  rope_t node_neg1_s = rope_new("a");
+  node_neg1_s -> len = -1;
+  // Prevent segfault when rope_join is buggy
+  assert (loopy_fail_s -> left != NULL && loopy_fail_s -> right != NULL);
+  loopy_fail_s -> right -> right = loopy_fail_s;
+  loopy_fail_s -> right -> left = node_neg1_s;
+
+  // Failure Case 6 - Naive Loop
+  rope_t simple_fail5 = rope_new("abcd");
+  rope_t simple_fail5_n1 = rope_new("a");
+  simple_fail5_n1 -> len = 0;
+  simple_fail5 -> left = simple_fail5_n1;
+  simple_fail5 -> right = simple_fail5;
+
+  // Failure Case 6s - symmetrical of case 6
+  rope_t simple_fail5s = rope_new("abcd");
+  rope_t simple_fail5s_n1 = rope_new("a");
+  simple_fail5s_n1 -> len = 0;
+  simple_fail5s -> right = simple_fail5s_n1;
+  simple_fail5s -> left = simple_fail5s;
+
+  rope_t[] T1 = alloc_array(rope_t, 3);
+  rope_t[] T1_ref = alloc_array(rope_t, 3);
+  T1[0] = rope_join(rope_new("a"), rope_new("br"));
+  T1[1] = rope_join(rope_new("abr"), rope_new("a"));
+  T1[2] = rope_join(rope_new("a"), rope_join(rope_new("br"), rope_new("a")));
+  T1_ref[0] = rope_join(rope_new("a"), rope_new("br"));
+  T1_ref[1] = rope_join(rope_new("abr"), rope_new("a"));
+  T1_ref[2] = rope_join(rope_new("a"), rope_join(rope_new("br"), rope_new("a")));
+
+  rope_t[] T2 = alloc_array(rope_t, 2);
+  rope_t[] T2_ref = alloc_array(rope_t, 2);
+  // Why don't we have a C0-to-Tree tool just like guys in 15-150 do ...
+  T2[0] = rope_join(rope_join(rope_join(rope_join(rope_new("a"),
+                                                  rope_new("a")),
+                                        rope_new("a")),
+                              rope_new("a")),
+                    rope_new("a"));
+  assert (is_rope(T2[0]));
+
+  T2[1] = rope_join(rope_join(rope_join(rope_new("a"),
+                                        rope_new("a")),
+                              rope_join(rope_new("a"),
+                                        rope_new("a"))),
+                    rope_join(rope_join(rope_new("a"),
+                                        rope_new("a")),
+                              rope_join(rope_new("a"),
+                                        rope_new("a"))));
+  assert (is_rope(T2[1]));
+
+  T2_ref[0] = rope_join(rope_join(rope_join(rope_join(rope_new("a"),
+                                                  rope_new("a")),
+                                        rope_new("a")),
+                              rope_new("a")),
+                    rope_new("a"));
+
+  T2_ref[1] = rope_join(rope_join(rope_join(rope_new("a"),
+                                        rope_new("a")),
+                              rope_join(rope_new("a"),
+                                        rope_new("a"))),
+                    rope_join(rope_join(rope_new("a"),
+                                        rope_new("a")),
+                              rope_join(rope_new("a"),
+                                        rope_new("a"))));
+
+  rope_t[] T3 = alloc_array(rope_t, 4);
+  rope_t[] T3_ref = alloc_array(rope_t, 4);
+  T3[0] = rope_join(rope_new("a"),
+                    rope_join(rope_new("br"),
+                              rope_new("a")));
+  T3[1] = NULL;
+  T3[2] = rope_join(rope_new("abr"),
+                    rope_new("e"));
+  T3[3] = rope_new("bre");
+
+  T3_ref[0] = rope_join(rope_new("a"),
+                    rope_join(rope_new("br"),
+                              rope_new("a")));
+  T3_ref[1] = NULL;
+  T3_ref[2] = rope_join(rope_new("abr"),
+                    rope_new("e"));
+  T3_ref[3] = rope_new("bre");
+
+
+
+
+
+  // Using them, test the functions you wrote in file rope.c1
+
+  // is_rope
+  assert (is_rope(NULL));
+  assert (is_rope(example1));
+  assert (is_rope(success_1));
+  assert (is_rope(T1[0]));
+  assert (is_rope(T1[1]));
+  assert (is_rope(T1[2]));
+  assert (is_rope(T2[0]));
+  assert (is_rope(T2[1]));
+  assert (is_rope(T3[0]));
+  assert (is_rope(T3[1]));
+  assert (is_rope(T3[2]));
+  assert (is_rope(T3[3]));
+
+  assert (!is_rope(simple_fail1));
+  assert (!is_rope(simple_fail1s));
+  assert (!is_rope(simple_fail2));
+  assert (!is_rope(simple_fail3));
+  assert (!is_rope(simple_fail3s));
+  assert (!is_rope(simple_fail4));
+  assert (!is_rope(simple_fail5));
+  assert (!is_rope(simple_fail5s));
+  assert (!is_rope(loopy_fail));
+  assert (!is_rope(loopy_fail_s));
+  
+
+  // rope_new
+  assert (rope_new("") == NULL);
+  assert (rope_new("abc") -> len == 3);
+  assert (string_equal(rope_new("abc") -> data, "abc"));
+
+  // rope_charat
+  string s1 = "happy birthday!";
+  for (int i = 0; i < rope_length(example1); i ++){
+    assert(string_charat(s1, i) == rope_charat(example1, i));
+  }
+
+  string s2 = "rooplpl";
+  for (int i = 0; i < rope_length(success_1); i ++){
+    assert(string_charat(s2, i) == rope_charat(success_1, i));
+  }
+
+  // rope_tostring
+  assert (string_equal(s1, rope_tostring(example1)));
+  assert (string_equal(s2, rope_tostring(success_1)));
+
+  // rope_join
+  rope_t dummy_join = rope_new("a");
+  assert (rope_join(NULL, dummy_join) == dummy_join);
+  assert (rope_join(dummy_join, NULL) == dummy_join);
+  assert (rope_join(NULL, NULL) == NULL);
+  assert (string_equal("a", rope_tostring(rope_join(NULL, rope_new("a")))));
+  assert (string_equal("a", rope_tostring(rope_join(rope_new("a"), NULL))));
+  assert (string_equal("", rope_tostring(rope_join(NULL, NULL))));
+  assert (string_equal("abc", rope_tostring(
+    rope_join(rope_new("a"), rope_join(rope_new("b"), rope_new("c")))
+  )));
+  assert (string_equal("ac", rope_tostring(
+    rope_join(rope_new("a"), rope_join(NULL, rope_new("c")))
+  )));
+  assert (string_equal("abrabra", rope_tostring(rope_join(T1[0], T1[1]))));
+  assert (string_equal("aaaaaaaaaaaaa", rope_tostring(rope_join(T2[0], T2[1]))));
+  assert (string_equal("abrabraaaaaaaaaaaaaa", rope_tostring(rope_join(
+          rope_join(T1[0], T1[1]), rope_join(T2[0], T2[1])))));
+  assert (string_equal("aaaaaaaaaaaaaabrabra", rope_tostring(rope_join(
+          rope_join(T2[0], T2[1]), rope_join(T1[0], T1[1])))));
+  assert (rope_join(T2[0], T2[1]) -> left == T2[0]);
+  assert (rope_join(T2[0], T2[1]) -> right == T2[1]);
+
+  assert (is_rope(rope_join(NULL, dummy_join)));
+  assert (is_rope(rope_join(dummy_join, NULL)));
+  assert (is_rope(rope_join(NULL, NULL)));
+  assert (is_rope(rope_join(T1[0], T1[1])));
+  assert (is_rope(rope_join(T2[0], T2[1])));
+  assert (is_rope(rope_join(rope_new("a"), rope_join(NULL, rope_new("c")))));
+
+  // rope_sub
+  assert (string_equal(rope_tostring(rope_sub(example1, 0, 0)), ""));
+  // Do u use shared memory?
+  assert (rope_sub(example1, 0, 4) == example1 -> left -> left);
+  assert (rope_sub(example1, 0, 11) == example1 -> left);
+  assert (rope_sub(example1, 11, 15) == example1 -> right);
+  assert (rope_sub(example1, 7, 15) -> right == example1 -> right);
+  assert (rope_sub(example1, 4, 15) -> right == example1 -> right);
+  assert (rope_sub(example1, 4, 15) -> left == example1 -> left -> right);
+  assert (rope_sub(success_1, 0, 1) == success_1 -> left -> left);
+  assert (rope_sub(success_1, 3, 5) == success_1 -> right);
+  assert (rope_sub(success_1, 1, 5) == success_1 -> left -> right);
+  rope_t sub_1 = rope_sub(success_1, 1, 4);
+  assert (sub_1 -> left == success_1 -> left -> right -> left);
+  assert (sub_1 -> right != NULL);
+  assert (sub_1 -> right -> left == success_1 -> left -> right -> right -> left);
+  assert (sub_1 -> right -> right == success_1 -> right -> left);
+  // Coverage Test
+  for (int i = 0; i < 15; i ++){
+    for (int j = i + 1; j < 16; j ++){
+      assert (string_equal(
+        string_sub(s1, i, j), rope_tostring(rope_sub(example1, i, j))
+      ));
+      assert(is_rope(rope_sub(example1, i, j)));
+    }
+  }
+  for (int i = 0; i < 7; i ++){
+    for (int j = i + 1; j < 8; j ++){
+      assert (string_equal(
+        string_sub(s2, i, j), rope_tostring(rope_sub(success_1, i, j))
+      ));
+      assert(is_rope(rope_sub(success_1, i, j)));
+    }
+  }
+
+
+  // compress
+  rope_reduce(alloc_array(rope_t, 0), 0);
+  rope_reduce(alloc_array(rope_t, 1), 1);
+  rope_reduce(alloc_array(rope_t, 10), 10);
+  rope_reduce(T1, 3);
+  for (int i = 0; i < 3; i ++){
+    assert(is_rope(T1[i]));
+    assert(string_equal(rope_tostring(T1[i]), rope_tostring(T1_ref[i])));
+  }
+
+  rope_reduce(T2, 2);
+  for (int i = 0; i < 2; i ++){
+    assert(is_rope(T2[i]));
+    assert(string_equal(rope_tostring(T2[i]), rope_tostring(T2_ref[i])));
+  }
+
+  rope_reduce(T3, 4);
+  for (int i = 0; i < 4; i ++){
+    assert(is_rope(T3[i]));
+    assert(string_equal(rope_tostring(T3[i]), rope_tostring(T3_ref[i])));
+  }
+
+  // Effectiveness Check
+  safe_property_checker("l", "", T1[1], T1[0]);
+  safe_property_checker("l", "", T1[2], T1[0]);
+  safe_property_checker("l", "r", T1[0], T1[1]);
+  safe_property_checker("l", "r", T1[0], T1[2]);
+
+  safe_property_checker("l", "l", T2[0], T2[1]);
+  safe_property_checker("l", "r", T2[0], T2[1]);
+  safe_property_checker("llll", "r", T2[0], T2[0]);
+  safe_property_checker("llll", "lr", T2[0], T2[0]);
+  safe_property_checker("llll", "llr", T2[0], T2[0]);
+  safe_property_checker("llll", "lllr", T2[0], T2[0]);
+
+  safe_property_checker("rr", "l", T3[0], T3[0]);
+
+  printf("All tests passed!\n");
+  return 0;
+}

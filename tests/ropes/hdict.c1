@@ -1,0 +1,215 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2022                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+/*
+ * Generic dictionaries, implemented with separate chaining
+ *
+ * 15-122 Principles of Imperative Computation
+ */
+
+#use <util>
+#use <conio>
+
+/************************************************************************/
+/**************************** Client Interface **************************/
+
+typedef void* entry;
+typedef void* key;
+
+typedef key entry_key_fn(entry x)            // Supplied by client
+          /*@requires x != NULL; @*/ ;
+typedef int key_hash_fn(key k);              // Supplied by client
+typedef bool key_equiv_fn(key k1, key k2);   // Supplied by client
+
+/************************* End Client Interface *************************/
+/************************************************************************/
+
+/************************************************************************/
+/************************* BEGIN IMPLEMENTATION *************************/
+
+typedef struct chain_node chain;
+struct chain_node {
+  entry  data;           // != NULL; contains both key and value
+  chain* next;
+};
+
+typedef struct hdict_header hdict;
+struct hdict_header {
+  int size;             // 0 <= size
+  chain*[] table;       // \length(table) == capacity
+  int capacity;         // 0 < capacity
+  entry_key_fn* key;    // != NULL
+  key_hash_fn* hash;    // != NULL
+  key_equiv_fn* equiv;  // != NULL
+};
+
+bool key_equiv(hdict* H, key k1, key k2)
+//@requires H != NULL && H->equiv != NULL;
+{
+  return (*H->equiv)(k1, k2);
+}
+
+int index_of_key(hdict* H, key k)
+//@requires H != NULL && H->capacity > 0 && H->hash != NULL;
+//@ensures 0 <= \result && \result < H->capacity;
+{
+  return abs((*H->hash)(k) % H->capacity);
+}
+
+key entry_key(hdict* H, entry x)
+//@requires  H != NULL && H->key != NULL && x != NULL;
+{
+  return (*H->key)(x);
+}
+
+// All hash values are correct for the current index
+bool is_chain(hdict* H, chain* p, int i)
+//@requires H != NULL && H->capacity > 0 && H->hash != NULL;
+{
+  if (p == NULL) return true;
+  return p->data != NULL
+    && index_of_key(H, entry_key(H, p->data)) == i
+    && is_chain(H, p->next, i);
+}
+
+bool is_chains(hdict* H, int lo, int hi)
+//@requires H != NULL && H->capacity > 0 && H->hash != NULL;
+//@requires \length(H->table) == H->capacity;
+//@requires 0 <= lo && lo <= hi && hi <= H->capacity;
+{
+  for (int i = lo; i < hi; i++)
+    if (!is_chain(H, H->table[i], i)) return false;
+  return true;
+}
+
+bool is_table_expected_length(chain*[] table, int length) {
+  //@assert \length(table) == length;
+  return true;
+}
+
+bool is_hdict(hdict* H) {
+  return H != NULL
+      && H->capacity > 0
+      && H->size >= 0
+      && H->key   != NULL
+      && H->hash  != NULL
+      && H->equiv != NULL
+      && is_table_expected_length(H->table, H->capacity)
+    && is_chains(H, 0, H->capacity);
+}
+
+hdict* hdict_new(int capacity,
+                 entry_key_fn* entry_key, key_hash_fn* hash, key_equiv_fn* equiv)
+//@requires capacity > 0;
+//@requires entry_key != NULL && hash != NULL && equiv != NULL;
+//@ensures is_hdict(\result);
+{
+  hdict* H = alloc(hdict);
+  H->size = 0;
+  H->capacity = capacity;
+  H->table = alloc_array(chain*, capacity);
+  H->key   = entry_key;
+  H->hash  = hash;
+  H->equiv = equiv;
+  return H;
+}
+
+entry hdict_lookup(hdict* H, key k)
+//@requires is_hdict(H);
+//@ensures \result == NULL || key_equiv(H, entry_key(H, \result), k);
+{
+  int i = index_of_key(H, k);
+  for (chain* p = H->table[i]; p != NULL; p = p->next)
+  //@loop_invariant is_chain(H, p, i);
+  {
+    if (key_equiv(H, entry_key(H, p->data), k))
+      return p->data;
+  }
+  return NULL;
+}
+
+void hdict_resize(hdict* H)
+//@requires is_hdict(H);
+//@requires H->size >= H->capacity;
+//@ensures is_hdict(H);
+{
+  int old_capacity = H->capacity;
+  int new_capacity = H->size * 2;
+  assert(new_capacity > H->capacity);
+  chain*[] old_table = H->table;
+  chain*[] new_table = alloc_array(chain*, new_capacity);
+
+  printf("(hdict resizing to %d)\n", new_capacity);
+  H->capacity = new_capacity; // is_hdict now violated!
+  H->table = new_table; // is_hdict restored *only* because we don't check size
+
+  for (int i = 0; i < old_capacity; i++)
+  //@loop_invariant 0 <= i && i <= old_capacity;
+  //@loop_invariant is_hdict(H); // only because we don't check size
+  {
+    chain* p = old_table[i];
+    while (p != NULL)
+    //@loop_invariant is_hdict(H); // only because we don't check size
+    {
+      //@assert p->data != NULL;
+      chain* q = p->next; // Save the rest of the chain
+      int h = index_of_key(H, entry_key(H, p->data));
+      p->next = H->table[h];
+      H->table[h] = p;
+      p = q;
+    }
+  }
+}
+
+void hdict_insert(hdict* H, entry x)
+//@requires is_hdict(H);
+//@requires x != NULL;
+//@ensures is_hdict(H);
+//@ensures hdict_lookup(H, entry_key(H, x)) == x;
+{
+  key k = entry_key(H, x);
+  int i = index_of_key(H, k);
+  for (chain* p = H->table[i]; p != NULL; p = p->next)
+  //@loop_invariant is_chain(H, p, i);
+  {
+    if (key_equiv(H, entry_key(H, p->data), k)) {
+      p->data = x;
+      return;
+    }
+  }
+
+  // prepend new entry
+  chain* p = alloc(chain);
+  p->data = x;
+  p->next = H->table[i];
+  H->table[i] = p;
+  (H->size)++;
+  assert(H->size > 0);
+
+  if (H->size >= H->capacity) hdict_resize(H);
+}
+
+
+// Client-side type
+typedef hdict* hdict_t;
+
+/************************** END IMPLEMENTATION **************************/
+/************************************************************************/
+
+/************************************************************************/
+/*************************** Library Interface **************************/
+
+// typedef ______* hdict_t;
+
+hdict_t hdict_new(int capacity,
+                  entry_key_fn* entry_key, key_hash_fn* hash, key_equiv_fn* equiv)
+/*@requires capacity > 0; @*/
+/*@requires entry_key != NULL && hash != NULL && equiv != NULL; @*/
+/*@ensures \result != NULL; @*/ ;
+
+entry hdict_lookup(hdict_t H, key k)
+/*@requires H != NULL; @*/ ;
+
+void hdict_insert(hdict_t H, entry x)
+/*@requires H != NULL && x != NULL; @*/ ;

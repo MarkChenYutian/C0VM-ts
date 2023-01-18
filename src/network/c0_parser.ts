@@ -1,5 +1,6 @@
 import { C0Language } from "../components/code_editor/editor_extension/syntax/c0";
-import { String2Type } from "../utility/c0_type_utility";
+import { String2Type, Type2String } from "../utility/c0_type_utility";
+import { internal_error } from "../utility/errors";
 
 
 function extract_library(code: string) {
@@ -61,6 +62,40 @@ function extract_typedef(code: string): [TypeDefInfo[], Set<string>] {
 }
 
 /**
+ * Try apply typedef to the type (recursively)
+ * 
+ * If the 
+ * 
+ * @param T The type to be apply typedef with
+ * @param typedefs current typedefs in project
+ */
+function try_typedef_recursively(T: C0Type<C0TypeClass>, typedefs: Map<AliasType, SourceType>): [C0Type<C0TypeClass>, boolean] {
+    if (T.type === "ptr" && T.kind === "struct") {
+        if (typedefs.has(T.value)) {
+            return [String2Type(typedefs.get(T.value) as SourceType), true]
+        } else {
+            return [T, false];
+        }
+    }
+
+    switch (T.type) {
+        case "<unknown>":
+        case "tagptr":
+        case "value":
+        case "funcptr":
+        case "string":
+            return [T, false];
+        case "ptr":
+            if (T.kind === "arr" || T.kind === "ptr") {
+                const [childType, hasChanged] = try_typedef_recursively(T.value, typedefs);
+                T.value = childType;
+                return [T, hasChanged];
+            }
+            throw new internal_error("Impossible case reached in apply_typdef")
+    }
+}
+
+/**
  * Resolve the nested reference in map automatically
  * 
  * e.g. A -> B, D -> B, B -> C
@@ -69,21 +104,26 @@ function extract_typedef(code: string): [TypeDefInfo[], Set<string>] {
  * 
  * @returns A flattened type mapping
  */
-function flatten_typedef(typedefs: TypeDefInfo[]): Map<string, string> {
-    const original_map = new Map<string, string>(); // alias -> source
+function flatten_typedef(typedefs: TypeDefInfo[]): Map<AliasType, SourceType> {
+    const typedef_map = new Map<AliasType, SourceType>(); // alias -> source
     for (const typedef of typedefs){
-        original_map.set(typedef.alias, typedef.source);
+        typedef_map.set(typedef.alias, typedef.source);
     }
-    const flattened = new Map<string, string>();
-    original_map.forEach(
-        (source, alias) => {
-            let actual_source = source;
-            while (original_map.has(actual_source)) {
-                actual_source = original_map.get(actual_source) as string;
-            }
-            flattened.set(alias, actual_source);
-        })
-    return flattened;
+
+    let isConverged = false;
+    while (!isConverged) {
+        isConverged = true;
+        const aliases = Array.from(typedef_map.keys());
+        for (const alias_typename of aliases) {
+            const temp_source = typedef_map.get(alias_typename) as AliasType;
+            const temp_src_type = String2Type(temp_source);
+            const [new_source, hasChanged] = try_typedef_recursively(temp_src_type, typedef_map);
+            isConverged = isConverged && (!hasChanged);
+            typedef_map.set(alias_typename, Type2String(new_source));
+        }
+    }
+
+    return typedef_map;
 }
 
 function next_real_sibling(ptr: any){
@@ -94,7 +134,7 @@ function next_real_sibling(ptr: any){
     return result
 }
 
-function extract_struct(code: string): Map<string, Struct_Type_Record[]> {
+function extract_struct(code: string, typedef: Map<AliasType, SourceType>): Map<string, Struct_Type_Record[]> {
     const syntaxTree = C0Language.parser.parse(code);
 
     const structInfos: Map<string, Struct_Type_Record[]> = new Map();
@@ -113,7 +153,7 @@ function extract_struct(code: string): Map<string, Struct_Type_Record[]> {
                 next_real_sibling(ptr);
                 const fieldName = code.substring(ptr.from, ptr.to);
                 next_real_sibling(ptr);
-                fieldTypes.push({type: fieldType, name: fieldName});
+                fieldTypes.push({type: try_typedef_recursively(fieldType, typedef)[0], name: fieldName});
             }
             structInfos.set(structureType, fieldTypes);
         }
@@ -124,8 +164,10 @@ function extract_struct(code: string): Map<string, Struct_Type_Record[]> {
 
 function extract_all_structs(editors: C0EditorTab[]): Map<string, Struct_Type_Record[]>{
     let all_structs: Map<string, Struct_Type_Record[]> = new Map();
+    const typedefs = extract_all_typedef(editors)[0];
+
     for (const editor of editors){
-        const new_structs = extract_struct(editor.content);
+        const new_structs = extract_struct(editor.content, typedefs);
         all_structs = new Map([...Array.from(all_structs), ...Array.from(new_structs)]);
     }
     return all_structs;

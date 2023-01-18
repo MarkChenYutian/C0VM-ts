@@ -22,6 +22,8 @@ function safe_pop_stack(
     const V = state.CurrFrame.S.pop();
     if (V === undefined) throw new vm_error("Unable to pop value out of an empty stack!");
     
+    let ret_val = V;
+
     /**
      * Since in C0, there can't have struct on stack, a value with type of struct without ptr MUST be a poitner
      * to some field of the struct.
@@ -33,7 +35,7 @@ function safe_pop_stack(
         if (fields !== undefined) {
             const deref_type = fields.get(V.type.offset)?.type;
             if (deref_type !== undefined) {
-                return { value: V.value, type: deref_type };
+                ret_val = { value: V.value, type: deref_type };
             }
         }
     }
@@ -45,16 +47,16 @@ function safe_pop_stack(
         const [, tag] = read_tagptr(V.value, mem);
         const actualType = state.TagRecord.get(tag);
         if (actualType !== undefined) {
-            return {value: V.value, type: {type: "tagptr", value: actualType}}
+            ret_val = {value: V.value, type: {type: "tagptr", value: actualType}}
         }
     }
 
-    return V;
+    return ret_val;
 }
 
 
 function updateTypeRecord(state: VM_State, a: C0Value<C0TypeClass>, x: C0Value<C0TypeClass>){
-    if (TypeUtil.isPointerType(a) && TypeUtil.is_struct_pointer(a) && !TypeUtil.isUnknownType(x)){
+    if (TypeUtil.isPointerType(a) && TypeUtil.is_struct_pointer(a) && TypeUtil.isCertainType(x.type)){
         const a_concrete = a.type.value;
         let struct_field_record = state.TypeRecord.get(a_concrete.value);
 
@@ -342,6 +344,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             v.setInt32(0, b);
 
             if (type_note === undefined) {
+                if (DEBUG) console.warn(`BIPUSH reconstruction failed on line ${state.CurrLineNumber}`)
                 throw new vm_error("BIPUSH type reconstruction failed!");
             } else {
                 state.CurrFrame.S.push( build_c0_value(v, (type_note as C0ValueTypes)) );
@@ -806,6 +809,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             if (TypeUtil.isPointerType(new_value)) {
                 if (!TypeUtil.is_struct_pointer(new_value)) {
+                    console.log(new_value);
+                    console.log(state.CurrC0RefLine);
+                    console.log(state.CurrLineNumber);
                     throw new vm_error("AADDF should only be applied on a struct pointer");
                 }
 

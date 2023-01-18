@@ -51,7 +51,7 @@ export class VM_Memory implements C0HeapAllocator {
             throw new c0_memory_error(`malloc(...) expect to receive a non-negative number`);
         }
         if (this.heap_top_address + size > this.memory_size) {
-            throw new c0_memory_error(`Out of memory: C0VM's heap memory can't exceed ${globalThis.MEM_POOL_MAX_SIZE} bytes. Allocating ${size} bytes on heap already with ${this.heap_top_address} bytes allocated.`);
+            throw new c0_memory_error(`Out of memory: C0VM's heap memory can't exceed ${this.memory_size} bytes. Allocating ${size} bytes on heap already with ${this.heap_top_address} bytes allocated.`);
         }
         if (size > globalThis.MEM_BLOCK_MAX_SIZE) {
             throw new c0_memory_error(`Unable to allocate memory block bigger than ${globalThis.MEM_BLOCK_MAX_SIZE}`);
