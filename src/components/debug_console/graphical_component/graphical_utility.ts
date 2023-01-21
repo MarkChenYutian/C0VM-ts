@@ -35,7 +35,7 @@ export function calculate_node_height(lines: number, type: NodeTypes) {
 export function calculate_entry_height(lines: number, type: NodeTypes) {
     switch (type) {
         case "frame":
-            return TOP_HEIGHT + LINE_HEIGHT * (lines - 1) + 0.8 * LINE_HEIGHT;
+            return TOP_HEIGHT + LINE_HEIGHT * (lines - 1) + 0.9 * LINE_HEIGHT;
         case "struct":
             return STRUCT_TOP_HEIGHT + LINE_HEIGHT * (lines - 1) + 0.8 * LINE_HEIGHT;
         case "array": 

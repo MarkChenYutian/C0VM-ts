@@ -203,7 +203,7 @@ export default class CodeEditor extends React.Component
                             key="language_selector"
                             options={[
                                 { label: "Source", value: "c0" }, 
-                                { label: "ByteC",value: "bc0"}
+                                { label: "Bytecode",value: "bc0"}
                             ]}
                             defaultValue={this.state.mode}
                             onChange={(value) => {this.setState({mode: value as "c0" | "bc0"})}}

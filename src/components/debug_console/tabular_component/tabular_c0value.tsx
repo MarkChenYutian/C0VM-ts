@@ -97,7 +97,7 @@ export default class C0ValueTabularDisplay extends React.Component<
 
         let descriptor = <span>Pointer</span>
         if (is_tagged) {
-            descriptor = <span>Tagged Pointer <code>{ Type2String(value_to_render.type, this.props.typedef) }</code></span>;
+            descriptor = <span>Tagged Pointer <code className="tag">{ Type2String(value_to_render.type, this.props.typedef) }</code></span>;
         }
 
         // When the component is not expended, show Pointer(...)

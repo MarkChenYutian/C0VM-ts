@@ -10,6 +10,7 @@ import { loadString } from "../../../utility/string_utility";
 import { isNullPtr } from "../../../utility/pointer_utility";
 import { stackSrcHandleID } from "./graph_builder";
 import { read_funcPtr } from "../../../utility/func_ptr_utility";
+import { remove_tag } from "../../../utility/tag_ptr_utility";
 
 
 
@@ -29,12 +30,20 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
             if (to_be_rendered !== undefined && data.frame.P.varName[i] !== undefined) {
                 contents.push(<p key={"s-val-name-" + i} className="right-aligned"><code>{Type2String(to_be_rendered.type, data.typedef)} {data.frame.P.varName[i]}</code></p>);
                 let render_content = undefined;
+                let tag_element    = null;
+
                 if (TypeUtil.isValueType(to_be_rendered)) {
                     render_content = c0_value_cvt2_js_string(to_be_rendered);
                 } else if (TypeUtil.isStringType(to_be_rendered)) {
                     render_content = `"${loadString(to_be_rendered, data.mem)}"`;
-                } else if (TypeUtil.isPointerType(to_be_rendered) || TypeUtil.isTagPointerType(to_be_rendered)) {
+                } else if (TypeUtil.isPointerType(to_be_rendered)) {
                     render_content = isNullPtr(to_be_rendered.value) ? "NULL" : " ";
+                } else if (TypeUtil.isTagPointerType(to_be_rendered)) {
+                    render_content = isNullPtr(to_be_rendered.value) ? "NULL" : " ";
+                    if (!isNullPtr(to_be_rendered.value)) {
+                        const real_ptr = remove_tag(to_be_rendered, this.props.data.mem, this.props.data.state.TagRecord);
+                        tag_element = <code className="tag">{Type2String(real_ptr.type, this.props.data.typedef)}</code>;
+                    }
                 } else if (TypeUtil.isFuncPointerType(to_be_rendered)) {
                     const [idx, native] = read_funcPtr(to_be_rendered);
                     const nativeDisplay = native ? "native" : "static";
@@ -46,7 +55,7 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
                 }
                 contents.push(
                     <div key={"s-val-wrap-" + i}>
-                        <p key={"s-val-value-" + i} className="dbg-frame-content">{render_content}</p>
+                        <p key={"s-val-value-" + i} className="dbg-frame-content">{render_content} {tag_element}</p>
                         {
                             (TypeUtil.isPointerType(to_be_rendered) || TypeUtil.isTagPointerType(to_be_rendered)) && !isNullPtr(to_be_rendered.value)?
                             <Handle type="source" key={"s-val-ptr-" + i} id={stackSrcHandleID(i)} position={Position.Right} style={{ top: calculate_entry_height(valid_cnt, "frame"), right: "2rem" }}/>

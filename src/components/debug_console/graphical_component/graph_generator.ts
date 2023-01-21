@@ -3,7 +3,7 @@
  * @abstract Given VM State, Memory Allocation, and typedef information, 
  * return a set of nodes and edges that forms the graphical debugger display
  * 
- * 
+ * This file is not used ... It's an attempt to replace the graph_builder.ts (failed)
  */
 import { Node } from "react-flow-renderer";
 import { calculate_node_height, valid_variable_count } from "./graphical_utility";

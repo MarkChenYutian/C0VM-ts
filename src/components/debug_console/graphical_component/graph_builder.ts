@@ -232,7 +232,7 @@ function C0_Value_to_graph(
     x: number,
     y: number
 ): [Node<VisData>, Edge<undefined>[], number] {
-    const heap_node_extent: CoordinateExtent = [[310, 0], [10000, 10000]];
+    const heap_node_extent: CoordinateExtent = [[360, 10], [10000, 10000]];
     let result_data = undefined;
     let result_edge: Edge<undefined>[] = [];
     let delta_y = 0;

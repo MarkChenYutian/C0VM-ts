@@ -255,6 +255,15 @@ code {
     color: #ce1c1c;
 }
 
+code.tag {
+    font-family: cascadia-mono, 'Courier New', Courier, monospace;
+    background-color: #ffc003;
+    color: #333;
+    box-sizing: content-box;
+    padding: 3px;
+    border-radius: 0.3rem;
+}
+
 .dbg-func-name {
     color: #006cae;
     font-family: cascadia-mono, 'Courier New', Courier, monospace;
@@ -421,6 +430,7 @@ div.dbg-node-base:hover {
 .dbg-evaluate-arr-idx {
     color: #006cae;
     padding-left: .3rem;
+    padding-bottom: .2rem;
 }
 
 .dbg-evaluate-arr-val {
