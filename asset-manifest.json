@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.ddaa1ce3.css",
-    "main.js": "/static/js/main.640bf322.js",
+    "main.css": "/static/css/main.d816ddf9.css",
+    "main.js": "/static/js/main.3ce5a10d.js",
     "static/media/CascadiaMono.ttf": "/static/media/CascadiaMono.d3365ea61baa563ae8df.ttf",
     "static/media/Menlo-Regular.ttf": "/static/media/Menlo-Regular.92e41f43900c256f2286.ttf",
     "static/media/tutorial_sorttab.gif": "/static/media/tutorial_sorttab.bb610dc15a60e1d9c2a0.gif",
@@ -10,11 +10,11 @@
     "static/media/Tab_Names.png": "/static/media/Tab_Names.31f938d8ce6d1d1ea26c.png",
     "static/media/ts-logo-128.svg": "/static/media/ts-logo-128.c76204988f8496c480cbab87d1604986.svg",
     "index.html": "/index.html",
-    "main.ddaa1ce3.css.map": "/static/css/main.ddaa1ce3.css.map",
-    "main.640bf322.js.map": "/static/js/main.640bf322.js.map"
+    "main.d816ddf9.css.map": "/static/css/main.d816ddf9.css.map",
+    "main.3ce5a10d.js.map": "/static/js/main.3ce5a10d.js.map"
   },
   "entrypoints": [
-    "static/css/main.ddaa1ce3.css",
-    "static/js/main.640bf322.js"
+    "static/css/main.d816ddf9.css",
+    "static/js/main.3ce5a10d.js"
   ]
 }
