@@ -404,6 +404,9 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 throw new vm_error("Uninitialized value: Loading a local variable before it is initialized");
             }
 
+            const var_name = comment.varName;
+            if (var_name !== undefined) state.CurrFrame.V_Name[idx] = var_name;
+
             state.CurrFrame.S.push(to_be_loaded);
             break;
         }
@@ -427,6 +430,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             }
 
             state.CurrFrame.V[idx] = val;
+
+            const var_name = comment.varName;
+            if (var_name !== undefined) state.CurrFrame.V_Name[idx] = var_name;
+
             break;
         }
 
@@ -642,8 +649,10 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
             // Extract Arguments
             const called_F_vars: VM_LocalVariables = new Array(called_F.numVars).fill(undefined);
+            const called_F_varNames: string[] =  new Array(called_F.numVars).fill("<Anonymous>");
             for (let i = called_F.numArgs - 1; i >= 0; i --) {
                 called_F_vars[i] = safe_pop_stack(state, allocator);
+                called_F_varNames[i] = called_F.argName[i]; // fill in argument names
             }
             // Switch Context
             state.CallStack.push(state.CurrFrame);
@@ -654,6 +663,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 PC: 0,
                 S: [],
                 V: called_F_vars,
+                V_Name:called_F_varNames,
                 P: called_F
             };
             break;
@@ -1038,8 +1048,11 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
 
                 // Extract Arguments
                 const called_F_vars: VM_LocalVariables = new Array(called_F.numVars).fill(undefined);
+                const called_F_varNames: string[] = new Array(called_F.numVars).fill("<Anonymous>");
+
                 for (let i = called_F.numArgs - 1; i >= 0; i --) {
                     called_F_vars[i] = safe_pop_stack(state, allocator);
+                    called_F_varNames[i] = called_F.argName[i];
                 }
                 // Switch Context
                 state.CallStack.push(state.CurrFrame);
@@ -1050,6 +1063,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                     PC: 0,
                     S: [],
                     V: called_F_vars,
+                    V_Name: called_F_varNames,
                     P: called_F
                 };
             }

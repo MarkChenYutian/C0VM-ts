@@ -9,7 +9,7 @@ const ARR_ELEM_WIDTH = 82;
 export function valid_variable_count(frame: VM_StackFrame): number {
     let cnt = 0;
     for (let i = 0; i < frame.V.length; i ++) {
-        if (frame.V[i] !== undefined && frame.P.varName[i] !== undefined) {
+        if (frame.V[i] !== undefined && frame.V_Name[i] !== undefined) {
             cnt ++;
         }
     }

@@ -43,7 +43,14 @@ type C0Function = {
     // Number of arguments the function receives        
     numArgs: number;
     // name of local variables, inferenced from comments in .bc0 file
-    varName: string[];
+    // Since arguments will not be accessed immediately step into a function
+    // they will display as <Anonymous> initially. This field is used to provide
+    // enough display information to debugger so that they will not show up as 
+    // <Anonymous>.
+    argName: string[];
+    // name of local variables, inferenced from comments in .bc0 file
+    // Deprecated as an element in local var array may have multiple names during runtime.
+    // varName: string[];
     // the length of code of the function
     size: number;
     // bytecodes of the function
@@ -65,7 +72,8 @@ type C0Function = {
 type CodeComment = {
     dataType?: string,  // If command = new/new_array/bipush, the type name of variable will be placed here
     fieldName?: string, // If command = aaddf, the field name will be placed here
-    // File name, row, can_break_here
+    varName?: string,   // If command = vload/vstore, the var name will be placed here
+    // c0RefNumber: [File name, row, can_break_here]
     c0RefNumber?: [string, number, bool], // The corresponding line nunber in .c0 file, if can be resolved
     lineNumber: number  // The corresponding line number in .bc0 file    
 }
@@ -244,6 +252,7 @@ type VM_StackFrame = {
     PC: number,
     S: VM_OperandStack,
     V: VM_LocalVariables,
+    V_Name: string[],
     P: C0Function
 };
 

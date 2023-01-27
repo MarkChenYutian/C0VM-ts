@@ -46,6 +46,7 @@ export default class C0VM_RuntimeState implements C0VM_RT{
                 PC: 0,
                 S: [],
                 V: new Array(this.code.functionPool[0].numVars).fill(undefined),
+                V_Name: new Array(this.code.functionPool[0].numVars).fill("<Anonymous>"),
                 P: this.code.functionPool[0]
             },
             CurrLineNumber: 0,
