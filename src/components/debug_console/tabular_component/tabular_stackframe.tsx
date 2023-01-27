@@ -30,7 +30,7 @@ export default class TabularStackFrame extends React.Component<
             const to_be_rendered = this.props.frame.V[i];
             if (to_be_rendered === undefined) continue;
             var_info.push(
-                <p key={i + "-name"}><code>{Type2String(to_be_rendered.type, this.props.typedef)} {this.props.frame.P.varName[i]}</code></p>
+                <p key={i + "-name"}><code>{Type2String(to_be_rendered.type, this.props.typedef)} {this.props.frame.V_Name[i]}</code></p>
             )
             var_info.push(
                 <C0ValueTabularDisplay

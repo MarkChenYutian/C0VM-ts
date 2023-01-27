@@ -229,7 +229,7 @@ function parse_func_block(func_block: [string, number][], typedef_lib: Map<strin
         name: "undefined",
         code: new Uint8Array(),
         numVars: -1,
-        varName: [],
+        argName: [],
         numArgs: -1,
         size: -1,
         comment: new Map()
@@ -241,7 +241,7 @@ function parse_func_block(func_block: [string, number][], typedef_lib: Map<strin
     result.name = func_name[1];
     result.numArgs = safe_parse_hex(func_block[1][0].split("#")[0]);
     result.numVars = safe_parse_hex(func_block[2][0].split("#")[0]);
-    result.varName = new Array(result.numVars).fill("<Anonymous>");
+    result.argName = new Array(result.numArgs).fill("<Anonymous>");
     result.size = safe_combine_and_parse_hex(func_block[3][0].split("#")[0]);
 
     let bytecode_pos = 0;
@@ -268,14 +268,15 @@ function parse_func_block(func_block: [string, number][], typedef_lib: Map<strin
         for (let i = 0; i < num_tokens.length; i ++) code_num.push(num_tokens[i]);
 
         const var_name = resolve_var_name(tokens, byte_instruct, segment);
-        if (var_name !== undefined && result.varName[var_name[0]] === "<Anonymous>") {
-            result.varName[var_name[0]] = var_name[1];
+        if (var_name !== undefined && result.argName[var_name[0]] === "<Anonymous>" && var_name[0] < result.numArgs) {
+            result.argName[var_name[0]] = var_name[1];
         }
         
         result.comment.set(bytecode_pos, {
             lineNumber: func_block[bc_line][1],
             fieldName: resolve_field_name(byte_instruct, segment),
             dataType : resolve_type_info(byte_instruct, segment, typedef_lib),
+            varName  : var_name === undefined ? undefined : var_name[1],
             c0RefNumber: c0_ref_pos === undefined ? ["", 0, false] : [c0_ref_pos[0], c0_ref_pos[1], false]
         });
 

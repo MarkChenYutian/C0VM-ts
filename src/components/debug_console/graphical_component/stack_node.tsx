@@ -27,8 +27,8 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
         
         for (let i = 0; i < data.frame.V.length; i ++) {
             const to_be_rendered = data.frame.V[i];
-            if (to_be_rendered !== undefined && data.frame.P.varName[i] !== undefined) {
-                contents.push(<p key={"s-val-name-" + i} className="right-aligned"><code>{Type2String(to_be_rendered.type, data.typedef)} {data.frame.P.varName[i]}</code></p>);
+            if (to_be_rendered !== undefined && data.frame.V_Name[i] !== undefined) {
+                contents.push(<p key={"s-val-name-" + i} className="right-aligned"><code>{Type2String(to_be_rendered.type, data.typedef)} {data.frame.V_Name[i]}</code></p>);
                 let render_content = undefined;
                 let tag_element    = null;
 

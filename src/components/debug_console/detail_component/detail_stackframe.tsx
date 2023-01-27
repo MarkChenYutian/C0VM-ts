@@ -66,7 +66,7 @@ export default class DetailStackFrame extends React.Component<
                 );
             } else{
                 var_info.push(
-                    <p key={i + "-var-name"}>{i} - <code>{Type2String(to_be_rendered.type, this.props.typedef)} {this.props.frame.P.varName[i]}</code></p>
+                    <p key={i + "-var-name"}>{i} - <code>{Type2String(to_be_rendered.type, this.props.typedef)} {this.props.frame.V_Name[i]}</code></p>
                 );
                 var_info.push(
                     <C0ValueTabularDisplay
