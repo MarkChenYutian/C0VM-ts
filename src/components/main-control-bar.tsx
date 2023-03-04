@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { Button, Dropdown, MenuProps, Space, Tooltip } from "antd";
 
-import { faAngleDown, faBoltLightning, faClockRotateLeft, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDown, faBoltLightning, faBugSlash, faClockRotateLeft, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import * as VM from "../vm_core/vm_interface";
@@ -212,15 +212,15 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
         return () => document.removeEventListener('keydown',onKeyPressWrapper);
     })
 
-    const CompileButton = 
-        <Button
-            icon = {<FontAwesomeIcon icon={faScrewdriverWrench}/>}
-            size = "large"
-            disabled = {compilebtn_disabled}
-            onClick={compile_c0source}
-        >
-            &nbsp;Compile
-        </Button>;
+    const CompileNaiveButton = 
+        <div style={{fontSize: "1rem", color: "white"}}>
+            <FontAwesomeIcon icon={faScrewdriverWrench}/>&nbsp;Compile
+        </div>;
+    
+    const CompileContractButton = 
+        <div style={{fontSize: "1rem", color: "white"}}>
+            <FontAwesomeIcon icon={faBugSlash}/>&nbsp;Compile (contract)
+        </div>;
     
     const StepButton = 
         <Button
@@ -263,6 +263,7 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
             &nbsp;Restart
         </Button>;
     
+    // Dropdown menu for execute button
     const ExecBtnIcon = execMode === "Run" ? 
         <FontAwesomeIcon icon={faPlay}/> : 
         <FontAwesomeIcon icon={faClockRotateLeft}/>;
@@ -299,10 +300,46 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
         >
             {ExecBtnIcon}&nbsp;{execMode}
         </Dropdown.Button>;
+
+    // dropdown menu for compile button
+    const CompileBtnIcon = appState.CompilerFlags["d"] ?
+        <FontAwesomeIcon icon={faBugSlash}/> :
+        <FontAwesomeIcon icon={faScrewdriverWrench}/>;
+    
+    const menuItems_CompileBtn: MenuProps["items"] = [
+        {
+            label: appState.CompilerFlags["d"] ? CompileNaiveButton : CompileContractButton,
+            key: appState.CompilerFlags["d"] ? "naive" : "contract"
+        }
+    ];
+
+    const menuItems_ChangeCompileFn: MenuProps["onClick"] = (info) => {
+        const flags = {...appState.CompilerFlags};
+        flags["d"] = !(info.key === "naive");
+        props.set_app_state({CompilerFlags: flags});
+    };
+
+    const MenuPropCompile: MenuProps = {
+        style: {backgroundColor: props.themeColor},
+        items: menuItems_CompileBtn,
+        onClick: menuItems_ChangeCompileFn
+    }
+
+    const CompBtn = 
+        <Dropdown.Button
+            disabled={compilebtn_disabled}
+            type="primary"
+            size="large"
+            icon={<FontAwesomeIcon icon={faAngleDown}/>}
+            onClick={compile_c0source}
+            menu={MenuPropCompile}
+        >
+            {CompileBtnIcon}&nbsp;Compile{appState.CompilerFlags["d"] ? " (contract)" : ""}
+        </Dropdown.Button>;
     
     const display_CompileBtn = compilebtn_disabled ?
-        <Tooltip placement="bottomRight" color={props.themeColor} title="Write code in editor to Compile">{CompileButton}</Tooltip>
-         : CompileButton;
+        <Tooltip placement="bottomRight" color={props.themeColor} title="Write code in editor to Compile">{CompBtn}</Tooltip>
+         : CompBtn;
     
     const display_StepBtn = stepbtn_disabled ?
         <Tooltip

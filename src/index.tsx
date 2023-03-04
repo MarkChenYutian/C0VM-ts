@@ -11,7 +11,7 @@ import C0VMApplication from './application';
 import AntdEmitter from './utility/antd_emitter';
 
 // Global Variables
-global.C0VM_VERSION = "1.0.1";
+global.C0VM_VERSION = "1.0.2";
 
 globalThis.DEBUG = false;
 globalThis.DEBUG_DUMP_MEM = false;
@@ -23,12 +23,6 @@ globalThis.MEM_POOL_MAX_SIZE = 0xFFFF_FFFE;
 globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
 
 globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
-
-// For style specification only, writing to printout should be done
-// by calling react hooks
-globalThis.UI_ERR_DISPLAY_TIME_SEC = 5;
-globalThis.UI_WARN_DISPLAY_TIME_SEC = 5;
-globalThis.UI_OK_DISPLAY_TIME_SEC = 3;
 
 globalThis.COMPILER_BACKEND_URL = "https://cs122.andrew.cmu.edu/visualc0/compile";
 
@@ -47,19 +41,10 @@ const htmlRoots = document.querySelectorAll('#c0vm-root') as NodeListOf<HTMLElem
 htmlRoots.forEach(
   (htmlRoot) => {
     const root = ReactDOM.createRoot(htmlRoot);
-    
-    // const displayModeContext: React.Context<ApplicationContextInterface> = React.createContext<ApplicationContextInterface>({
-    //   mode: htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable",
-    //   std_out: htmlRoot.dataset["stdoutput"] === "on",
-    //   debug_console: htmlRoot.dataset["debugconsole"] === "on",
-    // });
 
     const displayMode = htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable";
     const showStdOut  = htmlRoot.dataset["stdoutput"] === "on";
     const showDebug   = htmlRoot.dataset["debugconsole"] === "on";
-    
-    // C0VMApplication.contextType = displayModeContext;
-    // AppCrashFallbackPage.contextType = displayModeContext;
     
     root.render(
       <React.StrictMode>

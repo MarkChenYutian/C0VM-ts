@@ -20,8 +20,8 @@ const RenameEditor =
 
 const SortEditor = (languageName: string) => 
     <>
-        <p>When compiling a {languageName} project, the order of file compilation does matter.</p>
-        <p>In C0VM.ts, the order of compilation is defined by the order of editor tabs. For instance, the following editor tab order:</p>
+        <p>When compiling a {languageName} project, the order of files does matter.</p>
+        <p>In C0VM.ts, the order of file names fed into <code>cc0</code> compiler is defined by the order of editor tabs. For instance, the following editor tab order:</p>
         <Image src={Tutorial_TabNames} width="50%"/>
         <p>corresponds to the following compilation command:</p>
         <pre>   cc0 tbuf.c0 tbuf-test.c0 tbuf-main.c0</pre>

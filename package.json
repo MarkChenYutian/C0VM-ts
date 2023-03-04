@@ -1,7 +1,7 @@
 {
   "name": "c0vm-ts",
   "version": "0.1.0",
-  "homepage": "http://visualc0.tk/",
+  "homepage": "https://cs122.andrew.cmu.edu/visualc0/",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",

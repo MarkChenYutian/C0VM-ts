@@ -12,10 +12,6 @@ declare global {
     var MEM_POOL_DEFAULT_SIZE: number;      // Default size of memory pool
 
     var COMPILER_BACKEND_URL: string;       // The URL for compile API
-    
-    var UI_ERR_DISPLAY_TIME_SEC: number;    // How many time (sec) an err message will display
-    var UI_WARN_DISPLAY_TIME_SEC: number;   // How many time (sec) a warn message will display
-    var UI_OK_DISPLAY_TIME_SEC: number;     // How many time (sec) an OK mssage will display
 
     var C0_MAX_RECURSION: number;           // Maximum allowed recursion level for C0 runtime
     var C0_TIME_SLICE: number;              // Number of steps the C0VM can go in a continuous time slice
