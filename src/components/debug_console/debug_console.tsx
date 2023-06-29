@@ -24,7 +24,7 @@ export default class DebugConsole extends React.Component
         this.state = {
             err: false,
             show: true,
-            mode: "Table"
+            mode: "Graph"
         };
     }
 
@@ -44,7 +44,18 @@ export default class DebugConsole extends React.Component
         if (S === undefined) return this.render_no_valid_state();
         switch (this.state.mode) {
             case "Table": return <TabularDebugEvaluation   state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={typedef}/>;
-            case "Graph": return <GraphicalDebugEvaluation state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={typedef}/>;
+            /*
+             * We add a key to this functional component since we want it to create a new component everytime the
+             * VM is "stepped" (VM execution position changed).
+             * 
+             * Using useEffect React Hook cannot properly update the flow chart and will lead to missing edges.
+             * This might be related to the issue:
+             * 
+             * https://github.com/wbkd/react-flow/issues/3171
+             * 
+             * case "Graph": return <GraphicalDebugEvaluation state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={typedef}/>;
+             */
+            case "Graph": return <GraphicalDebugEvaluation state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={typedef} key={S.step_cnt.toString()}/>;
             case "Detail": return <DetailDebugEvaluation   state={S.state} mem={S.allocator} cnt={S.step_cnt} typedef={typedef}/>;
         }
     }

@@ -163,6 +163,7 @@
     "@types/he": "^1.1.2",
     "cross-env": "^7.0.3",
     "javascript-obfuscator": "^4.0.0",
-    "react-flow-renderer": "^10.3.8"
+    "react-flow-renderer": "^10.3.8",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }

@@ -54,7 +54,6 @@ function GhostImportFolderButton() {
 
     useEffect(() => {
         buttonRef.current.click();
-        console.debug("ghost folder upload button generated and clicked")
     }, [buttonRef]);
 
     return (
@@ -70,7 +69,9 @@ function onLoadFolder(
     let tmp_dom = document.createElement("div");
     const root = ReactDOM.createRoot(tmp_dom as HTMLElement);
 
-    console.debug("handle_import_folder is currently ", handle_import_folder)
+    if (globalThis.DEBUG) {
+        console.debug("handle_import_folder is currently ", handle_import_folder);
+    }
 
     root.render(
         <Upload
@@ -95,7 +96,11 @@ class LoadDocumentWidget extends WidgetType {
         super();
         this.update_title = update_title;
         this.handle_import_folder = handle_import_folder;
-        console.debug("contructing load widget with handle_import_folder", handle_import_folder)
+
+        if (globalThis.DEBUG) {
+            console.debug("contructing load widget with handle_import_folder", handle_import_folder);
+        }
+        
         this.accept_format = accept_format;
     } 
 
@@ -136,7 +141,11 @@ class LoadDocumentWidget extends WidgetType {
 
 function loadDOMWidgetInterface(view: EditorView, accept_format: string, update_title ?: (s: string) => void, handle_import_folder ?: (F: RcFile, FList: RcFile[]) => void) {
     if (view.state.doc.length !== 0) return Decoration.none;
-    console.debug("making loadDOMWidgetInterface with handle_import_folder", handle_import_folder)
+
+    if (globalThis.DEBUG) {
+        console.debug("making loadDOMWidgetInterface with handle_import_folder", handle_import_folder)
+    }
+    
     return Decoration.set([
         Decoration.widget({
             widget: new LoadDocumentWidget(accept_format, update_title, handle_import_folder),
@@ -174,7 +183,11 @@ function LoadDocumentPlugin(accepted_format: string, update_name ?: (s: string) 
             this.update_title = update_name;
             this.accept_format = accepted_format;
             this.handle_import_folder = handle_import_folder
-            console.debug("making LoadDocumentPlugin with handle_import_folder", handle_import_folder)
+
+            if (globalThis.DEBUG) {
+                console.debug("making LoadDocumentPlugin with handle_import_folder", handle_import_folder);
+            }
+            
             this.decorations = loadDOMWidgetInterface(view, this.accept_format, this.update_title, this.handle_import_folder);
         }
 

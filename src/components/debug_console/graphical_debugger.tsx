@@ -1,5 +1,5 @@
-import ReactFlow, { Controls, Background, useNodesState, useEdgesState, NodeChange, Node, MarkerType } from "react-flow-renderer";
-import React, { useEffect, useCallback } from "react";
+import ReactFlow, { Controls, Background, applyNodeChanges, NodeChange, Node, MarkerType, Edge } from "react-flow-renderer";
+import React, { useEffect, useCallback, useState } from "react";
 import { build_nodes, merge_nodes } from "./graphical_component/graph_builder";
 
 import C0StackFrameNode from "./graphical_component/stack_node";
@@ -30,8 +30,10 @@ const node_types = {
  * , which makes it hard to write a class component for it)
  */
 export default function GraphicalDebugEvaluation(props: DebugConsoleInterface) {
-    const [nodes, setNodes, onNodesChange] = useNodesState([]);
-    const [edges, setEdges, ] = useEdgesState([]);
+    const [init_nodes, init_edges] = build_nodes(props.state, props.mem, props.typedef)
+    const [nodes, setNodes] = useState<Node<VisData>[]>(init_nodes);
+    const [edges, setEdges] = useState<Edge[]>         (init_edges);
+    const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
 
     /** 
      * NOTE: The useEffect hook below will lead to eslint warning, this
@@ -62,9 +64,7 @@ export default function GraphicalDebugEvaluation(props: DebugConsoleInterface) {
                 const nid = nodeChangeList[0].id;
                 setNodes(nodes.map(
                     (node) => {
-                        if (node.id === nid) {
-                            node.data.dragged = true;
-                        }
+                        if (node.id === nid) node.data.dragged = true;
                         return node;
                     }
                 ));

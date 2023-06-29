@@ -68,7 +68,7 @@ export default class C0StructNode extends React.Component<NodeProps<C0StructNode
                 ) && !isNullPtr(to_be_rendered.value)) {
                     StructFields.push(
                         <Handle type="source"
-                            key={structSrcHandleID(entry.offset)}
+                            key={"key-" + structSrcHandleID(entry.offset)}
                             id={structSrcHandleID(entry.offset)}
                             position={Position.Right}
                             style={{ top: calculate_entry_height(i, "struct"), right: "2rem" }}
