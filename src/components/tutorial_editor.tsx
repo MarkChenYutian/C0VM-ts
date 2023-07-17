@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { Button, Checkbox, Divider, Image, Modal, Space, Tabs, Tooltip } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBoltLightning, faClockRotateLeft, faGear, faPlay, faScrewdriverWrench, faStepForward } from "@fortawesome/free-solid-svg-icons";
+import { faBoltLightning, faClockRotateLeft, faGear, faPlay, faScrewdriverWrench, faStepForward, faCode, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
 
@@ -72,6 +72,13 @@ const Breakpoint = (language: string) =>
     </>;
 
 
+const About = <>
+    <p>Welcome to visit our GitHub repo!</p>
+    <p><a href="https://github.com/MarkChenYutian/C0VM-ts"><Button size="large" icon={<FontAwesomeIcon icon={faCode}/>}>&nbsp;GitHub Repo</Button></a></p>
+    <p>Met a bug? Have cool thoughts on this project? <br/>
+    Welcome to post an issue on GitHub or shoot an email to me (Yutian Chen, <FontAwesomeIcon icon={faEnvelope}/> yutianch@andrew.cmu.edu)!</p>
+</>
+
 function TutorialEditor(props: TutorialPanelProps & {themeColor: string | undefined}): JSX.Element {
     const [notAgain, setNotAgain] = useState<boolean>(false);
 
@@ -92,7 +99,8 @@ function TutorialEditor(props: TutorialPanelProps & {themeColor: string | undefi
         {key: "rename", label: "Rename Tabs", children: RenameEditor},
         {key: "sort", label: "Sort Tabs", children: SortEditor(languageName)},
         {key: "execute", label: "Run Program", children: Execution(languageName)},
-        {key: "breakpoint", label: "Use Breakpoint", children: Breakpoint(languageName)}
+        {key: "breakpoint", label: "Use Breakpoint", children: Breakpoint(languageName)},
+        {key: "about", label: "About", children: About}
     ]
 
     return (
