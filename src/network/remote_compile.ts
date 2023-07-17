@@ -16,6 +16,15 @@ export default function remote_compile(
         return;
     }
 
+    /** Update since v1.0.4 - print out the compile command when user hit compile button */
+    let compile_command = "$ cc0 ";
+    for (let tab of app_state.C0Editors) compile_command += " " + tab.title;
+    compile_command += app_state.CompilerFlags["d"] ? " -d" : "";
+
+    print_update("Compiling the code with command line \n");
+    print_update(compile_command + "\n\n");
+    /*** */
+
     fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${app_state.CompilerFlags["d"] ? "true" : "false"}`, {
         method: "POST",
         cache: "no-cache",
@@ -34,7 +43,8 @@ export default function remote_compile(
     .then(
         (result: any) => {
             if (result.error !== ""){
-                print_update(`<span class="stdout-error">${result.error as string}</span>`);
+                const error_explain = result.error as string;
+                print_update(`<span class="stdout-error">${error_explain.replaceAll(" ", "&nbsp;")}</span>`);
                 throw new vm_error("Compile Failed for c0 source code. See standard output for more information.");
             }
             

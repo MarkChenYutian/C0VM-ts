@@ -58,7 +58,17 @@ export async function step(s: C0VM_RT, c0_only: boolean, print_update: (s: strin
                new_state.state.CurrC0RefLine[0] === start_file &&
                new_state.state.CurrC0RefLine[1] === start_line && 
                can_continue) {
-            can_continue = await new_state.step_forward({print_update: print_update});
+            try {
+                // BUG FIX (version 1.4.0), when using C0-only mode, step function does not catch error
+                // correctly (issue #42)
+                can_continue = await new_state.step_forward({print_update: print_update});
+            } catch (e) {
+                const err = e as Error;
+                print_update(`<span class="stdout-error"> Program aborted with error message: <br/>${err.message} </span>`);
+                globalThis.MSG_EMITTER.err("Exception during runtime (" + err.name + ")", err.message);
+                if(globalThis.DEBUG) console.error(e);
+                return [s, false];
+            }
         }
         return [new_state, can_continue];
     } else {
