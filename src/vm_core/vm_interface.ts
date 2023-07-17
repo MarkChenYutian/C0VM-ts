@@ -226,7 +226,8 @@ function getCallstack(s: C0VM_RT): string[] {
 }
 
 function prettyPrintC0Error(e: Error, s: C0VM_RT, print_update: (s: string) => void) {
-    if (s.state.CurrC0RefLine !== undefined) {
+    if (s.state.CurrC0RefLine !== undefined && s.state.CurrC0RefLine[0] !== "") {
+        console.log(s.state.CurrC0RefLine);
         print_update(`<span class="stdout-error">
             Program aborted at ${s.state.CurrC0RefLine[0]}: Line ${s.state.CurrC0RefLine[1]}
             
@@ -234,7 +235,14 @@ function prettyPrintC0Error(e: Error, s: C0VM_RT, print_update: (s: string) => v
             ${e.message}
             
             Traceback:
-            ${getCallstack(s).join("\n&nbsp;↪")} &larr; Error raised here!</span>`);
+            ${getCallstack(s).join("\n&nbsp;↪&nbsp;")} &larr; <b><i>Error raised here!</i></b></span>`);
+    } else if (s.state.CurrC0RefLine !== undefined && s.state.CurrC0RefLine[0] === "") {
+        print_update(`<span class="stdout-error"> 
+            Program aborted
+            
+            with error message:
+            ${e.message}
+            </span>`);
     } else {
         print_update(`<span class="stdout-error"> 
             Program aborted
@@ -243,6 +251,6 @@ function prettyPrintC0Error(e: Error, s: C0VM_RT, print_update: (s: string) => v
             ${e.message}
             
             Traceback:
-            ${getCallstack(s).join("\n&nbsp;↪")} &larr; Error raised here!</span>`);
+            ${getCallstack(s).join("\n&nbsp;↪")} &larr; <b><i>Error raised here!</i></b></span>`);
     }
 }
