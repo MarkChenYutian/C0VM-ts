@@ -64,7 +64,7 @@ export async function step(s: C0VM_RT, c0_only: boolean, print_update: (s: strin
                 can_continue = await new_state.step_forward({print_update: print_update});
             } catch (e) {
                 const err = e as Error;
-                print_update(`<span class="stdout-error"> Program aborted with error message: <br/>${err.message} </span>`);
+                prettyPrintC0Error(err, s, print_update);
                 globalThis.MSG_EMITTER.err("Exception during runtime (" + err.name + ")", err.message);
                 if(globalThis.DEBUG) console.error(e);
                 return [s, false];
@@ -80,7 +80,7 @@ export async function step(s: C0VM_RT, c0_only: boolean, print_update: (s: strin
             return [new_state, can_continue];
         } catch(e) {
             const err = e as Error;
-            print_update(`<span class="stdout-error"> Program aborted with error message: <br/>${err.message} </span>`);
+            prettyPrintC0Error(err, s, print_update);
             globalThis.MSG_EMITTER.err("Exception during runtime (" + err.name + ")", err.message);   
             if(globalThis.DEBUG) console.error(e);
             return [s, false];
@@ -115,7 +115,7 @@ export async function autoStep(
         [new_state,can_continue] = await step(new_state,c0_only,print_update);
     } catch(e) {
         const err = e as Error;
-        print_update(`<span class="stdout-error"> Program aborted with ${err.message} </span>`);
+        prettyPrintC0Error(err, s, print_update);
         globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);
         if(globalThis.DEBUG) console.error(e);
         resetSig();
@@ -199,7 +199,7 @@ export async function run(
             }
         } catch(e) {
             const err = e as Error;
-            print_update(`<span class="stdout-error"> Program aborted with error message: <br/>${err.message} </span>`);
+            prettyPrintC0Error(err, s, print_update);
             globalThis.MSG_EMITTER.err("Exception during runtime (" + (e as Error).name + ")", (e as Error).message);
             if(globalThis.DEBUG) console.error(e);
 
@@ -214,4 +214,35 @@ export async function run(
     // We want to reset the abort signal before we exit the run subroutin.
     resetSig();
     return [new_state, can_continue];
+}
+
+function getCallstack(s: C0VM_RT): string[] {
+    const functionNames: string[] = [];
+    for (let funcFrame of s.state.CallStack) {
+        functionNames.push(funcFrame.P.name);
+    }
+    functionNames.push(s.state.CurrFrame.P.name);
+    return functionNames;
+}
+
+function prettyPrintC0Error(e: Error, s: C0VM_RT, print_update: (s: string) => void) {
+    if (s.state.CurrC0RefLine !== undefined) {
+        print_update(`<span class="stdout-error">
+            Program aborted at ${s.state.CurrC0RefLine[0]}: Line ${s.state.CurrC0RefLine[1]}
+            
+            with error message:
+            ${e.message}
+            
+            Traceback:
+            ${getCallstack(s).join("\n&nbsp;↪")} &larr; Error raised here!</span>`);
+    } else {
+        print_update(`<span class="stdout-error"> 
+            Program aborted
+            
+            with error message:
+            ${e.message}
+            
+            Traceback:
+            ${getCallstack(s).join("\n&nbsp;↪")} &larr; Error raised here!</span>`);
+    }
 }
