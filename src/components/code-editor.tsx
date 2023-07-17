@@ -67,6 +67,7 @@ export default class CodeEditor extends React.Component
             key: this.state.C0_nextKey,
             content: "",
             breakpoints: [],
+            noCompile: false,
         });
         this.props.set_app_state({C0Editors: new_editors, ActiveEditor: this.state.C0_nextKey});
         this.setState({C0_nextKey: this.state.C0_nextKey + 1});
@@ -77,7 +78,7 @@ export default class CodeEditor extends React.Component
     handle_import_folder(F: RcFile, FList: RcFile[]) {
         if (DEBUG) console.debug("received a folder upload, processing one of them")
 
-        if (!(F.name.endsWith('.c0') || F.name.endsWith('.c1'))) {
+        if (!(F.name.endsWith('.c0') || F.name.endsWith('.c1') || F.name.toLowerCase() === "readme.txt")) {
             globalThis.MSG_EMITTER.warn(
                 "File is not Imported",
                 `${F.name} is not a c0/c1 file and is thus ignored.`
@@ -100,6 +101,7 @@ export default class CodeEditor extends React.Component
                 key: -1,
                 content: res,
                 breakpoints: [],
+                noCompile: F.name.endsWith(".txt")
             })
         };
         reader.readAsText(F, "utf-8");
@@ -119,7 +121,7 @@ export default class CodeEditor extends React.Component
     update_content(key: number, s: string) {
         let ns: C0EditorTab[] = [...this.props.app_state.C0Editors];
         ns = ns.map((tab) => tab.key === key ? {
-                key: tab.key, title: tab.title, content: s, breakpoints: tab.breakpoints
+                key: tab.key, title: tab.title, content: s, breakpoints: tab.breakpoints, noCompile: tab.noCompile
             } : tab);
         this.props.set_app_state({C0Editors: ns, contentChanged: true});
     }

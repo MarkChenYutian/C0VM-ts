@@ -8,9 +8,10 @@ import DraggableTabs from "./draggable_tabs";
 import EditableTab from "./editable_tabs";
 
 import type { RcFile } from 'antd/lib/upload';
+import TextEditor from "./text-editor";
 
 const { TabPane } = Tabs;
-const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.c(0|1)$/;
+const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.(c(0|1)|txt)$/;
 
 
 export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
@@ -29,29 +30,44 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         if (!regex_valid_file_name.test(name)) {
             globalThis.MSG_EMITTER.warn(
                 "Failed to rename editor tab", 
-                "Editor tab's name can't contain special character and should end in .c0"
+                "Editor tab's name can't contain special character and should end in .c0 or .c1"
             );
             return;
         }
         if (this.props.appState.C0Runtime !== undefined && this.props.appState.C0Runtime.state.CurrLineNumber !== 0) {
             globalThis.MSG_EMITTER.warn(
                 "Failed to rename editor tab",
-                "Can't rename editor tab when a C0/BC0 program is running in background"
+                "Can't rename editor tab when a C0/C1 program is running in background"
             );
             return;
         }
         for (let i = 0; i < this.props.appState.C0Editors.length; i ++) {
             const tab = this.props.appState.C0Editors[i];
             if (tab.title === name && tab.key !== key) {
-                globalThis.MSG_EMITTER.warn("Failed to rename editor tab", "Editor tabs must have different name.");
+                globalThis.MSG_EMITTER.warn("Failed to rename editor tab", "Editor tabs must have unique names.");
                 return;
             }
         }
+        if (name.endsWith(".txt")) {
+            let containsTextTab = false;
+            for (let tab of this.props.appState.C0Editors) {
+                if (tab.title.endsWith(".txt") && tab.key !== key) containsTextTab = true;
+            }
+            if (containsTextTab) {
+                globalThis.MSG_EMITTER.warn("Failed to rename editor tab", "Only one editor tab with filename '*.txt' can exist.")
+                return;
+            }
+        }
+        
         this.props.set_app_state(
             (S) => {
                 let new_tabs = [...S.C0Editors];
                 for (let i = 0; i < new_tabs.length; i ++) {
-                    if (new_tabs[i].key === key) new_tabs[i].title = name;
+                    if (new_tabs[i].key === key) {
+                        new_tabs[i].title = name;
+                        if (name.endsWith(".txt")) new_tabs[i].noCompile = true;
+                        else new_tabs[i].noCompile = false;
+                    }
                 }
                 return { C0Editors: new_tabs };
             }
@@ -126,8 +142,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                         }
 
                         return <TabPane
-                            tab={
-                                <EditableTab 
+                            tab={<EditableTab 
                                     title={editor.title} 
                                     editor_key={editor.key + ""} 
                                     updateName={(k, s) => this.set_current_tab_name(k, s)}
@@ -136,7 +151,15 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                             closable = {this.props.appState.C0Editors.length !== 1}
                             closeIcon={<FontAwesomeIcon icon={faXmark}/>}
                         >
-                            <C0Editor
+                            {
+                            editor.title.endsWith(".txt")
+                            ? <TextEditor
+                                editorValue   = {editor.content}
+                                updateContent = {(s) => this.props.updateContent(editor.key, s)}
+                                updateCompileLine = {fileArr => console.log(fileArr)}
+                                updateName    = {(name) => this.set_tab_name(editor.key, name)}
+                            />
+                            : <C0Editor
                                 execLine      = {lineNumber}
                                 editorValue   = {editor.content}
                                 breakPoints   = {editor.breakpoints}
@@ -145,7 +168,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                                 setBreakPts   = {(bps)  => this.set_brkpt_for_editor(editor.key, bps)}
                                 editable      = {this.props.currLine === undefined}
                                 handle_import_folder = {(F: RcFile, FList: RcFile[]) => this.props.handle_import_folder(F, FList)}
-                            />
+                            />}
                         </TabPane>;
                     }
                 )

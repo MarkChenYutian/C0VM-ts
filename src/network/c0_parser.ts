@@ -277,7 +277,7 @@ export function is_all_library_supported(editors: C0EditorTab[]){
         libraries.has("args")  ||
         libraries.has("img")   ||
         libraries.has("file")  ||
-        libraries.has("curses")
+        libraries.has("cursor")
     );
 }
 

@@ -22,7 +22,8 @@ type C0EditorTab = {
     title  : string,            /* Title of editor tab */
     key    : number,            /* Key of editor tab */
     content: string,            /* Content (raw string) of that tab */
-    breakpoints: BreakPoint[]   /* Breakpoints attatched to that tab */
+    breakpoints: BreakPoint[],  /* Breakpoints attatched to that tab */
+    noCompile: boolean          /* true to ignore this file in compile process */
 };
 
 interface C0VMApplicationProps {
@@ -139,6 +140,13 @@ interface BC0EditorProps {
     execLine      : number,
     breakpointVal : Set<BreakPoint>,
     updateBrkPts  : (ns: BreakPoint[]) => void,
+}
+
+interface TextEditorProps {
+    updateContent : (s: string) => void,
+    editorValue   : string,
+    updateCompileLine : (fileSeq: string[]) => void
+    updateName    : (s: string) => void,
 }
 
 // The props that CompilerOption component will accept

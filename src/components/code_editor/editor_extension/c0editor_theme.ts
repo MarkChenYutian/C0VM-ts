@@ -10,7 +10,8 @@ export const backgroundColor = "#FFFFFF",
     selectText = "#526FFF",
     textBackground = "#BBDEE3",
     searchBackground = "#AACDD2",
-    execLineBackground = "#FFFF90"
+    execLineBackground = "#FFFF90",
+    compileLineOKBackground = "#CFFECA"
 
 
 const highlighter = {
@@ -75,6 +76,9 @@ export const C0LightStyle = EditorView.theme({
     },
     ".cm-execLine-light": {
         backgroundColor: execLineBackground
+    },
+    ".cm-compileLine-ok": {
+        backgroundColor: compileLineOKBackground
     },
     ".cm-foldGutter": {
         FontFace: "menlo-regular",
