@@ -1,6 +1,6 @@
 import React from "react";
 import BC0Editor from "./code_editor/bc0-editor";
-import C0EditorGroup from "./code_editor/c0-editor-group";
+import C0EditorGroup from "./code_editor/code-editor-tabs";
 
 import { Segmented, Space, Tooltip, Upload } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -112,6 +112,11 @@ export default class CodeEditor extends React.Component
 
     remove_panel(key: string) {
         const key_tbr = parseInt(key);
+        let to_be_removed: C0EditorTab = [...this.props.app_state.C0Editors].filter(
+            tab => tab.key === key_tbr
+        )[0]
+        if (to_be_removed.title.endsWith(".txt")) globalThis.RECOMMAND_COMPILE_SEQ = undefined;
+
         let new_editors: C0EditorTab[] = [...this.props.app_state.C0Editors];
         new_editors = new_editors.filter((value) => value.key !== key_tbr);
         const new_activeTab = this.props.app_state.ActiveEditor === key_tbr ? new_editors[0].key : this.props.app_state.ActiveEditor;

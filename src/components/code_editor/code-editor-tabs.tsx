@@ -30,7 +30,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         if (!regex_valid_file_name.test(name)) {
             globalThis.MSG_EMITTER.warn(
                 "Failed to rename editor tab", 
-                "Editor tab's name can't contain special character and should end in .c0 or .c1"
+                "Editor tab's name can't contain special character and should end in .c0, .c1 or .txt"
             );
             return;
         }
@@ -156,7 +156,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                             ? <TextEditor
                                 editorValue   = {editor.content}
                                 updateContent = {(s) => this.props.updateContent(editor.key, s)}
-                                updateCompileLine = {fileArr => console.log(fileArr)}
+                                updateCompileLine = {fileArr => globalThis.RECOMMAND_COMPILE_SEQ = fileArr}
                                 updateName    = {(name) => this.set_tab_name(editor.key, name)}
                             />
                             : <C0Editor

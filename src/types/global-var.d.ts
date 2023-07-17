@@ -19,6 +19,8 @@ declare global {
     var C0_ASYNC_INTERVAL: number;          // Interval between each time slice will be at least these much ms
     var AUTOSTEP_INTERVAL: "Fast" | "Slow"; // Interval between each step during AUTOSTEP, in ms
 
+    var RECOMMAND_COMPILE_SEQ: string[] | undefined; // Recommanded compile sequence (might be undefined)
+
     // MS Clarity client API
     var clarity: undefined | ((s: "set", key: "VM Error", 
         value: 
