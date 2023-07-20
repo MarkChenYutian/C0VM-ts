@@ -11,7 +11,8 @@ export const backgroundColor = "#FFFFFF",
     textBackground = "#BBDEE3",
     searchBackground = "#AACDD2",
     execLineBackground = "#FFFF90",
-    compileLineOKBackground = "#CFFECA"
+    compileLineOKBackground = "#CFFECA",
+    compileLineErrBackground = "#FEFDBA"
 
 
 const highlighter = {
@@ -79,6 +80,15 @@ export const C0LightStyle = EditorView.theme({
     },
     ".cm-compileLine-ok": {
         backgroundColor: compileLineOKBackground
+    },
+    ".cm-compileLine-interface": {
+        backgroundColor: compileLineErrBackground
+    },
+    ".cm-compileLine-notsupport": {
+        backgroundColor: compileLineErrBackground
+    },
+    ".cm-compileLine-override": {
+        backgroundColor: compileLineErrBackground
     },
     ".cm-foldGutter": {
         FontFace: "menlo-regular",

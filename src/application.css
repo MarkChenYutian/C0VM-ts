@@ -99,6 +99,30 @@ ul > li {
 
 /* Editor Style */
 
+.cm-compileLine-ok::after {
+    color: green;
+    white-space: pre;
+    content: "   ✅ Compiler setting applied";
+}
+
+.cm-compileLine-interface::after {
+    color: #333;
+    white-space: pre;
+    content: "   ❌ Command with --interface (-i) flag is ignored.";
+}
+
+.cm-compileLine-notsupport::after {
+    color: #333;
+    white-space: pre;
+    content: "   ❌ Visualizer does not support .o0/o1 files.";
+}
+
+.cm-compileLine-override::after {
+    color: #333;
+    white-space: pre;
+    content: "   ⚠️ Valid command, overriden by another valid commands above";
+}
+
 .editor-tab-btn {
     font-size: 1.2rem;
     color: #3577C1;

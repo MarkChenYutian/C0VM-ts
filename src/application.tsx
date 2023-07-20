@@ -40,7 +40,7 @@ export default class C0VMApplication extends React.Component<
 
             C0Running: false,
             C0Runtime: undefined,
-            CompilerFlags: { d: false },
+            CompilerFlags: { d: undefined },
         };
     }
 

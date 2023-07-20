@@ -109,7 +109,15 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                 this.props.removePanel(target_key);
                 break;
         }
-    };    
+    };
+
+    set_compiler_flag(flag: string, value: boolean) {
+        if (this.props.appState.CompilerFlags[flag] !== undefined) return;
+
+        const new_state = {...this.props.appState.CompilerFlags};
+        new_state[flag] = value;
+        this.props.set_app_state({CompilerFlags: new_state});
+    }
 
     render() {
         const tabConfig: TabsProps = {
@@ -158,6 +166,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                                 updateContent = {(s) => this.props.updateContent(editor.key, s)}
                                 updateCompileLine = {fileArr => globalThis.RECOMMAND_COMPILE_SEQ = fileArr}
                                 updateName    = {(name) => this.set_tab_name(editor.key, name)}
+                                updateCompilerFlag={(k, v) => this.set_compiler_flag(k, v)}
                             />
                             : <C0Editor
                                 execLine      = {lineNumber}

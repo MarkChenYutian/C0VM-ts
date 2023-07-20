@@ -4,7 +4,7 @@ import C0EditorGroup from "./code_editor/code-editor-tabs";
 
 import { Segmented, Space, Tooltip, Upload } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCode, faLock } from "@fortawesome/free-solid-svg-icons";
+import { faLock } from "@fortawesome/free-solid-svg-icons";
 import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
 import type { RcFile } from 'antd/lib/upload';
@@ -80,8 +80,8 @@ export default class CodeEditor extends React.Component
 
         if (!(F.name.endsWith('.c0') || F.name.endsWith('.c1') || F.name.toLowerCase() === "readme.txt")) {
             globalThis.MSG_EMITTER.warn(
-                "File is not Imported",
-                `${F.name} is not a c0/c1 file and is thus ignored.`
+                "File Ignored",
+                `${F.name} is not *.c0 / *.c1 / README.txt file and is thus ignored.`
             );
             return Upload.LIST_IGNORE;
         }
@@ -166,7 +166,7 @@ export default class CodeEditor extends React.Component
             const vm = this.props.app_state.C0Runtime;
             content = <>
                 <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "baseline"}}>
-                    <h3 style={{margin: "0"}}><FontAwesomeIcon icon={faCode}/> Bytecode Reader</h3>
+                    <h3 style={{margin: "0"}}>Bytecode Reader</h3>
                     {selector}
                 </div>
                 <BC0Editor

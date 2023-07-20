@@ -200,4 +200,4 @@ function LoadDocumentPlugin(accepted_format: string, update_name ?: (s: string) 
     });
 }
 
-export { LoadDocumentPlugin };
+export default LoadDocumentPlugin;

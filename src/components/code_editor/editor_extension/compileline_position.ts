@@ -3,8 +3,8 @@ import { Decoration, ViewPlugin } from "@codemirror/view";
 
 
 
-function CompileLineHighlighter(lineNum: number) {
-    const currExecLineDeco = Decoration.line({ class: "cm-compileLine-ok" });
+function CompileLineHighlighter(lineNum: number, type: "ok" | "notsupport" | "interface" | "override") {
+    const currExecLineDeco = Decoration.line({ class: "cm-compileLine-" + type });
     return ViewPlugin.fromClass(class {
         public decorations;
 

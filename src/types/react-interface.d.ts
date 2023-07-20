@@ -51,7 +51,7 @@ interface C0VMApplicationState {
 
     C0Running      : boolean,               /* If the C0VM is running currently */
     C0Runtime      : C0VM_RT | undefined,   /* Runtime of C0VM */
-    CompilerFlags  : Record<string, boolean>    /* Compiler Flags (-d) */
+    CompilerFlags  : Record<string, boolean | undefined>    /* Compiler Flags (-d) */
 };
 
 
@@ -147,6 +147,7 @@ interface TextEditorProps {
     editorValue   : string,
     updateCompileLine : (fileSeq: string[]) => void
     updateName    : (s: string) => void,
+    updateCompilerFlag : (flag, value) => void
 }
 
 // The props that CompilerOption component will accept
