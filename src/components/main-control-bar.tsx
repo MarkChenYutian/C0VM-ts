@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Button, Dropdown, MenuProps, Space, Tooltip } from "antd";
+import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
 import { faAngleDown, faBoltLightning, faBugSlash, faClockRotateLeft, faPlay, faScrewdriverWrench, faStepForward, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,7 +10,6 @@ import * as VM from "../vm_core/vm_interface";
 import remote_compile from "../network/remote_compile";
 
 import tsLogo from "../assets/ts-logo-128.svg";
-import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
 
 /**

@@ -51,7 +51,6 @@ export default class TextEditor extends React.Component<TextEditorProps>
 {
     render() {
         const compilerLine = getCompilerLineNumber(this.props.editorValue, this.props.updateCompileLine, this.props.updateCompilerFlag);
-        console.log(compilerLine);
 
         const notSupportIndicator = compilerLine.notsupport.map(
             (line) => CompileLineHighlighter(line, "notsupport")

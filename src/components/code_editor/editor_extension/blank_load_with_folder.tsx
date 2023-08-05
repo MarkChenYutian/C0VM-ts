@@ -118,7 +118,7 @@ class LoadDocumentWidget extends WidgetType {
             load_dom.appendChild(document.createTextNode("Or "))
             let tmp2 = document.createElement("a");
             tmp2.className = "active-href";
-            tmp2.textContent = "Import Folder"
+            tmp2.textContent = "Import Folder (15-122 Homework)"
             tmp2.onclick = () => onLoadFolder(this.handle_import_folder);
             load_dom.appendChild(tmp2);
         }

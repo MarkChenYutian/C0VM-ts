@@ -8,6 +8,7 @@ import { faLock } from "@fortawesome/free-solid-svg-icons";
 import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
 import type { RcFile } from 'antd/lib/upload';
+import LoadAsHomeworkIfPossible from "./code_editor/auto-import-homework";
 
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>
@@ -95,7 +96,6 @@ export default class CodeEditor extends React.Component
             }
 
             const res = reader.result.toString();
-           
             this.push_populated_tab({
                 title: F.name,
                 key: -1,
@@ -143,7 +143,12 @@ export default class CodeEditor extends React.Component
                     newPanel        = {() => this.create_panel()}
                     removePanel     = {(key) => this.remove_panel(key)}
                     updateContent   = {(key, s) => this.update_content(key, s)}
-                    handle_import_folder = {(F: RcFile, FList: RcFile[]) => this.handle_import_folder(F, FList)}
+                    handle_import_folder={(F: RcFile, FList: RcFile[]) => {
+                        this.handle_import_folder(F, FList); 
+                        setTimeout(() => {
+                            LoadAsHomeworkIfPossible(this)
+                        }, 500);
+                    }}
                 />
             </div>);
     }
@@ -160,7 +165,12 @@ export default class CodeEditor extends React.Component
                 newPanel        = {() => this.create_panel()}
                 removePanel     = {(key) => this.remove_panel(key)}
                 updateContent   = {(key, s) => this.update_content(key, s)}
-                handle_import_folder={(F: RcFile, FList: RcFile[]) => this.handle_import_folder(F, FList)}
+                handle_import_folder={(F: RcFile, FList: RcFile[]) => {
+                    this.handle_import_folder(F, FList); 
+                    setTimeout(() => {
+                        LoadAsHomeworkIfPossible(this)
+                    }, 500);
+                }}
             />;
         } else {
             const vm = this.props.app_state.C0Runtime;
