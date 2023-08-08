@@ -23,7 +23,6 @@ type C0EditorTab = {
     key    : number,            /* Key of editor tab */
     content: string,            /* Content (raw string) of that tab */
     breakpoints: BreakPoint[],  /* Breakpoints attatched to that tab */
-    noCompile: boolean          /* true to ignore this file in compile process */
 };
 
 interface C0VMApplicationProps {

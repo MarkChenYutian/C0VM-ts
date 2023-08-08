@@ -8,7 +8,6 @@ import DraggableTabs from "./draggable_tabs";
 import EditableTab from "./editable_tabs";
 
 import type { RcFile } from 'antd/lib/upload';
-import TextEditor from "./text-editor";
 
 const { TabPane } = Tabs;
 const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.(c(0|1)|txt)$/;
@@ -65,8 +64,6 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                 for (let i = 0; i < new_tabs.length; i ++) {
                     if (new_tabs[i].key === key) {
                         new_tabs[i].title = name;
-                        if (name.endsWith(".txt")) new_tabs[i].noCompile = true;
-                        else new_tabs[i].noCompile = false;
                     }
                 }
                 return { C0Editors: new_tabs };
@@ -151,15 +148,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                             closable = {this.props.appState.C0Editors.length !== 1}
                             closeIcon={<FontAwesomeIcon icon={faXmark}/>}
                         >
-                            {
-                            editor.title.endsWith(".txt")
-                            ? <TextEditor
-                                editorValue   = {editor.content}
-                                updateContent = {(s) => this.props.updateContent(editor.key, s)}
-                                updateCompileLine = {fileArr => console.log(fileArr)}
-                                updateName    = {(name) => this.set_tab_name(editor.key, name)}
-                            />
-                            : <C0Editor
+                            <C0Editor
                                 execLine      = {lineNumber}
                                 editorValue   = {editor.content}
                                 breakPoints   = {editor.breakpoints}
@@ -168,7 +157,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                                 setBreakPts   = {(bps)  => this.set_brkpt_for_editor(editor.key, bps)}
                                 editable      = {this.props.currLine === undefined}
                                 handle_import_folder = {(F: RcFile, FList: RcFile[]) => this.props.handle_import_folder(F, FList)}
-                            />}
+                            />
                         </TabPane>;
                     }
                 )

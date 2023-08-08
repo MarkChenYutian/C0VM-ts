@@ -33,7 +33,7 @@ export default class C0VMApplication extends React.Component<
             BC0SourceCode: "",
             BC0BreakPoints: new Set(),
 
-            C0Editors: [{ title: "Untitled_0.c0", key: 0, content: "", breakpoints: [], noCompile: false }],
+            C0Editors: [{ title: "Untitled_0.c0", key: 0, content: "", breakpoints: [] }],
             ActiveEditor: 0,
 
             PrintoutValue: "",

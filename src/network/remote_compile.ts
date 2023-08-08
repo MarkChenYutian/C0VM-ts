@@ -19,7 +19,6 @@ export default function remote_compile(
     /** Update since v1.0.4 - print out the compile command when user hit compile button */
     let compile_command = "$ cc0 ";
     for (let tab of app_state.C0Editors) {
-        if (tab.noCompile) continue;
         compile_command += " " + tab.title;
     }
     compile_command += app_state.CompilerFlags["d"] ? " -d" : "";
@@ -36,8 +35,8 @@ export default function remote_compile(
             "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
-            codes    : app_state.C0Editors.filter(tab => !tab.noCompile).map(tab => tab.content),
-            filenames: app_state.C0Editors.filter(tab => !tab.noCompile).map(tab => tab.title),
+            codes    : app_state.C0Editors.map(tab => tab.content),
+            filenames: app_state.C0Editors.map(tab => tab.title),
         })
     })
     .then(
