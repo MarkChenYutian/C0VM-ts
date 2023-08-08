@@ -136,7 +136,6 @@ export default class CodeEditor extends React.Component
                     newPanel        = {() => this.create_panel()}
                     removePanel     = {(key) => this.remove_panel(key)}
                     updateContent   = {(key, s) => this.update_content(key, s)}
-                    handle_import_folder = {(F: RcFile, FList: RcFile[]) => this.handle_import_folder(F, FList)}
                 />
             </div>);
     }
@@ -153,7 +152,6 @@ export default class CodeEditor extends React.Component
                 newPanel        = {() => this.create_panel()}
                 removePanel     = {(key) => this.remove_panel(key)}
                 updateContent   = {(key, s) => this.update_content(key, s)}
-                handle_import_folder={(F: RcFile, FList: RcFile[]) => this.handle_import_folder(F, FList)}
             />;
         } else {
             const vm = this.props.app_state.C0Runtime;

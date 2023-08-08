@@ -379,7 +379,8 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
 
 export default function MainControlBar(props: MainControlProps){
     return  <ConfigConsumer>
-                {(value: ConfigConsumerProps) => 
+                {
+                (value: ConfigConsumerProps) => 
                     <MainControlBarFC 
                         themeColor={value.theme?.token?.colorPrimary}
                         {...props}

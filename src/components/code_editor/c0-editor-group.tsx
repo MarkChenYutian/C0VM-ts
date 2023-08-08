@@ -7,7 +7,6 @@ import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
 import DraggableTabs from "./draggable_tabs";
 import EditableTab from "./editable_tabs";
 
-import type { RcFile } from 'antd/lib/upload';
 
 const { TabPane } = Tabs;
 const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.(c(0|1)|txt)$/;
@@ -22,7 +21,6 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         this.on_change_key = this.on_change_key.bind(this);
         this.update_tab_order = this.update_tab_order.bind(this);
         this.set_brkpt_for_editor = this.set_brkpt_for_editor.bind(this);
-        if (DEBUG) console.debug("handle_import_folder prop in C0EditorGroup is", this.props.handle_import_folder);
     }
 
     set_tab_name(key: number, name: string){
@@ -156,7 +154,6 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                                 updateName    = {(name) => this.set_tab_name(editor.key, name)}
                                 setBreakPts   = {(bps)  => this.set_brkpt_for_editor(editor.key, bps)}
                                 editable      = {this.props.currLine === undefined}
-                                handle_import_folder = {(F: RcFile, FList: RcFile[]) => this.props.handle_import_folder(F, FList)}
                             />
                         </TabPane>;
                     }
