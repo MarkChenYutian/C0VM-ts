@@ -122,13 +122,19 @@ interface C0EditorGroupProps {
 
 interface C0EditorProps {
     execLine      : number,                     /* The line number C0VM is currently on (0 if not running on this C0 tab) */
-    content   : string,                     /* Editor content (raw string) */
+    content       : string,                     /* Editor content (raw string) */
     editable      : boolean                     /* Is editor editable? (if false, in read-only mode) */
     breakPoints   : BreakPoint[],               /* Breakpoints attatched to this editor */
     
-    setContent : (s: string) => void,
+    setContent    : (s: string) => void,
     setBreakPts   : (lns: BreakPoint[]) => void,
-    setTitle    : (s: string) => void,
+    setTitle      : (s: string) => void,
+    setAllTabs    : (tabs: C0EditorTab[]) => void,
+}
+
+interface C0EditorState {
+    show: boolean,
+    files: string[]
 }
 
 interface BC0EditorProps {
@@ -295,3 +301,12 @@ interface EditableTabState {
     being_edited: boolean,
     wip_title: string
 }
+
+interface FilesLoadProps {
+    show: boolean,
+    files: string[],
+    setShow: (show: boolean) => void,
+    setAllTabs: (tabs: C0EditorTab[]) => void
+}
+
+type CodeFile = { title: string, content: string | undefined }

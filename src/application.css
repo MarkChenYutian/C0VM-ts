@@ -501,3 +501,11 @@ div.settings-grid > p {
     border: none;
     color: rgb(230, 107, 0);
 }
+
+
+/* Project Importer */
+
+.app-project-import-progress-grid {
+    display: grid;
+    grid-template-columns: 6fr 4fr;
+}

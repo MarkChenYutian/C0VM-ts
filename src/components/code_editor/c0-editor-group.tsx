@@ -149,10 +149,12 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                             execLine    = {execLine}
                             content     = {editor.content}
                             breakPoints = {editor.breakpoints}
+                            editable    = {this.props.currLine === undefined}
+
                             setContent  = {(content) => this.props.set_content(editor.key, content)}
                             setTitle    = {(title) => this.set_tab_name(editor.key, title)}
                             setBreakPts = {(bps)  => this.set_breakpoint(editor.key, bps)}
-                            editable    = {this.props.currLine === undefined}
+                            setAllTabs  = {(tabs) => this.props.set_app_state({C0Editors: tabs})}
                         />
                     </TabPane>
                     );

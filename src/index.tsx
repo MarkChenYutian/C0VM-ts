@@ -11,7 +11,7 @@ import C0VMApplication from './application';
 import AntdEmitter from './utility/antd_emitter';
 
 // Global Variables
-global.C0VM_VERSION = "1.0.4";
+global.C0VM_VERSION = "1.1.0";
 
 globalThis.DEBUG = false;
 globalThis.DEBUG_DUMP_MEM = false;
