@@ -14,7 +14,7 @@ export default class C0Editor extends React.Component<C0EditorProps, C0EditorSta
 {
     constructor(props: C0EditorProps) {
         super(props);
-        this.state = {show: false, files: []};
+        this.state = {show: false};
     }
 
     /**
@@ -52,7 +52,6 @@ export default class C0Editor extends React.Component<C0EditorProps, C0EditorSta
                             LoadDocumentPlugin(
                                 ".c0, .c1",
                                 this.props.setTitle,
-                                (files) => this.setState({files}),
                                 (show) => this.setState({show})
                             ),
                             basicSetup(),
@@ -64,9 +63,9 @@ export default class C0Editor extends React.Component<C0EditorProps, C0EditorSta
                     />
                     <FilesLoad
                         show={this.state.show}
-                        files={this.state.files}
                         setAllTabs={(tabs) => this.props.setAllTabs(tabs)}
                         setShow={(s) => this.setState(({show: s}))}
+                        setActiveEditor={(key) => this.props.setActiveKey(key)}
                     />
                 </div>;
     }

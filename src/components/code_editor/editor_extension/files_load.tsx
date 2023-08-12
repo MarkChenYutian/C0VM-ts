@@ -68,9 +68,7 @@ async function onLoadProjectCode(expectFiles: CodeFile[], setFiles: (fs: CodeFil
 const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
     const [files, setFiles] = useState<CodeFile[]>([]);
     const showFileStatus = (loaded: boolean) => loaded ? <Text type="success">Loaded</Text> : <Text type="warning">Not Loaded</Text>;
-    const notFinished = files.length !== 0 && files.reduce((prev, curr) => prev && curr.content !== undefined, true);
-
-    
+    const notFinished = files.length !== 0 && files.reduce((prev, curr) => prev && curr.content !== undefined, true);    
 
     let content = null;
     let step = 0;
@@ -108,10 +106,11 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
                 onOk={() => {
                     props.setAllTabs(
                         files.map((f, idx) => {
-                            return {title: f.title, content: (f.content as string), breakpoints: [], key: idx}
+                            return {title: f.title, content: (f.content as string), breakpoints: [], key: -1 * idx}
                         })
                     );
                     props.setShow(false);
+                    props.setActiveEditor(0);
                 }}
                 okButtonProps={{disabled: !notFinished}}
                 title={`15-122 Project Import Guide (Step ${step})`}

@@ -130,11 +130,11 @@ interface C0EditorProps {
     setBreakPts   : (lns: BreakPoint[]) => void,
     setTitle      : (s: string) => void,
     setAllTabs    : (tabs: C0EditorTab[]) => void,
+    setActiveKey  : (key: number) => void
 }
 
 interface C0EditorState {
     show: boolean,
-    files: string[]
 }
 
 interface BC0EditorProps {
@@ -304,9 +304,9 @@ interface EditableTabState {
 
 interface FilesLoadProps {
     show: boolean,
-    files: string[],
     setShow: (show: boolean) => void,
-    setAllTabs: (tabs: C0EditorTab[]) => void
+    setAllTabs: (tabs: C0EditorTab[]) => void,
+    setActiveEditor: (key: number) => void
 }
 
 type CodeFile = { title: string, content: string | undefined }

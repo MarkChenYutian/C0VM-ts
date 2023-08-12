@@ -20,19 +20,16 @@ function loadFileThroughDialog(view: EditorView, accept_format: string, update_t
 // Reference: https://codemirror.net/examples/decoration/
 class LoadDocumentWidget extends WidgetType {
     public update_title : (s: string) => void;
-    public update_files : (tabs: string[]) => void;
     public update_show  : (show: boolean) => void;
     public accept_format: string;
 
     constructor(
         accept_format: string,
         update_title: (s: string) => void,
-        update_files: (tabs: string[]) => void,
         update_show: (show: boolean) => void
     ) {
         super();
         this.update_title = (s) => update_title(s);
-        this.update_files = update_files;
         this.accept_format= accept_format;
         this.update_show  = update_show;
     } 
@@ -76,14 +73,13 @@ function loadDOMWidgetInterface(
     view: EditorView,
     accept_format: string,
     update_title: (s: string) => void,
-    update_files: (tabs: string[]) => void,
     update_show : (show: boolean) => void,
 ) {
     if (view.state.doc.length !== 0) return Decoration.none;
     
     return Decoration.set([
         Decoration.widget({
-            widget: new LoadDocumentWidget(accept_format, update_title, update_files, update_show),
+            widget: new LoadDocumentWidget(accept_format, update_title, update_show),
             side: 0,
         }).range(0)
     ]);
@@ -104,26 +100,23 @@ function loadDOMWidgetInterface(
 function LoadDocumentPlugin(
     accepted_format: string,
     update_title : (s: string) => void,
-    update_files : (tabs: string[]) => void,
     update_show  : (show: boolean) => void
 ) {
     return ViewPlugin.fromClass(class {
         public decorations   : DecorationSet;
         public update_title  : (s: string) => void;
-        public update_files  : (tabs: string[]) => void;
         public update_show   : (show: boolean) => void
         public accept_format : string;
     
         constructor (view: EditorView) {
             this.update_title  = (s) => update_title(s);
-            this.update_files  = update_files;
             this.accept_format = accepted_format;
             this.update_show   = update_show;
-            this.decorations   = loadDOMWidgetInterface(view, this.accept_format, this.update_title, this.update_files, this.update_show);
+            this.decorations   = loadDOMWidgetInterface(view, this.accept_format, this.update_title, this.update_show);
         }
 
         update(update: ViewUpdate) {
-            this.decorations = loadDOMWidgetInterface(update.view, this.accept_format, this.update_title, this.update_files, this.update_show);
+            this.decorations = loadDOMWidgetInterface(update.view, this.accept_format, this.update_title, this.update_show);
             return;
         }
     }, {

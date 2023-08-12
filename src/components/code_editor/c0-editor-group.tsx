@@ -155,6 +155,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                             setTitle    = {(title) => this.set_tab_name(editor.key, title)}
                             setBreakPts = {(bps)  => this.set_breakpoint(editor.key, bps)}
                             setAllTabs  = {(tabs) => this.props.set_app_state({C0Editors: tabs})}
+                            setActiveKey= {(key) => {this.props.set_app_state({ActiveEditor: key})}}
                         />
                     </TabPane>
                     );
