@@ -4,76 +4,102 @@ import C0Editor from "./c0-editor";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
 
-import DraggableTabs from "./draggable_tabs";
+import DraggableTab from "./draggable_tabs";
 import EditableTab from "./editable_tabs";
+import { internal_error } from "../../utility/errors";
 
 
 const { TabPane } = Tabs;
-const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.(c(0|1)|txt)$/;
+const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.(c(0|1))$/;
+
+
+function isValidFileName(name: string): boolean {
+    if (!regex_valid_file_name.test(name)) {
+        globalThis.MSG_EMITTER.warn(
+            "Failed to rename editor tab", 
+            "Editor tab's name can't contain special character and should end in .c0 or .c1"
+        );
+        return false;
+    }
+    return true;
+}
+
+function vmNotRunning(props: C0EditorGroupProps) {
+    if (props.appState.C0Runtime !== undefined && props.appState.C0Runtime.state.CurrLineNumber !== 0) {
+        globalThis.MSG_EMITTER.warn(
+            "Failed to rename editor tab",
+            "Can't rename editor tab when a C0/C1 program is running in background"
+        );
+        return false;
+    }
+    return true;
+}
+
+function isUniqueFileName(props: C0EditorGroupProps, key: number, name: string): boolean {
+    for (let i = 0; i < props.appState.C0Editors.length; i ++) {
+        const tab = props.appState.C0Editors[i];
+        if (tab.title === name && tab.key !== key) {
+            globalThis.MSG_EMITTER.warn(
+                "Failed to rename editor tab",
+                "Editor tabs must have unique names."
+            );
+            return false;
+        }
+    }
+    return true;
+}
 
 
 export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
 {
     constructor(props: C0EditorGroupProps){
         super(props);
-        this.on_edit = this.on_edit.bind(this);
+        this.change_tab = this.change_tab.bind(this);
         this.set_tab_name = this.set_tab_name.bind(this);
-        this.on_change_key = this.on_change_key.bind(this);
-        this.update_tab_order = this.update_tab_order.bind(this);
-        this.set_brkpt_for_editor = this.set_brkpt_for_editor.bind(this);
+        this.set_active = this.set_active.bind(this);
+        this.set_tab_order = this.set_tab_order.bind(this);
+        this.set_breakpoint = this.set_breakpoint.bind(this);
     }
 
-    set_tab_name(key: number, name: string){
-        if (!regex_valid_file_name.test(name)) {
-            globalThis.MSG_EMITTER.warn(
-                "Failed to rename editor tab", 
-                "Editor tab's name can't contain special character and should end in .c0 or .c1"
-            );
-            return;
+    get_tab(key: number): C0EditorTab {
+        for (const tab of this.props.appState.C0Editors) {
+            if (tab.key === key) return tab;
         }
-        if (this.props.appState.C0Runtime !== undefined && this.props.appState.C0Runtime.state.CurrLineNumber !== 0) {
-            globalThis.MSG_EMITTER.warn(
-                "Failed to rename editor tab",
-                "Can't rename editor tab when a C0/C1 program is running in background"
-            );
-            return;
-        }
-        for (let i = 0; i < this.props.appState.C0Editors.length; i ++) {
-            const tab = this.props.appState.C0Editors[i];
-            if (tab.title === name && tab.key !== key) {
-                globalThis.MSG_EMITTER.warn("Failed to rename editor tab", "Editor tabs must have unique names.");
-                return;
-            }
-        }
-        if (name.endsWith(".txt")) {
-            let containsTextTab = false;
-            for (let tab of this.props.appState.C0Editors) {
-                if (tab.title.endsWith(".txt") && tab.key !== key) containsTextTab = true;
-            }
-            if (containsTextTab) {
-                globalThis.MSG_EMITTER.warn("Failed to rename editor tab", "Only one editor tab with filename '*.txt' can exist.")
-                return;
-            }
-        }
-        
+        throw new internal_error("Failed to retrieve the editor tab required.");
+    }
+
+    set_tab(key: number, new_tab: C0EditorTab) {
         this.props.set_app_state(
             (S) => {
                 let new_tabs = [...S.C0Editors];
                 for (let i = 0; i < new_tabs.length; i ++) {
-                    if (new_tabs[i].key === key) {
-                        new_tabs[i].title = name;
-                    }
+                    if (new_tabs[i].key === key) new_tabs[i] = new_tab
                 }
                 return { C0Editors: new_tabs };
             }
         );
     }
 
-    on_change_key(new_active_key: string) {
+    set_tab_name(key: number, name: string){
+        if (!isValidFileName(name) || !vmNotRunning(this.props) || !isUniqueFileName(this.props, key, name)) {
+            return;
+        }
+        const orig_tab = this.get_tab(key);
+        const new_tab: C0EditorTab = {...orig_tab, title: name};
+        this.set_tab(key, new_tab);
+    }
+
+    set_breakpoint(key: number, bps: BreakPoint[]) {
+        const newTab = this.get_tab(key);
+        newTab.breakpoints = bps;
+        this.set_tab(key, newTab);
+    }
+
+    set_active(new_active_key: string) {
         this.props.set_app_state({ActiveEditor: parseInt(new_active_key)});
     }
 
-    update_tab_order(new_order: React.Key[]): void {
+    set_tab_order(new_order: React.Key[]): void {
         const tab_keymap = new Map<number, C0EditorTab>();
         const result = [];
         this.props.appState.C0Editors.forEach((tab) => tab_keymap.set(tab.key, tab));
@@ -83,83 +109,56 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         this.props.set_app_state({C0Editors: result});
     }
 
-    set_brkpt_for_editor(key: number, bps: BreakPoint[]) {
-        const newTabs = [...this.props.appState.C0Editors];
-        for (let i = 0; i < newTabs.length; i ++) {
-            if (newTabs[i].key === key) newTabs[i].breakpoints = bps;
+    change_tab(target_key: any, action: "add" | "remove") {
+        if (action === "add") {
+            this.props.newPanel();
+        } else {
+            this.props.removePanel(target_key);
         }
-        this.props.set_app_state({C0Editors: newTabs});
     }
-
-    set_current_tab_name(key: string, s: string): void {
-        this.set_tab_name(parseInt(key), s === null ? "" : s);
-    }
-
-    on_edit(target_key: any, action: "add" | "remove") {
-        switch (action) {
-            case "add":
-                this.props.newPanel();
-                break;
-            case "remove":
-                this.props.removePanel(target_key);
-                break;
-        }
-    };    
 
     render() {
         const tabConfig: TabsProps = {
-            tabBarExtraContent: this.props.selector,
             type: "editable-card",
-            activeKey: this.props.appState.ActiveEditor + "",
             size: "small",
-            onChange: (new_key: string) => {this.on_change_key(new_key)},
-            onTabClick: (key: string, e)   => {
-                if (e.altKey) {
-                    const s = prompt("File name for tab:");
-                    this.set_tab_name(parseInt(key), s === null ? "" : s)
-                }
-            },
+            tabBarExtraContent: this.props.selector,
+            activeKey: this.props.appState.ActiveEditor.toString(),
+            onChange: (new_key: string) => {this.set_active(new_key)},
             addIcon: <FontAwesomeIcon icon={faAdd}/>
         }
 
         return (
-        <DraggableTabs
-            config={tabConfig}
-            onTabEdit={this.on_edit}
-            setTabOrder={this.update_tab_order}
-        >
-            {
-                this.props.appState.C0Editors.map(
-                    (editor) => {
-                        let lineNumber = 0;
-                        if (this.props.currLine !== undefined && editor.title === this.props.currLine[0]) {
-                            lineNumber = this.props.currLine[1];
-                        }
-
-                        return <TabPane
-                            tab={<EditableTab 
-                                    title={editor.title} 
-                                    editor_key={editor.key + ""} 
-                                    updateName={(k, s) => this.set_current_tab_name(k, s)}
-                                />}
-                            key={editor.key + ""}
-                            closable = {this.props.appState.C0Editors.length !== 1}
-                            closeIcon={<FontAwesomeIcon icon={faXmark}/>}
-                        >
-                            <C0Editor
-                                execLine      = {lineNumber}
-                                editorValue   = {editor.content}
-                                breakPoints   = {editor.breakpoints}
-                                updateContent = {(s) => this.props.updateContent(editor.key, s)}
-                                updateName    = {(name) => this.set_tab_name(editor.key, name)}
-                                setBreakPts   = {(bps)  => this.set_brkpt_for_editor(editor.key, bps)}
-                                editable      = {this.props.currLine === undefined}
-                            />
-                        </TabPane>;
+        <DraggableTab config={tabConfig} onTabEdit={this.change_tab} setTabOrder={this.set_tab_order}>
+            {this.props.appState.C0Editors.map(
+                (editor) => {
+                    let execLine = 0;
+                    if (this.props.currLine !== undefined && editor.title === this.props.currLine[0]) {
+                        execLine = this.props.currLine[1];
                     }
-                )
-            }
-        </DraggableTabs>
+
+                    return (
+                    <TabPane
+                        tab={
+                            <EditableTab title={editor.title} editor_key={editor.key + ""} updateName={(k, s) => this.set_tab_name(k, s)}/>
+                        }
+                        key={editor.key.toString()}
+                        closable = {this.props.appState.C0Editors.length !== 1}
+                        closeIcon={<FontAwesomeIcon icon={faXmark}/>}
+                    >
+                        <C0Editor
+                            execLine    = {execLine}
+                            content     = {editor.content}
+                            breakPoints = {editor.breakpoints}
+                            setContent  = {(content) => this.props.set_content(editor.key, content)}
+                            setTitle    = {(title) => this.set_tab_name(editor.key, title)}
+                            setBreakPts = {(bps)  => this.set_breakpoint(editor.key, bps)}
+                            editable    = {this.props.currLine === undefined}
+                        />
+                    </TabPane>
+                    );
+                }
+            )}
+        </DraggableTab>
         );
     }
 }

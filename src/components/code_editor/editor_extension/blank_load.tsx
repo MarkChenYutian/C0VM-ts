@@ -59,17 +59,17 @@ class LoadDocumentWidget extends WidgetType {
         let tmp = document.createElement("a");
         tmp.className = "active-href";
         tmp.onclick = () => onLoadFile(view, this.accept_format, this.update_title);
-        tmp.textContent = "Load Manually"
+        tmp.textContent = "Upload File"
         load_dom.appendChild(tmp);
 
         if (do_support_directory_upload()) {
-            // load_dom.appendChild(document.createElement("br"));
-            // load_dom.appendChild(document.createTextNode("Or "))
-            // let tmp2 = document.createElement("a");
-            // tmp2.className = "active-href";
-            // tmp2.textContent = "Import Folder"
+            load_dom.appendChild(document.createElement("br"));
+            load_dom.appendChild(document.createTextNode("Or "))
+            let tmp2 = document.createElement("a");
+            tmp2.className = "active-href";
+            tmp2.textContent = "Import 15-122 Project"
             // tmp2.onclick = () => onLoadFolder(this.handle_import_folder);
-            // load_dom.appendChild(tmp2);
+            load_dom.appendChild(tmp2);
         }
 
         load_dom.appendChild(document.createElement("br"));

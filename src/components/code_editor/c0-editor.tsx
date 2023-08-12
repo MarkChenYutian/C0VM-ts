@@ -17,7 +17,7 @@ export default class C0Editor extends React.Component<C0EditorProps>
      */
     shouldComponentUpdate(nextProps: Readonly<C0EditorProps>, nextState: Readonly<{}>, nextContext: any): boolean {
         const execLineChanged = this.props.execLine !== nextProps.execLine;
-        const valueChanged = this.props.editorValue !== nextProps.editorValue;
+        const valueChanged = this.props.content !== nextProps.content;
         const editableStateChanged = this.props.editable !== nextProps.editable;
         return execLineChanged || valueChanged || editableStateChanged;
     }
@@ -35,14 +35,14 @@ export default class C0Editor extends React.Component<C0EditorProps>
                         onUpdate={(v) => 
                             {
                                 if (v.docChanged) {
-                                    this.props.updateContent(v.state.doc.toString());
+                                    this.props.setContent(v.state.doc.toString());
                                 }
                             }
                         }
-                        value = {this.props.editorValue}
+                        value = {this.props.content}
                         extensions={[
                             breakpoint_extension,
-                            LoadDocumentPlugin(".c0, .c1", this.props.updateName),
+                            LoadDocumentPlugin(".c0, .c1", this.props.setTitle),
                             basicSetup(),
                             indentUnit.of("    "),
                             execLineHighlighter(this.props.execLine, "light"),

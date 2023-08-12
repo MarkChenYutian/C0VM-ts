@@ -39,7 +39,10 @@ export default class EditableTab extends React.Component<EditableTabProps, Edita
     }
 
     async stopEditing() {
-        await this.props.updateName(this.props.editor_key, this.state.wip_title);
+        await this.props.updateName(
+            parseInt(this.props.editor_key), 
+            this.state.wip_title ? this.state.wip_title : ""
+        );
         this.setState({
             being_edited: false,
             title: this.props.title,    // update display title
@@ -49,21 +52,14 @@ export default class EditableTab extends React.Component<EditableTabProps, Edita
 
     render() {
         if (!this.state.being_edited) {
-            return (
-                <span onDoubleClick={this.startEditing}>{this.state.title}</span>
-            );
-        } else {
-            return (
-                    <AutosizeInput 
-                        className="tab-name"
-                        type="text" 
-                        value={this.state.wip_title}
-                        onChange={this.onChange} 
-                        onKeyDown={this.onKeyDown}
-                        onBlur={this.stopEditing}
-                        autoFocus
-                    ></AutosizeInput>
-            );
+            return <span onDoubleClick={this.startEditing}>{this.state.title}</span>;
         }
+        return (
+            <AutosizeInput 
+                className="tab-name" type="text" autoFocus
+                value={this.state.wip_title}
+                onChange={this.onChange}  onKeyDown={this.onKeyDown} onBlur={this.stopEditing}
+            />
+        );
     }
 }

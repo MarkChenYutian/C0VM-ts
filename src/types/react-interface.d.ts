@@ -116,19 +116,19 @@ interface C0EditorGroupProps {
     set_group_state: (mode: "c0" | "bc0") => void,
     newPanel     : () => void,
     removePanel  : (key: string) => void,
-    updateContent: (key: number, s: string) => void,
+    set_content: (key: number, s: string) => void,
 }
 
 
 interface C0EditorProps {
     execLine      : number,                     /* The line number C0VM is currently on (0 if not running on this C0 tab) */
-    editorValue   : string,                     /* Editor content (raw string) */
+    content   : string,                     /* Editor content (raw string) */
     editable      : boolean                     /* Is editor editable? (if false, in read-only mode) */
     breakPoints   : BreakPoint[],               /* Breakpoints attatched to this editor */
     
-    updateContent : (s: string) => void,
+    setContent : (s: string) => void,
     setBreakPts   : (lns: BreakPoint[]) => void,
-    updateName    : (s: string) => void,
+    setTitle    : (s: string) => void,
 }
 
 interface BC0EditorProps {
@@ -287,7 +287,7 @@ type SourceType = string;
 interface EditableTabProps {
     title: string,
     editor_key: string,
-    updateName: (key: string, a: string) => void
+    updateName: (key: number, a: string) => void
 }
 
 interface EditableTabState {

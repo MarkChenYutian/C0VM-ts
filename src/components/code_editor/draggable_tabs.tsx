@@ -47,7 +47,7 @@ const DraggableTabNode = ({ index, children, moveNode }: DraggableTabPaneProps) 
   );
 };
 
-const DraggableTabs: React.FunctionComponent<{
+const DraggableTab: React.FunctionComponent<{
     children: React.ReactNode,
     setTabOrder: (s: React.Key[]) => void,
     onTabEdit: (target: any, action: "add" | "remove") => void,
@@ -137,4 +137,4 @@ const DraggableTabs: React.FunctionComponent<{
 };
 
 
-export default DraggableTabs;
+export default DraggableTab;

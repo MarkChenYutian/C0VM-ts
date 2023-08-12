@@ -135,7 +135,7 @@ export default class CodeEditor extends React.Component
                     set_group_state = {(mode) => this.setState({mode: mode})}
                     newPanel        = {() => this.create_panel()}
                     removePanel     = {(key) => this.remove_panel(key)}
-                    updateContent   = {(key, s) => this.update_content(key, s)}
+                    set_content   = {(key, s) => this.update_content(key, s)}
                 />
             </div>);
     }
@@ -151,7 +151,7 @@ export default class CodeEditor extends React.Component
                 set_group_state = {(mode) => this.setState({mode: mode})}
                 newPanel        = {() => this.create_panel()}
                 removePanel     = {(key) => this.remove_panel(key)}
-                updateContent   = {(key, s) => this.update_content(key, s)}
+                set_content   = {(key, s) => this.update_content(key, s)}
             />;
         } else {
             const vm = this.props.app_state.C0Runtime;
