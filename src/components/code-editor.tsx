@@ -2,12 +2,11 @@ import React from "react";
 import BC0Editor from "./code_editor/bc0-editor";
 import C0EditorGroup from "./code_editor/c0-editor-group";
 
-import { Segmented, Space, Tooltip, Upload } from "antd";
+import { Segmented, Space, Tooltip } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faLock } from "@fortawesome/free-solid-svg-icons";
 import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
-import type { RcFile } from 'antd/lib/upload';
 
 export default class CodeEditor extends React.Component
 <CodeEditorProps, CodeEditorState>
@@ -19,45 +18,6 @@ export default class CodeEditor extends React.Component
             mode: "c0",
             C0_nextKey : tabs.length === 0 ? 1 : Math.max(...tabs.map((tab) => tab.key)) + 1
         }
-        this.handle_import_folder = this.handle_import_folder.bind(this);
-        if (DEBUG) console.debug("handle_import_folder in CodeEditor is", this.handle_import_folder)
-    }
-
-    push_populated_tab(tab: C0EditorTab) {
-        // check if there's already file with this name and append _num if exists
-        let try_suffix = 1;
-        let is_conflict = false;
-        const all_titles = this.props.app_state.C0Editors.map((tab) => tab.title);
-        const extension  = tab.title.slice(tab.title.lastIndexOf("."));
-        const file_name  = tab.title.slice(0, tab.title.lastIndexOf("."));
-        const new_key    = Math.max(...this.props.app_state.C0Editors.map((tab) => tab.key)) + 1;
-
-        tab.key = new_key;
-
-        while (all_titles.includes(tab.title)) {
-            if (!all_titles.includes(file_name + '_' + try_suffix + extension)) {
-                tab.title = file_name + '_' + try_suffix + extension;
-                is_conflict = true;
-                break;
-            }
-            try_suffix++
-        }
-
-        if (is_conflict) {
-            globalThis.MSG_EMITTER.warn(
-                "Duplicated File Name",
-                `${file_name + extension} already exists. It is renamed to ${tab.title} to ensure all tabs have unique name.`
-            );
-        }
-
-        this.props.set_app_state((S) => {
-            const new_tabs = [...S.C0Editors, tab]
-            for (let i = 0; i < new_tabs.length; i ++) {
-                new_tabs[i].key = i;
-            }
-            return {C0Editors: new_tabs, ActiveEditor: new_tabs[0].key};
-        });
-        this.setState((S) => {return {C0_nextKey: S.C0_nextKey + 1}});
     }
 
     create_panel() {
@@ -70,42 +30,6 @@ export default class CodeEditor extends React.Component
         });
         this.props.set_app_state({C0Editors: new_editors, ActiveEditor: this.state.C0_nextKey});
         this.setState({C0_nextKey: this.state.C0_nextKey + 1});
-    }
-
-    // this function is called for every file in the uploaded directory, recursive.
-    // the function is called by ant design component "Upload"
-    handle_import_folder(F: RcFile, FList: RcFile[]) {
-        if (DEBUG) console.debug("received a folder upload, processing one of them")
-
-        if (!(F.name.endsWith('.c0') || F.name.endsWith('.c1') || F.name.toLowerCase() === "readme.txt")) {
-            globalThis.MSG_EMITTER.warn(
-                "File is not Imported",
-                `${F.name} is not a c0/c1 file and is thus ignored.`
-            );
-            return Upload.LIST_IGNORE;
-        }
-                
-        const reader = new FileReader();
-
-        reader.onload = e => {
-            if (reader.result === null) { 
-                console.error("Failed to read input file")
-                return Upload.LIST_IGNORE;
-            }
-
-            const res = reader.result.toString();
-           
-            this.push_populated_tab({
-                title: F.name,
-                key: -1,
-                content: res,
-                breakpoints: [],
-            })
-        };
-        reader.readAsText(F, "utf-8");
-
-        // Prevent upload traffic
-        return false;
     }
 
     remove_panel(key: string) {
@@ -129,7 +53,7 @@ export default class CodeEditor extends React.Component
             <div className="code-editor" data-lang={this.state.mode}>
                 <C0EditorGroup
                     currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
-                    appState        = {this.props.app_state}
+                    app_state       = {this.props.app_state}
                     selector        = {selector}
                     set_app_state   = {(ns) => this.props.set_app_state(ns)}
                     set_group_state = {(mode) => this.setState({mode: mode})}
@@ -145,7 +69,7 @@ export default class CodeEditor extends React.Component
         if (this.state.mode === "c0") {
             content = <C0EditorGroup
                 currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
-                appState        = {this.props.app_state}
+                app_state       = {this.props.app_state}
                 selector        = {selector}
                 set_app_state   = {(ns) => this.props.set_app_state(ns)}
                 set_group_state = {(mode) => this.setState({mode: mode})}

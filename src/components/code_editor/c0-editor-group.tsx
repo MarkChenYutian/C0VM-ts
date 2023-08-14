@@ -25,7 +25,7 @@ function isValidFileName(name: string): boolean {
 }
 
 function vmNotRunning(props: C0EditorGroupProps) {
-    if (props.appState.C0Runtime !== undefined && props.appState.C0Runtime.state.CurrLineNumber !== 0) {
+    if (props.app_state.C0Runtime !== undefined && props.app_state.C0Runtime.state.CurrLineNumber !== 0) {
         globalThis.MSG_EMITTER.warn(
             "Failed to rename editor tab",
             "Can't rename editor tab when a C0/C1 program is running in background"
@@ -36,8 +36,8 @@ function vmNotRunning(props: C0EditorGroupProps) {
 }
 
 function isUniqueFileName(props: C0EditorGroupProps, key: number, name: string): boolean {
-    for (let i = 0; i < props.appState.C0Editors.length; i ++) {
-        const tab = props.appState.C0Editors[i];
+    for (let i = 0; i < props.app_state.C0Editors.length; i ++) {
+        const tab = props.app_state.C0Editors[i];
         if (tab.title === name && tab.key !== key) {
             globalThis.MSG_EMITTER.warn(
                 "Failed to rename editor tab",
@@ -62,7 +62,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
     }
 
     get_tab(key: number): C0EditorTab {
-        for (const tab of this.props.appState.C0Editors) {
+        for (const tab of this.props.app_state.C0Editors) {
             if (tab.key === key) return tab;
         }
         throw new internal_error("Failed to retrieve the editor tab required.");
@@ -102,7 +102,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
     set_tab_order(new_order: React.Key[]): void {
         const tab_keymap = new Map<number, C0EditorTab>();
         const result = [];
-        this.props.appState.C0Editors.forEach((tab) => tab_keymap.set(tab.key, tab));
+        this.props.app_state.C0Editors.forEach((tab) => tab_keymap.set(tab.key, tab));
         for (let i = 0; i < new_order.length; i ++) {
             result.push(tab_keymap.get(parseInt(new_order[i] + "")) as C0EditorTab);
         }
@@ -122,14 +122,14 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
             type: "editable-card",
             size: "small",
             tabBarExtraContent: this.props.selector,
-            activeKey: this.props.appState.ActiveEditor.toString(),
+            activeKey: this.props.app_state.ActiveEditor.toString(),
             onChange: (new_key: string) => {this.set_active(new_key)},
             addIcon: <FontAwesomeIcon icon={faAdd}/>
         }
 
         return (
         <DraggableTab config={tabConfig} onTabEdit={this.change_tab} setTabOrder={this.set_tab_order}>
-            {this.props.appState.C0Editors.map(
+            {this.props.app_state.C0Editors.map(
                 (editor) => {
                     let execLine = 0;
                     if (this.props.currLine !== undefined && editor.title === this.props.currLine[0]) {
@@ -142,7 +142,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                             <EditableTab title={editor.title} editor_key={editor.key + ""} updateName={(k, s) => this.set_tab_name(k, s)}/>
                         }
                         key={editor.key.toString()}
-                        closable = {this.props.appState.C0Editors.length !== 1}
+                        closable = {this.props.app_state.C0Editors.length !== 1}
                         closeIcon={<FontAwesomeIcon icon={faXmark}/>}
                     >
                         <C0Editor

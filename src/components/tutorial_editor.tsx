@@ -75,7 +75,7 @@ const Breakpoint = (language: string) =>
 function TutorialEditor(props: TutorialPanelProps & {themeColor: string | undefined}): JSX.Element {
     const [notAgain, setNotAgain] = useState<boolean>(false);
 
-    const languageName = props.state.c0_only ? "C0" : "C0/BC0";
+    const languageName = props.app_state.c0_only ? "C0" : "C0/BC0";
 
     const onCheckBoxChange = (e: CheckboxChangeEvent) => {
         setNotAgain(e.target.checked);
@@ -98,7 +98,7 @@ function TutorialEditor(props: TutorialPanelProps & {themeColor: string | undefi
     return (
     <Modal
         title={<h2>🎉 C0 Visualizer Tutorial</h2>}
-        open={props.state.tutorialOn}
+        open={props.app_state.tutorialOn}
         closable={false}
         footer={[
             <Space key="actions" size="large">

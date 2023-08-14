@@ -53,57 +53,11 @@ interface C0VMApplicationState {
     CompilerFlags  : Record<string, boolean>    /* Compiler Flags (-d) */
 };
 
-
-// The props that main control bar component will accept
-interface MainControlProps {
-    application_state   : C0VMApplicationState,
-    set_app_state<K extends keyof C0VMApplicationState>(
-                            state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
-                                    => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
-                                | (Pick<C0VMApplicationState, K> 
-                                | C0VMApplicationState 
-                                | null),
-                            callback?: () => void
-                        ): void,
-};
-
-
-interface TutorialPanelProps {
-    state : C0VMApplicationState,
-    set_app_state<K extends keyof C0VMApplicationState>(
-        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
-                => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
-            | (Pick<C0VMApplicationState, K> 
-            | C0VMApplicationState 
-            | null),
-        callback?: () => void
-    ): void
+interface AppStateProp {
+    app_state: C0VMApplicationState
 }
 
-
-interface CodeEditorProps {
-    app_state: C0VMApplicationState,
-    set_app_state<K extends keyof C0VMApplicationState>(
-        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
-                => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
-            | (Pick<C0VMApplicationState, K> 
-            | C0VMApplicationState 
-            | null),
-        callback?: () => void
-    ): void;
-}
-
-interface CodeEditorState {
-    mode: "c0" | "bc0";     /* Editor mode (C0 or BC0) */
-    C0_nextKey: number      /* Editor key for next tab */
-}
-
-interface C0EditorGroupProps {
-    /* currLine = [ FileName, lineNumber, isBreakPoint ] */
-    currLine     : [string, number, boolean] | undefined,   /* Current C0 line the C0VM is executing */
-
-    appState     : C0VMApplicationState,                    /* C0VM Application State */
-    selector     : JSX.Element | undefined                  /* Code editor mode selector */
+interface SetAppStateHook {
     set_app_state<K extends keyof C0VMApplicationState>(
         state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
                 => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
@@ -112,7 +66,24 @@ interface C0EditorGroupProps {
             | null),
             callback?: () => void
         ): void;
-    
+}
+
+// The props that main control bar component will accept
+interface MainControlProps          extends SetAppStateHook, AppStateProp {};
+interface ApplicationCrashPageProps extends SetAppStateHook, AppStateProp {};
+interface SettingMenuProps          extends SetAppStateHook, AppStateProp {};
+interface TutorialPanelProps        extends SetAppStateHook, AppStateProp {};
+interface CodeEditorProps           extends SetAppStateHook, AppStateProp {};
+
+interface CodeEditorState {
+    mode: "c0" | "bc0";     /* Editor mode (C0 or BC0) */
+    C0_nextKey: number      /* Editor key for next tab */
+}
+
+interface C0EditorGroupProps extends AppStateProp, SetAppStateHook {
+    /* currLine = [ FileName, lineNumber, isBreakPoint ] */
+    currLine     : [string, number, boolean] | undefined,   /* Current C0 line the C0VM is executing */
+    selector     : JSX.Element | undefined                  /* Code editor mode selector */
     set_group_state: (mode: "c0" | "bc0") => void,
     newPanel     : () => void,
     removePanel  : (key: string) => void,
@@ -257,24 +228,7 @@ interface C0ValueNodeData {
 
 type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData | C0TagPointerData | C0FuncPtrNodeData;
 
-interface ApplicationCrashPageProps {
-    state: C0VMApplicationState;
-    setState<K extends keyof C0VMApplicationState>(ns: Pick<C0VMApplicationState, K>): void;
-}
-
-interface ApplicationContextInterface {
-    theme: "dark" | "light"
-}
-
-interface SettingMenuProps {
-    state: C0VMApplicationState,
-    set_app_state<K extends keyof C0VMApplicationState>(
-        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) => (
-            Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) | (Pick<C0VMApplicationState, K> | C0VMApplicationState | null),
-        callback?: () => void
-    ): void;
-}
-
+interface ApplicationContextInterface {theme: "dark" | "light"}
 
 interface BreakpointExtProps {
     currBps: BreakPoint[],                  // Current breakpoints
@@ -283,10 +237,7 @@ interface BreakpointExtProps {
 
 type BreakpointExt = (props: BreakpointExtProps) => ((StateField<RangeSet<GutterMarker>> | Extension)[])
 
-interface ContextValue {
-    themeColor: string | undefined
-}
-
+interface ContextValue {themeColor: string | undefined}
 type AliasType = string;
 type SourceType = string;
 

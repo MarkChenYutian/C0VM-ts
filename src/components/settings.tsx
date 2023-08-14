@@ -7,7 +7,7 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
     render() {
         return <Modal
                 title={<h3 style={{margin: "0"}}><FontAwesomeIcon icon={faGear}/> Settings</h3>}
-                open ={this.props.state.settingMenuOn}
+                open ={this.props.app_state.settingMenuOn}
                 closable={false}
                 centered
                 footer  ={[
@@ -23,7 +23,7 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
                 <Switch
                     size="small"
                     style={{justifySelf: "right"}} 
-                    defaultChecked={this.props.state.CompilerFlags['d']}
+                    defaultChecked={this.props.app_state.CompilerFlags['d']}
                     onChange={() => {
                     this.props.set_app_state((state) => {
                         return {CompilerFlags: {...state.CompilerFlags,
@@ -33,7 +33,7 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
                 }}/>
 
                 <p>Expose Bytecode</p>
-                <Switch size="small" style={{justifySelf: "right"}} defaultChecked={!this.props.state.c0_only} onChange={() => {this.props.set_app_state((state) => {return {c0_only: !state.c0_only}})}}/>
+                <Switch size="small" style={{justifySelf: "right"}} defaultChecked={!this.props.app_state.c0_only} onChange={() => {this.props.set_app_state((state) => {return {c0_only: !state.c0_only}})}}/>
 
                 <p>AutoStep Speed</p>
                 <Select

@@ -48,16 +48,16 @@ export default class C0VMApplication extends React.Component<
         if (this.state.crashed) {
             return (
                 <AppCrashFallbackPage
-                    state={this.state}
-                    setState={(ns) => this.setState(ns)}
+                    app_state={this.state}
+                    set_app_state={(ns) => this.setState(ns)}
                 />
             );
         }
 
         const MainControlBarComponent = (
             <MainControlBar
-                application_state   ={this.state}
-                set_app_state       ={(s) => this.setState(s)}
+                app_state     ={this.state}
+                set_app_state ={(s) => this.setState(s)}
             />
         );
 
@@ -74,8 +74,8 @@ export default class C0VMApplication extends React.Component<
             />
         ) : null;
 
-        const TutorialPanelComponent = <TutorialEditor state={this.state} set_app_state={(ns) => this.setState(ns)}/>;
-        const SettingMenuComponent   = <SettingPopup state={this.state} set_app_state={(ns) => this.setState(ns)}/>;
+        const TutorialPanelComponent = <TutorialEditor app_state={this.state} set_app_state={(ns) => this.setState(ns)}/>;
+        const SettingMenuComponent   = <SettingPopup app_state={this.state} set_app_state={(ns) => this.setState(ns)}/>;
 
         if (this.state.dbgFullScreen) {
             return <div className="page-framework">

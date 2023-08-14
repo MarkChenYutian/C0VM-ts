@@ -42,8 +42,8 @@ function convertC0Bpts(C0Editors: C0EditorTab[]): Set<string>{
 }
 
 function MainControlBarFC(props: MainControlProps & ContextValue) {
-    const appState = props.application_state;
-    const is_bc0_valid = props.application_state.BC0SourceCode.toUpperCase().startsWith("C0 C0 FF EE");
+    const appState = props.app_state;
+    const is_bc0_valid = props.app_state.BC0SourceCode.toUpperCase().startsWith("C0 C0 FF EE");
 
     const [abortSignal, abort, reset] = AbortRef();
     const [execMode, setExecMode] = useState<"Run"|"AutoStep">("Run");
@@ -100,7 +100,7 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
             bc0BreakPoints,
             c0BreakPoint,
             abortSignal,
-            props.application_state.c0_only,
+            props.app_state.c0_only,
             reset,
             print_update,
             s => props.set_app_state({C0Runtime: s}),
@@ -178,8 +178,7 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
     const compile_c0source = () => {
         clear_print();
         remote_compile(
-            appState,
-            props.set_app_state,
+            {app_state: appState, set_app_state: props.set_app_state},
             clear_print,
             print_update,
         );

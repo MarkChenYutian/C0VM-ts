@@ -3,8 +3,7 @@ import * as VM from "../vm_core/vm_interface";
 import { is_all_library_supported } from "./c0_parser";
 
 export default function remote_compile(
-    app_state: C0VMApplicationState,
-    set_app_state: (update: SetAppStateInput) => void,
+    {app_state, set_app_state}: AppStateProp & SetAppStateHook,
     clean_printout: () => void,
     print_update: (s: string) => void,
 ): void {
