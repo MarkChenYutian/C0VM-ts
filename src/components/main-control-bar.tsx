@@ -178,7 +178,9 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
     const compile_c0source = () => {
         clear_print();
         remote_compile(
-            {app_state: appState, set_app_state: props.set_app_state},
+            {set_app_state: props.set_app_state},
+            props.app_state.C0Editors,
+            props.app_state.CompilerFlags["-d"],
             clear_print,
             print_update,
         );

@@ -3,11 +3,13 @@ import * as VM from "../vm_core/vm_interface";
 import { is_all_library_supported } from "./c0_parser";
 
 export default function remote_compile(
-    {app_state, set_app_state}: AppStateProp & SetAppStateHook,
+    {set_app_state}: SetAppStateHook,
+    editors: C0EditorTab[],
+    check_contract: boolean,
     clean_printout: () => void,
     print_update: (s: string) => void,
 ): void {
-    if (!is_all_library_supported(app_state.C0Editors)){
+    if (!is_all_library_supported(editors)){
         globalThis.MSG_EMITTER.err(
             "Unsupported Library Used", 
             "The C0 visualizer does not support 'file', 'img', 'args', and 'cursor' libraries, please remove these dependencies."
@@ -17,16 +19,16 @@ export default function remote_compile(
 
     /** Update since v1.0.4 - print out the compile command when user hit compile button */
     let compile_command = "$ cc0 ";
-    for (let tab of app_state.C0Editors) {
+    for (let tab of editors) {
         compile_command += " " + tab.title;
     }
-    compile_command += app_state.CompilerFlags["d"] ? " -d" : "";
+    compile_command += check_contract ? " -d" : "";
 
     print_update("Compiling the code with command line \n");
     print_update(compile_command + "\n\n");
     /*** */
 
-    fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${app_state.CompilerFlags["d"] ? "true" : "false"}`, {
+    fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${check_contract ? "true" : "false"}`, {
         method: "POST",
         cache: "no-cache",
         headers: {
@@ -34,8 +36,8 @@ export default function remote_compile(
             "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
-            codes    : app_state.C0Editors.map(tab => tab.content),
-            filenames: app_state.C0Editors.map(tab => tab.title),
+            codes    : editors.map(tab => tab.content),
+            filenames: editors.map(tab => tab.title),
         })
     })
     .then(
@@ -50,7 +52,7 @@ export default function remote_compile(
             }
             
             set_app_state({BC0SourceCode: result.bytecode});
-            return VM.initialize(result.bytecode, clean_printout, app_state.C0Editors, print_update, MEM_POOL_SIZE);
+            return VM.initialize(result.bytecode, clean_printout, editors, print_update, MEM_POOL_SIZE);
         }
     )
     .then(

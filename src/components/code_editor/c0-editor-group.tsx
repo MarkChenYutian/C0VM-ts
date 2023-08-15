@@ -109,15 +109,16 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
         this.props.set_app_state({C0Editors: result});
     }
 
-    change_tab(target_key: any, action: "add" | "remove") {
+    change_tab(target_key: string, action: "add" | "remove") {
         if (action === "add") {
             this.props.newPanel();
         } else {
-            this.props.removePanel(target_key);
+            this.props.removePanel(parseInt(target_key));
         }
     }
 
     render() {
+        const currLine = this.props.app_state.C0Runtime?.state.CurrC0RefLine;
         const tabConfig: TabsProps = {
             type: "editable-card",
             size: "small",
@@ -132,8 +133,8 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
             {this.props.app_state.C0Editors.map(
                 (editor) => {
                     let execLine = 0;
-                    if (this.props.currLine !== undefined && editor.title === this.props.currLine[0]) {
-                        execLine = this.props.currLine[1];
+                    if (currLine !== undefined && editor.title === currLine[0]) {
+                        execLine = currLine[1];
                     }
 
                     return (
@@ -149,13 +150,15 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                             execLine    = {execLine}
                             content     = {editor.content}
                             breakPoints = {editor.breakpoints}
-                            editable    = {this.props.currLine === undefined}
+                            editable    = {currLine === undefined}
+                            app_state   = {this.props.app_state}
 
-                            setContent  = {(content) => this.props.set_content(editor.key, content)}
-                            setTitle    = {(title) => this.set_tab_name(editor.key, title)}
-                            setBreakPts = {(bps)  => this.set_breakpoint(editor.key, bps)}
-                            setAllTabs  = {(tabs) => this.props.set_app_state({C0Editors: tabs})}
-                            setActiveKey= {(key) => {this.props.set_app_state({ActiveEditor: key})}}
+                            set_app_state = {(s, cb) => this.props.set_app_state(s, cb)}
+                            setContent    = {(content) => this.props.set_content(editor.key, content)}
+                            setTitle      = {(title) => this.set_tab_name(editor.key, title)}
+                            setBreakPts   = {(bps)  => this.set_breakpoint(editor.key, bps)}
+                            setAllTabs    = {(tabs) => this.props.set_app_state({C0Editors: tabs})}
+                            setActiveKey  = {(key) => {this.props.set_app_state({ActiveEditor: key})}}
                         />
                     </TabPane>
                     );

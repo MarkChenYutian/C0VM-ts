@@ -62,10 +62,10 @@ export default class C0Editor extends React.Component<C0EditorProps, C0EditorSta
                         editable={this.props.editable}
                     />
                     <FilesLoad
+                        app_state={this.props.app_state}
+                        set_app_state={(s, cb) => this.props.set_app_state(s, cb)}
                         show={this.state.show}
-                        setAllTabs={(tabs) => this.props.setAllTabs(tabs)}
                         setShow={(s) => this.setState(({show: s}))}
-                        setActiveEditor={(key) => this.props.setActiveKey(key)}
                     />
                 </div>;
     }

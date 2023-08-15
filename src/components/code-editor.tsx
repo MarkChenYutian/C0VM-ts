@@ -29,14 +29,13 @@ export default class CodeEditor extends React.Component
             breakpoints: [],
         });
         this.props.set_app_state({C0Editors: new_editors, ActiveEditor: this.state.C0_nextKey});
-        this.setState({C0_nextKey: this.state.C0_nextKey + 1});
+        this.setState({C0_nextKey: this.state.C0_nextKey + 1})
     }
 
-    remove_panel(key: string) {
-        const key_tbr = parseInt(key);
+    remove_panel(key: number) {
         let new_editors: C0EditorTab[] = [...this.props.app_state.C0Editors];
-        new_editors = new_editors.filter((value) => value.key !== key_tbr);
-        const new_activeTab = this.props.app_state.ActiveEditor === key_tbr ? new_editors[0].key : this.props.app_state.ActiveEditor;
+        new_editors = new_editors.filter((value) => value.key !== key);
+        const new_activeTab = this.props.app_state.ActiveEditor === key ? new_editors[0].key : this.props.app_state.ActiveEditor;
         this.props.set_app_state({C0Editors: new_editors, ActiveEditor: new_activeTab});
     }
 
@@ -52,14 +51,13 @@ export default class CodeEditor extends React.Component
         return (
             <div className="code-editor" data-lang={this.state.mode}>
                 <C0EditorGroup
-                    currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
                     app_state       = {this.props.app_state}
+                    set_app_state   = {(ns, cb) => this.props.set_app_state(ns, cb)}
                     selector        = {selector}
-                    set_app_state   = {(ns) => this.props.set_app_state(ns)}
                     set_group_state = {(mode) => this.setState({mode: mode})}
                     newPanel        = {() => this.create_panel()}
                     removePanel     = {(key) => this.remove_panel(key)}
-                    set_content   = {(key, s) => this.update_content(key, s)}
+                    set_content     = {(key, s) => this.update_content(key, s)}
                 />
             </div>);
     }
@@ -68,14 +66,13 @@ export default class CodeEditor extends React.Component
         let content = undefined;
         if (this.state.mode === "c0") {
             content = <C0EditorGroup
-                currLine        = {this.props.app_state.C0Runtime?.state.CurrC0RefLine}
                 app_state       = {this.props.app_state}
+                set_app_state   = {(ns, cb) => this.props.set_app_state(ns, cb)}
                 selector        = {selector}
-                set_app_state   = {(ns) => this.props.set_app_state(ns)}
                 set_group_state = {(mode) => this.setState({mode: mode})}
                 newPanel        = {() => this.create_panel()}
                 removePanel     = {(key) => this.remove_panel(key)}
-                set_content   = {(key, s) => this.update_content(key, s)}
+                set_content     = {(key, s) => this.update_content(key, s)}
             />;
         } else {
             const vm = this.props.app_state.C0Runtime;
@@ -85,7 +82,6 @@ export default class CodeEditor extends React.Component
                     {selector}
                 </div>
                 <BC0Editor
-                    updateContent={s => this.props.set_app_state({BC0SourceCode: s})}
                     editorValue  ={this.props.app_state.BC0SourceCode}
                     execLine     ={vm === undefined ? 0 : vm.state.CurrLineNumber}
                     breakpointVal={this.props.app_state.BC0BreakPoints}

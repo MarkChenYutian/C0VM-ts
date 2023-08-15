@@ -2,8 +2,6 @@
 
 declare module '*.svg';
 
-type SetAppStateInput = (Pick<C0VMApplicationState, any> | C0VMApplicationState | null)
-
 /* Breakpoint representation */
 type BreakPoint = {
     line: number,       /* The line number that breakpoint is on right now */
@@ -82,16 +80,15 @@ interface CodeEditorState {
 
 interface C0EditorGroupProps extends AppStateProp, SetAppStateHook {
     /* currLine = [ FileName, lineNumber, isBreakPoint ] */
-    currLine     : [string, number, boolean] | undefined,   /* Current C0 line the C0VM is executing */
     selector     : JSX.Element | undefined                  /* Code editor mode selector */
-    set_group_state: (mode: "c0" | "bc0") => void,
     newPanel     : () => void,
-    removePanel  : (key: string) => void,
+    removePanel  : (key: number) => void,
+    set_group_state: (mode: "c0" | "bc0") => void,
     set_content: (key: number, s: string) => void,
 }
 
 
-interface C0EditorProps {
+interface C0EditorProps extends SetAppStateHook, AppStateProp {
     execLine      : number,                     /* The line number C0VM is currently on (0 if not running on this C0 tab) */
     content       : string,                     /* Editor content (raw string) */
     editable      : boolean                     /* Is editor editable? (if false, in read-only mode) */
@@ -109,7 +106,6 @@ interface C0EditorState {
 }
 
 interface BC0EditorProps {
-    updateContent : (s: string) => void,
     editorValue   : string,
     execLine      : number,
     breakpointVal : Set<BreakPoint>,
@@ -124,11 +120,6 @@ interface TextEditorProps {
 }
 
 // The props that CompilerOption component will accept
-interface CompilerOptionPropInterface {
-    d_flag_stat: boolean;
-    flip_d_flag: () => void
-};
-
 interface C0OutputPropInterface {
     printContent: string
 };
@@ -143,8 +134,8 @@ interface DebugConsoleProps {
 
 interface DebugConsoleState {
     show: boolean,
-    mode: "Table" | "Graph" | "Detail",
     err: boolean
+    mode: "Table" | "Graph" | "Detail",
 }
 
 interface DebugConsoleInterface {
@@ -228,8 +219,6 @@ interface C0ValueNodeData {
 
 type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData | C0TagPointerData | C0FuncPtrNodeData;
 
-interface ApplicationContextInterface {theme: "dark" | "light"}
-
 interface BreakpointExtProps {
     currBps: BreakPoint[],                  // Current breakpoints
     setBps: (ns: BreakPoint[]) => void      // Update breakpoints
@@ -253,11 +242,9 @@ interface EditableTabState {
     wip_title: string
 }
 
-interface FilesLoadProps {
+interface FilesLoadProps extends SetAppStateHook, AppStateProp {
     show: boolean,
     setShow: (show: boolean) => void,
-    setAllTabs: (tabs: C0EditorTab[]) => void,
-    setActiveEditor: (key: number) => void
 }
 
-type CodeFile = { title: string, content: string | undefined }
+type ExternalFile = { title: string, content: string | undefined }

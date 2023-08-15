@@ -1,6 +1,6 @@
 import { internal_error } from "../../../utility/errors";
 
-function _loadExternalFile(F: File): Promise<CodeFile> {
+function _loadExternalFile(F: File): Promise<ExternalFile> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
@@ -12,7 +12,7 @@ function _loadExternalFile(F: File): Promise<CodeFile> {
     })
 }
 
-export function asyncLoadExternalFile(accept_format: string): Promise<CodeFile> {
+export function asyncLoadExternalFile(accept_format: string): Promise<ExternalFile> {
     return new Promise((resolve, reject) => {
         function resolveLoadFile(e: Event) {
             if (e.target === null) {
@@ -35,7 +35,7 @@ export function asyncLoadExternalFile(accept_format: string): Promise<CodeFile> 
     });
 }
 
-export async function asyncLoadDirectory(): Promise<CodeFile[]> {
+export async function asyncLoadDirectory(): Promise<ExternalFile[]> {
     return new Promise((resolve, reject) => {
         const hidden_elem = document.createElement("input");
         hidden_elem.type = "file";
@@ -52,7 +52,7 @@ export async function asyncLoadDirectory(): Promise<CodeFile[]> {
                     return reject(new internal_error("Failed to read input file"));
                 }
                 
-                const result: CodeFile[] = [];
+                const result: ExternalFile[] = [];
 
                 for (let i = 0; i < fileList.length; i ++) {
                     const F = await _loadExternalFile(fileList[i]);

@@ -25,13 +25,6 @@ export default class BC0Editor extends React.Component<BC0EditorProps>
         return  <ReactCodeMirror
                     theme={BC0LightTheme}
                     basicSetup={false}
-                    onUpdate={(v) => 
-                        {
-                            if (v.docChanged) {
-                                this.props.updateContent(v.state.doc.toString());
-                            }
-                        }
-                    }
                     value = {this.props.editorValue}
                     extensions={[
                         breakpoint_extension,

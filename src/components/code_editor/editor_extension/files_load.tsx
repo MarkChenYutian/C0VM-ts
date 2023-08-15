@@ -3,12 +3,13 @@ import React, { useState } from "react";
 
 import { asyncLoadDirectory, asyncLoadExternalFile } from "./external_fs";
 import { internal_error } from "../../../utility/errors";
+import remote_compile from "../../../network/remote_compile";
 
 const { Text } = Typography;
 const regex_valid_cc0_command = /^\s*%\s*cc0/;
 
 function onLoadProjectReadme(
-    update_files: (tabs: CodeFile[]) => void,
+    update_files: (tabs: ExternalFile[]) => void,
 ) {
     asyncLoadExternalFile(".txt")
     .then(({ content }) => {
@@ -38,7 +39,7 @@ function onLoadProjectReadme(
         throw new internal_error("Failed to import 15-122 project (reason: Can't find cc0 compile line)");
     })
     .then((files) => {
-        const code_files: CodeFile[] = files?.map((title) => {return {title: title, content: undefined}});
+        const code_files: ExternalFile[] = files?.map((title) => {return {title: title, content: undefined}});
         update_files(code_files);
     })
     .catch((rej) => {
@@ -46,7 +47,7 @@ function onLoadProjectReadme(
     })
 }
 
-async function onLoadProjectCode(expectFiles: CodeFile[], setFiles: (fs: CodeFile[]) => void) {
+async function onLoadProjectCode(expectFiles: ExternalFile[], setFiles: (fs: ExternalFile[]) => void) {
     const readFiles = await asyncLoadDirectory();
     const expected_map = new Map<string, string | undefined>();
     for (const expect_file of expectFiles) {
@@ -66,7 +67,7 @@ async function onLoadProjectCode(expectFiles: CodeFile[], setFiles: (fs: CodeFil
 
 
 const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
-    const [files, setFiles] = useState<CodeFile[]>([]);
+    const [files, setFiles] = useState<ExternalFile[]>([]);
     const showFileStatus = (loaded: boolean) => loaded ? <Text type="success">Loaded</Text> : <Text type="warning">Not Loaded</Text>;
     const notFinished = files.length !== 0 && files.reduce((prev, curr) => prev && curr.content !== undefined, true);    
 
@@ -104,13 +105,28 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
                 open={props.show} maskClosable={false}
                 onCancel={() => props.setShow(false)}
                 onOk={() => {
-                    props.setAllTabs(
-                        files.map((f, idx) => {
-                            return {title: f.title, content: (f.content as string), breakpoints: [], key: -1 * idx}
-                        })
+                    const newEditorTabs = files.map((f, idx) => {
+                        return {title: f.title, content: (f.content as string), breakpoints: [], key: -1 * idx}
+                    });
+
+                    props.set_app_state(
+                    {
+                        C0Editors: newEditorTabs,
+                        ActiveEditor: 0
+                    },
+                    () => {
+                        console.log("Callback activated");
+                        props.setShow(false);
+                        remote_compile(
+                            { set_app_state: (s, cb) => props.set_app_state(s, cb)},
+                            newEditorTabs,
+                            props.app_state.CompilerFlags["-d"],
+                            () => { props.set_app_state({PrintoutValue: ""}) },
+                            (s) => { props.set_app_state({PrintoutValue: props.app_state.PrintoutValue + s}) }
+                        );
+                    }
                     );
                     props.setShow(false);
-                    props.setActiveEditor(0);
                 }}
                 okButtonProps={{disabled: !notFinished}}
                 title={`15-122 Project Import Guide (Step ${step})`}
