@@ -1,5 +1,5 @@
 import React from "react";
-import { Handle, NodeProps, Position } from "react-flow-renderer";
+import { Handle, NodeProps, Position } from "reactflow";
 import { isNullPtr } from "../../../utility/pointer_utility";
 import { deref_C0Value } from "../../../utility/c0_value_utility";
 import { calculate_entry_height } from "./graphical_utility";

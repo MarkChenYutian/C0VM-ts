@@ -1,10 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 
 import './index.css';
 import './application.css';
 import './embeddable.css';
 import 'antd/dist/reset.css'
+import 'reactflow/dist/style.css';
 import { ConfigProvider } from 'antd';
 
 import C0VMApplication from './application';
@@ -40,7 +41,7 @@ const htmlRoots = document.querySelectorAll('#c0vm-root') as NodeListOf<HTMLElem
 
 htmlRoots.forEach(
   (htmlRoot) => {
-    const root = ReactDOM.createRoot(htmlRoot);
+    const root = createRoot(htmlRoot);
 
     const displayMode = htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable";
     const showStdOut  = htmlRoot.dataset["stdoutput"] === "on";

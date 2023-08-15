@@ -1,5 +1,5 @@
 import React from "react";
-import { Handle, NodeProps, Position } from "react-flow-renderer";
+import { Handle, NodeProps, Position } from "reactflow";
 import { heapNodeTargetHandleID } from "./graph_builder";
 
 export default class C0UnknownNode extends React.Component<NodeProps<C0ArrayNodeData>> {

@@ -2,7 +2,7 @@ import React from "react";
 
 import * as TypeUtil from "../../../utility/c0_type_utility";
 
-import { NodeProps, Handle, Position } from "react-flow-renderer";
+import { NodeProps, Handle, Position } from "reactflow";
 import { calculate_entry_height } from "./graphical_utility";
 import { Type2String } from "../../../utility/c0_type_utility";
 import { c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";

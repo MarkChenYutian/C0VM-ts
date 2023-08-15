@@ -5,7 +5,7 @@
  * 
  * This file is not used ... It's an attempt to replace the graph_builder.ts (failed)
  */
-import { Node } from "react-flow-renderer";
+import { Node } from "reactflow";
 import { calculate_node_height, valid_variable_count } from "./graphical_utility";
 
 
