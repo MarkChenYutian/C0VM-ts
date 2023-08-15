@@ -115,7 +115,6 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
                         ActiveEditor: 0
                     },
                     () => {
-                        console.log("Callback activated");
                         props.setShow(false);
                         remote_compile(
                             { set_app_state: (s, cb) => props.set_app_state(s, cb)},

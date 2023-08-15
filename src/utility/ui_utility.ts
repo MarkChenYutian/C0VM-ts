@@ -14,3 +14,14 @@ export function replacer(key: any, value: any) {
         return value;
     }
 }
+
+export function stdout(type: "info" | "normal" | "error", update_print: (s: string) => void): (s: string) => void {
+    switch (type) {
+        case "error": 
+            return (s) => update_print(`<span class="stdout-error">${s.replaceAll(" ", "&nbsp;")}</span>`)
+        case "normal":
+            return (s) => update_print(s.replaceAll(" ", "&nbsp;"))
+        case "info":
+            return (s) => update_print(`<span class='stdout-info'>${s.replaceAll(" ", "&nbsp;")}</span>`)
+    }
+}

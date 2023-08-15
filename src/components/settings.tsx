@@ -63,30 +63,3 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
     }
 }
 
-
-// Update: According to iliano, the advanced settings should not be exposed to students
-// class AdvancedSetting extends React.Component<
-//     SettingMenuProps,
-//     {expand: boolean}
-// > {
-//     constructor(props: SettingMenuProps){
-//         super(props);
-//         this.state = {expand: false};
-//     }
-//     render(): React.ReactNode {
-//         if (this.state.expand) {
-//             return <>
-//             <h3 onClick={() => {this.setState({expand: false})}} className="dbg-entire-row">
-//                 <FontAwesomeIcon icon={faAngleDown}/> Advanced Settings
-//             </h3>
-//             <p>Debug Mode</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG} onChange={() => {DEBUG = !DEBUG}}/>
-//             <p>Debug - Dump Step</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_STEP} onChange={() => {DEBUG_DUMP_STEP = !DEBUG_DUMP_STEP}}/>
-//             <p>Debug - Dump Heap</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_MEM} onChange={() => {DEBUG_DUMP_MEM = !DEBUG_DUMP_MEM}}/>
-//             </>;
-//         } else {
-//             return <h3 onClick={() => {this.setState({expand: true})}}>
-//                 <FontAwesomeIcon icon={faAngleRight}/> Advanced Settings
-//             </h3>;
-//         }
-//     }
-// }

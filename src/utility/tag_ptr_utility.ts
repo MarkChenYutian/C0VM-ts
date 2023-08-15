@@ -41,7 +41,7 @@ export function read_tagptr(ptr: C0Pointer, mem: C0HeapAllocator): [C0Pointer, n
  * @param tag The tag for that pointer
  * @param mem Heap memory allocator for C0VM
  */
-export function build_tagptr(ptr: C0Pointer, tag: number, mem: C0HeapAllocator): C0Pointer {
+export function create_tagptr(ptr: C0Pointer, tag: number, mem: C0HeapAllocator): C0Pointer {
     const tagptr = mem.malloc(12);
     const tagptr_struct = mem.deref(tagptr);
     /*  

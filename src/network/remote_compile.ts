@@ -1,4 +1,5 @@
 import { vm_error } from "../utility/errors";
+import { stdout } from "../utility/ui_utility";
 import * as VM from "../vm_core/vm_interface"; 
 import { is_all_library_supported } from "./c0_parser";
 
@@ -18,7 +19,7 @@ export default function remote_compile(
     }
 
     /** Update since v1.0.4 - print out the compile command when user hit compile button */
-    let compile_command = "$ cc0 ";
+    let compile_command = "$ cc0";
     for (let tab of editors) {
         compile_command += " " + tab.title;
     }
@@ -47,7 +48,15 @@ export default function remote_compile(
         (result: any) => {
             if (result.error !== ""){
                 const error_explain = result.error as string;
-                print_update(`<span class="stdout-error">${error_explain.replaceAll(" ", "&nbsp;")}</span>`);
+                stdout("error", print_update)(
+`[Error]: Program compile failed!
+with command line:
+${compile_command}
+
+---
+with error message:
+${error_explain}`
+                )
                 throw new vm_error("Compile Failed for c0 source code. See standard output for more information.");
             }
             
@@ -57,6 +66,10 @@ export default function remote_compile(
     )
     .then(
         (state) => {
+            stdout("info", print_update)(
+`Compile success with command line:
+${compile_command}
+`)
             set_app_state({
                 contentChanged: false, // Now we can run the new program
                 C0Runtime     : state  // Load the initialized state
