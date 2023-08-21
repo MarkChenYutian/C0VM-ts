@@ -11,7 +11,7 @@ function do_support_directory_upload(): boolean {
 
 function loadFileThroughDialog(view: EditorView, accept_format: string, update_title: (s: string) => void) {
     asyncLoadExternalFile(accept_format)
-    .then(({title, content}) => {
+    .then(({path: title, content}) => {
         update_title(title);
         view.dispatch({changes: {from: 0, insert: content}});
     })

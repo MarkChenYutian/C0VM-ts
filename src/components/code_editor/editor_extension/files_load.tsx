@@ -13,33 +13,43 @@ function onLoadProjectReadme(
 ) {
     asyncLoadExternalFile(".txt")
     .then(({ content }) => {
-        const lines = content === undefined ? "" : content.split("\n");
+        const lines = content === undefined ? "" : content.split(/\r?\n/);
+        let res_files: string[] | undefined = undefined;
+        
         for (const line of lines) {
-            if (!regex_valid_cc0_command.test(line)) continue;
-            if (line.includes("-i") || line.includes("--interface")) continue;
+            if (!regex_valid_cc0_command.test(line)) {
+                continue;
+            }
+            if (line.includes("-i") || line.includes("--interface")) {
+                continue;
+            }
 
             const files = line.split(" ").filter(f => f.endsWith(".c0") || f.endsWith(".c1") || f.endsWith(".o0") || f.endsWith(".o1"));
+            if (files === undefined || files.length === 0) {
+                continue;
+            }
+
             let notSupportFlag = false;
             for (const file of files) notSupportFlag = notSupportFlag || file.endsWith(".o0") || file.endsWith(".o1");
-            if (notSupportFlag) continue;
+            if (notSupportFlag) {
+                continue;
+            }
 
-            if (files === undefined || files.length === 0) {
-                globalThis.MSG_EMITTER.warn(
-                    "Failed to load 15-122 Project",
-                    "Did not find valid CC0 compile line in the *.txt file provided."
-                )
-                throw new internal_error("Failed to import 15-122 project (reason: Can't find cc0 compile line)");
-            };
-            return files;
+            res_files = files;
+            break;
         }
-        globalThis.MSG_EMITTER.warn(
-            "Failed to load 15-122 Project",
-            "Did not find valid CC0 compile line in the *.txt file provided."
-        )
-        throw new internal_error("Failed to import 15-122 project (reason: Can't find cc0 compile line)");
+
+        if (res_files === undefined) {
+            globalThis.MSG_EMITTER.warn(
+                "Failed to load 15-122 Project",
+                "Did not find valid CC0 compile line in the *.txt file provided."
+            )
+            throw new internal_error("Failed to import 15-122 project (reason: Can't find cc0 compile line)");
+        }
+        return res_files;
     })
     .then((files) => {
-        const code_files: ExternalFile[] = files?.map((title) => {return {title: title, content: undefined}});
+        const code_files: ExternalFile[] = files?.map((title) => {return {path: title, content: undefined}});
         update_files(code_files);
     })
     .catch((rej) => {
@@ -48,19 +58,19 @@ function onLoadProjectReadme(
 }
 
 async function onLoadProjectCode(expectFiles: ExternalFile[], setFiles: (fs: ExternalFile[]) => void) {
-    const readFiles = await asyncLoadDirectory();
+    const readFiles = await asyncLoadDirectory(["c0", "c1"]);
     const expected_map = new Map<string, string | undefined>();
     for (const expect_file of expectFiles) {
-        expected_map.set(expect_file.title, undefined);
+        expected_map.set(expect_file.path, undefined);
     }
     for (const actual_file of readFiles) {
-        if (!expected_map.has(actual_file.title)) continue;
-        expected_map.set(actual_file.title, actual_file.content);
+        if (!expected_map.has(actual_file.path)) continue;
+        expected_map.set(actual_file.path, actual_file.content);
     }
-    
+
     const resultFiles = [...expectFiles];
     for (let idx = 0; idx < resultFiles.length; idx ++) {
-        resultFiles[idx].content = expected_map.get(resultFiles[idx].title);
+        resultFiles[idx].content = expected_map.get(resultFiles[idx].path);
     }
     setFiles(resultFiles);
 }
@@ -86,11 +96,11 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
         step = 2;
         content = <>
             <p>Successfully read the <code>*.txt</code> file selected. The compile line for project will be:</p>
-            <pre>$cc0 {files.map(f => f.title).join(" ")}</pre>
+            <pre>$cc0 {files.map(f => f.path).join(" ")}</pre>
             <p>Now, please select the folder containing the files listed below using the Upload button:</p>
             <div className="app-project-import-progress-grid">
                 {files.map((file, idx) => <>
-                    <span key={idx.toString() + "-code"}><code>{file.title}</code></span>
+                    <span key={idx.toString() + "-code"}><code>{file.path}</code></span>
                     <div key={idx.toString() + "-stat"}>{showFileStatus(file.content !== undefined)}</div>
                 </>)}
             </div>
@@ -106,7 +116,7 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
                 onCancel={() => props.setShow(false)}
                 onOk={() => {
                     const newEditorTabs = files.map((f, idx) => {
-                        return {title: f.title, content: (f.content as string), breakpoints: [], key: -1 * idx}
+                        return {title: f.path, content: (f.content as string), breakpoints: [], key: -1 * idx}
                     });
 
                     props.set_app_state(
@@ -121,11 +131,10 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
                             newEditorTabs,
                             props.app_state.CompilerFlags["-d"],
                             () => { props.set_app_state({PrintoutValue: ""}) },
-                            (s) => { props.set_app_state({PrintoutValue: props.app_state.PrintoutValue + s}) }
+                            (s) => { props.set_app_state((ps) => {return {PrintoutValue: ps.PrintoutValue + s};}) }
                         );
                     }
                     );
-                    props.setShow(false);
                 }}
                 okButtonProps={{disabled: !notFinished}}
                 title={`15-122 Project Import Guide (Step ${step})`}

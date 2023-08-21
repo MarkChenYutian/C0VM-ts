@@ -66,6 +66,8 @@ interface SetAppStateHook {
         ): void;
 }
 
+type SetAppState = React.Dispatch<React.SetStateAction<C0VMApplicationState>>
+
 // The props that main control bar component will accept
 interface MainControlProps          extends SetAppStateHook, AppStateProp {};
 interface ApplicationCrashPageProps extends SetAppStateHook, AppStateProp {};
@@ -247,4 +249,4 @@ interface FilesLoadProps extends SetAppStateHook, AppStateProp {
     setShow: (show: boolean) => void,
 }
 
-type ExternalFile = { title: string, content: string | undefined }
+type ExternalFile = { path: string, content: string | undefined }

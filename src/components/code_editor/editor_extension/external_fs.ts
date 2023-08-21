@@ -6,7 +6,7 @@ function _loadExternalFile(F: File): Promise<ExternalFile> {
 
         reader.onloadend = () => {
             if (reader.result === null) throw new internal_error("Failed to read input file");
-            return resolve({title: F.name, content: reader.result.toString()});
+            return resolve({path: F.name, content: reader.result.toString()});
         };
         reader.readAsText(F, "utf-8");
     })
@@ -35,7 +35,7 @@ export function asyncLoadExternalFile(accept_format: string): Promise<ExternalFi
     });
 }
 
-export async function asyncLoadDirectory(): Promise<ExternalFile[]> {
+export async function asyncLoadDirectory(accepted_format: string[]): Promise<ExternalFile[]> {
     return new Promise((resolve, reject) => {
         const hidden_elem = document.createElement("input");
         hidden_elem.type = "file";
@@ -55,6 +55,8 @@ export async function asyncLoadDirectory(): Promise<ExternalFile[]> {
                 const result: ExternalFile[] = [];
 
                 for (let i = 0; i < fileList.length; i ++) {
+                    const suffix = fileList[i].name.split(".").at(-1);
+                    if (suffix === undefined || !accepted_format.includes(suffix)) continue;
                     const F = await _loadExternalFile(fileList[i]);
                     result.push(F);
                 }
