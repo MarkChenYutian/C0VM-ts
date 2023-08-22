@@ -21,6 +21,7 @@ function extract_library(code: string) {
 function extract_all_libraries(editors: C0EditorTab[]): Set<string>{
     const libraries = [];
     for (const editor of editors){
+        if (typeof editor.content !== "string") continue;
         libraries.push(...extract_library(editor.content));
     }
     return new Set(libraries);
@@ -167,6 +168,7 @@ function extract_all_structs(editors: C0EditorTab[]): Map<string, Struct_Type_Re
     const typedefs = extract_all_typedef(editors)[0];
 
     for (const editor of editors){
+        if (typeof editor.content !== "string") continue;
         const new_structs = extract_struct(editor.content, typedefs);
         all_structs = new Map([...Array.from(all_structs), ...Array.from(new_structs)]);
     }
@@ -254,6 +256,7 @@ export function extract_all_typedef(editors: C0EditorTab[]): [Map<AliasType, Sou
     const rawTypedefs: TypeDefInfo[] = [];
     const functionTypes = [];
     for (const editor of editors) {
+        if (typeof editor.content !== "string") continue;
         const [typedef, functype] = extract_typedef(editor.content)
         rawTypedefs.push(...typedef);
         functionTypes.push(...Array.from(functype));

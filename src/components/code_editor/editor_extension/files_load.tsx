@@ -9,7 +9,7 @@ const { Text } = Typography;
 const regex_valid_cc0_command = /^\s*%\s*cc0/;
 
 function onLoadProjectReadme(
-    update_files: (tabs: ExternalFile[]) => void,
+    update_files: (tabs: GeneralExternalFile[]) => void,
 ) {
     asyncLoadExternalFile(".txt")
     .then(({ content }) => {
@@ -29,12 +29,6 @@ function onLoadProjectReadme(
                 continue;
             }
 
-            let notSupportFlag = false;
-            for (const file of files) notSupportFlag = notSupportFlag || file.endsWith(".o0") || file.endsWith(".o1");
-            if (notSupportFlag) {
-                continue;
-            }
-
             res_files = files;
             break;
         }
@@ -49,7 +43,7 @@ function onLoadProjectReadme(
         return res_files;
     })
     .then((files) => {
-        const code_files: ExternalFile[] = files?.map((title) => {return {path: title, content: undefined}});
+        const code_files: GeneralExternalFile[] = files?.map((title) => {return {path: title, content: undefined}});
         update_files(code_files);
     })
     .catch((rej) => {
@@ -57,7 +51,7 @@ function onLoadProjectReadme(
     })
 }
 
-async function onLoadProjectCode(expectFiles: ExternalFile[], setFiles: (fs: ExternalFile[]) => void) {
+async function onLoadProjectCode(expectFiles: GeneralExternalFile[], setFiles: (fs: GeneralExternalFile[]) => void) {
     const readFiles = await asyncLoadDirectory(["c0", "c1"]);
     const expected_map = new Map<string, string | undefined>();
     for (const expect_file of expectFiles) {
@@ -68,6 +62,8 @@ async function onLoadProjectCode(expectFiles: ExternalFile[], setFiles: (fs: Ext
         expected_map.set(actual_file.path, actual_file.content);
     }
 
+    console.log(readFiles);
+
     const resultFiles = [...expectFiles];
     for (let idx = 0; idx < resultFiles.length; idx ++) {
         resultFiles[idx].content = expected_map.get(resultFiles[idx].path);
@@ -77,7 +73,7 @@ async function onLoadProjectCode(expectFiles: ExternalFile[], setFiles: (fs: Ext
 
 
 const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
-    const [files, setFiles] = useState<ExternalFile[]>([]);
+    const [files, setFiles] = useState<GeneralExternalFile[]>([]);
     const showFileStatus = (loaded: boolean) => loaded ? <Text type="success">Loaded</Text> : <Text type="warning">Not Loaded</Text>;
     const notFinished = files.length !== 0 && files.reduce((prev, curr) => prev && curr.content !== undefined, true);    
 

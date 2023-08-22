@@ -7,6 +7,7 @@ import { faXmark, faAdd } from "@fortawesome/free-solid-svg-icons";
 import DraggableTab from "./draggable_tabs";
 import EditableTab from "./editable_tabs";
 import { internal_error } from "../../utility/errors";
+import O0Viewer from "./o0-viewer";
 
 
 const { TabPane } = Tabs;
@@ -137,15 +138,7 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                         execLine = currLine[1];
                     }
 
-                    return (
-                    <TabPane
-                        tab={
-                            <EditableTab title={editor.title} editor_key={editor.key + ""} updateName={(k, s) => this.set_tab_name(k, s)}/>
-                        }
-                        key={editor.key.toString()}
-                        closable = {this.props.app_state.C0Editors.length !== 1}
-                        closeIcon={<FontAwesomeIcon icon={faXmark}/>}
-                    >
+                    const code_editor = typeof editor.content === "string" ?
                         <C0Editor
                             execLine    = {execLine}
                             content     = {editor.content}
@@ -160,6 +153,21 @@ export default class C0EditorGroup extends React.Component <C0EditorGroupProps>
                             setAllTabs    = {(tabs) => this.props.set_app_state({C0Editors: tabs})}
                             setActiveKey  = {(key) => {this.props.set_app_state({ActiveEditor: key})}}
                         />
+                    :   <O0Viewer
+                            content     = {editor.content}
+                        />
+
+
+                    return (
+                    <TabPane
+                        tab={
+                            <EditableTab title={editor.title} editor_key={editor.key + ""} updateName={(k, s) => this.set_tab_name(k, s)}/>
+                        }
+                        key={editor.key.toString()}
+                        closable = {this.props.app_state.C0Editors.length !== 1}
+                        closeIcon={<FontAwesomeIcon icon={faXmark}/>}
+                    >
+                        {code_editor}
                     </TabPane>
                     );
                 }

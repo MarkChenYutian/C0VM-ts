@@ -19,7 +19,7 @@ type TypeDefInfo = {
 type C0EditorTab = {
     title  : string,            /* Title of editor tab */
     key    : number,            /* Key of editor tab */
-    content: string,            /* Content (raw string) of that tab */
+    content: string | File,     /* Content (raw string) of that tab */
     breakpoints: BreakPoint[],  /* Breakpoints attatched to that tab */
 };
 
@@ -101,6 +101,15 @@ interface C0EditorProps extends SetAppStateHook, AppStateProp {
     setTitle      : (s: string) => void,
     setAllTabs    : (tabs: C0EditorTab[]) => void,
     setActiveKey  : (key: number) => void
+}
+
+interface O0ViewerProps {
+    content       : File
+}
+
+interface O0ViewerState {
+    is_error       : boolean
+    interface_str ?: string
 }
 
 interface C0EditorState {
@@ -250,3 +259,4 @@ interface FilesLoadProps extends SetAppStateHook, AppStateProp {
 }
 
 type ExternalFile = { path: string, content: string | undefined }
+type GeneralExternalFile = { path: string, content: string | undefined | File }

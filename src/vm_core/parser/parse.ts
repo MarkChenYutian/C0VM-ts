@@ -211,8 +211,8 @@ function parse_func_head(func_head: [string, number][]): number {
 
 function resolve_src_reference(comment_ref: string): [string, number, number, number, number] | undefined {
     if (!regex_ref_comment.test(comment_ref)) return undefined;
-    const path = comment_ref.split("/");
-    const file = path[path.length - 1];
+    const path = comment_ref.split("/").slice(3,);
+    const file = path.join("/");
     const [file_name, line_range] = file.split(": ");
     const [start_pos, end_pos] = line_range.split("-");
     const [start_ln, start_col] = start_pos.split(".").map((tok) => parseInt(tok));
