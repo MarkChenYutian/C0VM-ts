@@ -83,7 +83,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "cross-env GENERATE_SOURCEMAP=true BUILD_PATH='./build' react-scripts build",
+    "build": "cross-env GENERATE_SOURCEMAP=false BUILD_PATH='./build' react-scripts build",
     "test": "react-scripts test",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
