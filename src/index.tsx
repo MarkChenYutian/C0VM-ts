@@ -25,7 +25,7 @@ globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
 
 globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
 
-globalThis.COMPILER_BACKEND_URL = "https://cs122.andrew.cmu.edu/visualc0/compile";
+globalThis.COMPILER_BACKEND_URL = "https://cs122.andrew.cmu.edu/visualc0/";
 
 globalThis.C0_MAX_RECURSION = 999;
 globalThis.C0_TIME_SLICE = 500;

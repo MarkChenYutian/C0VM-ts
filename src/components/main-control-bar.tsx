@@ -180,7 +180,7 @@ function MainControlBarFC(props: MainControlProps & ContextValue) {
         remote_compile(
             {set_app_state: props.set_app_state},
             props.app_state.C0Editors,
-            props.app_state.CompilerFlags["-d"],
+            props.app_state.CompilerFlags["d"],
             clear_print,
             print_update,
         );

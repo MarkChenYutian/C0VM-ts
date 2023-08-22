@@ -125,7 +125,7 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
                         remote_compile(
                             { set_app_state: (s, cb) => props.set_app_state(s, cb)},
                             newEditorTabs,
-                            props.app_state.CompilerFlags["-d"],
+                            props.app_state.CompilerFlags["d"],
                             () => { props.set_app_state({PrintoutValue: ""}) },
                             (s) => { props.set_app_state((ps) => {return {PrintoutValue: ps.PrintoutValue + s};}) }
                         );

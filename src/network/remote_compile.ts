@@ -1,21 +1,7 @@
 import { vm_error } from "../utility/errors";
-import { stdout } from "../utility/ui_utility";
+import { stdout, toBase64 } from "../utility/ui_utility";
 import * as VM from "../vm_core/vm_interface"; 
 import { is_all_library_supported } from "./c0_parser";
-
-const toBase64: (f: File) => Promise<string> = 
-    (file: File) => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            let encoded = (reader.result as string).toString().replace(/^data:(.*,)?/, '');
-            if ((encoded.length % 4) > 0) {
-                encoded += '='.repeat(4 - (encoded.length % 4));
-            }
-            resolve(encoded);
-        }
-        reader.onerror = reject;
-    });
 
 async function stringify_content(content: string | File) {
     if (typeof content === "string") return content
@@ -30,6 +16,7 @@ export default async function remote_compile(
     clean_printout: () => void,
     print_update: (s: string) => void,
 ): Promise<void> {
+    console.log(check_contract);
     if (!is_all_library_supported(editors)){
         globalThis.MSG_EMITTER.err(
             "Unsupported Library Used", 
@@ -55,7 +42,7 @@ export default async function remote_compile(
         code_file.push(str_content);
     }
 
-    fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${check_contract ? "true" : "false"}`, {
+    fetch(globalThis.COMPILER_BACKEND_URL + `compile?dyn_check=${check_contract ? "true" : "false"}`, {
         method: "POST",
         cache: "no-cache",
         headers: {
