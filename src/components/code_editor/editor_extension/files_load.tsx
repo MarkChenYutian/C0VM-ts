@@ -52,8 +52,8 @@ function onLoadProjectReadme(
 }
 
 async function onLoadProjectCode(expectFiles: GeneralExternalFile[], setFiles: (fs: GeneralExternalFile[]) => void) {
-    const readFiles = await asyncLoadDirectory(["c0", "c1"]);
-    const expected_map = new Map<string, string | undefined>();
+    const readFiles = await asyncLoadDirectory({text: ["c0", "c1"], binary: ["o0", "o1"]});
+    const expected_map = new Map<string, string | undefined | File>();
     for (const expect_file of expectFiles) {
         expected_map.set(expect_file.path, undefined);
     }

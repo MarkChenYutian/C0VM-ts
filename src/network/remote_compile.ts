@@ -3,13 +3,33 @@ import { stdout } from "../utility/ui_utility";
 import * as VM from "../vm_core/vm_interface"; 
 import { is_all_library_supported } from "./c0_parser";
 
-export default function remote_compile(
+const toBase64: (f: File) => Promise<string> = 
+    (file: File) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            let encoded = (reader.result as string).toString().replace(/^data:(.*,)?/, '');
+            if ((encoded.length % 4) > 0) {
+                encoded += '='.repeat(4 - (encoded.length % 4));
+            }
+            resolve(encoded);
+        }
+        reader.onerror = reject;
+    });
+
+async function stringify_content(content: string | File) {
+    if (typeof content === "string") return content
+    const base64_encoded_file: string = await toBase64(content)
+    return base64_encoded_file
+}
+
+export default async function remote_compile(
     {set_app_state}: SetAppStateHook,
     editors: C0EditorTab[],
     check_contract: boolean,
     clean_printout: () => void,
     print_update: (s: string) => void,
-): void {
+): Promise<void> {
     if (!is_all_library_supported(editors)){
         globalThis.MSG_EMITTER.err(
             "Unsupported Library Used", 
@@ -27,7 +47,13 @@ export default function remote_compile(
 
     print_update("Compiling the code with command line \n");
     print_update(compile_command + "\n\n");
-    /*** */
+
+    /* Start building compile command */
+    const code_file: string[] = [];
+    for (const tab of editors) {
+        const str_content = await stringify_content(tab.content)
+        code_file.push(str_content);
+    }
 
     fetch(globalThis.COMPILER_BACKEND_URL + `?dyn_check=${check_contract ? "true" : "false"}`, {
         method: "POST",
@@ -37,8 +63,9 @@ export default function remote_compile(
             "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
-            codes    : editors.map(tab => tab.content),
+            codes    : code_file,
             filenames: editors.map(tab => tab.title),
+            is_binaries: editors.map(tab => typeof tab.content !== "string")
         })
     })
     .then(

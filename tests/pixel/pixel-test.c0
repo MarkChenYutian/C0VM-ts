@@ -1,0 +1,57 @@
+#use <util>
+#use <conio>
+
+int main() {
+  pixel_t p;
+
+  p = make_pixel(0xFF, 0xFF, 0xFF, 0xFF);
+  assert(0xFF == get_alpha(p));
+  assert(0xFF == get_red(p));
+  assert(0xFF == get_green(p));
+  assert(0xFF == get_blue(p));
+
+  p = make_pixel(0x00, 0x00, 0x00, 0x00);
+  assert(0x00 == get_alpha(p));
+  assert(0x00 == get_red(p));
+  assert(0x00 == get_green(p));
+  assert(0x00 == get_blue(p));
+
+  p = make_pixel(0xFF, 0x00, 0x00, 0x00);
+  assert(0xFF == get_alpha(p));
+  assert(0x00 == get_red(p));
+  assert(0x00 == get_green(p));
+  assert(0x00 == get_blue(p));
+
+  p = make_pixel(0x00, 0xFF, 0x00, 0x00);
+  assert(0x00 == get_alpha(p));
+  assert(0xFF == get_red(p));
+  assert(0x00 == get_green(p));
+  assert(0x00 == get_blue(p));
+
+  p = make_pixel(0x00, 0x00, 0xFF, 0x00);
+  assert(0x00 == get_alpha(p));
+  assert(0x00 == get_red(p));
+  assert(0xFF == get_green(p));
+  assert(0x00 == get_blue(p));
+
+  p = make_pixel(0x00, 0x00, 0x00, 0xFF);
+  assert(0x00 == get_alpha(p));
+  assert(0x00 == get_red(p));
+  assert(0x00 == get_green(p));
+  assert(0xFF == get_blue(p));
+
+  p = make_pixel(0x01, 0x02, 0x03, 0x04);
+  assert(0x01 == get_alpha(p));
+  assert(0x02 == get_red(p));
+  assert(0x03 == get_green(p));
+  assert(0x04 == get_blue(p));
+
+  p = make_pixel(0xF1, 0xF2, 0xF3, 0xF4);
+  assert(0xF1 == get_alpha(p));
+  assert(0xF2 == get_red(p));
+  assert(0xF3 == get_green(p));
+  assert(0xF4 == get_blue(p));
+
+  printf("All tests passed!\n");
+  return 15;
+}

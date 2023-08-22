@@ -108,6 +108,7 @@ interface O0ViewerProps {
 }
 
 interface O0ViewerState {
+    content        : File
     is_error       : boolean
     interface_str ?: string
 }

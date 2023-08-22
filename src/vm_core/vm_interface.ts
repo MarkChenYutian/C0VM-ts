@@ -103,7 +103,7 @@ export async function autoStep(
     if(globalThis.DEBUG) console.log('Running autostep...');
     if (signal.abort) {
         resetSig();
-        print_update("C0VM.ts: Execution aborted manually.\n");
+        stdout("error", print_update)("C0VM.ts: Execution aborted manually.\n");
         globalThis.MSG_EMITTER.warn("Execution Aborted", "Execution is aborted since the user click the 'Abort' button manually.");
         resetSig();
         resetC0Running();
@@ -192,7 +192,7 @@ export async function run(
              */
             if (signal.abort) {
                 resetSig();
-                print_update("C0VM.ts: Execution aborted manually.\n");
+                stdout("error", print_update)("C0VM.ts: Execution aborted manually.\n");
                 globalThis.MSG_EMITTER.warn("Execution Aborted", "Execution is aborted since the user click the 'Abort' button manually.");
                 resetSig();
                 return [s, false];

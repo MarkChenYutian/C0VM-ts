@@ -1,0 +1,62 @@
+/* The pixel interface describes the pixel type. It also defines
+   five functions: get_red(p), get_green(p), get_blue(p),
+   get_alpha(p), and make_pixel(a,r,g,b).  If you're *given* a
+   working pixel library, you can use the pixel interface
+   without knowing how pixels are represented.
+
+   When writing this file, only use the pixel interface.  We'll
+   check your code by compiling and running it against different
+   implementations of the pixel interface.
+
+   There are 2 tasks in this file:
+    - Task 1 - Implement quantize() as described in the writeup
+    - Task 2 - Testing quantize()
+*/
+
+/* Task 1 - Implement quantize() as described in the writeup */
+
+pixel_t quantize(pixel_t p, int q)
+//@requires 0 <= q && q <= 8;
+{
+  int mask = (0xFF << q) & 0xFF;
+
+  return make_pixel(get_alpha(p),
+                    get_red(p) & mask,
+                    get_green(p) & mask,
+                    get_blue(p) & mask);
+}
+
+/* Task 2 - Testing quantize()
+
+   Write some more tests for quantize. Remember to respect the pixels
+   interface! We *will* run these tests, and will grade them based on
+   their ability to catch buggy implementations of quantize.
+*/
+
+void test_quantize() {
+  pixel_t p = quantize(make_pixel(0xFF, 0xFF, 0xFF, 0xFF), 4);
+  assert(get_alpha(p) == 0xFF);
+  assert(get_red(p)   == 0xF0);
+  assert(get_green(p) == 0xF0);
+  assert(get_blue(p)  == 0xF0);
+
+  // More tests ...
+
+  p = quantize(make_pixel(0xFA, 0xFB, 0xFC, 0xFD), 0);
+  assert(get_alpha(p) == 0xFA);
+  assert(get_red(p) == 0xFB);
+  assert(get_green(p) == 0xFC);
+  assert(get_blue(p) == 0xFD);
+
+  p = quantize(make_pixel(0xF1, 0xF2, 0xF3, 0xF4), 7);
+  assert(get_alpha(p) == 0xF1);
+  assert(get_red(p) == 0x80);
+  assert(get_green(p) == 0x80);
+  assert(get_blue(p) == 0x80);
+
+  p = quantize(make_pixel(0xF1, 0xF2, 0xF3, 0xF4), 8);
+  assert(get_alpha(p) == 0xF1);
+  assert(get_red(p) == 0x00);
+  assert(get_green(p) == 0x00);
+  assert(get_blue(p) == 0x00);
+}

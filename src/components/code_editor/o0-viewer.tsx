@@ -10,8 +10,11 @@ export default class O0Viewer extends React.Component<O0ViewerProps, O0ViewerSta
 {
     constructor(props: O0ViewerProps) {
         super(props);
-        this.state = { interface_str: undefined, is_error: false };
-        retrieve_interface(props.content)
+        this.state = { content: props.content, interface_str: undefined, is_error: false };
+    }
+
+    componentDidMount(): void {
+        retrieve_interface(this.state.content)
         .then((result) => {
             if (result.error !== "") {
                 this.setState({ interface_str: result.error, is_error: true })
@@ -28,7 +31,7 @@ export default class O0Viewer extends React.Component<O0ViewerProps, O0ViewerSta
                         basicSetup={false}
                         value = {
                             this.state.interface_str === undefined
-                            ? "Loading object file interface ..."
+                            ? "/* Loading object file interface ... */"
                             : this.state.interface_str
                         }
                         extensions={[

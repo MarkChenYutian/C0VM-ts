@@ -7,9 +7,6 @@ import { nativeFuncLoader } from "../native/native_interface";
  * Terms: | token | # byte_instruct | # program_snippet | # comment(?) |
  * * If comment starts with ./cache/... 
  *      We know the bytecode comes from remote compile.
- *      * If C0Editor != undefined ...
- *          In this case, go to the source code in C0Editors parameter and resolve the reference
- *          in comment (start_row.start_col : end_row.end_col).
  *      * If typedefRecord != undefined ..
  *          In this case, apply typedef mapping and continue parsing
  *          ```c0
@@ -22,7 +19,7 @@ import { nativeFuncLoader } from "../native/native_interface";
  * @param typedefRecord Typedef information extracted from c0 editors
  * @returns A parsed bytecode data structure.
  */
-export default function parse(bytecode: string, C0Editors: C0EditorTab[], typedef_lib: Map<string, string>): C0ByteCode {
+export default function parse(bytecode: string, typedef_lib: Map<string, string>): C0ByteCode {
     const lines = annotate_linenum(bytecode);   // Add line number info to each line
     const blocks = split_blocks(lines);
 
@@ -211,8 +208,10 @@ function parse_func_head(func_head: [string, number][]): number {
 
 function resolve_src_reference(comment_ref: string): [string, number, number, number, number] | undefined {
     if (!regex_ref_comment.test(comment_ref)) return undefined;
-    const path = comment_ref.split("/").slice(3,);
-    const file = path.join("/");
+    const file = comment_ref.startsWith("./cache/")
+        ? comment_ref.split("/").slice(3,).join("/")    /* Is internal file (compile from source code) */
+        : comment_ref;                                  /* Is external file (lib or object file) */
+    
     const [file_name, line_range] = file.split(": ");
     const [start_pos, end_pos] = line_range.split("-");
     const [start_ln, start_col] = start_pos.split(".").map((tok) => parseInt(tok));

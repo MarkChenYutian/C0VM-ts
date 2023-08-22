@@ -1,5 +1,7 @@
 import { internal_error } from "../../../utility/errors";
 
+type LoadInstruction = { "binary": string[], "text": string[] }
+
 function _loadExternalFile(F: File, get_path: boolean): Promise<ExternalFile> {
     return new Promise((resolve) => {
         const reader = new FileReader();
@@ -40,7 +42,7 @@ export function asyncLoadExternalFile(accept_format: string): Promise<ExternalFi
     });
 }
 
-export async function asyncLoadDirectory(accepted_format: string[]): Promise<ExternalFile[]> {
+export async function asyncLoadDirectory(accepted_format: LoadInstruction): Promise<GeneralExternalFile[]> {
     return new Promise((resolve, reject) => {
         const hidden_elem = document.createElement("input");
         hidden_elem.type = "file";
@@ -57,15 +59,19 @@ export async function asyncLoadDirectory(accepted_format: string[]): Promise<Ext
                     return reject(new internal_error("Failed to read input file"));
                 }
                 
-                const result: ExternalFile[] = [];
+                const result: GeneralExternalFile[] = [];
 
                 for (let i = 0; i < fileList.length; i ++) {
                     const suffix = fileList[i].name.split(".").at(-1);
-                    if (suffix === undefined || !accepted_format.includes(suffix)) continue;
-                    const F = await _loadExternalFile(fileList[i], true);
-                    result.push(F);
+                    if (suffix !== undefined && accepted_format.text.includes(suffix)){
+                        const F = await _loadExternalFile(fileList[i], true);
+                        result.push(F);
+                    } else if (suffix !== undefined && accepted_format.binary.includes(suffix)) {
+                        const F = fileList[i]
+                        const path = F.webkitRelativePath;
+                        result.push({path: path.split("/").slice(1,).join("/"), content: F})
+                    }
                 }
-
                 resolve(result);
             }
         );
