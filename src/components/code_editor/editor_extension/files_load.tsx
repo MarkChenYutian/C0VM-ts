@@ -1,7 +1,7 @@
-import { Button, Modal, Typography } from "antd";
+import { Button, Modal, Space, Steps, Typography } from "antd";
 import React, { useState } from "react";
 
-import { asyncLoadDirectory, asyncLoadExternalFile } from "./external_fs";
+import { asyncLoadDirectory, asyncLoadExternalTextFile } from "./external_fs";
 import { internal_error } from "../../../utility/errors";
 import remote_compile from "../../../network/remote_compile";
 
@@ -11,7 +11,7 @@ const regex_valid_cc0_command = /^\s*%\s*cc0/;
 function onLoadProjectReadme(
     update_files: (tabs: GeneralExternalFile[]) => void,
 ) {
-    asyncLoadExternalFile(".txt")
+    asyncLoadExternalTextFile(".txt")
     .then(({ content }) => {
         const lines = content === undefined ? "" : content.split(/\r?\n/);
         let res_files: string[] | undefined = undefined;
@@ -71,16 +71,15 @@ async function onLoadProjectCode(expectFiles: GeneralExternalFile[], setFiles: (
     setFiles(resultFiles);
 }
 
-
 const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
     const [files, setFiles] = useState<GeneralExternalFile[]>([]);
     const showFileStatus = (loaded: boolean) => loaded ? <Text type="success">Loaded</Text> : <Text type="warning">Not Loaded</Text>;
-    const notFinished = files.length !== 0 && files.reduce((prev, curr) => prev && curr.content !== undefined, true);    
+    const importFinished = files.length !== 0 && files.reduce((prev, curr) => prev && curr.content !== undefined, true);    
 
     let content = null;
     let step = 0;
     if (files.length === 0) {
-        step = 1;
+        step = 0;
         content = <>
             <p>To import a 15-122 project, please select the <code>README.txt</code> file using the upload button below</p>
             <div style={{display: "flex", flexDirection: "row-reverse"}}>
@@ -89,7 +88,7 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
             <hr/>
         </>
     } else {
-        step = 2;
+        step = !importFinished ? 1 : 2;
         content = <>
             <p>Successfully read the <code>*.txt</code> file selected. The compile line for project will be:</p>
             <pre>$cc0 {files.map(f => f.path).join(" ")}</pre>
@@ -100,15 +99,16 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
                     <div key={idx.toString() + "-stat"}>{showFileStatus(file.content !== undefined)}</div>
                 </>)}
             </div>
-            <div style={{display: "flex", flexDirection: "row-reverse"}}>
-                <Button type="primary" size="large" onClick={() => {onLoadProjectCode(files, setFiles)}}>Upload Code</Button>
-            </div>
+            <Space style={{marginTop: 16, marginBottom: 8}} >
+                <Button size="large" onClick={() => setFiles([])}>Back to step 1</Button>
+                <Button type={importFinished ? undefined : "primary"} size="large" onClick={() => {onLoadProjectCode(files, setFiles)}}>Upload Code</Button>
+            </Space>
             <hr/>
         </>;
     }
 
     return  <Modal
-                open={props.show} maskClosable={false}
+                open={props.show} maskClosable={false} width={960}
                 onCancel={() => props.setShow(false)}
                 onOk={() => {
                     const newEditorTabs = files.map((f, idx) => {
@@ -132,9 +132,17 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
                     }
                     );
                 }}
-                okButtonProps={{disabled: !notFinished}}
-                title={`15-122 Project Import Guide (Step ${step})`}
+                okButtonProps={{disabled: !importFinished}}
+                title={`15-122 Project Import Guide`}
             >
+                <Steps current={step}
+                    items={[
+                        {title: "Upload README.txt"},
+                        {title: "Upload code"},
+                        {title: "Confirm"}
+                    ]}
+                    style={{marginBottom: 16}}
+                />
                 {content}
             </Modal>
 }

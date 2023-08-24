@@ -50,8 +50,8 @@ export default class C0Editor extends React.Component<C0EditorProps, C0EditorSta
                         extensions={[
                             breakpoint_extension,
                             LoadDocumentPlugin(
-                                ".c0, .c1",
-                                this.props.setTitle,
+                                ".c0, .c1, .o0, .o1",
+                                {app_state: this.props.app_state, set_app_state: this.props.set_app_state},
                                 (show) => this.setState({show})
                             ),
                             basicSetup(),

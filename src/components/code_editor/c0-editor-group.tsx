@@ -11,7 +11,7 @@ import O0Viewer from "./o0-viewer";
 
 
 const { TabPane } = Tabs;
-const regex_valid_file_name = /^[0-9a-zA-Z_-]+\.(c(0|1))$/;
+const regex_valid_file_name = /^([0-9a-zA-Z_-]|\/)+\.((c|o)(0|1))$/;
 
 
 function isValidFileName(name: string): boolean {

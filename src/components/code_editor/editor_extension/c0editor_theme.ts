@@ -11,6 +11,7 @@ export const backgroundColor = "#FFFFFF",
     textBackground = "#BBDEE3",
     searchBackground = "#AACDD2",
     execLineBackground = "#FFFF90",
+    warningLineBackground = "#850100",
     compileLineOKBackground = "#CFFECA"
 
 
@@ -76,6 +77,9 @@ export const C0LightStyle = EditorView.theme({
     },
     ".cm-execLine-light": {
         backgroundColor: execLineBackground
+    },
+    ".cm-execLine-dark": {
+        backgroundColor: warningLineBackground
     },
     ".cm-compileLine-ok": {
         backgroundColor: compileLineOKBackground

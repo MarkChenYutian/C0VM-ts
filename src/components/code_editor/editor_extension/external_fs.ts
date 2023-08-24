@@ -2,7 +2,7 @@ import { internal_error } from "../../../utility/errors";
 
 type LoadInstruction = { "binary": string[], "text": string[] }
 
-function _loadExternalFile(F: File, get_path: boolean): Promise<ExternalFile> {
+function _loadExternalTextFile(F: File, get_path: boolean): Promise<ExternalFile> {
     return new Promise((resolve) => {
         const reader = new FileReader();
 
@@ -19,7 +19,7 @@ function _loadExternalFile(F: File, get_path: boolean): Promise<ExternalFile> {
     })
 }
 
-export function asyncLoadExternalFile(accept_format: string): Promise<ExternalFile> {
+export function asyncLoadExternalTextFile(accept_format: string): Promise<ExternalFile> {
     return new Promise((resolve, reject) => {
         function resolveLoadFile(e: Event) {
             if (e.target === null) {
@@ -31,7 +31,37 @@ export function asyncLoadExternalFile(accept_format: string): Promise<ExternalFi
             }
 
             const F = fileList[0];
-            _loadExternalFile(F, false).then(resolve);
+            _loadExternalTextFile(F, false).then(resolve);
+        }
+
+        const inputElem = document.createElement("input");
+        inputElem.type = "file";
+        inputElem.accept = accept_format;
+        inputElem.onchange = (e) => resolveLoadFile(e);
+        inputElem.click();
+    });
+}
+
+export function asyncLoadExternalFile(accept_format: string): Promise<GeneralExternalFile> {
+    return new Promise((resolve, reject) => {
+        function resolveLoadFile(e: Event) {
+            console.log("ResolveLoadFile")
+            if (e.target === null) {
+                return reject(new internal_error("Failed to read input file"));
+            }
+            const fileList = (e.target as HTMLInputElement).files;
+            if (fileList === null) {
+                return reject(new internal_error("Failed to read input file"));
+            }
+
+            const F = fileList[0];
+            console.log(F);
+            const path = F.name;
+            if (path.endsWith("o0") || path.endsWith("o1")) {
+                resolve({path: path, content: F})
+            } else {
+                _loadExternalTextFile(F, false).then(resolve)
+            }
         }
 
         const inputElem = document.createElement("input");
@@ -64,7 +94,7 @@ export async function asyncLoadDirectory(accepted_format: LoadInstruction): Prom
                 for (let i = 0; i < fileList.length; i ++) {
                     const suffix = fileList[i].name.split(".").at(-1);
                     if (suffix !== undefined && accepted_format.text.includes(suffix)){
-                        const F = await _loadExternalFile(fileList[i], true);
+                        const F = await _loadExternalTextFile(fileList[i], true);
                         result.push(F);
                     } else if (suffix !== undefined && accepted_format.binary.includes(suffix)) {
                         const F = fileList[i]
