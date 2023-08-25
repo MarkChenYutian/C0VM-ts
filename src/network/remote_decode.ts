@@ -1,11 +1,11 @@
 import { toBase64 } from "../utility/ui_utility";
 
-interface RetrieveInterfaceResult {error: string, interface: string};
+interface RetrieveContentResult {error: string, result: string};
 
-async function retrieve_interface(content: File): Promise<RetrieveInterfaceResult> {
+async function retrieve_content(content: File): Promise<RetrieveContentResult> {
     const stringify_content = await toBase64(content);
-    const interface_result = await fetch(
-        globalThis.COMPILER_BACKEND_URL + `interface?` + new URLSearchParams({
+    const content_result = await fetch(
+        globalThis.COMPILER_BACKEND_URL + `decode?` + new URLSearchParams({
             content: stringify_content
         })
         , 
@@ -22,8 +22,8 @@ async function retrieve_interface(content: File): Promise<RetrieveInterfaceResul
             return {error: "/* " + err.message + " */", interface: ""}
         }
     )
-    return interface_result;
+    return content_result;
 }
 
 
-export default retrieve_interface
+export default retrieve_content

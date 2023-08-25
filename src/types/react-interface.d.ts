@@ -21,6 +21,7 @@ type C0EditorTab = {
     key    : number,            /* Key of editor tab */
     content: string | File,     /* Content (raw string) of that tab */
     breakpoints: BreakPoint[],  /* Breakpoints attatched to that tab */
+    ref_content?: string        /* Content resolved from the object file, if succeed */
 };
 
 interface C0VMApplicationProps {
@@ -260,4 +261,4 @@ interface FilesLoadProps extends SetAppStateHook, AppStateProp {
 }
 
 type ExternalFile = { path: string, content: string | undefined }
-type GeneralExternalFile = { path: string, content: string | undefined | File }
+type GeneralExternalFile = { path: string, content: string | undefined | File, ref_content?: string }

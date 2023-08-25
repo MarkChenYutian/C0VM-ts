@@ -1,3 +1,4 @@
+import retrieve_content from "../../../network/remote_decode";
 import { internal_error } from "../../../utility/errors";
 
 type LoadInstruction = { "binary": string[], "text": string[] }
@@ -44,8 +45,7 @@ export function asyncLoadExternalTextFile(accept_format: string): Promise<Extern
 
 export function asyncLoadExternalFile(accept_format: string): Promise<GeneralExternalFile> {
     return new Promise((resolve, reject) => {
-        function resolveLoadFile(e: Event) {
-            console.log("ResolveLoadFile")
+        async function resolveLoadFile(e: Event) {
             if (e.target === null) {
                 return reject(new internal_error("Failed to read input file"));
             }
@@ -55,10 +55,11 @@ export function asyncLoadExternalFile(accept_format: string): Promise<GeneralExt
             }
 
             const F = fileList[0];
-            console.log(F);
             const path = F.name;
+
             if (path.endsWith("o0") || path.endsWith("o1")) {
-                resolve({path: path, content: F})
+                const ref_content = await retrieve_content(F);
+                resolve({path: path, content: F, ref_content: ref_content.result})
             } else {
                 _loadExternalTextFile(F, false).then(resolve)
             }
@@ -73,7 +74,7 @@ export function asyncLoadExternalFile(accept_format: string): Promise<GeneralExt
 }
 
 export async function asyncLoadDirectory(accepted_format: LoadInstruction): Promise<GeneralExternalFile[]> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         const hidden_elem = document.createElement("input");
         hidden_elem.type = "file";
         hidden_elem.webkitdirectory = true;
@@ -99,7 +100,10 @@ export async function asyncLoadDirectory(accepted_format: LoadInstruction): Prom
                     } else if (suffix !== undefined && accepted_format.binary.includes(suffix)) {
                         const F = fileList[i]
                         const path = F.webkitRelativePath;
-                        result.push({path: path.split("/").slice(1,).join("/"), content: F})
+                        const ref_content = await retrieve_content(F);
+                        result.push({
+                            path: path.split("/").slice(1,).join("/"), content: F, ref_content: ref_content.result
+                        })
                     }
                 }
                 resolve(result);

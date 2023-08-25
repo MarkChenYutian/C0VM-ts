@@ -16,7 +16,15 @@ export default async function remote_compile(
     clean_printout: () => void,
     print_update: (s: string) => void,
 ): Promise<void> {
-    console.log(check_contract);
+    for (const tab of editors) {
+        if (typeof tab.content !== "string" && tab.ref_content === undefined) {
+            MSG_EMITTER.warn(
+                "Parsing Failed", 
+                `Failed to get typedef information from ${tab.title}. The type display in debugger may not apply certain typedef aliaes appropriately.`
+            );
+        }
+    }
+
     if (!is_all_library_supported(editors)){
         globalThis.MSG_EMITTER.err(
             "Unsupported Library Used", 

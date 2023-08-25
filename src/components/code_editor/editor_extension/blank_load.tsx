@@ -10,21 +10,25 @@ function do_support_directory_upload(): boolean {
 }
 
 function loadFileThroughDialog(accept_format: string, set_app_state: SetAppStateHook["set_app_state"]) {
-    console.log("LoadFileThroughDialog")
     asyncLoadExternalFile(accept_format)
-    .then(({path: title, content}) => {
+    .then(({path: title, content, ref_content}) => {
         set_app_state((S) => {
             const active_editor_key = S.ActiveEditor;
             const new_editors = S.C0Editors.map(
                 (tab) => {
                     if (tab.key === active_editor_key) {
-                        return {title: title, content: content ? content : "", key: tab.key, breakpoints: []};
+                        return {
+                            title: title,
+                            content: content ? content : "",
+                            key: tab.key,
+                            breakpoints: [],
+                            ref_content: ref_content
+                        };
                     } else {
                         return tab;
                     }
                 }
             );
-            
             return {C0Editors: new_editors};
         })
     })

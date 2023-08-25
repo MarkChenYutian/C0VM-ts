@@ -53,20 +53,19 @@ function onLoadProjectReadme(
 
 async function onLoadProjectCode(expectFiles: GeneralExternalFile[], setFiles: (fs: GeneralExternalFile[]) => void) {
     const readFiles = await asyncLoadDirectory({text: ["c0", "c1"], binary: ["o0", "o1"]});
-    const expected_map = new Map<string, string | undefined | File>();
+    const expected_map = new Map<string, GeneralExternalFile | undefined>();
     for (const expect_file of expectFiles) {
         expected_map.set(expect_file.path, undefined);
     }
     for (const actual_file of readFiles) {
         if (!expected_map.has(actual_file.path)) continue;
-        expected_map.set(actual_file.path, actual_file.content);
+        expected_map.set(actual_file.path, actual_file);
     }
-
-    console.log(readFiles);
-
+    
     const resultFiles = [...expectFiles];
     for (let idx = 0; idx < resultFiles.length; idx ++) {
-        resultFiles[idx].content = expected_map.get(resultFiles[idx].path);
+        resultFiles[idx].content = expected_map.get(resultFiles[idx].path)?.content;
+        resultFiles[idx].ref_content = expected_map.get(resultFiles[idx].path)?.ref_content;
     }
     setFiles(resultFiles);
 }
@@ -111,8 +110,14 @@ const FilesLoad: React.FC<FilesLoadProps> = (props: FilesLoadProps) => {
                 open={props.show} maskClosable={false} width={960}
                 onCancel={() => props.setShow(false)}
                 onOk={() => {
-                    const newEditorTabs = files.map((f, idx) => {
-                        return {title: f.path, content: (f.content as string), breakpoints: [], key: -1 * idx}
+                    const newEditorTabs: C0EditorTab[] = files.map((f, idx) => {
+                        return {
+                            title: f.path,
+                            content: (f.content as string),
+                            breakpoints: [],
+                            key: -1 * idx,
+                            ref_content: f.ref_content
+                        }
                     });
 
                     props.set_app_state(
