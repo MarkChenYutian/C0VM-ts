@@ -2,7 +2,7 @@ import React from "react";
 
 import * as TypeUtil from "../../../utility/c0_type_utility";
 
-import { Handle, NodeProps, Position } from "react-flow-renderer";
+import { Handle, NodeProps, Position } from "reactflow";
 import { internal_error } from "../../../utility/errors";
 import { loadString } from "../../../utility/string_utility";
 import { deref_C0Value, c0_value_cvt2_js_string } from "../../../utility/c0_value_utility";

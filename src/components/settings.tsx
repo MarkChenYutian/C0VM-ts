@@ -7,7 +7,7 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
     render() {
         return <Modal
                 title={<h3 style={{margin: "0"}}><FontAwesomeIcon icon={faGear}/> Settings</h3>}
-                open ={this.props.state.settingMenuOn}
+                open ={this.props.app_state.settingMenuOn}
                 closable={false}
                 centered
                 footer  ={[
@@ -23,7 +23,7 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
                 <Switch
                     size="small"
                     style={{justifySelf: "right"}} 
-                    defaultChecked={this.props.state.CompilerFlags['d']}
+                    defaultChecked={this.props.app_state.CompilerFlags['d']}
                     onChange={() => {
                     this.props.set_app_state((state) => {
                         return {CompilerFlags: {...state.CompilerFlags,
@@ -33,7 +33,7 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
                 }}/>
 
                 <p>Expose Bytecode</p>
-                <Switch size="small" style={{justifySelf: "right"}} defaultChecked={!this.props.state.c0_only} onChange={() => {this.props.set_app_state((state) => {return {c0_only: !state.c0_only}})}}/>
+                <Switch size="small" style={{justifySelf: "right"}} defaultChecked={!this.props.app_state.c0_only} onChange={() => {this.props.set_app_state((state) => {return {c0_only: !state.c0_only}})}}/>
 
                 <p>AutoStep Speed</p>
                 <Select
@@ -63,30 +63,3 @@ export default class SettingPopup extends React.Component<SettingMenuProps> {
     }
 }
 
-
-// Update: According to iliano, the advanced settings should not be exposed to students
-// class AdvancedSetting extends React.Component<
-//     SettingMenuProps,
-//     {expand: boolean}
-// > {
-//     constructor(props: SettingMenuProps){
-//         super(props);
-//         this.state = {expand: false};
-//     }
-//     render(): React.ReactNode {
-//         if (this.state.expand) {
-//             return <>
-//             <h3 onClick={() => {this.setState({expand: false})}} className="dbg-entire-row">
-//                 <FontAwesomeIcon icon={faAngleDown}/> Advanced Settings
-//             </h3>
-//             <p>Debug Mode</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG} onChange={() => {DEBUG = !DEBUG}}/>
-//             <p>Debug - Dump Step</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_STEP} onChange={() => {DEBUG_DUMP_STEP = !DEBUG_DUMP_STEP}}/>
-//             <p>Debug - Dump Heap</p> <Switch size="small" style={{justifySelf: "right"}} defaultChecked={DEBUG_DUMP_MEM} onChange={() => {DEBUG_DUMP_MEM = !DEBUG_DUMP_MEM}}/>
-//             </>;
-//         } else {
-//             return <h3 onClick={() => {this.setState({expand: true})}}>
-//                 <FontAwesomeIcon icon={faAngleRight}/> Advanced Settings
-//             </h3>;
-//         }
-//     }
-// }

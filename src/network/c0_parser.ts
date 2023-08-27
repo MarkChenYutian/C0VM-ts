@@ -21,7 +21,11 @@ function extract_library(code: string) {
 function extract_all_libraries(editors: C0EditorTab[]): Set<string>{
     const libraries = [];
     for (const editor of editors){
-        libraries.push(...extract_library(editor.content));
+        if (typeof editor.content !== "string" && editor.ref_content !== undefined) {
+            libraries.push(...extract_library(editor.ref_content));
+        } else if (typeof editor.content === "string") {
+            libraries.push(...extract_library(editor.content));
+        }
     }
     return new Set(libraries);
 }
@@ -167,7 +171,14 @@ function extract_all_structs(editors: C0EditorTab[]): Map<string, Struct_Type_Re
     const typedefs = extract_all_typedef(editors)[0];
 
     for (const editor of editors){
-        const new_structs = extract_struct(editor.content, typedefs);
+        let new_structs;
+        if (typeof editor.content !== "string" && editor.ref_content !== undefined) {
+            new_structs = extract_struct(editor.ref_content, typedefs);
+        } else if (typeof editor.content === "string") {
+            new_structs = extract_struct(editor.content, typedefs);
+        }
+        if (new_structs === undefined) continue;
+
         all_structs = new Map([...Array.from(all_structs), ...Array.from(new_structs)]);
     }
     return all_structs;
@@ -254,7 +265,16 @@ export function extract_all_typedef(editors: C0EditorTab[]): [Map<AliasType, Sou
     const rawTypedefs: TypeDefInfo[] = [];
     const functionTypes = [];
     for (const editor of editors) {
-        const [typedef, functype] = extract_typedef(editor.content)
+        let typedef, functype;
+        if (typeof editor.content !== "string" && editor.ref_content !== undefined) {
+            [typedef, functype] = extract_typedef(editor.ref_content);
+        } else if (typeof editor.content === "string") {
+            [typedef, functype] = extract_typedef(editor.content);
+        }
+        if (typedef === undefined || functype === undefined) {
+            continue;
+        }
+
         rawTypedefs.push(...typedef);
         functionTypes.push(...Array.from(functype));
     }

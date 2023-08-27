@@ -1,5 +1,5 @@
 import React from "react";
-import { Handle, NodeProps, Position } from "react-flow-renderer";
+import { Handle, NodeProps, Position } from "reactflow";
 import { Type2String } from "../../../utility/c0_type_utility";
 import { deref_C0Value } from "../../../utility/c0_value_utility";
 import { isNullPtr } from "../../../utility/pointer_utility";

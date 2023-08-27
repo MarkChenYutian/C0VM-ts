@@ -29,7 +29,7 @@ export default class C0VM_RuntimeState implements C0VM_RT{
         this.c0_source = C0Source;
         this.raw_code  = rawByteCode;
         this.typedef   = typedef
-        this.code      = parse(rawByteCode, C0Source, this.typedef);
+        this.code      = parse(rawByteCode, this.typedef);
         this.heap_size = heapSize;
         this.allocator = createHeap(VM_Memory, heapSize);
         this.step_cnt  = 0;

@@ -1,4 +1,4 @@
-import ReactFlow, { Controls, Background, applyNodeChanges, NodeChange, Node, MarkerType, Edge } from "react-flow-renderer";
+import ReactFlow, { Controls, Background, applyNodeChanges, NodeChange, Node, MarkerType, Edge } from "reactflow";
 import React, { useEffect, useCallback, useState } from "react";
 import { build_nodes, merge_nodes } from "./graphical_component/graph_builder";
 

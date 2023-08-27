@@ -1,17 +1,18 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 
 import './index.css';
 import './application.css';
 import './embeddable.css';
 import 'antd/dist/reset.css'
+import 'reactflow/dist/style.css';
 import { ConfigProvider } from 'antd';
 
 import C0VMApplication from './application';
 import AntdEmitter from './utility/antd_emitter';
 
 // Global Variables
-global.C0VM_VERSION = "1.0.4";
+global.C0VM_VERSION = "1.2.1";
 
 globalThis.DEBUG = false;
 globalThis.DEBUG_DUMP_MEM = false;
@@ -24,7 +25,7 @@ globalThis.MEM_POOL_MIN_SIZE = 0x0000_0001;
 
 globalThis.MEM_BLOCK_MAX_SIZE = 0xFFFF;
 
-globalThis.COMPILER_BACKEND_URL = "https://cs122.andrew.cmu.edu/visualc0/compile";
+globalThis.COMPILER_BACKEND_URL = "https://cs122.andrew.cmu.edu/visualc0/";
 
 globalThis.C0_MAX_RECURSION = 999;
 globalThis.C0_TIME_SLICE = 500;
@@ -40,7 +41,7 @@ const htmlRoots = document.querySelectorAll('#c0vm-root') as NodeListOf<HTMLElem
 
 htmlRoots.forEach(
   (htmlRoot) => {
-    const root = ReactDOM.createRoot(htmlRoot);
+    const root = createRoot(htmlRoot);
 
     const displayMode = htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable";
     const showStdOut  = htmlRoot.dataset["stdoutput"] === "on";

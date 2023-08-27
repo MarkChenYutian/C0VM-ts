@@ -22,10 +22,10 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                             size="large"
                             type="primary"
                             onClick={() => {
-                                this.props.setState({
+                                this.props.set_app_state({
                                     crashed: false,
                                     C0Runtime: undefined,
-                                    ActiveEditor: this.props.state.C0Editors[0].key
+                                    ActiveEditor: this.props.app_state.C0Editors[0].key
                                 });
                             }}
                         >
@@ -44,7 +44,7 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                             JSON.stringify(
                                 {
                                     Version: globalThis.C0VM_VERSION,
-                                    SourceCode: this.props.state.C0Editors,
+                                    SourceCode: this.props.app_state.C0Editors,
                                     ReactContext: this.context,
                                     GlobalState: {
                                         configuration: {
@@ -77,7 +77,7 @@ export default class AppCrashFallbackPage extends React.Component<ApplicationCra
                         size="large"
                         type="primary"
                         onClick={() => {
-                            this.props.setState({crashed: false, dbgFullScreen: false, settingMenuOn: false, C0Runtime: undefined, PrintoutValue: ""});
+                            this.props.set_app_state({crashed: false, dbgFullScreen: false, settingMenuOn: false, C0Runtime: undefined, PrintoutValue: ""});
                         }}
                     >
                         Reload Application

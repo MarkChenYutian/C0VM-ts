@@ -64,6 +64,7 @@
     "react-dom": "^18.2.0",
     "react-refresh": "^0.11.0",
     "react-scripts": "^5.0.0",
+    "reactflow": "^11.8.1",
     "resolve": "^1.20.0",
     "resolve-url-loader": "^4.0.0",
     "sass-loader": "^12.3.0",
@@ -82,7 +83,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "cross-env GENERATE_SOURCEMAP=true BUILD_PATH='./build' react-scripts build",
+    "build": "cross-env GENERATE_SOURCEMAP=false BUILD_PATH='./build' react-scripts build",
     "test": "react-scripts test",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
@@ -160,10 +161,9 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.0.0",
     "@types/he": "^1.1.2",
     "cross-env": "^7.0.3",
-    "javascript-obfuscator": "^4.0.0",
-    "react-flow-renderer": "^10.3.8",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "javascript-obfuscator": "^4.0.0"
   }
 }

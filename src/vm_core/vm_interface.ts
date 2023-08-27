@@ -1,4 +1,4 @@
-import { replacer } from "../utility/ui_utility";
+import { replacer, stdout } from "../utility/ui_utility";
 import C0VM_RuntimeState from "./exec/state";
 
 export async function initialize(
@@ -18,13 +18,13 @@ export async function initialize(
         }
 
         if (globalThis.DEBUG){
-            print_update(
-                "<span class='stdout-info'>[DEBUG] Parsed Information from C0 Source Code:<br>" + 
+            stdout("info", print_update)(
+                "[DEBUG] Parsed Information from C0 Source Code:<br>" + 
                 JSON.stringify(
                     { "Typedef": ns.typedef, "Struct Information": ns.state.TypeRecord, "Function Type": ns.state.FuncTypeRecord }
                     , replacer, "&nbsp;"
                 ) + 
-                "</span><br>"
+                "<br>"
             );
             console.log({
                 "Code": ns.code,
@@ -36,7 +36,7 @@ export async function initialize(
         return ns;
     } catch (e) {
         const err = e as Error;
-        print_update(`<span class="stdout-error"> Program aborted with error message: <br/>${err.message} </span>`);
+        stdout("error", print_update)(`Program aborted with error message: <br/>${err.message}`);
         globalThis.MSG_EMITTER.warn("Load Failed", "Failed to load code into C0VM");
         if(globalThis.DEBUG) console.error(e);
         return undefined;
@@ -103,7 +103,7 @@ export async function autoStep(
     if(globalThis.DEBUG) console.log('Running autostep...');
     if (signal.abort) {
         resetSig();
-        print_update("C0VM.ts: Execution aborted manually.\n");
+        stdout("error", print_update)("C0VM.ts: Execution aborted manually.\n");
         globalThis.MSG_EMITTER.warn("Execution Aborted", "Execution is aborted since the user click the 'Abort' button manually.");
         resetSig();
         resetC0Running();
@@ -192,7 +192,7 @@ export async function run(
              */
             if (signal.abort) {
                 resetSig();
-                print_update("C0VM.ts: Execution aborted manually.\n");
+                stdout("error", print_update)("C0VM.ts: Execution aborted manually.\n");
                 globalThis.MSG_EMITTER.warn("Execution Aborted", "Execution is aborted since the user click the 'Abort' button manually.");
                 resetSig();
                 return [s, false];
@@ -227,30 +227,32 @@ function getCallstack(s: C0VM_RT): string[] {
 
 function prettyPrintC0Error(e: Error, s: C0VM_RT, print_update: (s: string) => void) {
     if (s.state.CurrC0RefLine !== undefined && s.state.CurrC0RefLine[0] !== "") {
-        console.log(s.state.CurrC0RefLine);
-        print_update(`<span class="stdout-error">
-            Program aborted at ${s.state.CurrC0RefLine[0]}: Line ${s.state.CurrC0RefLine[1]}
+        stdout("error", print_update)(
+            `
+Program aborted at ${s.state.CurrC0RefLine[0]}: Line ${s.state.CurrC0RefLine[1]}
             
-            with error message:
-            ${e.message}
-            
-            Traceback:
-            ${getCallstack(s).join("\n&nbsp;↪&nbsp;")} &larr; <b><i>Error raised here!</i></b></span>`);
+with error message:
+${e.message}
+
+Traceback:
+${getCallstack(s).join("\n&nbsp;↪&nbsp;")} &larr; <b><i>Error raised here!</i></b>`
+        );
     } else if (s.state.CurrC0RefLine !== undefined && s.state.CurrC0RefLine[0] === "") {
-        print_update(`<span class="stdout-error"> 
-            Program aborted
-            
-            with error message:
-            ${e.message}
-            </span>`);
+        stdout("error", print_update)(`
+Program aborted
+    
+with error message:
+${e.message}`
+        );
     } else {
-        print_update(`<span class="stdout-error"> 
-            Program aborted
-            
-            with error message:
-            ${e.message}
-            
-            Traceback:
-            ${getCallstack(s).join("\n&nbsp;↪")} &larr; <b><i>Error raised here!</i></b></span>`);
+        stdout("error", print_update)(`
+Program aborted
+
+with error message:
+${e.message}
+
+Traceback:
+${getCallstack(s).join("\n&nbsp;↪")} &larr; <b><i>Error raised here!</i></b>
+        `)
     }
 }

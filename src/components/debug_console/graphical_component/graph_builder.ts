@@ -7,7 +7,7 @@
  * state function described in this file.
  */
 
-import { Node, Edge, MarkerType, CoordinateExtent } from "react-flow-renderer";
+import { Node, Edge, MarkerType, CoordinateExtent } from "reactflow";
 import { isPointerType, isTagPointerType, is_struct_pointer } from "../../../utility/c0_type_utility";
 import { deref_C0Value, expand_C0Array, expand_C0Struct } from "../../../utility/c0_value_utility";
 import { internal_error } from "../../../utility/errors";

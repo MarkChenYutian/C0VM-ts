@@ -5,12 +5,13 @@ import Tutorial_SetBpGif   from "../assets/tutorial_setbp.gif";
 
 import React, { useState } from "react";
 
-import { Button, Checkbox, Divider, Image, Modal, Space, Tabs, Tooltip } from "antd";
+import { Button, Checkbox, Divider, Image, Modal, Space, Tabs, Tooltip, Typography } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBoltLightning, faClockRotateLeft, faGear, faPlay, faScrewdriverWrench, faStepForward } from "@fortawesome/free-solid-svg-icons";
 import { ConfigConsumer, ConfigConsumerProps } from "antd/es/config-provider";
 
+const {Link} = Typography;
 
 const RenameEditor = 
     <>
@@ -72,10 +73,19 @@ const Breakpoint = (language: string) =>
     </>;
 
 
+const About = 
+    <>  
+        <p>Welcome to the C0 Visualizer: a remarkable tool that originated from a simple idea conceived by <Link href="https://markchenyutian.github.io/blog/">Yutian</Link> in the summer of 2022. What began as a modest concept—a webpage for running C0 source code and obtaining standard outputs on web browsers—has since evolved into a great C0 visualizer. After a year of dedicated development and continuous improvement, we proudly present a platform that not only executes C0/C1 programs but also offers a plethora of useful debugging features like memory diagram, breakpoints and auto-stepping.</p>
+        <p><Link href="https://www.cs.cmu.edu/~iliano/">Prof. Illiano</Link>, <Link href="http://www.cs.cmu.edu/~fp/">Prof. Pfenning</Link>, <Link href="https://www.cs.cmu.edu/~dilsun/">Prof. Dilsun</Link>, Many 122TAs, and some students have contributed a lot to this project by reporting bugs, brining up new feature request, and contributing codes. Without their help and contribution, I will never be able to finish this great project.</p>
+        <br/>
+        <p>If you are interested in becomming a developer / mainteiner in this project and have some basic knowledge about javascript & react, please do not hesitate to contact with Prof. Iliano!</p>
+    </>;
+
+
 function TutorialEditor(props: TutorialPanelProps & {themeColor: string | undefined}): JSX.Element {
     const [notAgain, setNotAgain] = useState<boolean>(false);
 
-    const languageName = props.state.c0_only ? "C0" : "C0/BC0";
+    const languageName = props.app_state.c0_only ? "C0" : "C0/BC0";
 
     const onCheckBoxChange = (e: CheckboxChangeEvent) => {
         setNotAgain(e.target.checked);
@@ -92,13 +102,14 @@ function TutorialEditor(props: TutorialPanelProps & {themeColor: string | undefi
         {key: "rename", label: "Rename Tabs", children: RenameEditor},
         {key: "sort", label: "Sort Tabs", children: SortEditor(languageName)},
         {key: "execute", label: "Run Program", children: Execution(languageName)},
-        {key: "breakpoint", label: "Use Breakpoint", children: Breakpoint(languageName)}
+        {key: "breakpoint", label: "Use Breakpoint", children: Breakpoint(languageName)},
+        {key: "about", label: "About", children: About}
     ]
 
     return (
     <Modal
         title={<h2>🎉 C0 Visualizer Tutorial</h2>}
-        open={props.state.tutorialOn}
+        open={props.app_state.tutorialOn}
         closable={false}
         footer={[
             <Space key="actions" size="large">

@@ -5,7 +5,7 @@ import { build_c0_ptrValue, build_c0_value, js_cvt2_c0_value, is_same_value, bui
 import { c0_assertion_error, c0_memory_error, c0_user_error, vm_error } from "../../utility/errors";
 import { build_null_ptr, isNullPtr, read_ptr, shift_ptr } from "../../utility/pointer_utility";
 import { loadString } from "../../utility/string_utility";
-import { build_tagptr, read_tagptr } from "../../utility/tag_ptr_utility";
+import { create_tagptr, read_tagptr } from "../../utility/tag_ptr_utility";
 import { create_funcPtr, read_funcPtr } from "../../utility/func_ptr_utility";
 import OpCode from "./opcode";
 
@@ -990,7 +990,7 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
                 throw new vm_error("Type unmatch: HASTAG is only expected to apply on <ptr> type.");
             }
 
-            const tag_ptr = build_tagptr(p.value, tag, allocator);
+            const tag_ptr = create_tagptr(p.value, tag, allocator);
 
             if (!TypeUtil.isUnknownType(p)) state.TagRecord.set(tag, p.type as C0Type<"ptr">);
 

@@ -2,8 +2,6 @@
 
 declare module '*.svg';
 
-type SetAppStateInput = (Pick<C0VMApplicationState, any> | C0VMApplicationState | null)
-
 /* Breakpoint representation */
 type BreakPoint = {
     line: number,       /* The line number that breakpoint is on right now */
@@ -21,8 +19,9 @@ type TypeDefInfo = {
 type C0EditorTab = {
     title  : string,            /* Title of editor tab */
     key    : number,            /* Key of editor tab */
-    content: string,            /* Content (raw string) of that tab */
+    content: string | File,     /* Content (raw string) of that tab */
     breakpoints: BreakPoint[],  /* Breakpoints attatched to that tab */
+    ref_content?: string        /* Content resolved from the object file, if succeed */
 };
 
 interface C0VMApplicationProps {
@@ -53,57 +52,11 @@ interface C0VMApplicationState {
     CompilerFlags  : Record<string, boolean>    /* Compiler Flags (-d) */
 };
 
-
-// The props that main control bar component will accept
-interface MainControlProps {
-    application_state   : C0VMApplicationState,
-    set_app_state<K extends keyof C0VMApplicationState>(
-                            state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
-                                    => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
-                                | (Pick<C0VMApplicationState, K> 
-                                | C0VMApplicationState 
-                                | null),
-                            callback?: () => void
-                        ): void,
-};
-
-
-interface TutorialPanelProps {
-    state : C0VMApplicationState,
-    set_app_state<K extends keyof C0VMApplicationState>(
-        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
-                => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
-            | (Pick<C0VMApplicationState, K> 
-            | C0VMApplicationState 
-            | null),
-        callback?: () => void
-    ): void
+interface AppStateProp {
+    app_state: C0VMApplicationState
 }
 
-
-interface CodeEditorProps {
-    app_state: C0VMApplicationState,
-    set_app_state<K extends keyof C0VMApplicationState>(
-        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
-                => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
-            | (Pick<C0VMApplicationState, K> 
-            | C0VMApplicationState 
-            | null),
-        callback?: () => void
-    ): void;
-}
-
-interface CodeEditorState {
-    mode: "c0" | "bc0";     /* Editor mode (C0 or BC0) */
-    C0_nextKey: number      /* Editor key for next tab */
-}
-
-interface C0EditorGroupProps {
-    /* currLine = [ FileName, lineNumber, isBreakPoint ] */
-    currLine     : [string, number, boolean] | undefined,   /* Current C0 line the C0VM is executing */
-
-    appState     : C0VMApplicationState,                    /* C0VM Application State */
-    selector     : JSX.Element | undefined                  /* Code editor mode selector */
+interface SetAppStateHook {
     set_app_state<K extends keyof C0VMApplicationState>(
         state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) 
                 => (Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) 
@@ -112,29 +65,60 @@ interface C0EditorGroupProps {
             | null),
             callback?: () => void
         ): void;
-    
-    set_group_state: (mode: "c0" | "bc0") => void,
+}
+
+type SetAppState = React.Dispatch<React.SetStateAction<C0VMApplicationState>>
+
+// The props that main control bar component will accept
+interface MainControlProps          extends SetAppStateHook, AppStateProp {};
+interface ApplicationCrashPageProps extends SetAppStateHook, AppStateProp {};
+interface SettingMenuProps          extends SetAppStateHook, AppStateProp {};
+interface TutorialPanelProps        extends SetAppStateHook, AppStateProp {};
+interface CodeEditorProps           extends SetAppStateHook, AppStateProp {};
+
+interface CodeEditorState {
+    mode: "c0" | "bc0";     /* Editor mode (C0 or BC0) */
+    C0_nextKey: number      /* Editor key for next tab */
+}
+
+interface C0EditorGroupProps extends AppStateProp, SetAppStateHook {
+    /* currLine = [ FileName, lineNumber, isBreakPoint ] */
+    selector     : JSX.Element | undefined                  /* Code editor mode selector */
     newPanel     : () => void,
-    removePanel  : (key: string) => void,
-    updateContent: (key: number, s: string) => void,
-    handle_import_folder: (F: RcFile, FList: RcFile[]) => void,
+    removePanel  : (key: number) => void,
+    set_group_state: (mode: "c0" | "bc0") => void,
+    set_content: (key: number, s: string) => void,
 }
 
 
-interface C0EditorProps {
+interface C0EditorProps extends SetAppStateHook, AppStateProp {
     execLine      : number,                     /* The line number C0VM is currently on (0 if not running on this C0 tab) */
-    editorValue   : string,                     /* Editor content (raw string) */
+    content       : string,                     /* Editor content (raw string) */
     editable      : boolean                     /* Is editor editable? (if false, in read-only mode) */
     breakPoints   : BreakPoint[],               /* Breakpoints attatched to this editor */
     
-    updateContent : (s: string) => void,
+    setContent    : (s: string) => void,
     setBreakPts   : (lns: BreakPoint[]) => void,
-    updateName    : (s: string) => void,
-    handle_import_folder: (F: RcFile, FList: RcFile[]) => void,
+    setTitle      : (s: string) => void,
+    setAllTabs    : (tabs: C0EditorTab[]) => void,
+    setActiveKey  : (key: number) => void
+}
+
+interface O0ViewerProps {
+    content       : File
+}
+
+interface O0ViewerState {
+    content        : File
+    is_error       : boolean
+    interface_str ?: string
+}
+
+interface C0EditorState {
+    show: boolean,
 }
 
 interface BC0EditorProps {
-    updateContent : (s: string) => void,
     editorValue   : string,
     execLine      : number,
     breakpointVal : Set<BreakPoint>,
@@ -149,11 +133,6 @@ interface TextEditorProps {
 }
 
 // The props that CompilerOption component will accept
-interface CompilerOptionPropInterface {
-    d_flag_stat: boolean;
-    flip_d_flag: () => void
-};
-
 interface C0OutputPropInterface {
     printContent: string
 };
@@ -168,8 +147,8 @@ interface DebugConsoleProps {
 
 interface DebugConsoleState {
     show: boolean,
-    mode: "Table" | "Graph" | "Detail",
     err: boolean
+    mode: "Table" | "Graph" | "Detail",
 }
 
 interface DebugConsoleInterface {
@@ -253,25 +232,6 @@ interface C0ValueNodeData {
 
 type VisData = C0StackFrameNodeData | C0StructNodeData | C0ArrayNodeData | C0PointerNodeData | C0ValueNodeData | C0TagPointerData | C0FuncPtrNodeData;
 
-interface ApplicationCrashPageProps {
-    state: C0VMApplicationState;
-    setState<K extends keyof C0VMApplicationState>(ns: Pick<C0VMApplicationState, K>): void;
-}
-
-interface ApplicationContextInterface {
-    theme: "dark" | "light"
-}
-
-interface SettingMenuProps {
-    state: C0VMApplicationState,
-    set_app_state<K extends keyof C0VMApplicationState>(
-        state: ((prevState: Readonly<C0VMApplicationState>, props: Readonly<P>) => (
-            Pick<C0VMApplicationState, K> | C0VMApplicationState | null)) | (Pick<C0VMApplicationState, K> | C0VMApplicationState | null),
-        callback?: () => void
-    ): void;
-}
-
-
 interface BreakpointExtProps {
     currBps: BreakPoint[],                  // Current breakpoints
     setBps: (ns: BreakPoint[]) => void      // Update breakpoints
@@ -279,17 +239,14 @@ interface BreakpointExtProps {
 
 type BreakpointExt = (props: BreakpointExtProps) => ((StateField<RangeSet<GutterMarker>> | Extension)[])
 
-interface ContextValue {
-    themeColor: string | undefined
-}
-
+interface ContextValue {themeColor: string | undefined}
 type AliasType = string;
 type SourceType = string;
 
 interface EditableTabProps {
     title: string,
     editor_key: string,
-    updateName: (key: string, a: string) => void
+    updateName: (key: number, a: string) => void
 }
 
 interface EditableTabState {
@@ -297,3 +254,11 @@ interface EditableTabState {
     being_edited: boolean,
     wip_title: string
 }
+
+interface FilesLoadProps extends SetAppStateHook, AppStateProp {
+    show: boolean,
+    setShow: (show: boolean) => void,
+}
+
+type ExternalFile = { path: string, content: string | undefined }
+type GeneralExternalFile = { path: string, content: string | undefined | File, ref_content?: string }
