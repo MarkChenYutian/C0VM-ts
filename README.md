@@ -33,7 +33,8 @@ Link: https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/
 
 - [ ] **Function**: Improve type inference system - allow struct on stack **[Breaking change required]**
 - [ ] **Allocator**: Implement memory allocator with garbage collection. *(Nice to have)*
-- [x] **Error Handling**: Friendly Error Message
+- [ ] **Error Msg**: Show readable error message on AADDS access out of bound.
+<!-- - [x] **Error Handling**: Friendly Error Message
 - [x] **Function**: Type Inference System during runtime
 - [x] **Function**: Show local variable’s value during runtime
 - [x] **Function**: `NativeIO::Readline`
@@ -43,7 +44,7 @@ Link: https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/
 - [x] **Type Inference**: Resolve `typedef` in C0 source code automatically
 - [x] **Function**: Support `NativeParse` functions
 - [x] **Function**: Partially support `NativeFloat` functions (`printint` and `printhex`)
-- [x] **Debugger**: Add `Details` panel in debugger options. Show all C0VM details (`V`, `S`, etc.)
+- [x] **Debugger**: Add `Details` panel in debugger options. Show all C0VM details (`V`, `S`, etc.) -->
 - [ ] **Function**: <del>Change `NativeIO::Readline` to `async` function</del>
 - [ ] **Function**: <del>Heap allocator garbage collection based on ref count</del>
 
@@ -54,7 +55,9 @@ Link: https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/
 
 - [ ] **Debugger**: Add garbage collection sign (pacman)
 - [ ] **Debugger**: Show pointer address on hover on struct component
-- [x] **Debugger**: Store break point state when user switch between BC0 and C0 mode using `toJSON` and `fromJSON` serialization methods in CodeMirror.
+- [ ] **Debugger**: When a function is called, display variable boxes for all of its local variables right away rather than incrementally (add the names as the declaration for them are executed) &rarr; CC0 will reuse variable slots, see Issue@34
+- [ ] **Debugger**: Hide the detailed structure in `o0` and `o1` file.
+<!-- - [x] **Debugger**: Store break point state when user switch between BC0 and C0 mode using `toJSON` and `fromJSON` serialization methods in CodeMirror.
 - [x] **Debugger**: Show function call stack
 - [x] **Debugger**: Show struct field value whenever possible
 - [x] **Debugger**: Show array content (elements in `arr`) whenever possible
@@ -64,7 +67,7 @@ Link: https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/
 - [x] **Debugger**: Add a button/arrow on func name collapse/expand
 - [x] **Debugger**: When array is not initialized, it’s by default an empty array (currently displayed as NULL)
 - [x] **Debugger**: Just show the function name on debug console (not `f main` as it currently shows)
-- [x] **Debugger**: Darken breakpoint column on hover
+- [x] **Debugger**: Darken breakpoint column on hover -->
 - [ ] <del>**Debugger**: Add a "step over" option?</del>
 
 </details>
@@ -72,20 +75,21 @@ Link: https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/
 <details>
 <summary><b>C0VM.ts Backend Server</b></summary>
 
-- [x] **Server**: Change the synchronous system-calls to `async`.
+<!-- - [x] **Server**: Change the synchronous system-calls to `async`.
 - [x] **Server**: Support the -d flag option
 - [x] **Server**: Documentation of Compile-code API
 - [x] **Server**: Extended Bytecode format to allow c0 - bc0 correspondence
-- [x] **Server**: Fix domain name problem
+- [x] **Server**: Fix domain name problem -->
 
 </details>
 
 <details>
 <summary><b>UI/UX Enhancements</b></summary>
 
-- [ ] **UI**: flexible grid proportion *(Nice to have)*
+- [ ] **UI**: Flexible grid proportion (editor resize)
 - [ ] **React**: Encapsulate the application using `shadowRoot` in HTML *(Nice to have)*
-- [x] **UX**: Shortcut key for Run and Step
+- [ ] **UI**: Garbage collection on graphical debug console &rarr; User click the isolated node to "collect" them.
+<!-- - [x] **UX**: Shortcut key for Run and Step
 - [x] **UX**: Auto Step - step the code with certain interval
 - [x] **UX**: Settings - allow user to set interval
 - [x] **UX**: Make it clear how to use breakpoint feature
@@ -100,17 +104,17 @@ Link: https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/
 - [x] **UI**: Right aligned variable names in stack
 - [x] **UI**: Right aligned struct field names
 - [x] **React**: Add breakpoint as a component state instead of global variable (which may lead to strange problems, sometimes toggled breakpoint does not work at all)
-- [x] **React**: Add execution line (highlight line) as component state instead of global state
+- [x] **React**: Add execution line (highlight line) as component state instead of global state -->
 
 </details>
 
 <details>
 <summary><b>Feature Enhancements</b></summary>
 
-- [x] **Feature**: Breakpoint, Step and Run
+<!-- - [x] **Feature**: Breakpoint, Step and Run
 - [x] **Feature**: Show execution position
 - [x] **Feature**: Compile Multiple Files
-- [x] **Feature**: Compile with flags
+- [x] **Feature**: Compile with flags -->
 
 </details>
 
@@ -122,13 +126,13 @@ Link: https://yutian-chen.gitbook.io/c0vm.ts-dev-documentation/
 - [ ] **Editor**: Import object file (`.o0` and `.o1` file)
 - [ ] **Editor**: Jump to the line executing *(Nice to have)*
 - [ ] **Editor**: Autocomplete for C0 Language *(Nice to have)*
-- [x] **Editor**: Import project (folder)
+<!-- - [x] **Editor**: Import project (folder)
 - [x] **Editor**: Refresh & Render problem when scrolling
 - [x] **Editor**: Syntax Highlighting (BC0)
 - [x] **Editor**: Middle comment in BC0 in another color
 - [x] **Editor**: Syntax Highlighting (C0)
 - [x] **Editor**: Multiple File Editors (Tabs?)
-- [x] **Syntax Highlighting**: Swap the syntax highlight between instruction and comment
+- [x] **Syntax Highlighting**: Swap the syntax highlight between instruction and comment -->
 - [ ] **Debug**: <del>Fix drag & drop import not working problem</del>
 - [ ] **Editor**: <del>Replace Codemirror with Monaco https://microsoft.github.io/monaco-editor/</del>
 - [ ] **Editor**: <del>Recover editor content based on `localStorage`</del>
