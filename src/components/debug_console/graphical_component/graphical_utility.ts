@@ -45,3 +45,7 @@ export function calculate_entry_height(lines: number, type: NodeTypes) {
     }
     
 }
+
+export function is_valid_var(var_name: string) {
+    return !(var_name === "_result" || var_name === "_caller" || var_name === "<Anonymous>")
+}
