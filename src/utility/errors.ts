@@ -111,6 +111,16 @@ export class bc0_format_error extends Error {
 }
 
 /**
+ * Error for empty project (source code)
+ */
+export class empty_code_error extends Error {
+    public readonly name = "EmptyCodeError";
+    constructor() {
+        super("Did not find compiled result for the project, have you compiled your source code?");
+    }
+}
+
+/**
  * General error for all other parts of the project
  */
 export class internal_error extends Error {

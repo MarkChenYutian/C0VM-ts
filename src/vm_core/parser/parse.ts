@@ -1,5 +1,5 @@
 import { String2Type, Type2String } from "../../utility/c0_type_utility";
-import { bc0_format_error, vm_error } from "../../utility/errors";
+import { bc0_format_error, vm_error, empty_code_error } from "../../utility/errors";
 import { nativeFuncLoader } from "../native/native_interface";
 
 /**
@@ -22,6 +22,8 @@ import { nativeFuncLoader } from "../native/native_interface";
 export default function parse(bytecode: string, typedef_lib: Map<string, string>): C0ByteCode {
     const lines = annotate_linenum(bytecode);   // Add line number info to each line
     const blocks = split_blocks(lines);
+
+    if (bytecode==="") throw new empty_code_error();
 
     let parser_internal_state: "header" | "int" | "string" | "funchead" | "function" = "header";
     const parsing: C0ByteCode = {
