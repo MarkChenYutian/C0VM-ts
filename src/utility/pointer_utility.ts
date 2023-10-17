@@ -44,7 +44,7 @@ export function shift_ptr(ptr: C0Pointer, offset: number): C0Pointer {
     const [address, original_offset, size] = read_ptr(ptr);
     const new_offset = original_offset + offset;
     
-        if (offset < 0 || new_offset > size || new_offset < 0) {
+        if (offset < 0 || new_offset >= size || new_offset < 0) {
             throw new c0_memory_error(
                 `Tried to perform ${offset} shift on pointer @${address}+${original_offset}. However, the allocated segment is only [${address}, ${address + size})`
             );
