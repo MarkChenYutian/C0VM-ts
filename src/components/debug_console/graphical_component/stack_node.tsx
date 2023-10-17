@@ -23,7 +23,8 @@ export default class C0StackFrameNode extends React.Component<NodeProps<C0StackF
 
         let valid_cnt = 0;
 
-        contents.push(<p className="dbg-func-name" key="func-name">{data.frame.P.name}</p>)
+        contents.push(<p className="dbg-func-name" key="func-name">{data.frame.P.name} &nbsp;
+                      {data.isActive ? <span className="active-frame">Active Frame</span> : null}</p>)
         
         for (let i = 0; i < data.frame.V.length; i ++) {
             /* Update on version 1.2.0 

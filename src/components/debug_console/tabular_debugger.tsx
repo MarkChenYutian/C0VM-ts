@@ -16,6 +16,7 @@ export default class TabularDebugEvaluation extends React.Component<
                     state={this.props.state}
                     typedef={this.props.typedef}
                     key={i}
+                    isActive={false}
                 />
             );
         }
@@ -26,6 +27,7 @@ export default class TabularDebugEvaluation extends React.Component<
                 state={this.props.state}
                 typedef={this.props.typedef}
                 key={this.props.state.CallStack.length}
+                isActive={true}
             />
         )
         return (<div className="debug-console">

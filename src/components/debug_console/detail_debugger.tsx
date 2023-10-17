@@ -15,6 +15,7 @@ export default class DetailDebugEvaluation extends React.Component<
                     mem={this.props.mem}
                     typedef={this.props.typedef}
                     key={i}
+                    isActive={false}
                 />
             );
         }
@@ -25,6 +26,7 @@ export default class DetailDebugEvaluation extends React.Component<
                 mem={this.props.mem}
                 typedef={this.props.typedef}
                 key={this.props.state.CallStack.length}
+                isActive={true}
             />
         )
         return <div className="debug-console">

@@ -70,7 +70,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator, typedef: Map<
     nodes.push({
         id: `stack-${state.CallStack.length}`,
         position: {x, y},
-        data: {frame: state.CurrFrame, mem, state, typedef, dragged: false},
+        data: {frame: state.CurrFrame, mem, state, typedef, dragged: false, isActive: true},
         type: "stackNode",
         draggable: false
     });
@@ -80,7 +80,7 @@ export function build_nodes(state: VM_State, mem: C0HeapAllocator, typedef: Map<
         nodes.push({
             id: stackNodeID(i),
             position: {x, y},
-            data: {frame: state.CallStack[i], mem, state, typedef, dragged: false},
+            data: {frame: state.CallStack[i], mem, state, typedef, dragged: false, isActive: false},
             type: "stackNode",
             draggable: false
         });

@@ -209,6 +209,15 @@ i.editor-load-hint {
     border-radius: 0.3rem;
 }
 
+.active-frame {
+    background-color: #ffc003;
+    border-radius: .3rem;
+    padding: .15rem;
+    margin-bottom: .3rem;
+    color: #333;
+    font-size: small;
+}
+
 .debug-console-box {
     flex-grow: 3;
     flex-basis: 10rem;

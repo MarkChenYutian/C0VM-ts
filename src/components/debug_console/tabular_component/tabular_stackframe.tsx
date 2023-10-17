@@ -20,6 +20,8 @@ export default class TabularStackFrame extends React.Component<
                         <FontAwesomeIcon icon={faCaretRight}/>
                     </button>
                     {this.props.frame.P.name}(...)
+                    &nbsp;
+                    {this.props.isActive ? <span className="active-frame">Active Frame</span> : null}
                 </div>
             )
         }
@@ -51,6 +53,8 @@ export default class TabularStackFrame extends React.Component<
                     <FontAwesomeIcon icon={faCaretDown} />
                 </button>
                 {this.props.frame.P.name} {var_info.length === 0 ? "(No variable to evaluate)" : ""}
+                &nbsp;
+                {this.props.isActive ? <span className="active-frame">Active Frame</span> : null}
             </div>
             {var_info}
             </>

@@ -162,6 +162,7 @@ interface TabularStackFrameProps {
     state: VM_State,
     mem: C0HeapAllocator,
     typedef: Map<string, string>,
+    isActive: boolean,
 }
 
 
@@ -177,6 +178,7 @@ interface C0StackFrameNodeData {
     frame: VM_StackFrame,
     mem: C0HeapAllocator,
     state: VM_State,
+    isActive: boolean,
     typedef: Map<string, string>,
     dragged: boolean,
 }

@@ -20,6 +20,7 @@ type HeapNode    = Node< C0ArrayNodeData | C0ValueNodeData | C0PointerNodeData |
 function getStackNodeID(id: number): StackNodeID { return `stack-${id}`; }
 function getHeapNodeID(addr: number): HeapNodeID { return `heap-${addr}`; }
 function getSourceID(cnt: number): SourceID { return `src-${cnt}`; }
+function getEdgeID(srcid: SourceID, src: StackNodeID|HeapNodeID, dst: HeapNodeID): EdgeID { return `${srcid}@${src}>${dst}`; }
 
 function createStackNodeData(
     cnt     : number,
@@ -27,12 +28,13 @@ function createStackNodeData(
     state   : VM_State,
     frame   : VM_StackFrame,
     mem     : C0HeapAllocator,
+    isActive: boolean,
     typedef : Map<SourceType, AliasType>
 ): StackNode {
     return {
         id: getStackNodeID(cnt),
         position: {x: position[0], y: position[1]},
-        data: {frame, mem, typedef, state, dragged: false},
+        data: {frame, mem, typedef, state, dragged: false, isActive},
         type: "stackNode",
         draggable: false
     };
@@ -49,13 +51,13 @@ function generateStackNodes(
     let [xCoord, yCoord] = [0, 0];
 
     const stackNodes: StackNode[] = [
-        createStackNodeData(state.CallStack.length, [xCoord, yCoord], state, state.CurrFrame, mem, typedef)
+        createStackNodeData(state.CallStack.length, [xCoord, yCoord], state, state.CurrFrame, mem, true, typedef,)
     ];
     yCoord += calculate_node_height(valid_variable_count(state.CurrFrame), "frame");
 
     for (let i = state.CallStack.length - 1; i >= 0; i --) {
         stackNodes.push(
-            createStackNodeData(i, [xCoord, yCoord], state, state.CallStack[i], mem, typedef)
+            createStackNodeData(i, [xCoord, yCoord], state, state.CallStack[i], mem, false, typedef)
         );
         yCoord += calculate_node_height(valid_variable_count(state.CallStack[i]), "frame");
     }
