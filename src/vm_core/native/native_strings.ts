@@ -220,7 +220,7 @@ export function c0_string_terminated(
 
     const str = expand_C0Array(mem, arg1 as C0Value<"ptr">);
 
-    const n = c0_cvt2_js_value(arg2);
+    const n = c0_cvt2_js_value(arg2) as number;
     for (let i = 0; i < str.length && i < n; i ++) {
         if (c0_cvt2_js_value(str[i] as C0Value<"value">) === '\0') {
             return true;

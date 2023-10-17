@@ -25,7 +25,6 @@ type C0EditorTab = {
 };
 
 interface C0VMApplicationProps {
-    displayMode    : "full-page" | "embeddable",
     showStdOut     : boolean,
     showDebug      : boolean
 }

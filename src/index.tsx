@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client';
 
 import './index.css';
 import './application.css';
-import './embeddable.css';
 import 'antd/dist/reset.css'
 import 'reactflow/dist/style.css';
 import { ConfigProvider } from 'antd';
@@ -43,14 +42,13 @@ htmlRoots.forEach(
   (htmlRoot) => {
     const root = createRoot(htmlRoot);
 
-    const displayMode = htmlRoot.dataset["mode"] === "full-page" ? "full-page" : "embeddable";
     const showStdOut  = htmlRoot.dataset["stdoutput"] === "on";
     const showDebug   = htmlRoot.dataset["debugconsole"] === "on";
     
     root.render(
       <React.StrictMode>
         <ConfigProvider theme={{token: {colorPrimary: "#3577C1"}}}>
-        <C0VMApplication displayMode={displayMode} showStdOut={showStdOut} showDebug={showDebug}/>
+        <C0VMApplication showStdOut={showStdOut} showDebug={showDebug}/>
         </ConfigProvider>
       </React.StrictMode>
     );
