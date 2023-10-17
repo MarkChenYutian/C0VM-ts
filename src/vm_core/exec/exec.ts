@@ -903,7 +903,19 @@ export function step(state: VM_State, allocator: C0HeapAllocator, UIHooks: React
             }
 
             const elem_size = allocator.deref(a.value).getUint32(0);
-            const elem_ptr = shift_ptr(a.value, 4 + elem_size * i.value.getUint32(0));
+            let elem_ptr;
+            try {
+                elem_ptr = shift_ptr(a.value, 4 + elem_size * i.value.getUint32(0));    
+            } catch (error) {
+                /**
+                 * New in v1.2.2, wrap around the shift_ptr function to provide more user-friendly
+                 * error message.
+                 */
+                const [, offset, block_size] = read_ptr(a.value);
+                const index = i.value.getUint32(0);
+                const length = (block_size - 4 - offset) / elem_size;
+                throw new c0_memory_error(`Array index out-of-bound. Try to access index ${index} in array with length ${length}`);
+            }
 
             if (TypeUtil.isUnknownType(a)){
                 state.CurrFrame.S.push(

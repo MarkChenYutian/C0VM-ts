@@ -37,7 +37,7 @@ export async function initialize(
     } catch (e) {
         const err = e as Error;
         stdout("error", print_update)(`Program aborted with error message: <br/>${err.message}`);
-        globalThis.MSG_EMITTER.warn("Load Failed", "Failed to load code into C0VM");
+        globalThis.MSG_EMITTER.err("Failed to Start Visualizer", `${err.message}`);
         if(globalThis.DEBUG) console.error(e);
         return undefined;
     }
