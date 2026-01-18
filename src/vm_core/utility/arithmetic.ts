@@ -85,12 +85,12 @@ export function c_mul(x: DataView, y: DataView, Issue_Handler: MessageEmitter): 
  * @param y The first 4 bytes of `y` will be interpreted as an i32
  * @returns A dataview with length 4 that stores `x / y`, following C's overflow behavior with `-fwrap` flag on gcc.
  * @throws `vm_error` when `x` or `y` have a length < 4
- * @throws `c0_arith_error` when `y == 0` or `x = INT_MIN && y = 0`.
+ * @throws `c0_arith_error` when `y == 0` or `x == INT_MIN && y == -1`.
  */
 export function c_div(x: DataView, y: DataView): DataView {
     const x_i32 = read_i32_with_check(x);
     const y_i32 = read_i32_with_check(y);
-    if (y_i32 === 0 || (x_i32 === 0x8000_0000 && y_i32 === -1)) {
+    if (y_i32 === 0 || (x_i32 === -2147483648 && y_i32 === -1)) {
         throw new c0_arith_error("Divide by zero.");
     }
     const res = new DataView(new ArrayBuffer(4));
@@ -104,12 +104,12 @@ export function c_div(x: DataView, y: DataView): DataView {
  * @param y The first 4 bytes of `y` will be interpreted as an i32
  * @returns A dataview with length 4 that stores `x % y`, following C's overflow behavior with `-fwrap` flag on gcc.
  * @throws `vm_error` when `x` or `y` have a length < 4
- * @throws `c0_arith_error` when `y == 0` or `x = INT_MIN && y = 0`.
+ * @throws `c0_arith_error` when `y == 0` or `x == INT_MIN && y == -1`.
  */
  export function c_rem(x: DataView, y: DataView): DataView {
     const x_i32 = read_i32_with_check(x);
     const y_i32 = read_i32_with_check(y);
-    if (y_i32 === 0 || (x_i32 === 0x8000_0000 && y_i32 === -1)) {
+    if (y_i32 === 0 || (x_i32 === -2147483648 && y_i32 === -1)) {
         throw new c0_arith_error("Divide by zero.");
     }
     const res = new DataView(new ArrayBuffer(4));
@@ -198,3 +198,4 @@ export function c_xor(x: DataView, y: DataView): DataView {
     );
     return res;
 }
+
